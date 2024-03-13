@@ -14,3 +14,19 @@ spectre-host, the principal back-end component of the SPECTRE program, is a CLI 
 
 Currently being developed on Ubuntu 22.04.3, spectre-host may also function on other Linux distributions and Ubuntu versions. While striving for broad compatibility, optimal performance and full functionality are only assured for the specified operating system.
 
+## Features
+...
+
+## Installation
+...
+
+## Usage
+...
+
+## Contributing
+...
+
+## Improvements to Come
+...
+
+
