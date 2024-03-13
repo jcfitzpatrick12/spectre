@@ -21,7 +21,11 @@ Currently being developed on Ubuntu 22.04.3, spectre-host may also function on o
 ...
 
 ## Usage
-...
+1. Build the image from the Dockerfile:
+```docker build -t spectre-host .```  
+2. Run the container:
+```bash run.sh```
+3. Follow the in-terminal instructions.
 
 ## Contributing
 ...
