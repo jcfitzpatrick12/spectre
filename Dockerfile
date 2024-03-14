@@ -27,7 +27,6 @@ RUN apt-get update -y && \
     # expect is used while installing the RSP API (auto accepts licence agreement etc.)
     expect=5.45.4-2build1 \
     git=1:2.34.1-1ubuntu1.10 \
-    # swig=4.0.2-1ubuntu1 \
     # cmake is required for installing OOT modules for gnuradio
     cmake=3.22.1-1ubuntu1.22.04.2 \
     gnuradio=3.10.1.1-2  \
@@ -41,7 +40,7 @@ RUN apt-get update -y && \
     libcanberra-gtk-module=0.30-10ubuntu1.22.04.1 \
     libcanberra-gtk3-module=0.30-10ubuntu1.22.04.1 \
     # dbus x11 stops a warning when "opening from file" in gnuradio
-    dbus-x11 \
+    dbus-x11=1.12.20-2ubuntu4.1 \
     vim && rm -rf /var/lib/apt/lists/*
 
 # download the SDRplay RSP API (fixed version as of 13th March 2024)
