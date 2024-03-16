@@ -43,31 +43,38 @@ RUN apt-get update -y && \
     dbus-x11=1.12.20-2ubuntu4.1 \
     vim && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /tmp
+
 # download the SDRplay RSP API (fixed version as of 13th March 2024)
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.14.0.run
 # Copy expect script into image [this will run the API .run and auto accepts any interactive dialogue]
-COPY ./scripts/install_RSP_API.sh tmp/install_RSP_API.sh
-RUN chmod +x /tmp/install_RSP_API.sh && \
-	/tmp/install_RSP_API.sh  && rm tmp/install_RSP_API.sh
+COPY ./scripts/install_RSP_API.sh /install_RSP_API.sh
+RUN chmod +x /install_RSP_API.sh && \
+	/install_RSP_API.sh  && rm /install_RSP_API.sh
+# delete the API run file after installation
+RUN rm SDRplay_RSP_API-Linux-3.14.0.run
 
 # Now copy the script which will install fventuri's gr-sdrplay3 OOT module
-COPY ./scripts/install_gr_sdrplay3.sh /tmp/install_gr_sdrplay3.sh
-RUN chmod +x /tmp/install_gr_sdrplay3.sh && \ 
-    /tmp/install_gr_sdrplay3.sh && rm /tmp/install_gr_sdrplay3.sh
+COPY ./scripts/install_gr_sdrplay3.sh /install_gr_sdrplay3.sh
+RUN chmod +x /install_gr_sdrplay3.sh && \ 
+    /install_gr_sdrplay3.sh && rm /install_gr_sdrplay3.sh
     
 # own fix see https://sdrplayusers.net/forums/topic/problem-sdrplay-with-gnu-radio-3-10-1-installed-via-ubuntu-22-04/
-COPY ./scripts/file_fix.sh /tmp/file_fix.sh
-RUN chmod +x /tmp/file_fix.sh && \
-    /tmp/file_fix.sh && rm /tmp/file_fix.sh
+COPY ./scripts/file_fix.sh /file_fix.sh
+RUN chmod +x /file_fix.sh && \
+    /file_fix.sh && rm /file_fix.sh
 
 
 WORKDIR /home
+
 # now clone the spectre-host repository
 RUN git clone https://github.com/jcfitzpatrick12/spectre-host.git && \
     cd spectre-host && \
     pip install -r requirements.txt
 
-COPY ./scripts/startup.sh /startup.sh
-RUN chmod +x /startup.sh
+COPY ./scripts/startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
 
-ENTRYPOINT ["/startup.sh"]
+WORKDIR /home/spectre-host
+
+ENTRYPOINT ["/usr/local/bin/startup.sh"]
