@@ -63,7 +63,9 @@ RUN chmod +x /tmp/file_fix.sh && \
 
 WORKDIR /home
 # now clone the spectre-host repository
-RUN git clone https://github.com/jcfitzpatrick12/spectre-host.git
+RUN git clone https://github.com/jcfitzpatrick12/spectre-host.git && \
+    cd spectre-host && \
+    pip install -r requirements.txt
 
 COPY ./scripts/startup.sh /startup.sh
 RUN chmod +x /startup.sh
