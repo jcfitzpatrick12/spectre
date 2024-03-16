@@ -24,11 +24,7 @@ It may also work on other Linux distributions and other Ubuntu versions. However
 ...
 
 ## Usage
-1. Build the image from the Dockerfile:
-```docker build -t spectre-host .```  
-2. Run the container:
-```bash run.sh```
-3. Follow the in-terminal instructions.
+...
 
 ## Contributing
 ...
