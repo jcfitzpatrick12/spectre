@@ -8,11 +8,14 @@
 # spectre-host (in development)
 
 ## Introduction
-```spectre-host```, the principal back-end component of the SPECTRE program, is a CLI tool for the automated recording of radio spectrograms. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). Leveraging gnuradio foundations, it aims to accommodate any SDR receiver with a gnuradio source block. The tool will be delivered with a ready-made, containerized environment, emphasizing ease of installation and minimal setup requirements.
+```spectre-host```, the principal back-end component of the SPECTRE program, is a CLI tool for the automated recording of radio spectrograms. Underpinned with gnuradio, it aims to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). The tool is delivered with a ready-made, containerized environment.
 
 ## Supported Operating Systems
+This project is tested to be compatible with the following operating systems:
 
-Currently being developed on Ubuntu 22.04.3, spectre-host may also function on other Linux distributions and Ubuntu versions. While striving for broad compatibility, optimal performance and full functionality are only assured for the specified operating system.
+- Ubuntu 22.04.3
+
+It may also work on other Linux distributions and other Ubuntu versions. However, full compatibility is not guaranteed for operating systems other than the ones listed above.
 
 ## Features
 ...
@@ -21,11 +24,7 @@ Currently being developed on Ubuntu 22.04.3, spectre-host may also function on o
 ...
 
 ## Usage
-1. Build the image from the Dockerfile:
-```docker build -t spectre-host .```  
-2. Run the container:
-```bash run.sh```
-3. Follow the in-terminal instructions.
+...
 
 ## Contributing
 ...
