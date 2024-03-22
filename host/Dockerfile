@@ -15,9 +15,9 @@ ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 ENV NO_AT_BRIDGE=1
 
 #Set SPECTREHOST as the parent directory of the package
-ENV SPECTREHOSTPARENTPATH /home/host-spectre
-#add grso to the python path so we can import modules properly
-ENV PYTHONPATH "${PYTHONPATH}:/home/host-spectre"
+ENV SPECTREPARENTPATH /home/spectre
+#add spectre to the python path so we can import modules properly
+ENV PYTHONPATH "${PYTHONPATH}:/home/spectre"
 
 # Install the required packages for the installation
 # versions are most recent as of 13th of March 2024
@@ -67,18 +67,18 @@ RUN chmod +x /file_fix.sh && \
 
 WORKDIR /home
 
-# now clone the spectre-host repository
-RUN git clone https://github.com/jcfitzpatrick12/spectre-host.git && \
-    cd spectre-host && \
+# now clone the spectre repository
+RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
+    cd spectre && \
     pip install -r requirements.txt
 
 COPY ./scripts/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-WORKDIR /home/spectre-host
+WORKDIR /home/spectre
 
 # Set an alias to make the CLI tool easier to work with
-RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
+RUN echo 'alias spectre="python3 -m host"' >> ~/.bashrc
 
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
