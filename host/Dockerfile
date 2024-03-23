@@ -17,7 +17,7 @@ ENV NO_AT_BRIDGE=1
 #Set SPECTREHOST as the parent directory of the package
 ENV SPECTREPARENTPATH /home/spectre
 #add spectre to the python path so we can import modules properly
-ENV PYTHONPATH "${PYTHONPATH}:/home/spectre"
+ENV PYTHONPATH "${PYTHONPATH}:/home/spectre/host/"
 
 # Install the required packages for the installation
 # versions are most recent as of 13th of March 2024
@@ -69,16 +69,16 @@ WORKDIR /home
 
 # now clone the spectre repository
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
-    cd spectre && \
+    cd spectre/host/ && \
     pip install -r requirements.txt
 
 COPY ./scripts/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-WORKDIR /home/spectre
+WORKDIR /home/spectre/host
 
 # Set an alias to make the CLI tool easier to work with
-RUN echo 'alias spectre="python3 -m host"' >> ~/.bashrc
+RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
 
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
