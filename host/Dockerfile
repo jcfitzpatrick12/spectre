@@ -78,7 +78,7 @@ RUN chmod +x /usr/local/bin/startup.sh
 WORKDIR /home/spectre/host
 
 # Set an alias to make the CLI tool easier to work with
-RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
+RUN echo 'alias spectre="python3 -m host"' >> ~/.bashrc
 
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
