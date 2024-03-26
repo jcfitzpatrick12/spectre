@@ -4,10 +4,7 @@ import os
 from cli import __app_name__, __version__
 from cli.cfg import CONFIG
 
-from cli.cfg.CaptureConfig import CaptureConfig
-# from cli.json_config.GlobalConfig import GlobalConfig
-# from cli.capture.config.defined_params import defined_params 
-# from spectre.capture.config import action
+from spectre.capture_config.CaptureConfig import CaptureConfig
 
 app = typer.Typer()
             
@@ -27,7 +24,7 @@ def capture_config(
 
 
     try:
-        capture_config = CaptureConfig(tag)
+        capture_config = CaptureConfig(tag, CONFIG.path_to_capture_configs)
         config_dict = capture_config.load_as_dict()
         for key, value in config_dict.items():
             typer.secho(

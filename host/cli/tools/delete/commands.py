@@ -2,8 +2,10 @@ import typer
 import os
 
 from cli import __app_name__, __version__
-from cli.cfg.CaptureConfig import CaptureConfig
-from cli.utils import json_helpers 
+from cli.cfg import CONFIG
+
+from spectre.capture_config.CaptureConfig import CaptureConfig
+from spectre.utils import json_helpers 
 
 app = typer.Typer()
 
@@ -19,7 +21,7 @@ def capture_config(
         )
         raise typer.Exit(1)
     
-    capture_config = CaptureConfig(tag)
+    capture_config = CaptureConfig(tag, CONFIG.path_to_capture_configs)
     config_path = capture_config.absolute_path()
 
     if not os.path.exists(config_path):
