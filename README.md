@@ -1,7 +1,7 @@
 # SPECTRE
 
 ## Overview
-```SPECTRE``` is a program under development for the automated recording, analysis, and visualization of radio spectrograms. It consists of two primary components: ```spectre-host```, a CLI tool (with an accompanying ready-made, containerized environment) for recording radio spectrograms, and ```spectre-client```, a web-based application for viewing and analysis. This program builds upon the existing [```grso```](https://github.com/jcfitzpatrick12/grso) repository.
+```SPECTRE``` is a program under development for the automated recording, analysis, and visualization of radio spectrograms. It consists of three primary components: ```spectre-host```, a CLI tool (with an accompanying ready-made, containerized environment) for recording radio spectrograms, ```spectre-client```, a web-based application for viewing and analysis and ```spectre``` a standalone package for recording, analysing and visualising radio spectrograms. This program builds upon the existing [```grso```](https://github.com/jcfitzpatrick12/grso) repository.
 
 ---
 
