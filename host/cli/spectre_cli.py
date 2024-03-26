@@ -2,8 +2,9 @@ import typer
 from typing import Optional
 
 from cli import __app_name__, __version__
+from cli.cfg import CONFIG
 
-from cli.receivers.Receiver import Receiver
+from spectre.receivers.Receiver import Receiver
 
 from cli.tools.create.commands import app as create_app
 from cli.tools.list.commands import app as list_app
@@ -74,7 +75,7 @@ def capture(
     try:
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.capture(tag)
+        receiver.do_capture(tag, CONFIG.path_to_capture_configs)
 
     except Exception as e:
         typer.secho(

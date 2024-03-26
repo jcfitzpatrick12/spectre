@@ -2,7 +2,8 @@ import typer
 from typing import List
 
 from cli import __app_name__, __version__
-from cli.receivers.Receiver import Receiver
+from cli.cfg import CONFIG
+from spectre.receivers.Receiver import Receiver
 
 
 app = typer.Typer()
@@ -43,10 +44,10 @@ def capture_config(
     
     # # # # #save the params to file as a validated configuration file
     try:
-        # instantiate the receiver specific capture config class 
+    # # instantiate the receiver specific capture config class 
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.save_capture_config(params, tag)
+        receiver.save_capture_config(params, tag, CONFIG.path_to_capture_configs)
 
     except Exception as e:
         typer.secho(

@@ -1,16 +1,14 @@
 import os
 
-from cli.cfg import CONFIG
-from cli.utils import json_helpers
-from cli.receivers import fetch
+from spectre.utils import json_helpers
 
 class CaptureConfig:
-    def __init__(self, tag):
+    def __init__(self, tag, root_path):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')
     
         self.name = f"capture_config_{tag}"
-        self.root_path = CONFIG.path_to_capture_configs
+        self.root_path = root_path
     
 
     def load_as_dict(self):
@@ -26,6 +24,5 @@ class CaptureConfig:
     def absolute_path(self,):
         return os.path.join(self.root_path,f"{self.name}.json")
     
-    
-    # def validate_raw_dict(self, raw_dict, )
+
     

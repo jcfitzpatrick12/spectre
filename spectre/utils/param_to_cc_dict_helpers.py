@@ -1,5 +1,4 @@
-from cli.utils import json_helpers
-    
+## helper functions which convert params (input from CLI) into a validated capture config
 
 def unpack(param):
     if '=' not in param or param.startswith('=') or param.endswith('='):
@@ -23,3 +22,20 @@ def convert_types(raw_dict, template):
         except ValueError as e:
             raise ValueError(f'Could not convert type for {key}. Received: {string_value} but expected {dynamic_type}.')
     return config_dict
+
+
+def validate_keys(raw_dict, template):
+    # self.get_template(mode).keys()
+    template_keys = set(template.keys())
+    raw_dict_keys = set(raw_dict.keys())
+
+    missing_keys = template_keys - raw_dict_keys
+    invalid_keys = raw_dict_keys - template_keys
+
+    if missing_keys or invalid_keys:
+        errors = []
+        if missing_keys:
+            errors.append(f"Missing keys: {', '.join(missing_keys)}. Pass in the missing keys via --param [KEY]=[VALUE].")
+        if invalid_keys:
+            errors.append(f"Invalid keys: {', '.join(invalid_keys)}.")
+        raise KeyError("Key errors found! " + " ".join(errors))
