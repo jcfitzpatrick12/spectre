@@ -75,7 +75,7 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
 COPY ./scripts/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-WORKDIR /home/spectre/host
+WORKDIR /home/spectre/
 
 # Set an alias to make the CLI tool easier to work with
 RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
