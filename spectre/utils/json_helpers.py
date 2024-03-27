@@ -1,5 +1,7 @@
 import json
 import os
+import importlib
+import pkgutil 
 
 
 def print_config(config_dict):
@@ -36,15 +38,15 @@ def doublecheck_overwrite_at_path(fpath):
             proceed_with_overwrite = False
 
 
-def save_dict_as_json(data_dict: dict, name: str, root_path: str, **kwargs) -> None:
+def save_dict_as_json(data_dict: dict, name: str, dir_path: str, **kwargs) -> None:
     """
     """
     doublecheck_overwrite = kwargs.get('doublecheck_overwrite', True)
 
-    if not os.path.exists(root_path):
-        raise FileNotFoundError(f"The root path '{root_path}' does not exist.")
+    if not os.path.exists(dir_path):
+        raise NotADirectoryError(f"The directory '{dir_path}' does not exist.")
 
-    fpath = os.path.join(root_path, f"{name}.json")
+    fpath = os.path.join(dir_path, f"{name}.json")
 
     if os.path.exists(fpath) and doublecheck_overwrite:
         doublecheck_overwrite_at_path(fpath)
@@ -59,14 +61,15 @@ def save_dict_as_json(data_dict: dict, name: str, root_path: str, **kwargs) -> N
 
 
 
-def load_json_as_dict(name: str, root_path: str) -> dict:
+def load_json_as_dict(name: str, dir_path: str) -> dict:
     """
 
     """
-    if not os.path.exists(root_path):
-        raise FileNotFoundError(f"The root path {root_path} does not exist.")
+    if not os.path.exists(dir_path):
+        # change this to a IsNotDirectory error
+        raise NotADirectoryError(f"The directory {dir_path} does not exist.")
     
-    fpath = os.path.join(root_path, f"{name}.json")
+    fpath = os.path.join(dir_path, f"{name}.json")
 
     try:
         with open(fpath, 'r') as json_file:
