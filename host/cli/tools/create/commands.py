@@ -47,7 +47,7 @@ def capture_config(
     # # instantiate the receiver specific capture config class 
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.save_capture_config(params, tag, CONFIG.path_to_capture_configs)
+        receiver.save_params_as_capture_config(params, tag, CONFIG.path_to_capture_configs)
 
     except Exception as e:
         typer.secho(
