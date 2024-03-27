@@ -1,3 +1,6 @@
-def main():
-    print("Dummy sweeping capture.")
+from spectre.utils import json_helpers
+
+def main(capture_config_dict):
+    print("Dummy sweeping capture using capture config:\n")
+    json_helpers.print_config(capture_config_dict)
     return 

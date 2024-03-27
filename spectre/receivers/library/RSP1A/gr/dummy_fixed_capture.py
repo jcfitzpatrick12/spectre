@@ -1,3 +1,6 @@
+from spectre.utils import json_helpers
+
 def main(capture_config_dict):
-    print("Dummy fixed capture.")
+    print("Dummy fixed capture using capture config:\n")
+    json_helpers.print_config(capture_config_dict)
     return 
