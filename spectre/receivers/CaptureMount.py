@@ -8,12 +8,13 @@ class CaptureMount(ABC):
 
 
     @abstractmethod
-    def set_capture_modes(self,):
+    def set_capture_modes(self) -> None:
         pass
 
 
-    def start(self, mode, capture_config, **kwargs):
+    def start(self, mode: str, capture_config: dict, **kwargs) -> None:
         capture_method = self.capture_modes.get(mode)
         if capture_method is None:
             raise ValueError(f"Invalid mode '{mode}'. Valid modes are: {self.valid_modes}")
         capture_method(capture_config, **kwargs)
+        return

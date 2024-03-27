@@ -9,17 +9,17 @@ class Capture(CaptureMount):
         super().__init__()
 
 
-    def set_capture_modes(self,):
+    def set_capture_modes(self) -> None:
         self.capture_modes = {
             "fixed": self.fixed,
             "sweeping": self.sweeping
         }
 
 
-    def fixed(self, capture_config):
+    def fixed(self, capture_config: dict) -> None:
         dummy_fixed_capture.main(capture_config)
 
 
-    def sweeping(self, capture_config):
+    def sweeping(self, capture_config: dict) -> None:
         dummy_sweeping_capture.main(capture_config)
 

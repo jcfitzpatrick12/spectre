@@ -19,14 +19,14 @@ class Receiver:
             raise KeyError(f"Mismatch for defined valid modes between CaptureConfig and Capture mounts. Check the keys.")
 
 
-    def set_mode(self, mode):
+    def set_mode(self, mode: str) -> None:
         if mode not in self.capture_config.valid_modes:
             raise ValueError(f'{mode} is not a defined mode for the receiver: {self.receiver_name}. Need one of {self.capture_config.valid_modes}')
         self.mode = mode
         return
 
 
-    def save_capture_config(self, capture_config_as_dict, tag, path_to_capture_configs):
+    def save_capture_config(self, capture_config_as_dict: dict, tag: str, path_to_capture_configs: str) -> None:
         # validate according to receiver-specific constraints
         self.capture_config.validate(capture_config_as_dict, self.mode)
 
@@ -42,7 +42,7 @@ class Receiver:
 
 
     # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
-    def save_params_as_capture_config(self, params, tag, path_to_capture_configs):
+    def save_params_as_capture_config(self, params: list, tag: str, path_to_capture_configs:str) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # convert the user defined params to a raw_dict [key=string_value]
@@ -57,7 +57,7 @@ class Receiver:
         return  
 
     
-    def do_capture(self, tag, path_to_capture_configs):
+    def do_capture(self, tag: str, path_to_capture_configs: str) -> None:
         # first check if the current mode is valid.
         if self.mode not in self.capture_config.valid_modes:
             raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.capture_config.valid_modes}.')

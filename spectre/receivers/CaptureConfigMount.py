@@ -21,16 +21,16 @@ class CaptureConfigMount(ABC):
         pass
 
 
-    def validate(self, capture_config, mode):
+    def validate(self, capture_config: dict, mode: str):
         validator = self.get_validator(mode)
         validator(capture_config)
 
 
-    def get_validator(self, mode):
+    def get_validator(self, mode: str):
         return self.validators[mode]
     
 
-    def get_template(self, mode):
+    def get_template(self, mode: str) -> dict:
         return self.templates[mode]
     
 

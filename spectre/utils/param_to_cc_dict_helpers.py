@@ -1,19 +1,19 @@
 ## helper functions which convert params (input from CLI) into a validated capture config
 
-def unpack(param):
+def unpack(param: str) -> tuple:
     if '=' not in param or param.startswith('=') or param.endswith('='):
         raise ValueError(f'Invalid format: "{param}". Expected "KEY=VALUE".')
     return tuple(map(str.strip, param.split('=', 1)))
 
 
-def params_to_raw_dict(params):
+def params_to_raw_dict(params: list) -> dict:
     # unpack the config dict. Everything is string! The types are specified in the base_template configs
     raw_dict = {k: v for k, v in (unpack(param) for param in params)}
     # template = fetch.fetch_capture_config_template(re)
     return raw_dict
 
 
-def convert_types(raw_dict, template):
+def convert_types(raw_dict: dict, template: dict) -> dict:
     config_dict = {}
     for key, string_value in raw_dict.items():          
         dynamic_type = template[key]
@@ -24,7 +24,7 @@ def convert_types(raw_dict, template):
     return config_dict
 
 
-def validate_keys(raw_dict, template):
+def validate_keys(raw_dict: dict, template: dict) -> None:
     # self.get_template(mode).keys()
     template_keys = set(template.keys())
     raw_dict_keys = set(raw_dict.keys())

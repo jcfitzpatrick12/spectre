@@ -4,13 +4,13 @@ import importlib
 import pkgutil 
 
 
-def print_config(config_dict):
+def print_config(config_dict: str) -> None:
     for key, value in config_dict.items():
         print(f"{key}: {value}")
-    pass
+    return
 
 
-def doublecheck_delete(fpath):
+def doublecheck_delete(fpath: str) -> None:
     proceed_with_delete = False
     while not proceed_with_delete:
         user_input = input(f"Are you sure you would like to delete '{fpath}'? [y/n]: ").strip().lower()
@@ -24,7 +24,7 @@ def doublecheck_delete(fpath):
             proceed_with_delete = False
 
 
-def doublecheck_overwrite_at_path(fpath):
+def doublecheck_overwrite_at_path(fpath: str) -> None:
     proceed_with_overwrite = False
     while not proceed_with_overwrite:
         user_input = input(f"The file '{fpath}' already exists. Overwrite? [y/n]: ").strip().lower()

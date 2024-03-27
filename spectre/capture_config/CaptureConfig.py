@@ -3,7 +3,7 @@ import os
 from spectre.utils import json_helpers
 
 class CaptureConfig:
-    def __init__(self, tag, dir_path):
+    def __init__(self, tag: str, dir_path: str):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')
     
@@ -11,17 +11,17 @@ class CaptureConfig:
         self.dir_path = dir_path
     
 
-    def load_as_dict(self):
+    def load_as_dict(self) -> dict:
         json_as_dict = json_helpers.load_json_as_dict(self.name, self.dir_path)
         return json_as_dict
     
 
-    def save_dict_as_json(self, config_dict, **kwargs):
+    def save_dict_as_json(self, config_dict: dict, **kwargs) -> None:
         doublecheck_overwrite = kwargs.get("doublecheck_overwrite", True)
         json_helpers.save_dict_as_json(config_dict, self.name, self.dir_path, doublecheck_overwrite=doublecheck_overwrite)
 
 
-    def absolute_path(self,):
+    def absolute_path(self) -> str:
         return os.path.join(self.dir_path,f"{self.name}.json")
     
 
