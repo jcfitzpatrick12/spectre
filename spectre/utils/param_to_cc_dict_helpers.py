@@ -16,7 +16,9 @@ def params_to_raw_dict(params: list) -> dict:
 def convert_types(raw_dict: dict, template: dict) -> dict:
     config_dict = {}
     for key, string_value in raw_dict.items():          
-        dynamic_type = template[key]
+        dynamic_type = template.get(key)
+        if dynamic_type is None:
+            raise ValueError(f"Dynamic type must be specified in the template. Received: {dynamic_type}.")
         try:
             config_dict[key] = dynamic_type(string_value)
         except ValueError as e:
