@@ -13,7 +13,7 @@ class Receiver:
         self.receiver_name = receiver_name 
         self.mode = None # must be set manually for instances of this class
         self.capture_config = get_capture_config_mount(receiver_name) # receiver specific mounting class
-        self.capture = get_capture_mount(receiver_name) # receiver specific mounting
+        self.capture = get_capture_mount(receiver_name) # receiver specific mounting class
 
         if self.capture_config.valid_modes != self.capture.valid_modes:
             raise KeyError(f"Mismatch for defined valid modes between CaptureConfig and Capture mounts. Check the keys.")
