@@ -1,11 +1,6 @@
 from spectre.utils import json_helpers, param_to_cc_dict_helpers
 from spectre.capture_config.CaptureConfig import CaptureConfig
 
-# it is important to import the receivers library
-# since the decorators only take effect on import
-# importing will mean the mount maps will be populated as intended
-import spectre.receivers.library
-
 from spectre.receivers.get_mount import get_capture_config_mount, get_capture_mount
 
 class Receiver:
