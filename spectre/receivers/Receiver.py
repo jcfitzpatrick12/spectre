@@ -13,10 +13,12 @@ class Receiver:
         if self.capture_config.valid_modes != self.capture.valid_modes:
             raise KeyError(f"Mismatch for defined valid modes between CaptureConfig and Capture mounts. Check the keys.")
 
+        # after verifying that both mounts have the same modes specified, we can safely define valid modes
+        self.valid_modes = self.capture_config.valid_modes
 
     def set_mode(self, mode: str) -> None:
-        if mode not in self.capture_config.valid_modes:
-            raise ValueError(f'{mode} is not a defined mode for the receiver: {self.receiver_name}. Need one of {self.capture_config.valid_modes}')
+        if mode not in self.valid_modes:
+            raise ValueError(f'{mode} is not a defined mode for the receiver: {self.receiver_name}. Need one of {self.valid_modes}')
         self.mode = mode
         return
 
@@ -37,7 +39,7 @@ class Receiver:
 
 
     # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
-    def save_params_as_capture_config(self, params: list, tag: str, path_to_capture_configs:str) -> None:
+    def save_params_as_capture_config(self, params: list, tag: str, path_to_capture_configs: str) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # convert the user defined params to a raw_dict [key=string_value]
@@ -54,8 +56,8 @@ class Receiver:
     
     def do_capture(self, tag: str, path_to_capture_configs: str) -> None:
         # first check if the current mode is valid.
-        if self.mode not in self.capture_config.valid_modes:
-            raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.capture_config.valid_modes}.')
+        if self.mode not in self.valid_modes:
+            raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
         
         # then load the requested capture config
         capture_config = CaptureConfig(tag, path_to_capture_configs)
