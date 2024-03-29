@@ -56,6 +56,6 @@ def capture_config(
         )
         raise typer.Exit(1)
 
-    typer.secho(f"The capture config for tag {tag} has been created.", fg=typer.colors.GREEN)
+    typer.secho(f"The capture config for tag \"{tag}\" has been created.", fg=typer.colors.GREEN)
     
 
