@@ -1,21 +1,26 @@
 # SPECTRE
 
 ## Overview
-```SPECTRE``` is a program under development for the automated recording, analysis, and visualization of radio spectrograms. It consists of three primary components: ```spectre-host```, a CLI tool (with an accompanying ready-made, containerized environment) for recording radio spectrograms, ```spectre-client```, a web-based application for viewing and analysis and ```spectre``` a standalone package for recording, analysing and visualising radio spectrograms. This program builds upon the existing [```grso```](https://github.com/jcfitzpatrick12/grso) repository.
+```SPECTRE``` is a program under development for the automated recording, analysis, and visualization of radio spectrograms. It consists of three primary components: 
+- ```spectre-host``` - a containerised environment for recording radio spectrograms, delivered with an accompanying CLI tool.
+- ```spectre-client``` - a web-based application for viewing and analysis.
+- ```spectre``` - a standalone Python package for recording, analysing and visualising radio spectrograms.
+
+This program is building on the existing [```grso```](https://github.com/jcfitzpatrick12/grso) repository. 
 
 ---
 
-# spectre-host (in development)
+# spectre-host
 
 ## Introduction
-```spectre-host```, the principal back-end component of the SPECTRE program, is a CLI tool for the automated recording of radio spectrograms. Underpinned with gnuradio, it aims to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). The tool is delivered with a ready-made, containerized environment.
+```spectre-host``` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated recording of radio spectrograms. Underpinned with gnuradio, it aims to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). The tool is delivered with an accompanying CLI tool.
 
 ## Supported Operating Systems
 This project is tested to be compatible with the following operating systems:
 
 - Ubuntu 22.04.3
 
-It may also work on other Linux distributions and other Ubuntu versions. However, full compatibility is not guaranteed for operating systems other than the ones listed above.
+It may also work on other Linux distributions and other Ubuntu versions. Support for Windows is planned for the future.
 
 ## Features
 ...
