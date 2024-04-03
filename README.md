@@ -1,7 +1,7 @@
 # SPECTRE
 
 ## Overview
-```SPECTRE``` is a program under development for the automated recording, analysis, and visualization of radio spectrograms. It consists of three primary components: 
+```SPECTRE``` is a program under development for the automated recording, analysis, and visualisation of radio spectrograms. It consists of three primary components: 
 - ```spectre-host``` - a containerised environment for recording radio spectrograms, delivered with an accompanying CLI tool.
 - ```spectre-client``` - a web-based application for viewing and analysis.
 - ```spectre``` - a standalone Python package for recording, analysing and visualising radio spectrograms.
