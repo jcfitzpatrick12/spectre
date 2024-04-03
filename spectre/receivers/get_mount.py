@@ -1,5 +1,6 @@
 # it is important to import the receivers library
 # since the decorators only take effect on import
+# this import will run the __init__.py within library, which will dynamically import all the receivers
 import spectre.receivers.library
 # after we decorate all the mounts, we can import the receiver -> mount mapsw
 from spectre.receivers.mount_register import capture_config_mounts, capture_mounts
