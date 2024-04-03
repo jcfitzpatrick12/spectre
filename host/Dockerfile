@@ -58,6 +58,11 @@ RUN rm SDRplay_RSP_API-Linux-3.14.0.run
 COPY ./scripts/install_gr_sdrplay3.sh /install_gr_sdrplay3.sh
 RUN chmod +x /install_gr_sdrplay3.sh && \ 
     /install_gr_sdrplay3.sh && rm /install_gr_sdrplay3.sh
+  
+# Now copy the script which will install the gr-spectre custom OOT module
+COPY ./scripts/install_gr_spectre.sh /install_gr_spectre.sh
+RUN chmod +x /install_gr_spectre.sh && \ 
+    /install_gr_spectre.sh && rm /install_gr_spectre.sh
     
 # own fix see https://sdrplayusers.net/forums/topic/problem-sdrplay-with-gnu-radio-3-10-1-installed-via-ubuntu-22-04/
 COPY ./scripts/file_fix.sh /file_fix.sh
