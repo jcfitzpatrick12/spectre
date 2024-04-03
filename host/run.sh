@@ -1,9 +1,10 @@
-#enable xhost (temporary during development)
-xhost +
+# Enable xhost for the local machine only, safer than 'xhost +'
+xhost local:
 
-#create a volume so that storage persists
+# Create a volume so that storage persists
 docker volume create host-spectre-vol
 
+# Run the Docker container with GUI support
 docker run --name spectre-host-container -it --rm \
     --mount type=volume,src=host-spectre-vol,target=/home \
     -v /dev/shm:/dev/shm \
@@ -11,5 +12,5 @@ docker run --name spectre-host-container -it --rm \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     spectre-host
 
-#disable xhost 
+# Reset xhost
 xhost -
