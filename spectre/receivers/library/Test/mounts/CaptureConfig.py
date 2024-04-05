@@ -15,6 +15,7 @@ class CaptureConfig(CaptureConfigMount):
                 'frequency': float,
                 'samp_rate': int,
                 'amplitude': float,
+                'data_dir': str,
             },
         }
 

@@ -78,7 +78,7 @@ class cosine_signal(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink('/home/spectre/host/data/', 'test', 5, 32000)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(capture_config['data_dir'], 'test', 5, 32000)
         self.blocks_throttle_1 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, capture_config['frequency'], capture_config['amplitude'], 0, 0)
 
