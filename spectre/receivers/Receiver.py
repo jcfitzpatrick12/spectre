@@ -1,4 +1,4 @@
-from spectre.utils import json_helpers, param_to_cc_dict_helpers
+from spectre.utils import dict_helpers, json_helpers
 from spectre.capture_config.CaptureConfig import CaptureConfig
 
 from spectre.receivers.get_mount import get_capture_config_mount, get_capture_mount
@@ -24,13 +24,18 @@ class Receiver:
 
 
     def save_capture_config(self, capture_config_as_dict: dict, tag: str, path_to_capture_configs: str) -> None:
+        # extract the capture config template for the current mode of the receiver
+        template = self.capture_config.get_template(self.mode)
+        # extract the capture config template for the current mode of the receiver
+        dict_helpers.validate_keys(capture_config_as_dict, template)
+        # validate the types according to the template
+        dict_helpers.validate_types(capture_config_as_dict, template)
         # validate according to receiver-specific constraints
         self.capture_config.validate(capture_config_as_dict, self.mode)
-
+        
         # add two extra key values to specify the mode and the receiver name for the capture config
         capture_config_as_dict['receiver'] = self.receiver_name
         capture_config_as_dict['mode'] = self.mode
-        
         # instantiate capture_config and save the newly constructed config_dict
         capture_config_instance = CaptureConfig(tag, path_to_capture_configs)
         # save to file under the requested tag
@@ -43,13 +48,13 @@ class Receiver:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # convert the user defined params to a raw_dict [key=string_value]
-        raw_dict = param_to_cc_dict_helpers.params_to_raw_dict(params)
+        string_valued_dict = dict_helpers.params_list_to_string_valued_dict(params)
         # verify the keys of the raw dict against the template
-        param_to_cc_dict_helpers.validate_keys(raw_dict, template)
+        dict_helpers.validate_keys(string_valued_dict, template)
         # convert the raw dict string values to those defined in the template
-        capture_config_as_dict = param_to_cc_dict_helpers.convert_types(raw_dict, template)  
+        capture_config_as_dict = dict_helpers.convert_types(string_valued_dict, template)  
         # and finally, save the capture_config as dict. Internally performs validations on the config as specified
-        # the capture config mount
+        # the capture config mount 
         self.save_capture_config(capture_config_as_dict, tag, path_to_capture_configs)
         return  
 
