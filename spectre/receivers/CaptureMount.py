@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from cfg import CONFIG
+
+
 
 class CaptureMount(ABC):
     def __init__(self):
@@ -12,9 +15,14 @@ class CaptureMount(ABC):
         pass
 
 
-    def start(self, mode: str, capture_config: dict, **kwargs) -> None:
+    def start(self, mode: str, capture_config: dict) -> None:
         capture_method = self.capture_methods.get(mode)
         if capture_method is None:
             raise ValueError(f"Invalid mode '{mode}'. Valid modes are: {self.valid_modes}")
-        capture_method(capture_config, **kwargs)
+        
+        with open(CONFIG.path_to_capture_log, 'w') as capture_log:
+            capture_log.write(f"1: SESSION IN PROGRESS")
+        capture_log.close()
+        
+        capture_method(capture_config)
         return
