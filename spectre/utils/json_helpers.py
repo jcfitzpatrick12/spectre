@@ -1,13 +1,5 @@
 import json
 import os
-import importlib
-import pkgutil 
-
-
-def print_config(config_dict: str) -> None:
-    for key, value in config_dict.items():
-        print(f"{key}: {value}")
-    return
 
 
 def doublecheck_delete(fpath: str) -> None:
