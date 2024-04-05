@@ -11,22 +11,21 @@ class CaptureConfig(CaptureConfigMount):
 
     def set_templates(self) -> None:
         self.templates = {
-            "fixed": {
-                'str_key': str,
-                'int_key': int,
-                'float_key': float,
-                'bool_key': bool,
+            "cosine_signal": {
+                'frequency': float,
+                'samp_rate': int,
+                'amplitude': float,
             },
         }
 
 
     def set_validators(self) -> None:
         self.validators = {
-            "fixed": self.fixed_validator,
+            "cosine_signal": self.cosine_validator,
         }
 
     
-    def fixed_validator(self, capture_config_dict: dict) -> None:
+    def cosine_validator(self, capture_config_dict: dict) -> None:
         return
 
 
