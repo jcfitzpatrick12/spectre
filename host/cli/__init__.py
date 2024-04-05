@@ -1,2 +1,2 @@
-__app_name__ = "spectre-host"
+__app_name__ = "spectre"
 __version__ = "0.1.0"
