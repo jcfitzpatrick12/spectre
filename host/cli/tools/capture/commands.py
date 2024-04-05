@@ -47,6 +47,10 @@ def start(
     
     process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
+    with open(CONFIG.path_to_capture_log, 'w') as capture_log:
+        capture_log.write(f"1: SESSION IN PROGRESS")
+    capture_log.close()
+    
     typer.secho(
             f"Capture session starting ...",
             fg=typer.colors.YELLOW,

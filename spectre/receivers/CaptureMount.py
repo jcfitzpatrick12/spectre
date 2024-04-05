@@ -19,10 +19,5 @@ class CaptureMount(ABC):
         capture_method = self.capture_methods.get(mode)
         if capture_method is None:
             raise ValueError(f"Invalid mode '{mode}'. Valid modes are: {self.valid_modes}")
-        
-        with open(CONFIG.path_to_capture_log, 'w') as capture_log:
-            capture_log.write(f"1: SESSION IN PROGRESS")
-        capture_log.close()
-        
         capture_method(capture_config)
         return
