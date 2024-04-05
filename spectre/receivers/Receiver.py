@@ -57,34 +57,30 @@ class Receiver:
         # the capture config mount 
         self.save_capture_config(capture_config_as_dict, tag, path_to_capture_configs)
         return  
-
     
-    def do_capture(self, tag: str, path_to_capture_configs: str) -> None:
+    
+    def start_capture(self, tag: str, path_to_capture_configs: str) -> None:
         # first check if the current mode is valid.
         if self.mode not in self.valid_modes:
             raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
         
         # then load the requested capture config
-        capture_config = CaptureConfig(tag, path_to_capture_configs)
-        capture_config_dict = capture_config.load_as_dict()
+        capture_config_instance = CaptureConfig(tag, path_to_capture_configs)
+        capture_config = capture_config_instance.load_as_dict()
 
 
         # check the mode of the capture config matches the current mode of the receiver.
-        capture_config_mode = capture_config_dict['mode']
+        capture_config_mode = capture_config['mode']
         if self.mode != capture_config_mode:
             raise ValueError(f'Receiver must be in the same mode as that specified in capture-config. Receiver mode: {self.mode}, capture-config mode: {capture_config_mode}')
         
         # check the requested capture config matches the current receiver.
-        receiver_in_capture_config = capture_config_dict['receiver'] 
+        receiver_in_capture_config = capture_config['receiver'] 
         if receiver_in_capture_config != self.receiver_name:
             raise ValueError(f'Capture config receiver must match the current receiver. Got {receiver_in_capture_config} and {self.receiver_name} respectively.')
-    
-        print(f"Dummy capture using receiver {self.receiver_name}\nmode: {self.mode}\n")
-        print(f"loading the capture-config for tag {tag}")
-        json_helpers.print_config(capture_config_dict)
-        print(f"\n")
 
-        self.capture.start(self.mode, capture_config_dict)
+        # start the capture session
+        self.capture.start(self.mode, capture_config)
         return
  
 
