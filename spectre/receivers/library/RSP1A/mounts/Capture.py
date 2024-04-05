@@ -1,7 +1,6 @@
 from spectre.receivers.CaptureMount import CaptureMount
 from spectre.receivers.mount_register import register_capture_mount
 
-from spectre.receivers.library.RSP1A.gr import dummy_fixed_capture, dummy_sweeping_capture
 
 @register_capture_mount("RSP1A")
 class Capture(CaptureMount):
@@ -17,9 +16,9 @@ class Capture(CaptureMount):
 
 
     def fixed(self, capture_config: dict) -> None:
-        dummy_fixed_capture.main(capture_config)
+        return
 
 
     def sweeping(self, capture_config: dict) -> None:
-        dummy_sweeping_capture.main(capture_config)
+        return
 
