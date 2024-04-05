@@ -2,7 +2,7 @@ import typer
 import os
 
 from cli import __app_name__, __version__
-from cli.cfg import CONFIG
+from cfg import CONFIG
 
 from spectre.capture_config.CaptureConfig import CaptureConfig
 from spectre.utils import json_helpers 
