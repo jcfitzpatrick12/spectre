@@ -6,13 +6,14 @@ import time
 
 from cfg import CONFIG
 
-def start_capture(receiver_name: str, mode: str, tag: str):
+def start(receiver_name: str, mode: str, tag: str):
     if is_capture_session_in_progress():
         typer.secho("A capture session is already in progress.", fg=typer.colors.RED)
         raise typer.Exit(1)
 
+    # build the command to start the capture session
     command = [
-        'python3', '/home/spectre/host/utils/start_capture.py',
+        'python3', f'{CONFIG.path_to_start_capture}',
         '--receiver', receiver_name,
         '--tag', tag,
         '--mode', mode
@@ -31,7 +32,7 @@ def start_capture(receiver_name: str, mode: str, tag: str):
     typer.secho("Capture session started in the background.", fg=typer.colors.GREEN)
 
 
-def stop_capture():
+def stop():
     pid = get_capture_pid()
     if pid is None:
         typer.secho("No active capture session found.", fg=typer.colors.RED)
@@ -44,6 +45,7 @@ def stop_capture():
     except ProcessLookupError:
         typer.secho("Failed to terminate capture session. Process may have already exited.", fg=typer.colors.RED)
         clear_capture_log()  # Ensure log is cleared even if process had already exited
+
 
 def is_capture_session_in_progress():
     status = get_session_status()
@@ -72,6 +74,7 @@ def get_capture_pid():
             content = file.read().strip()
             return int(content.split(':')[1])
     return None
+
 
 def update_capture_log(content: str):
     with open(CONFIG.path_to_capture_log, 'w') as file:

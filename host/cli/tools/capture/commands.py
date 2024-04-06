@@ -25,7 +25,8 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    capture_session.start_capture(receiver_name, mode, tag)
+    
+    capture_session.start(receiver_name, mode, tag)
 
     # tag is mandatory
     if not tag:
@@ -39,7 +40,7 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
 @app.command()
 def stop(
 ) -> None:
-    capture_session.stop_capture()
+    capture_session.stop()
 
 if __name__ == "__main__":
     app()
