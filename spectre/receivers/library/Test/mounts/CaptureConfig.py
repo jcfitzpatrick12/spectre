@@ -16,6 +16,8 @@ class CaptureConfig(CaptureConfigMount):
                 'samp_rate': int,
                 'amplitude': float,
                 'data_dir': str,
+                'chunk_size': int,
+                'data_dir': str,
             },
         }
 
