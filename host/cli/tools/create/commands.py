@@ -9,11 +9,10 @@ from spectre.receivers.Receiver import Receiver
 app = typer.Typer()
 
 @app.command()
-def capture_config(
-    tag: str = typer.Option(None, "--tag", "-t", help=""),
-    mode: str = typer.Option(None, "--mode", "-m", help=""),
-    receiver_name: str = typer.Option(None, "--receiver", "-r", help=""),
-    params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE")
+def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
+                   mode: str = typer.Option(None, "--mode", "-m", help=""),
+                   receiver_name: str = typer.Option(None, "--receiver", "-r", help=""),
+                   params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE")
 ) -> None:
     
     # tag is mandatory

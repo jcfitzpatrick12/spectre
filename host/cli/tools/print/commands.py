@@ -10,8 +10,7 @@ app = typer.Typer()
             
 
 @app.command()
-def capture_config(
-    tag: str = typer.Option(None, "--tag", "-t", help=""),
+def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
 ) -> None:
     
 
