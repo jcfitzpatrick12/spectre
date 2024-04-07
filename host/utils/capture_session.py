@@ -1,85 +1,97 @@
 import subprocess
+import json
 import os
 import signal
-import typer
 import time
+import typer
+from typing import List
 
 from cfg import CONFIG
 
-def start(receiver_name: str, mode: str, tag: str):
-    if is_capture_session_in_progress():
-        typer.secho("A capture session is already in progress.", fg=typer.colors.RED)
-        raise typer.Exit(1)
+def start(command: List[str]) -> None:
 
-    # build the command to start the capture session
-    command = [
-        'python3', f'{CONFIG.path_to_start_capture}',
-        '--receiver', receiver_name,
-        '--tag', tag,
-        '--mode', mode
-    ]
+    # start the subprocess
+    process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    # and log that the subprocess is currently running
+    log_subprocess(process.pid, '1')  # '1' indicates the process is running
 
+    typer.secho("Subprocess started. Checking status...", fg=typer.colors.BLUE)
 
-    # Starting the capture subprocess
-    capture_process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-    update_capture_log(f"1:{capture_process.pid}")
+    # Wait a bit to see if the process fails
+    time.sleep(1)
     
-    time.sleep(1)  # Wait for the subprocess to potentially fail
-    if not is_capture_session_in_progress():
-        typer.secho(f"Failed to start capture session. Check the capture log at {CONFIG.path_to_capture_log}", fg=typer.colors.RED)
+    # Check if the started process is still running
+    if not process.poll() is None:
+        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Check the log for more details.", fg=typer.colors.RED)
         raise typer.Exit(1)
-    
-    typer.secho("Capture session started in the background.", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
 
 
-def stop():
-    pid = get_capture_pid()
-    if pid is None:
-        typer.secho("No active capture session found.", fg=typer.colors.RED)
-        raise typer.Exit(1)
+def stop() -> None:
+    """
+    Stops all subprocesses listed in the log file with status '1',
+    and completely wipes the process.pid log.
+    """
+    subprocesses = read_log()
+    if not subprocesses:
+        typer.secho("No subprocesses found to stop.", fg=typer.colors.YELLOW)
+        return
 
-    try:
-        os.kill(pid, signal.SIGTERM)
-        clear_capture_log()
-        typer.secho("Capture session has been successfully terminated.", fg=typer.colors.GREEN)
-    except ProcessLookupError:
-        typer.secho("Failed to terminate capture session. Process may have already exited.", fg=typer.colors.RED)
-        clear_capture_log()  # Ensure log is cleared even if process had already exited
+    for pid, status in subprocesses.items():
+        if status == '1':
+            try:
+                os.kill(int(pid), signal.SIGTERM)
+                typer.secho(f"Subprocess with PID {pid} has been successfully terminated.", fg=typer.colors.GREEN)
+            except ProcessLookupError:
+                typer.secho(f"Failed to terminate subprocess with PID {pid}. Process may have already exited.", fg=typer.colors.RED)
 
+    # After attempting to stop all processes, wipe the log file completely
+    wipe_log()
+    typer.secho("All subprocesses have been addressed, and the log file has been cleared.", fg=typer.colors.GREEN)
 
-def is_capture_session_in_progress():
-    status = get_session_status()
-    return status == 1
-
-
-def get_session_status():
-    try:
-        with open(CONFIG.path_to_capture_log, 'r') as file:
-            content = file.read().strip()
-            if content.startswith('1'):
-                return 1
-            elif content.startswith('0'):
-                return 0
-            else:
-                return None
-            
-    except FileNotFoundError:
-        typer.secho(f"{CONFIG.path_to_capture_log} not found.", fg=typer.colors.RED)
-        return None
-
-def get_capture_pid():
-    status = get_session_status()
-    if status == 1:
-        with open(CONFIG.path_to_capture_log, 'r') as file:
-            content = file.read().strip()
-            return int(content.split(':')[1])
-    return None
-
-
-def update_capture_log(content: str):
+def wipe_log() -> None:
+    """
+    Resets the process.pid log file to contain an empty dictionary.
+    """
     with open(CONFIG.path_to_capture_log, 'w') as file:
-        file.write(content)
+        json.dump({}, file)
+
+def has_failure() -> bool:
+    """
+    Checks if any subprocess has failed.
+    """
+    subprocesses = read_log()
+    return any(status.startswith(0) for status in subprocesses.values())
 
 
-def clear_capture_log():
-    open(CONFIG.path_to_capture_log, "w").close()
+def log_subprocess(pid: int, status: str) -> None:
+    """
+    Logs subprocess PID and status to the log file.
+    """
+    subprocesses = read_log()
+    subprocesses[str(pid)] = status
+    with open(CONFIG.path_to_capture_log, 'w') as file:
+        json.dump(subprocesses, file)
+
+def read_log() -> dict:
+    """
+    Reads the subprocess log, returning a dictionary of PIDs to statuses.
+    If the file does not exist, it is created and initialized with an empty dictionary.
+    """
+    try:
+        with open(CONFIG.path_to_capture_log, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        # If the file does not exist, create it and initialize with an empty dictionary
+        typer.secho(f"{CONFIG.path_to_capture_log} not found. Creating and initializing with an empty dictionary.", fg=typer.colors.YELLOW)
+        with open(CONFIG.path_to_capture_log, 'w') as file:
+            json.dump({}, file)  # Initialize the file with an empty dictionary
+        return {}
+    except json.JSONDecodeError:
+        # If the file contains invalid JSON, warn and return an empty dictionary
+        typer.secho(f"Invalid JSON in {CONFIG.path_to_capture_log}. Initializing with an empty dictionary.", fg=typer.colors.RED)
+        with open(CONFIG.path_to_capture_log, 'w') as file:
+            json.dump({}, file)
+        return {}
+
