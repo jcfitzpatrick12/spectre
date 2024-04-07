@@ -2,3 +2,4 @@ numpy==1.24.0
 scipy==1.12.0
 typer==0.3.2
 pytest==6.2.4
+astropy==6.0.1
