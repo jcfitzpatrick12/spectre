@@ -50,12 +50,14 @@ def stop() -> None:
     wipe_log()
     typer.secho("All subprocesses have been addressed, and the log file has been cleared.", fg=typer.colors.GREEN)
 
+
 def wipe_log() -> None:
     """
     Resets the process.pid log file to contain an empty dictionary.
     """
     with open(CONFIG.path_to_capture_log, 'w') as file:
         json.dump({}, file)
+
 
 def has_failure() -> bool:
     """
@@ -73,6 +75,7 @@ def log_subprocess(pid: int, status: str) -> None:
     subprocesses[str(pid)] = status
     with open(CONFIG.path_to_capture_log, 'w') as file:
         json.dump(subprocesses, file)
+
 
 def read_log() -> dict:
     """
