@@ -1,9 +1,10 @@
 from spectre.receivers.Receiver import Receiver
 from argparse import ArgumentParser
 from cfg import CONFIG
+from host.utils import capture_session
+import os
 
-if __name__ == "__main__":
-
+def main():
     parser = ArgumentParser()
     parser.add_argument("--receiver", type=str, help="")
     parser.add_argument("--mode", type=str, help="")
@@ -18,13 +19,15 @@ if __name__ == "__main__":
     try:
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.start_capture(tag, CONFIG.path_to_capture_configs)
+        receiver.start_capture(tag, CONFIG.json_configs_dir)
 
     except Exception as e:
-        with open(CONFIG.path_to_capture_log, 'w') as capture_log:
-            capture_log.write(f"0:{e}")
-        
-        capture_log.close()
+        capture_session.log_subprocess(os.getpid(), str(e))
+
+if __name__ == "__main__":
+    main()
+
+
 
 
 
