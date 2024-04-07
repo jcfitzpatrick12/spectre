@@ -1,3 +1,5 @@
+import ast
+
 def unpack(param: str) -> tuple:
     if '=' not in param or param.startswith('=') or param.endswith('='):
         raise ValueError(f'Invalid format: "{param}". Expected "KEY=VALUE".')
@@ -16,11 +18,14 @@ def convert_types(string_valued_dict: dict, template: dict) -> dict:
         if dynamic_type is None:
             raise ValueError(f"Dynamic type must be specified in the template. Received: {dynamic_type}.")
         try:
-            if not dynamic_type == bool:
-                type_converted_dict[key] = dynamic_type(string_value)
-            else:
-                # need a specific implementation for boolean types (using above method, bool("False") will result in True)
+            if dynamic_type == bool:
+                # need a specific implementation for boolean types
                 type_converted_dict[key] = convert_to_bool(string_value)
+            elif dynamic_type == dict:
+                # need a specific implementation for dictionaries
+                type_converted_dict[key] = ast.literal_eval(string_value)
+            else:
+                type_converted_dict[key] = dynamic_type(string_value)
         except ValueError as e:
             raise ValueError(f'Could not convert type for {key}. Received: {string_value} but expected {dynamic_type}.')
     return type_converted_dict
