@@ -12,12 +12,15 @@ class CaptureConfig(CaptureConfigMount):
     def set_templates(self) -> None:
         self.templates = {
             "cosine_signal": {
-                'frequency': float,
-                'samp_rate': int,
-                'amplitude': float,
-                'data_dir': str,
-                'chunk_size': int,
-                'data_dir': str,
+                'samp_rate': int, # gr (sampling rate)
+                'frequency': float, # gr (frequency of the cosine signal)
+                'amplitude': float, # gr (ampltude of the cosine signal)
+                'chunks_dir': str, # gr (directory where the chunks are stored)
+                'chunk_size': int, # gr (size of each batched file) [s]
+                'window_type': str, # post_proc (window type)
+                'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
+                'Nx': int, # post_proc (number of samples for window)
+                'STFFT_kwargs': dict # post_proc (keyword arguments for STFFT)
             },
         }
 
