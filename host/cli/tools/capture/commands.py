@@ -1,6 +1,8 @@
 import typer
+
 from cli import __app_name__, __version__
-from utils import capture_session  # Assume capture_session.py is the refactored module
+from utils import capture_session 
+from cfg import CONFIG
 
 app = typer.Typer()
 
@@ -25,8 +27,6 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    
-    capture_session.start(receiver_name, mode, tag)
 
     # tag is mandatory
     if not tag:
@@ -35,6 +35,35 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
+    
+    # build the command to start the capture session
+    subprocess_command = [
+        'python3', f'{CONFIG.path_to_start_capture}',
+        '--receiver', receiver_name,
+        '--tag', tag,
+        '--mode', mode
+    ]
+
+    capture_session.start(subprocess_command)
+
+@app.command()
+def postproc(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture session"),
+) -> None:
+    # tag is mandatory
+    if not tag:
+        typer.secho(
+            f'You must specify the tag via --tag [requested tag]',
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+    
+    # build the command to start the capture session
+    subprocess_command = [
+        'python3', f'{CONFIG.path_to_post_proc}',
+        '--tag', tag,
+    ]
+
+    capture_session.start(subprocess_command)
 
 
 @app.command()
@@ -42,5 +71,3 @@ def stop(
 ) -> None:
     capture_session.stop()
 
-if __name__ == "__main__":
-    app()
