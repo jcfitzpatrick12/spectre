@@ -4,10 +4,11 @@ import os
 from cli import __app_name__, __version__
 from cfg import CONFIG
 
-from spectre.capture_config.CaptureConfig import CaptureConfig
+from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+# from spectre.cfg.json_config.TagMap import TagMap
 
 app = typer.Typer()
-            
+
 
 @app.command()
 def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
@@ -23,7 +24,7 @@ def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
 
 
     try:
-        capture_config = CaptureConfig(tag, CONFIG.path_to_capture_configs)
+        capture_config = CaptureConfig(tag, CONFIG.json_configs_dir)
         config_dict = capture_config.load_as_dict()
         for key, value in config_dict.items():
             typer.secho(
