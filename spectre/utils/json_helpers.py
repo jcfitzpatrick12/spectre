@@ -36,7 +36,8 @@ def save_dict_as_json(data_dict: dict, name: str, dir_path: str, **kwargs) -> No
     doublecheck_overwrite = kwargs.get('doublecheck_overwrite', True)
 
     if not os.path.exists(dir_path):
-        raise NotADirectoryError(f"The directory '{dir_path}' does not exist.")
+        os.mkdir(dir_path)
+        # raise NotADirectoryError(f"The directory '{dir_path}' does not exist.")
 
     fpath = os.path.join(dir_path, f"{name}.json")
 
