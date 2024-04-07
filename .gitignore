@@ -1,6 +1,5 @@
-archive
 capture_configs
 __pycache__
-data
+host/chunks
 capture.log
-process.pid
+scrap
