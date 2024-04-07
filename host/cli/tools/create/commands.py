@@ -4,6 +4,7 @@ from typing import List
 from cli import __app_name__, __version__
 from cfg import CONFIG
 from spectre.receivers.Receiver import Receiver
+# from spectre.cfg.json_config.TagMap import TagMap
 
 
 app = typer.Typer()
@@ -12,7 +13,7 @@ app = typer.Typer()
 def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
                    mode: str = typer.Option(None, "--mode", "-m", help=""),
                    receiver_name: str = typer.Option(None, "--receiver", "-r", help=""),
-                   params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE")
+                   params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     
     # tag is mandatory
@@ -40,13 +41,13 @@ def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
         )
         raise typer.Exit(1)
     
-    
-    # # # # #save the params to file as a validated configuration file
+
+    # # # # #save the params to file as a validated capture config
     try:
     # # instantiate the receiver specific capture config class 
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.save_params_as_capture_config(params, tag, CONFIG.path_to_capture_configs)
+        receiver.save_params_as_capture_config(params, tag, CONFIG.json_configs_dir)
 
     except Exception as e:
         typer.secho(
@@ -55,6 +56,11 @@ def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
         )
         raise typer.Exit(1)
 
+
     typer.secho(f"The capture config for tag \"{tag}\" has been created.", fg=typer.colors.GREEN)
+    
+
+        
+
     
 
