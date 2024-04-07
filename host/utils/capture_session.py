@@ -26,7 +26,7 @@ def start(receiver_name: str, mode: str, tag: str):
     
     time.sleep(1)  # Wait for the subprocess to potentially fail
     if not is_capture_session_in_progress():
-        typer.secho("Failed to start capture session. Check the capture log.", fg=typer.colors.RED)
+        typer.secho(f"Failed to start capture session. Check the capture log at {CONFIG.path_to_capture_log}", fg=typer.colors.RED)
         raise typer.Exit(1)
     
     typer.secho("Capture session started in the background.", fg=typer.colors.GREEN)
