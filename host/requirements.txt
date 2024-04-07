@@ -2,9 +2,5 @@ numpy==1.24.0
 scipy==1.12.0
 typer==0.3.2
 pytest==6.2.4
-<<<<<<< HEAD
 watchdog==4.0.0
-
-=======
 astropy==6.0.1
->>>>>>> f5134cddf5909924f7794d9558b793cb29f063bf
