@@ -2,10 +2,12 @@ import numpy as np
 import os
 from datetime import datetime
 from typing import Tuple
+from matplotlib.figure import Figure
 
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from spectre.cfg import CONFIG
+from spectre.spectrogram.PanelStacker import PanelStacker
 
 
 class Spectrogram:
@@ -16,7 +18,7 @@ class Spectrogram:
                  freq_MHz: np.ndarray, 
                  chunk_start_time: str, 
                  tag: str, 
-                 chunks_dir: str,
+                 # chunks_dir: str,
                  **kwargs):
         
         # Check if 'mags' is a 2D array
@@ -31,6 +33,7 @@ class Spectrogram:
             raise ValueError(f"Mismatch in number of rows: Expected {len(time_seconds)}, but got {mags.shape[1]}.")
 
         self.mags = mags 
+        self.shape = np.shape(mags)
         self.time_seconds = time_seconds
         self.freq_MHz = freq_MHz
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
@@ -38,20 +41,16 @@ class Spectrogram:
 
         self.chunk_start_time = chunk_start_time
         self.tag = tag
-        self.chunks_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir) 
         self.bvect = kwargs.get("bvect", None)
 
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
         self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
 
 
-
-    def get_path(self) -> str:
-        return os.path.join(self.chunks_dir,f"{self.chunk_start_time}_{self.tag}.fits")
-
-
-    def save_to_fits(self, fits_config: dict) -> None:
-        fits_helpers.save_spectrogram(self, fits_config, self.get_path())
+    def save_to_fits(self, fits_config: dict, chunks_dir: str) -> None:
+        chunk_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir) 
+        file_path = os.path.join(chunk_dir,f"{self.chunk_start_time}_{self.tag}.fits")
+        fits_helpers.save_spectrogram(self, fits_config, file_path)
         return
     
 
@@ -109,4 +108,10 @@ class Spectrogram:
 
         return times, frequency_of_slice, self.mags[index_of_slice, :]
 
-    
+    def mags_as_dBb(self):
+        bvect_array = np.outer(self.bvect, np.ones(self.shape[1]))
+        mags_as_dBb = 10 * np.log10(self.mags / bvect_array)
+        return mags_as_dBb
+
+    def stack_panels(self, fig: Figure, panel_types: list[str]) -> None:
+        PanelStacker(self).create_figure(fig, panel_types)
