@@ -20,6 +20,7 @@ class CaptureConfig(CaptureConfigMount):
                 "RF_gain": int,
                 "chunk_size": int,
                 "integration_time": int,
+                "data_dir": str,
             },
             'sweeping': {
                 # 'sweeping_param': str,
@@ -32,6 +33,7 @@ class CaptureConfig(CaptureConfigMount):
                 "frequency_step": float,
                 "sweep_window": float,
                 "integration_time": float,
+                "data_dir": str,
             }
         }
 
