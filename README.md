@@ -13,7 +13,7 @@ This program is building on the existing [```grso```](https://github.com/jcfitzp
 # spectre-host
 
 ## Introduction
-```spectre-host``` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated recording of radio spectrograms. Underpinned with gnuradio, it aims to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). The tool is delivered with an accompanying CLI tool.
+```spectre-host``` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated recording of radio spectrograms. Underpinned with gnuradio, it aims to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the RSP* series via [```gr-sdrplay3```](https://github.com/fventuri/gr-sdrplay3). The container includes an accompanying CLI tool.
 
 ## Supported Operating Systems
 This project is tested to be compatible with the following operating systems:
