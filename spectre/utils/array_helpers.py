@@ -29,7 +29,7 @@ def compute_resolution(array: np.ndarray) -> float:
     # Verify that resolution is consistent.
     # often flagged when using join_spectrograms (time resolution will not be consistent for gaps in the spectrograms)
     if not np.allclose(resolutions, resolutions[0]):
-        warnings.warn("Resolution is not consistent across all elements.", UserWarning)
+        warnings.warn("Resolution is not consistent across all elements. Returning first difference.", UserWarning)
     
     return resolutions[0]
 
