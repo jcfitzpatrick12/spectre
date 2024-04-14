@@ -8,11 +8,11 @@ class ChunkExt:
         self.tag = tag
         self.ext = ext
         self.file = f"{self.chunk_start_time}_{tag}.{self.ext}"
-        self.chunks_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir)
+        self.chunk_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir)
 
 
     def get_path(self) -> str:
-        return os.path.join(self.chunks_dir, f"{self.chunk_start_time}_{self.tag}{self.ext}")
+        return os.path.join(self.chunk_dir, f"{self.chunk_start_time}_{self.tag}{self.ext}")
     
 
     def exists(self) -> bool:
