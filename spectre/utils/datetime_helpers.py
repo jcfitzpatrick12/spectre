@@ -7,7 +7,7 @@ from spectre.cfg import CONFIG
 
 def date_dir(dt: datetime, **kwargs) -> str:
     # Format the datetime object to the desired string format
-    year, month, day = dt.strftime("/%Y"), dt.strftime("%m"), dt.strftime("%d")
+    year, month, day = dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d")
     date_dir = os.path.join(year, month, day)
     # Format the datetime object to the desired string format
     base_dir = kwargs.get('base_dir', None)
@@ -26,7 +26,7 @@ def build_chunks_dir(chunk_start_time: str, chunks_dir: str) -> str:
     return date_dir(dt, base_dir=chunks_dir)
 
 
-def build_datetime_array(start_datetime: datetime, time_seconds: np.array) -> list:
+def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray) -> list:
     # Validate input types
     if not isinstance(start_datetime, datetime):
         raise TypeError("start_datetime must be a datetime object")
@@ -55,3 +55,42 @@ def seconds_of_day(dt: datetime) -> float:
     
     start_of_day = datetime(dt.year, dt.month, dt.day)
     return (dt - start_of_day).total_seconds()
+
+
+def find_closest_index(val: datetime, ar: np.ndarray) -> int:
+    # Convert Python datetime to numpy datetime64 if necessary
+    if isinstance(val, datetime):
+        val = np.datetime64(val)
+    if isinstance(ar, (list, tuple, np.ndarray)):
+        ar = np.array(ar, dtype='datetime64[ns]')  # Convert list or tuple to numpy array of datetime64
+    elif isinstance(ar, np.ndarray) and not np.issubdtype(ar.dtype, np.datetime64):
+        ar = ar.astype('datetime64[ns]')  # Convert existing numpy array elements to datetime64
+    
+    # Validate data types
+    if not np.issubdtype(ar.dtype, np.datetime64) or not isinstance(val, np.datetime64):
+        raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
+
+    # Calculate absolute differences in nanoseconds and find the index of the minimum
+    closest_index = np.argmin(np.abs(ar - val))
+    return closest_index
+
+
+def seconds_elapsed(datetimes: np.ndarray) -> np.ndarray:
+    if not isinstance(datetimes, np.ndarray):
+        raise TypeError(f"Input must be of type list. Received type {type(datetimes).__name__} instead.")
+    
+    if datetimes is None:
+        raise ValueError("The input list is empty. Please provide a list with at least one datetime object.")
+
+    if not all(isinstance(dt, datetime) for dt in datetimes):
+        raise TypeError("All elements of the list must be datetime objects.")
+
+    # Extract the first datetime to use as the reference point
+    base_time = datetimes[0]
+    
+
+    # Calculate elapsed time in seconds for each datetime in the list
+    elapsed_seconds = [(dt - base_time).total_seconds() for dt in datetimes]
+
+    # Convert the list of seconds to a NumPy array of type float64
+    return np.array(elapsed_seconds, dtype=np.float64)
