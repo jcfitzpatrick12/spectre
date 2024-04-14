@@ -1,8 +1,10 @@
 import typer
+import os
 
 from cli import __app_name__, __version__
 from utils import capture_session 
 from cfg import CONFIG
+
 
 app = typer.Typer()
 
@@ -36,6 +38,10 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
         )
         raise typer.Exit(1)
     
+    
+    if not os.path.exists(CONFIG.path_to_start_capture):
+        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_capture}.")
+    
     # build the command to start the capture session
     subprocess_command = [
         'python3', f'{CONFIG.path_to_start_capture}',
@@ -57,12 +63,16 @@ def postproc(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the captu
         )
         raise typer.Exit(1)
     
+    if not os.path.exists(CONFIG.path_to_post_proc):
+        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_post_proc}.")
+        
     # build the command to start the capture session
     subprocess_command = [
         'python3', f'{CONFIG.path_to_post_proc}',
         '--tag', tag,
     ]
-
+    
+    print(subprocess_command)
     capture_session.start(subprocess_command)
 
 
