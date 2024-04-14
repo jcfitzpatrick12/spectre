@@ -26,15 +26,16 @@ def save_spectrogram(spectrogram, fits_config: dict, path_to_fits: str):
         "Contact the NASA Science Office of Standards and Technology for the",
         "FITS Definition document #100 and other FITS information."
     ]
+    
     # The comments section remains unchanged since add_comment is the correct approach
     for comment in comments:
         primary_hdu.header.add_comment(comment)
 
-    start_datetime = spectrogram.datetime_array[0]
+    start_datetime = spectrogram.datetimes[0]
     start_date = start_datetime.strftime("%Y-%m-%d")
     start_time = start_datetime.strftime("%H:%M:%S.%f")
 
-    end_datetime = spectrogram.datetime_array[-1]
+    end_datetime = spectrogram.datetimes[-1]
     end_date = end_datetime.strftime("%Y-%m-%d")
     end_time = end_datetime.strftime("%H:%M:%S.%f")
 
