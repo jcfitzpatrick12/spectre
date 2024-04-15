@@ -20,7 +20,10 @@ class CaptureConfig(CaptureConfigMount):
                 'window_type': str, # post_proc (window type)
                 'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
                 'Nx': int, # post_proc (number of samples for window)
-                'STFFT_kwargs': dict # post_proc (keyword arguments for STFFT)
+                'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
+                'chunk_key': str, # tag will map to the chunk with this key
+                'event_handler_key': str, # tag will map to event handler with this key during post processing
+                'watch_extension': str # postprocessing will call proc defined in event handler for files appearing with this extension
             },
         }
 
