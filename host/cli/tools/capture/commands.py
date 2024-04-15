@@ -53,7 +53,7 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture 
     capture_session.start(subprocess_command)
 
 @app.command()
-def postproc(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture session"),
+def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture session"),
 ) -> None:
     # tag is mandatory
     if not tag:
@@ -63,12 +63,12 @@ def postproc(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the captu
         )
         raise typer.Exit(1)
     
-    if not os.path.exists(CONFIG.path_to_post_proc):
-        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_post_proc}.")
+    if not os.path.exists(CONFIG.path_to_start_watcher):
+        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_watcher}.")
         
     # build the command to start the capture session
     subprocess_command = [
-        'python3', f'{CONFIG.path_to_post_proc}',
+        'python3', f'{CONFIG.path_to_start_watcher}',
         '--tag', tag,
     ]
     
