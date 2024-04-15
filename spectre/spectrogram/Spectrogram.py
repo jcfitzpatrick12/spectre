@@ -39,7 +39,9 @@ class Spectrogram:
 
         self.chunk_start_time = chunk_start_time
         self.tag = tag
-        self.bvect = kwargs.get("bvect", None)
+
+        default_bvect = self.total_time_average()
+        self.bvect = kwargs.get("bvect", default_bvect)
         self.units = kwargs.get("units", None)
 
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
@@ -109,8 +111,16 @@ class Spectrogram:
 
     def dynamic_spectra_as_dBb(self):
         bvect_array = np.outer(self.bvect, np.ones(self.shape[1]))
-        dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bvect_array)
+
+        if self.units == "amplitude":
+            dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bvect_array)
+        elif self.units == "power":
+            dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bvect_array)
+        else:
+            raise ValueError(f"Units not specified, uncertain decibel conversions!")
+        
         return dynamic_spectra_as_dBb
+    
 
     def stack_panels(self, fig: Figure, panel_types: list[str]) -> None:
         PanelStacker(self).create_figure(fig, panel_types)
