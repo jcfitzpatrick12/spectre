@@ -27,14 +27,14 @@ def build_chunks_dir(chunk_start_time: str, chunks_dir: str) -> str:
 
 
 def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray) -> list:
-    # Validate input types
+    # Validate input types      
     if not isinstance(start_datetime, datetime):
         raise TypeError("start_datetime must be a datetime object")
     if not isinstance(time_seconds, (np.ndarray, list, tuple)):
         raise TypeError("time_seconds must be an array, list, or tuple of numbers")
 
-    try:
-        return [start_datetime + timedelta(seconds=int(ts)) for ts in time_seconds]
+    try:    
+        return [start_datetime + timedelta(seconds=ts) for ts in time_seconds]
     except ValueError:
         raise ValueError("time_seconds must only contain numeric values")
 
