@@ -72,7 +72,6 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
         '--tag', tag,
     ]
     
-    print(subprocess_command)
     capture_session.start(subprocess_command)
 
 
