@@ -51,14 +51,14 @@ class Panels:
         if self.S.bvect is None:
             raise ValueError(f"Cannot plot in units of dBb, bvect is not specified. Got bvect={self.S.bvect}")
 
-        mags = self.S.mags_as_dBb()
+        dynamic_spectra = self.S.dynamic_spectra_as_dBb()
 
         vmin = -1
         vmax = 5
 
         pcolor_plot = ax.pcolormesh(datetimes, 
                                     freq_MHz, 
-                                    mags, 
+                                    dynamic_spectra, 
                                     vmin=vmin, 
                                     vmax=vmax, 
                                     cmap=self.cmap)
@@ -81,13 +81,13 @@ class Panels:
     def rawlog(self, ax: Axes, cax: Axes) -> None:
         freq_MHz = self.S.freq_MHz
         datetimes = self.S.datetimes
-        mags = self.S.mags
+        dynamic_spectra = self.S.dynamic_spectra
 
         # Plot the spectrogram with LogNorm
         pcolor_plot = ax.pcolormesh(datetimes, 
                                     freq_MHz, 
-                                    mags, 
-                                    norm=LogNorm(vmin=np.min(mags[mags > 0]), vmax=np.max(mags)),
+                                    dynamic_spectra, 
+                                    norm=LogNorm(vmin=np.min(dynamic_spectra[dynamic_spectra > 0]), vmax=np.max(dynamic_spectra)),
                                     cmap=self.cmap)
 
         # Format the x-axis to display time in HH:MM:SS
@@ -105,11 +105,11 @@ class Panels:
     def raw(self, ax: Axes ,cax: Axes) -> None:
         freq_MHz = self.S.freq_MHz
         datetimes = self.S.datetimes
-        mags = self.S.mags
+        dynamic_spectra = self.S.dynamic_spectra
 
         pcolor_plot = ax.pcolormesh(datetimes, 
                                     freq_MHz, 
-                                    mags, 
+                                    dynamic_spectra, 
                                     cmap=self.cmap)
         # Format the x-axis to display time in HH:MM:SS
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))

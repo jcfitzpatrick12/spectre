@@ -15,7 +15,7 @@ class ChunkFits(ChunkExt):
                 # Access the primary HDU
                 primary_hdu = hdulist['PRIMARY']
                 # Access the data part of the primary HDU
-                mags = primary_hdu.data          
+                dynamic_spectra = primary_hdu.data          
                 # The index of the BINTABLE varies; commonly, it's the first extension, hence hdul[1]
                 bintable_hdu = hdulist[1]
                 # Access the data within the BINTABLE
@@ -24,6 +24,6 @@ class ChunkFits(ChunkExt):
                 # The column names ('TIME' and 'FREQUENCY') must match those in the FITS file
                 time_seconds = data['TIME'][0]
                 freq_MHz = data['FREQUENCY'][0]
-                return Spectrogram(mags, time_seconds, freq_MHz, self.chunk_start_time, self.tag)
+                return Spectrogram(dynamic_spectra, time_seconds, freq_MHz, self.chunk_start_time, self.tag)
         else:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")

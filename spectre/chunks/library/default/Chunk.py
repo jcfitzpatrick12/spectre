@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from spectre.chunks.ChunkBase import ChunkBase
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
+from spectre.spectrogram.Spectrogram import Spectrogram
 
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits
@@ -30,14 +31,14 @@ class Chunk(ChunkBase):
         # fetch the window
         w = self.fetch_window(capture_config)
 
-        time_seconds, freq_MHz, mags = self.do_STFFT(capture_config, w)
+        time_seconds, freq_MHz, dynamic_spectra = self.do_STFFT(capture_config, w)
 
         # convert all arrays to the standard type
         time_seconds = np.array(time_seconds, dtype = 'float64')
         freq_MHz = np.array(freq_MHz, dtype = 'float64')
-        mags = np.array(mags, dtype = 'float64')
+        dynamic_spectra = np.array(dynamic_spectra, dtype = 'float64')
 
-        return time_seconds, freq_MHz, mags
+        return time_seconds, freq_MHz, dynamic_spectra
 
     
     def fetch_window(self, capture_config: dict) -> np.ndarray:
@@ -76,7 +77,7 @@ class Chunk(ChunkBase):
         
         signal_spectra = SFT.stft(IQ_data, p0=p0, p1=p1)  # perform the STFT (no scaling)
         # take the magnitude of the output
-        mags = np.abs(signal_spectra)
+        dynamic_spectra = np.abs(signal_spectra)
 
         # build the time array
         time_seconds = SFT.t(num_samples, p0=0, p1=p1) # seconds
@@ -88,7 +89,7 @@ class Chunk(ChunkBase):
         # convert the frequency array to MHz
         freq_MHz = frequency_array / 10**6
 
-        return time_seconds, freq_MHz, mags
+        return time_seconds, freq_MHz, dynamic_spectra
 
 
 

@@ -12,28 +12,26 @@ from spectre.spectrogram.PanelStacker import PanelStacker
 
 class Spectrogram:
     def __init__(self, 
-                 mags: np.ndarray,
-                #  scaled_to: str,
+                 dynamic_spectra: np.ndarray,
                  time_seconds: np.ndarray, 
                  freq_MHz: np.ndarray, 
                  chunk_start_time: str, 
                  tag: str, 
-                 # chunks_dir: str,
                  **kwargs):
         
-        # Check if 'mags' is a 2D array
-        if np.ndim(mags) != 2:
-            raise ValueError(f"Expected 'mags' to be a 2D array, but got {np.ndim(mags)}D array.")
+        # Check if 'dynamic_spectra' is a 2D array
+        if np.ndim(dynamic_spectra) != 2:
+            raise ValueError(f"Expected 'dynamic_spectra' to be a 2D array, but got {np.ndim(dynamic_spectra)}D array.")
 
-        # Check if the dimensions of 'mags' are consistent with 'time_seconds' and 'freq_MHz'
-        if mags.shape[0] != len(freq_MHz):
-            raise ValueError(f"Mismatch in number of columns: Expected {len(freq_MHz)}, but got {mags.shape[0]}.")
+        # Check if the dimensions of 'dynamic_spectra' are consistent with 'time_seconds' and 'freq_MHz'
+        if dynamic_spectra.shape[0] != len(freq_MHz):
+            raise ValueError(f"Mismatch in number of columns: Expected {len(freq_MHz)}, but got {dynamic_spectra.shape[0]}.")
         
-        if mags.shape[1] != len(time_seconds):
-            raise ValueError(f"Mismatch in number of rows: Expected {len(time_seconds)}, but got {mags.shape[1]}.")
+        if dynamic_spectra.shape[1] != len(time_seconds):
+            raise ValueError(f"Mismatch in number of rows: Expected {len(time_seconds)}, but got {dynamic_spectra.shape[1]}.")
 
-        self.mags = mags 
-        self.shape = np.shape(mags)
+        self.dynamic_spectra = dynamic_spectra 
+        self.shape = np.shape(dynamic_spectra)
         self.time_seconds = time_seconds
         self.freq_MHz = freq_MHz
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
@@ -42,6 +40,7 @@ class Spectrogram:
         self.chunk_start_time = chunk_start_time
         self.tag = tag
         self.bvect = kwargs.get("bvect", None)
+        self.units = kwargs.get("units", None)
 
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
         self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
@@ -58,7 +57,7 @@ class Spectrogram:
         df = self.freq_res_MHz*10**-6 # Hz
         dt = self.time_res_seconds # seconds
         # find the (raw) integrated power over frequency
-        integrated_power = np.sum(self.mags, axis=0)*df
+        integrated_power = np.sum(self.dynamic_spectra, axis=0)*df
         # normalise to integrate to one
         integrated_power/=np.trapz(integrated_power,dx=dt)
         return integrated_power
@@ -66,7 +65,7 @@ class Spectrogram:
 
     def total_time_average(self,):
         # return the spectrum averaged over all time bins
-        return np.nanmean(self.mags, axis=-1)
+        return np.nanmean(self.dynamic_spectra, axis=-1)
     
     
     def slice_at_time(self, **kwargs) -> Tuple[datetime|float, np.array, np.array]:
@@ -85,7 +84,7 @@ class Spectrogram:
             index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds)
             time_of_slice = self.time_seconds[index_of_slice]
 
-        return time_of_slice, self.freq_MHz, self.mags[:, index_of_slice]
+        return time_of_slice, self.freq_MHz, self.dynamic_spectra[:, index_of_slice]
 
 
     def slice_at_frequency(self, **kwargs):
@@ -106,12 +105,12 @@ class Spectrogram:
         # the requested frequency is probably not an exact bin value. Return the exact bin value.
         frequency_of_slice = self.freq_MHz[index_of_slice]
 
-        return times, frequency_of_slice, self.mags[index_of_slice, :]
+        return times, frequency_of_slice, self.dynamic_spectra[index_of_slice, :]
 
-    def mags_as_dBb(self):
+    def dynamic_spectra_as_dBb(self):
         bvect_array = np.outer(self.bvect, np.ones(self.shape[1]))
-        mags_as_dBb = 10 * np.log10(self.mags / bvect_array)
-        return mags_as_dBb
+        dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bvect_array)
+        return dynamic_spectra_as_dBb
 
     def stack_panels(self, fig: Figure, panel_types: list[str]) -> None:
         PanelStacker(self).create_figure(fig, panel_types)

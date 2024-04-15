@@ -19,7 +19,7 @@ def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Sp
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
     
     # chop the spectrogram accordingly
-    chopped_mags = S.mags[start_index:end_index+1, :]
+    chopped_dynamic_spectra = S.dynamic_spectra[start_index:end_index+1, :]
     chopped_freq_MHz = S.freq_MHz[start_index:end_index+1]
 
     # if necessary, update bvect 
@@ -28,7 +28,7 @@ def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Sp
     else:
         bvect = S.bvect[start_index:end_index+1]
     
-    return Spectrogram(chopped_mags, S.time_seconds, chopped_freq_MHz, S.chunk_start_time, S.tag, S.chunks_dir, bvect = bvect)
+    return Spectrogram(chopped_dynamic_spectra, S.time_seconds, chopped_freq_MHz, S.chunk_start_time, S.tag, bvect = bvect)
 
 
 def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spectrogram:
@@ -47,47 +47,47 @@ def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spec
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
 
     # chop the spectrogram accordingly
-    chopped_mags = S.mags[:, start_index:end_index+1]
+    chopped_dynamic_spectra = S.dynamic_spectra[:, start_index:end_index+1]
     chopped_time_seconds = S.time_seconds[start_index:end_index+1]
     #translate the chopped time array to again start at zero
     chopped_time_seconds-=chopped_time_seconds[0]
     # #extract the new chunk_start_time
     chopped_chunk_start_time = datetime.strftime(S.datetimes[start_index], CONFIG.default_time_format)
 
-    return Spectrogram(chopped_mags, chopped_time_seconds, S.freq_MHz, chopped_chunk_start_time, S.tag, S.chunks_dir, bvect = S.bvect)
+    return Spectrogram(chopped_dynamic_spectra, chopped_time_seconds, S.freq_MHz, chopped_chunk_start_time, S.tag, bvect = S.bvect)
 
 
 def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
     if average_over == 1:
         return S
 
-    num_temporal_samples = S.mags.shape[1]
+    num_temporal_samples = S.dynamic_spectra.shape[1]
     num_full_blocks = num_temporal_samples // average_over
     remainder = num_temporal_samples % average_over
 
-    averaged_mags = array_helpers.average_array(S.mags, average_over, axis=1)
-    # Ensuring the time array matches the length of the averaged mags
+    averaged_dynamic_spectra = array_helpers.average_array(S.dynamic_spectra, average_over, axis=1)
+    # Ensuring the time array matches the length of the averaged dynamic_spectra
     block_count = num_full_blocks + (1 if remainder else 0)
     decimated_time_seconds = S.time_seconds[:(block_count * average_over):average_over]
 
-    return Spectrogram(averaged_mags, decimated_time_seconds, S.freq_MHz, S.chunk_start_time, S.tag, S.chunks_dir, bvect=S.bvect)
+    return Spectrogram(averaged_dynamic_spectra, decimated_time_seconds, S.freq_MHz, S.chunk_start_time, S.tag, bvect=S.bvect)
 
 
 def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
     if average_over == 1:
         return S
 
-    num_freq_samples = S.mags.shape[0]
+    num_freq_samples = S.dynamic_spectra.shape[0]
     num_full_blocks = num_freq_samples // average_over
     remainder = num_freq_samples % average_over
 
-    averaged_mags = array_helpers.average_array(S.mags, average_over, axis=0)
+    averaged_dynamic_spectra = array_helpers.average_array(S.dynamic_spectra, average_over, axis=0)
     averaged_bvect = array_helpers.average_array(S.bvect, average_over, axis=0) if S.bvect is not None else None
-    # Ensuring the frequency array matches the length of the averaged mags
+    # Ensuring the frequency array matches the length of the averaged dynamic_spectra
     block_count = num_full_blocks + (1 if remainder else 0)
     decimated_freq_MHz = S.freq_MHz[:(block_count * average_over):average_over]
 
-    return Spectrogram(averaged_mags, S.time_seconds, decimated_freq_MHz, S.chunk_start_time, S.tag, S.chunks_dir, bvect=averaged_bvect)
+    return Spectrogram(averaged_dynamic_spectra, S.time_seconds, decimated_freq_MHz, S.chunk_start_time, S.tag, bvect=averaged_bvect)
 
 
 
@@ -123,16 +123,16 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
     total_time_bins = len(conc_datetimes)
     # find the total number of frequency bins (we can safely now use the first)
     total_freq_bins = len(Sref.freq_MHz)
-    conc_mags = np.empty((total_freq_bins, total_time_bins))
+    conc_dynamic_spectra = np.empty((total_freq_bins, total_time_bins))
 
     start_index = 0
     for S in spectrogram_list:
         end_index = start_index + len(S.time_seconds)
-        conc_mags[:, start_index:end_index] = S.mags
+        conc_dynamic_spectra[:, start_index:end_index] = S.dynamic_spectra
         start_index = end_index
 
     conc_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
 
-    return Spectrogram(conc_mags, conc_time_seconds, Sref.freq_MHz, Sref.chunk_start_time, Sref.tag, Sref.chunks_dir, bvect=None)
+    return Spectrogram(conc_dynamic_spectra, conc_time_seconds, Sref.freq_MHz, Sref.chunk_start_time, Sref.tag, Sref.chunks_dir, bvect=None)
 
 

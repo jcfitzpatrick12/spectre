@@ -9,14 +9,14 @@ from spectre.utils import datetime_helpers
 # Function to create a FITS file with the specified structure
 def save_spectrogram(spectrogram, fits_config: dict, path_to_fits: str):
     # Primary HDU with data
-    primary_data = spectrogram.mags.astype(dtype=np.float64) 
+    primary_data = spectrogram.dynamic_spectra.astype(dtype=np.float64) 
     primary_hdu = fits.PrimaryHDU(primary_data)
 
     primary_hdu.header.set('SIMPLE', True, 'file does conform to FITS standard')
     primary_hdu.header.set('BITPIX', -64, 'number of bits per data pixel')
     primary_hdu.header.set('NAXIS', 2, 'number of data axes')
-    primary_hdu.header.set('NAXIS1', spectrogram.mags.shape[1], 'length of data axis 1')
-    primary_hdu.header.set('NAXIS2', spectrogram.mags.shape[0], 'length of data axis 2')
+    primary_hdu.header.set('NAXIS1', spectrogram.dynamic_spectra.shape[1], 'length of data axis 1')
+    primary_hdu.header.set('NAXIS2', spectrogram.dynamic_spectra.shape[0], 'length of data axis 2')
     primary_hdu.header.set('EXTEND', True, 'FITS dataset may contain extensions')
 
     # Add comments
@@ -55,8 +55,8 @@ def save_spectrogram(spectrogram, fits_config: dict, path_to_fits: str):
     primary_hdu.header.set('BSCALE', 1, 'scaling factor')
     primary_hdu.header.set('BUNIT', " ... ", 'z-axis title') # This should be specified with the actual unit
 
-    primary_hdu.header.set('DATAMIN', np.nanmin(spectrogram.mags), 'minimum element in image')
-    primary_hdu.header.set('DATAMAX', np.nanmax(spectrogram.mags), 'maximum element in image')
+    primary_hdu.header.set('DATAMIN', np.nanmin(spectrogram.dynamic_spectra), 'minimum element in image')
+    primary_hdu.header.set('DATAMAX', np.nanmax(spectrogram.dynamic_spectra), 'maximum element in image')
 
     primary_hdu.header.set('CRVAL1', f'{datetime_helpers.seconds_of_day(start_datetime)}', 'value on axis 1 at reference pixel [sec of day]')
     primary_hdu.header.set('CRPIX1', 0, 'reference pixel of axis 1')

@@ -9,7 +9,6 @@ class PanelStacker(Panels):
         super().__init__(S)
     
     def create_figure(self, fig: Figure, panel_types: str):
-
         if len(panel_types)==1:
             is_one_panel=True
         else:
@@ -24,7 +23,6 @@ class PanelStacker(Panels):
                             )
         # Iterate over the plot types and their respective axes
         for panel_index, panel_type in enumerate(panel_types):
-            
             ax = axs[panel_index, 0]  # Plot on the first column
             cax = axs[panel_index, 1]  # Colorbar on the second column
 
