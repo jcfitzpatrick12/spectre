@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.colors import LogNorm
 from matplotlib.axes import Axes
-from math import floor
+from math import ceil
 
 
 class Panels:
@@ -22,7 +22,8 @@ class Panels:
         self.fsize_head=20
         self.fsize=15
         self.cmap = 'gnuplot2'
-        self.seconds_interval = floor(self.S.time_seconds[-1]/3)
+
+        self.seconds_interval = ceil(self.S.time_seconds[-1]/3)
 
        
     def get_plot_method(self, panel_type: str):
@@ -106,7 +107,6 @@ class Panels:
         freq_MHz = self.S.freq_MHz
         datetimes = self.S.datetimes
         dynamic_spectra = self.S.dynamic_spectra
-
         pcolor_plot = ax.pcolormesh(datetimes, 
                                     freq_MHz, 
                                     dynamic_spectra, 
@@ -119,3 +119,4 @@ class Panels:
         # Format the x and y tick labels with specified font size
         ax.tick_params(axis='x', labelsize=self.fsize)
         ax.tick_params(axis='y', labelsize=self.fsize)
+
