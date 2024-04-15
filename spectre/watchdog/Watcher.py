@@ -2,16 +2,24 @@ from watchdog.observers import Observer
 import time
 import threading
 
+from spectre.watchdog.get_event_handler import get_event_handler_from_tag
+
 class Watcher:
-    def __init__(self, watch_directory: str, tag: str, extension: str):
+    def __init__(self, tag: str, extension: str, chunks_dir: str, json_configs_dir: str):
         self.observer = Observer()
-        self.watch_directory = watch_directory
         self.tag = tag
         self.extension = extension
+        self.chunks_dir = chunks_dir
+        self.json_configs_dir = json_configs_dir
+
+        EventHandler = get_event_handler_from_tag(tag, json_configs_dir)
+        # create an instance of the event handler
+        self.event_handler = EventHandler(self, tag, extension , chunks_dir, json_configs_dir)
+
         self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
 
-    def run(self, event_handler):
-        self.observer.schedule(event_handler, self.watch_directory, recursive=True)
+    def start(self):
+        self.observer.schedule(self.event_handler, self.chunks_dir, recursive=True)
         self.observer.start()
         print("Watching for new files...")
         try:
@@ -23,6 +31,7 @@ class Watcher:
             self.observer.stop()
             self.observer.join()
             print("Observer Stopped")
+
 
     def stop(self):
         self.stop_event.set()  # External method to stop the observer
