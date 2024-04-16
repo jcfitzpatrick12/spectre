@@ -4,7 +4,8 @@ from typing import Optional
 from cli import __app_name__, __version__
 from cfg import CONFIG
 
-from spectre.receivers.Receiver import Receiver
+from gui.SPECTRECompanion import main as spectre_companion
+
 
 from cli.tools.create.commands import app as create_app
 from cli.tools.list.commands import app as list_app
@@ -39,6 +40,13 @@ def main(
         is_eager=True,
     )
 ) -> None:
+    return
+
+@app.command()
+def companion(
+    tag: str = typer.Option(..., "--tag", "-t", help="Specify the tag on start up of the gui.")
+) -> None:
+    spectre_companion(tag)
     return
 
 
