@@ -33,8 +33,6 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
-
-
 from gnuradio import qtgui
 
 class cosine_signal(gr.top_block, Qt.QWidget):
@@ -80,7 +78,7 @@ class cosine_signal(gr.top_block, Qt.QWidget):
         ##################################################
         self.spectre_batched_file_sink_0 = spectre.batched_file_sink(capture_config['chunks_dir'], capture_config['tag'], capture_config['chunk_size'], capture_config['samp_rate'])
         self.blocks_throttle_1 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
-        self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, capture_config['frequency'], capture_config['amplitude'], 0, 0)
+        self.analog_sig_source_x_0 = analog.sig_source_c(capture_config['samp_rate'], analog.GR_COS_WAVE, capture_config['frequency'], capture_config['amplitude'], 0, 0)
 
 
         ##################################################
