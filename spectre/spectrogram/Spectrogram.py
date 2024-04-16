@@ -3,11 +3,13 @@ import os
 from datetime import datetime
 from typing import Tuple
 from matplotlib.figure import Figure
+import warnings
 
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from spectre.cfg import CONFIG
 from spectre.spectrogram.PanelStacker import PanelStacker
+from spectre.cfg.json_config.FitsConfig import FitsConfig
 
 
 class Spectrogram:
@@ -48,7 +50,13 @@ class Spectrogram:
         self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
 
 
-    def save_to_fits(self, fits_config: dict, chunks_dir: str) -> None:
+    def save_to_fits(self, chunks_dir: str, json_configs_dir: str) -> None:
+        try:
+            fits_config_instance = FitsConfig(self.tag, json_configs_dir)
+            fits_config = fits_config_instance.load_as_dict()
+        except (FileNotFoundError, IOError) as e:
+            warnings.warn(f"fits_config for tag {self.tag} unable to be loaded, defaulting to empty dictionary. Received error {e}")
+            fits_config = {}
         chunk_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir) 
         file_path = os.path.join(chunk_dir,f"{self.chunk_start_time}_{self.tag}.fits")
         fits_helpers.save_spectrogram(self, fits_config, file_path)
