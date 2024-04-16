@@ -5,27 +5,39 @@ from cli import __app_name__, __version__
 from cfg import CONFIG
 
 from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from spectre.cfg.json_config.FitsConfig import FitsConfig
 # from spectre.cfg.json_config.TagMap import TagMap
 
 app = typer.Typer()
 
-
 @app.command()
-def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
+def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
-    
 
-    if not tag:
+
+    try:
+        fits_config_instance = FitsConfig(tag, CONFIG.json_configs_dir)
+        config_dict = fits_config_instance.load_as_dict()
+        for key, value in config_dict.items():
+            typer.secho(
+                f"{key}: {value}"
+            )
+
+    except Exception as e:
         typer.secho(
-            f'You must specify the tag via --tag [requested tag]',
+            f'Could not print fits config. Received: {e}',
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
 
+@app.command()
+def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
+) -> None:
+
 
     try:
-        capture_config = CaptureConfig(tag, CONFIG.json_configs_dir)
-        config_dict = capture_config.load_as_dict()
+        capture_config_instance = CaptureConfig(tag, CONFIG.json_configs_dir)
+        config_dict = capture_config_instance.load_as_dict()
         for key, value in config_dict.items():
             typer.secho(
                 f"{key}: {value}"
