@@ -7,6 +7,18 @@ from cfg import CONFIG
 app = typer.Typer()
 
 @app.command()
+def fits_configs(
+) -> None:
+    json_config_files = os.listdir(CONFIG.json_configs_dir)
+    typer.secho(f'Listing all capture configs in the directory: {CONFIG.json_configs_dir}')
+    for json_config_file in json_config_files:
+        if json_config_file.startswith("fits_config"):
+            typer.secho(
+                f'-> {json_config_file}',
+            )
+    raise typer.Exit(1)
+
+@app.command()
 def capture_configs(
 ) -> None:
     json_config_files = os.listdir(CONFIG.json_configs_dir)
@@ -23,7 +35,7 @@ def capture_configs(
 def tags(
 ) -> None:
     # if len(capture_config_files) == 0:
-    typer.secho(f'Listing all defined tags.')
+    typer.secho(f'Listing all defined tags with corresponding capture configs.')
     json_config_files = os.listdir(CONFIG.json_configs_dir)
     for json_config_file in json_config_files:
         if json_config_file.startswith("capture_config"):
