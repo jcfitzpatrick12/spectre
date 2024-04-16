@@ -81,32 +81,41 @@ class Receiver:
         self.save_capture_config(capture_config_as_dict, tag, json_configs_dir)
         return  
     
-    
-    def start_capture(self, tag: str, json_configs_dir: str) -> None:
+
+    def start_capture(self, tags: list, json_configs_dir: str) -> None:
         # first check if the current mode is valid.
         if self.mode not in self.valid_modes:
             raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
-        
-        # then load the requested capture config
+
+        capture_configs = []
+        for tag in tags:
+            capture_config = self.get_capture_config_for_capture(tag, json_configs_dir)
+            capture_configs.append(capture_config)
+
+        # start the capture session
+        self.capture.start(self.mode, capture_configs)
+        return
+    
+
+    def get_capture_config_for_capture(self, tag: str, json_configs_dir: str) -> dict:
+        # load the requested capture config
         capture_config_instance = CaptureConfig(tag, json_configs_dir)
         capture_config = capture_config_instance.load_as_dict()
-
 
         # check the mode of the capture config matches the current mode of the receiver.
         capture_config_mode = capture_config['mode']
         if self.mode != capture_config_mode:
-            raise ValueError(f'Receiver must be in the same mode as that specified in capture-config. Receiver mode: {self.mode}, capture-config mode: {capture_config_mode}')
+            raise ValueError(f'Error fetching capture config for tag {tag}. Receiver must be in the same mode as that specified in capture-config. Receiver mode: {self.mode}, capture-config mode: {capture_config_mode}')
         
         # check the requested capture config matches the current receiver.
         receiver_in_capture_config = capture_config['receiver'] 
         if receiver_in_capture_config != self.receiver_name:
-            raise ValueError(f'Capture config receiver must match the current receiver. Got {receiver_in_capture_config} and {self.receiver_name} respectively.')
+            raise ValueError(f'Error fetching capture config for tag {tag}. Capture config receiver must match the current receiver. Got {receiver_in_capture_config} and {self.receiver_name} respectively.')
 
-        # validate the capture config before initiating the capture
+        # validate the capture config before returning
         self.capture_config.validate(capture_config, self.mode)
-        # start the capture session
-        self.capture.start(self.mode, capture_config)
-        return
+        return capture_config
+    
  
 
 
