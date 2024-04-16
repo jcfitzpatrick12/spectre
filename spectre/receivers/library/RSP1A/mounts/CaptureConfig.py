@@ -12,36 +12,27 @@ class CaptureConfig(CaptureConfigMount):
     def set_templates(self) -> None:
         self.templates = {
             "fixed": {
-                # 'fixed_param': str,
                 "center_freq": float,
                 "bandwidth": float,
                 "samp_rate": int, 
                 "IF_gain": int,
                 "RF_gain": int,
-                "chunk_size": int,
-                "integration_time": int,
-                "data_dir": str,
+                'chunks_dir': str, # gr (directory where the chunks are stored)
+                'chunk_size': int, # gr (size of each batched file) [s]
+                'window_type': str, # post_proc (window type)
+                'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
+                'Nx': int, # post_proc (number of samples for window)
+                'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
+                'chunk_key': str, # tag will map to the chunk with this key
+                'event_handler_key': str, # tag will map to event handler with this key during post processing
+                'watch_extension': str # postprocessing will call proc defined in event handler for files appearing with this extension
             },
-            'sweeping': {
-                # 'sweeping_param': str,
-                "center_freq": float,
-                "samp_rate": int,
-                "IF_gain": int,
-                "RF_gain": int,
-                "chunk_size": int,
-                "swept_bandwidth": float,
-                "frequency_step": float,
-                "sweep_window": float,
-                "integration_time": float,
-                "data_dir": str,
-            }
         }
 
 
     def set_validators(self) -> None:
         self.validators = {
             "fixed": self.fixed_validator,
-            "sweeping": self.sweeping_validator
         }
 
     
@@ -52,7 +43,6 @@ class CaptureConfig(CaptureConfigMount):
         IF_gain = capture_config_dict['IF_gain']
         RF_gain = capture_config_dict['RF_gain']
         chunk_size = capture_config_dict['chunk_size']
-        integration_time = capture_config_dict['integration_time']
 
         validator_helpers.validate_center_freq(center_freq)
         validator_helpers.validate_bandwidth(bandwidth, samp_rate)
@@ -60,10 +50,7 @@ class CaptureConfig(CaptureConfigMount):
         validator_helpers.validate_IF_gain(IF_gain)
         validator_helpers.validate_RF_gain(RF_gain)
         validator_helpers.validate_chunk_size(chunk_size)
-        validator_helpers.validate_integration_time(integration_time, chunk_size)
         return
 
-    def sweeping_validator(self, capture_config_dict: dict):
-        return
 
     
