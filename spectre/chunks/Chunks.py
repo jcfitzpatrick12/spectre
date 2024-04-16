@@ -19,6 +19,7 @@ class Chunks:
         self.all_files = dir_helpers.list_all_files(chunks_dir)
         self.set_dict()
 
+
     def set_dict(self) -> None:
         self.dict = OrderedDict()
         for file in self.all_files:
@@ -106,7 +107,7 @@ class Chunks:
         spectrogram_list = []
         for chunk in self.dict.values():
             # if the current chunk does not match the requested datetime, just continue
-            if chunk.chunk_start_datetime.day!=requested_day:
+            if chunk.chunk_start_datetime.day!=requested_day or not chunk.fits.exists():
                 continue
 
             S = chunk.fits.load_spectrogram()
