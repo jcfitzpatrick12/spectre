@@ -4,44 +4,39 @@ from typing import List
 from cli import __app_name__, __version__
 from cfg import CONFIG
 from spectre.receivers.Receiver import Receiver
-# from spectre.cfg.json_config.TagMap import TagMap
+from spectre.cfg.json_config.FitsConfig import FitsConfig
 
 
 app = typer.Typer()
 
 @app.command()
-def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
-                   mode: str = typer.Option(None, "--mode", "-m", help=""),
-                   receiver_name: str = typer.Option(None, "--receiver", "-r", help=""),
+def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
+                params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE")
+) -> None:
+    try:
+        fits_config_instance = FitsConfig(tag, CONFIG.json_configs_dir)
+        fits_config_instance.save_params_as_fits_config(params)
+
+    except KeyError as e:
+        typer.secho(
+            f'Received {e}. Pass in appropriate keys using --param [KEY=VALUE].',
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+    finally:
+        pass
+
+    typer.secho(f"The fits config for tag \"{tag}\" has been created.", fg=typer.colors.GREEN)
+
+
+@app.command()
+def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
+                   mode: str = typer.Option(..., "--mode", "-m", help=""),
+                   receiver_name: str = typer.Option(..., "--receiver", "-r", help=""),
                    params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     
-    # tag is mandatory
-    if not tag:
-        typer.secho(
-            f'You must specify the tag via --tag [requested tag]',
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(1)
-    
-    # receiver_name is mandatory
-    if not receiver_name:
-        typer.secho(
-            f'You must specify the receiver via --receiver [receiver name]',
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(1)
-    
-    # mode is mandatory
-
-    if not mode:
-        typer.secho(
-            f'You must specify the receiver mode via --mode [mode type]',
-            fg=typer.colors.RED
-        )
-        raise typer.Exit(1)
-    
-
     # # # # #save the params to file as a validated capture config
     try:
     # # instantiate the receiver specific capture config class 
@@ -49,13 +44,16 @@ def capture_config(tag: str = typer.Option(None, "--tag", "-t", help=""),
         receiver.set_mode(mode)
         receiver.save_params_as_capture_config(params, tag, CONFIG.json_configs_dir)
 
-    except Exception as e:
+    except KeyError as e:
         typer.secho(
-            f'Creating capture config failed: {e}',
+            f'Received {e}. Pass in appropriate keys using --param [KEY=VALUE].',
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
+    
 
+    finally:
+        pass
 
     typer.secho(f"The capture config for tag \"{tag}\" has been created.", fg=typer.colors.GREEN)
     
