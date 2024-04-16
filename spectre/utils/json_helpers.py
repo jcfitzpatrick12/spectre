@@ -73,3 +73,21 @@ def load_json_as_dict(name: str, dir_path: str) -> dict:
     except IOError as e:
         raise IOError(f"Error reading file: {fpath}") from e
     
+def delete_json_config(json_config_instance, json_config_label: str) -> None:
+    if not isinstance(json_config_label, str):
+        raise ValueError(f"Expected string for json_config_label, received {type(json_config_label)}")
+    
+    valid_json_config_labels = ["capture_config", "fits_config"]
+    if json_config_label not in valid_json_config_labels:
+        raise ValueError(f"Invalid json_config_label. Received {json_config_label}, expected one of {valid_json_config_labels}.")
+
+    config_path = json_config_instance.absolute_path()
+
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f'Could not delete of type {json_config_label} with tag {json_config_instance.tag}. {config_path} does not exist.')
+    
+    else:
+        doublecheck_delete(config_path)
+        os.remove(config_path)
+        
+    
