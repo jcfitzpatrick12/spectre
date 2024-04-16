@@ -1,5 +1,7 @@
 import os
 
+default_time_format = "%Y-%m-%dT%H:%M:%S"
+
 json_configs_dir = os.path.join(os.environ['SPECTREPARENTPATH'],"host", "cfg", "json_configs")
 chunks_dir = os.path.join(os.environ['SPECTREPARENTPATH'], 'host', 'chunks')
 path_to_capture_log = os.path.join(os.environ['SPECTREPARENTPATH'], 'host', 'cfg', 'capture.log')
