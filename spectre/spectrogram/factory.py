@@ -114,8 +114,8 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
             raise ValueError(f"All spectrograms must have identical frequency ranges.")
         if S.tag != Sref.tag:
             raise ValueError(f"All tags must be equal for each spectrogram in the input list!")
-        if S.chunks_dir != Sref.chunks_dir:
-            raise ValueError(f"The specified chunks_dir must be equal for each spectrogram in the list!")
+        if S.units != Sref.units:
+            raise ValueError(f"All units must be equal for each spectrogram in the input list!")
 
 
     # build a list of the time array of each spectrogram in the list
@@ -133,6 +133,6 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
 
     conc_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
 
-    return Spectrogram(conc_dynamic_spectra, conc_time_seconds, Sref.freq_MHz, Sref.chunk_start_time, Sref.tag, Sref.chunks_dir, bvect=None, units = S.units)
+    return Spectrogram(conc_dynamic_spectra, conc_time_seconds, Sref.freq_MHz, Sref.chunk_start_time, Sref.tag, bvect=Sref.bvect, units=Sref.units)
 
 
