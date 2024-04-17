@@ -37,6 +37,9 @@ def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spec
     start_dt = datetime.strptime(start_time_as_str, time_format)
     end_dt = datetime.strptime(end_time_as_str, time_format)
 
+    if (start_dt >= S.datetimes[-1] and end_dt >= S.datetimes[-1]) or (start_dt<= S.datetimes[0] and end_dt <= S.datetimes[0]):
+        return None
+    
     start_index = datetime_helpers.find_closest_index(start_dt, S.datetimes)
     end_index = datetime_helpers.find_closest_index(end_dt, S.datetimes)
 
