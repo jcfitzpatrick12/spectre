@@ -13,3 +13,4 @@ class ChunkBase:
         
         self.chunk_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time, chunks_dir)
         self.json_configs_dir = json_configs_dir
+        self.chunk_start_datetime = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
