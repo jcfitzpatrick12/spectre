@@ -109,11 +109,15 @@ class Chunks:
             # if the current chunk does not match the requested datetime, just continue
             if chunk.chunk_start_datetime.day!=requested_day or not chunk.fits.exists():
                 continue
+            
+            # extract (only!) the datetimes from the fits file (too bulky loading every spectrogram!)
+            datetimes = chunk.fits.get_datetimes()
 
-            S = chunk.fits.load_spectrogram()
-            chunk_start_datetime, chunk_end_datetime = S.datetimes[0], S.datetimes[-1]
-
-            if chunk_start_datetime <= requested_end_datetime and chunk_end_datetime >= requested_start_datetime:
+            if datetimes[0] <= requested_end_datetime and datetimes[-1] >= requested_start_datetime:
+                S = chunk.fits.load_spectrogram()
+                S = factory.time_chop(S, requested_start_str, requested_end_str)
+                if S is None:
+                    raise ValueError(f"Could not time chop spectrogram while building from range.")
                 spectrogram_list.append(S)
 
         return factory.join_spectrograms(spectrogram_list)

@@ -1,12 +1,15 @@
 from astropy.io import fits
+import numpy as np
 
 from spectre.chunks.ChunkExt import ChunkExt
 from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.utils import datetime_helpers
 
 class ChunkFits(ChunkExt):
     def __init__(self, chunk_start_time, tag: str, chunks_dir: str):
         super().__init__(chunk_start_time, tag, ".fits", chunks_dir)
     
+
     #load the RadioSpectrogram from the fits file.
     def load_spectrogram(self):
         if self.exists():
@@ -30,3 +33,16 @@ class ChunkFits(ChunkExt):
                 return Spectrogram(dynamic_spectra, time_seconds, freq_MHz, self.chunk_start_time, self.tag, units=units)
         else:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
+        
+
+
+    def get_datetimes(self) -> np.ndarray:
+        if self.exists():
+            with fits.open(self.get_path(), mode='readonly') as hdulist:
+                bintable_data = hdulist[1].data
+                time_seconds = bintable_data['TIME'][0]
+                return datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
+        else:
+            raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
+
+
