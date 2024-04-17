@@ -28,7 +28,7 @@ class SPECTRECompanion:
 
 
     def setup_widgets(self):
-        self.tag_entry = self.create_labeled_entry("tag:", self.tag, 0)
+        self.tag_entry = self.create_labeled_entry("Tag: ", self.tag, 0)
         tk.Button(self.master, text="Update", command=self.update_tag_from_entry).grid(row=0, column=2, sticky="ew")
         tk.Button(self.master, text="Plot", command=self.plot_data).grid(row=8, column=0, sticky="ew")
 
@@ -59,8 +59,8 @@ class SPECTRECompanion:
             if chunk.fits.exists():
                 default_S = chunk.fits.load_spectrogram()
                 self.default_values = {
-                    'start': default_S.datetimes[0].strftime(CONFIG.default_time_format),
-                    'end': default_S.datetimes[-1].strftime(CONFIG.default_time_format),
+                    'start_time': default_S.datetimes[0].strftime(CONFIG.default_time_format),
+                    'end_time': default_S.datetimes[-1].strftime(CONFIG.default_time_format),
                     'lower_freq': round(default_S.freq_MHz[0], 2),
                     'upper_freq': round(default_S.freq_MHz[-1], 2),
                     'avg_over_int_time': 1,
@@ -72,9 +72,26 @@ class SPECTRECompanion:
 
 
     def update_entry_fields(self):
-        fields = ['start', 'end', 'lower_freq', 'upper_freq', 'avg_over_int_time', 'avg_over_int_freq']
-        self.entries = {field: self.create_labeled_entry(field + ":", self.default_values[field], i + 1) for i, field in enumerate(fields)}
+        self.entries = {}
+        fields = ['start_time', 'end_time', 'lower_freq', 'upper_freq', 'avg_over_int_time', 'avg_over_int_freq']
+        field_titles_dict = self.get_field_titles_dict()
+        for i, field in enumerate(fields, start=1):
+            self.entries[field] = self.create_labeled_entry(field_titles_dict[field], self.default_values[field], i)
 
+
+    def get_field_titles_dict(self):
+        
+        field_titles_dict = {
+            'start_time': "Start time: ",
+            'end_time': "End time: ",
+            'lower_freq': "Lower frequency [MHz]: ",
+            'upper_freq': "Higher frequency [MHz]: ",
+            'avg_over_int_time': "Average over int (time): ",
+            'avg_over_int_freq': "Average over int (frequency): ",
+        }
+
+        return field_titles_dict
+    
 
     def populate_panel_types(self):
         if not hasattr(self, 'panel_type_frame'):
@@ -101,9 +118,9 @@ class SPECTRECompanion:
 
 
     def get_spectrogram(self):
-        start, end = self.entries['start'].get(), self.entries['end'].get()
+        start_time, end_time = self.entries['start_time'].get(), self.entries['end_time'].get()
         lower_freq, upper_freq = float(self.entries['lower_freq'].get()), float(self.entries['upper_freq'].get())
-        S = self.chunks.build_spectrogram_from_range(start, end)
+        S = self.chunks.build_spectrogram_from_range(start_time, end_time)
         S = factory.frequency_chop(S, lower_freq, upper_freq)
         S = factory.frequency_average(S, int(self.entries['avg_over_int_freq'].get()))
         S = factory.time_average(S, int(self.entries['avg_over_int_time'].get()))
