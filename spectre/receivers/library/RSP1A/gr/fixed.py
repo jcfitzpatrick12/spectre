@@ -102,14 +102,12 @@ class fixed(gr.top_block, Qt.QWidget):
         self.sdrplay3_rsp1a_0.set_debug_mode(False)
         self.sdrplay3_rsp1a_0.set_sample_sequence_gaps_check(False)
         self.sdrplay3_rsp1a_0.set_show_gain_changes(False)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, capture_config['samp_rate'], True)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_throttle_0, 0), (self.spectre_batched_file_sink_0, 0))
-        self.connect((self.sdrplay3_rsp1a_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.sdrplay3_rsp1a_0, 0), (self.spectre_batched_file_sink_0, 0))
 
 
     def closeEvent(self, event):
@@ -125,7 +123,6 @@ class fixed(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate)
         self.sdrplay3_rsp1a_0.set_sample_rate(self.samp_rate)
 
 
