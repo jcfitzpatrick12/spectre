@@ -23,7 +23,7 @@ class Panels:
         self.fsize=15
         self.cmap = 'gnuplot2'
 
-        self.seconds_interval = ceil(self.S.time_seconds[-1]/3)
+        self.seconds_interval = ceil(self.S.time_seconds[-1]/6)
 
        
     def get_plot_method(self, panel_type: str):
@@ -55,7 +55,7 @@ class Panels:
         dynamic_spectra = self.S.dynamic_spectra_as_dBb()
 
         vmin = -1
-        vmax = 5
+        vmax = 3
 
         pcolor_plot = ax.pcolormesh(datetimes, 
                                     freq_MHz, 
