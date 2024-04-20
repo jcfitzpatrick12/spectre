@@ -1,8 +1,8 @@
 import typer
 from typing import List
 
-from cli import __app_name__, __version__
-from cfg import CONFIG
+from host.cli import __app_name__, __version__
+from host.cfg import CONFIG
 from spectre.receivers.Receiver import Receiver
 from spectre.cfg.json_config.FitsConfig import FitsConfig
 

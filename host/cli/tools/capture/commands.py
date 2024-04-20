@@ -2,9 +2,9 @@ import typer
 import os
 from typing import List
 
-from cli import __app_name__, __version__
-from utils import capture_session 
-from cfg import CONFIG
+from host.cli import __app_name__, __version__
+from host.utils import capture_session 
+from host.cfg import CONFIG
 
 
 app = typer.Typer()

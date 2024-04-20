@@ -1,4 +1,4 @@
-from cli import spectre_cli, __app_name__
+from host.cli import spectre_cli, __app_name__
 
 def main():
     spectre_cli.app(prog_name=__app_name__)

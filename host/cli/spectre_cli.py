@@ -1,17 +1,16 @@
 import typer
 from typing import Optional
 
-from cli import __app_name__, __version__
-from cfg import CONFIG
+from host.cli import __app_name__, __version__
+from host.cfg import CONFIG
+from host.gui.SPECTRECompanion import main as spectre_companion
 
-from gui.SPECTRECompanion import main as spectre_companion
 
-
-from cli.tools.create.commands import app as create_app
-from cli.tools.list.commands import app as list_app
-from cli.tools.print.commands import app as print_app
-from cli.tools.delete.commands import app as delete_app
-from cli.tools.capture.commands import app as capture_app
+from host.cli.tools.create.commands import app as create_app
+from host.cli.tools.list.commands import app as list_app
+from host.cli.tools.print.commands import app as print_app
+from host.cli.tools.delete.commands import app as delete_app
+from host.cli.tools.capture.commands import app as capture_app
 
 
 app = typer.Typer()

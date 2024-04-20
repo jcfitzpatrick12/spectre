@@ -1,8 +1,8 @@
 import typer
 import os
 
-from cli import __app_name__, __version__
-from cfg import CONFIG
+from host.cli import __app_name__, __version__
+from host.cfg import CONFIG
 
 from spectre.cfg.json_config.CaptureConfig import CaptureConfig
 from spectre.cfg.json_config.FitsConfig import FitsConfig

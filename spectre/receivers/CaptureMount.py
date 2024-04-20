@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from cfg import CONFIG
+from spectre.cfg import CONFIG
 
 
 
