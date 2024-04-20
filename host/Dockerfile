@@ -17,13 +17,14 @@ ENV NO_AT_BRIDGE=1
 #Set SPECTREHOST as the parent directory of the package
 ENV SPECTREPARENTPATH /home/spectre
 #add spectre to the python path so we can import modules properly
-ENV PYTHONPATH "${PYTHONPATH}:/home/spectre/host/"
+ENV PYTHONPATH "/home/spectre/host:/home/spectre/:/home/spectre/spectre:${PYTHONPATH}"
+
 
 # Install the required packages for the installation
 # versions are most recent as of 13th of March 2024
 RUN apt-get update -y && \
     apt-get install -y sudo \
-    bash=5.1-6ubuntu1 \
+    bash=5.1-6ubuntu1.1 \
     # expect is used while installing the RSP API (auto accepts licence agreement etc.)
     expect=5.45.4-2build1 \
     git=1:2.34.1-1ubuntu1.10 \
@@ -58,7 +59,7 @@ RUN rm SDRplay_RSP_API-Linux-3.14.0.run
 COPY ./scripts/install_gr_sdrplay3.sh /install_gr_sdrplay3.sh
 RUN chmod +x /install_gr_sdrplay3.sh && \ 
     /install_gr_sdrplay3.sh && rm /install_gr_sdrplay3.sh
-  
+
 # Now copy the script which will install the gr-spectre custom OOT module
 COPY ./scripts/install_gr_spectre.sh /install_gr_spectre.sh
 RUN chmod +x /install_gr_spectre.sh && \ 
@@ -82,8 +83,7 @@ RUN chmod +x /usr/local/bin/startup.sh
 
 WORKDIR /home/spectre/
 
-# Set an alias to make the CLI tool easier to work with
+# Create an alias for running the script
 RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
-
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
