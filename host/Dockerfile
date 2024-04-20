@@ -17,7 +17,7 @@ ENV NO_AT_BRIDGE=1
 #Set SPECTREHOST as the parent directory of the package
 ENV SPECTREPARENTPATH /home/spectre
 #add spectre to the python path so we can import modules properly
-ENV PYTHONPATH "/home/spectre/host:/home/spectre/:/home/spectre/spectre:${PYTHONPATH}"
+ENV PYTHONPATH "${SPECTREPARENTPATH}:${SPECTREPARENTPATH}/spectre:${SPECTREPARENTPATH}/host:${PYTHONPATH}"
 
 
 # Install the required packages for the installation
