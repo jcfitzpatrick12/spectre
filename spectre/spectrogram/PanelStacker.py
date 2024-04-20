@@ -9,38 +9,38 @@ class PanelStacker(Panels):
         super().__init__(S)
     
     def create_figure(self, fig: Figure, panel_types: str):
-        if len(panel_types)==1:
-            is_one_panel=True
-        else:
-            is_one_panel=False
-        
-        # # Create a figure with subplots for plots and colorbars
-        # two columns, one for the panels, and an optional column for the colorbars
-        axs = fig.subplots(len(panel_types), 2, 
-                            gridspec_kw={'width_ratios': [3, 0.1], 
-                            'wspace': 0.05},
-                            squeeze=False
-                            )
-        # Iterate over the plot types and their respective axes
-        for panel_index, panel_type in enumerate(panel_types):
-            ax = axs[panel_index, 0]  # Plot on the first column
-            cax = axs[panel_index, 1]  # Colorbar on the second column
+            # Create a figure with subplots for plots and colorbars
+            axs = fig.subplots(len(panel_types), 2, 
+                            gridspec_kw={'width_ratios': [3, 0.1], 'wspace': 0.05},
+                            squeeze=False)
 
-            # by default, turn the color axis off
-            cax.axis('off')  # Initially turn off the colorbar axis; it will be turned on if needed
+            # Store the first axis to link subsequent axes
+            first_ax = None
 
-            # Get the plotting function
-            plot_method = self.get_plot_method(panel_type)
+            # Iterate over the plot types and their respective axes
+            for i, (ax, cax) in enumerate(zip(axs[:, 0], axs[:, 1])):
+                # Turn the colorbar axis off initially; it will be turned on if needed
+                cax.axis('off')
 
-            # Call the plotting function with its specific kwargs
-            plot_method(ax=ax, cax=cax)  # Pass both plot and colorbar axes
+                # Get the plotting function
+                plot_method = self.get_plot_method(panel_types[i])
 
-            # Hide x-axis labels for all but the bottom plot
-            if panel_index < len(panel_types) - 1:
-                ax.tick_params(labelbottom=False)
+                # Call the plotting function with its specific kwargs
+                plot_method(ax=ax, cax=cax)
+
+                # Manage x-axis visibility and linking
+                if first_ax is not None:
+                    ax.sharex(first_ax)  # Link x-axis with the first axis
+                else:
+                    first_ax = ax  # Set the first axis
+
+                if i == len(panel_types) - 1:
+                    ax.set_xlabel('Time [GMT]', size=self.fsize_head)  # Set x-label for the bottom plot
+                else:
+                    ax.tick_params(labelbottom=False)  # Hide x-tick labels for all but the last ax
+
+            # Align all x-axes and labels
+            plt.subplots_adjust(hspace=0)  # Adjust horizontal space to zero
+
+
             
-            if panel_index ==len(panel_types)-1 or is_one_panel:
-                ax.set_xlabel('Time [GMT]', size=self.fsize_head)
-
-
-        
