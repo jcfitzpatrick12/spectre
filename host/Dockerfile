@@ -84,6 +84,12 @@ RUN chmod +x /usr/local/bin/startup.sh
 WORKDIR /home/spectre/
 
 # Create an alias for running the script
-RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
+#RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
+
+# making "spectre" cli command  callable from anywhere (from non-interactice shells too!) 
+RUN echo '#!/bin/bash' > /usr/local/bin/spectre \
+    && echo 'python3 -m cli "$@"' >> /usr/local/bin/spectre \
+    && chmod +x /usr/local/bin/spectre
+
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
