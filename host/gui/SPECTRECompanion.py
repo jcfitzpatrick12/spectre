@@ -26,13 +26,12 @@ class SPECTRECompanion:
     def load_chunks(self):
         self.chunks = Chunks(self.tag, CONFIG.chunks_dir, CONFIG.json_configs_dir)
 
-
     def setup_widgets(self):
         self.tag_entry = self.create_labeled_entry("Tag: ", self.tag, 0)
         tk.Button(self.master, text="Update", command=self.update_tag_from_entry).grid(row=0, column=2, sticky="ew")
         tk.Button(self.master, text="Plot", command=self.plot_data).grid(row=8, column=0, sticky="ew")
 
-        self.figure = Figure(figsize=(10, 10))
+        self.figure = Figure(figsize=(15, 10))
         self.canvas = FigureCanvasTkAgg(self.figure, self.master)
         self.canvas.get_tk_widget().grid(row=9, column=0, columnspan=3)
 
