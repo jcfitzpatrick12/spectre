@@ -42,7 +42,7 @@ class BaseEventHandler(FileSystemEventHandler, ABC):
                 if current_size == size:
                     break
                 size = current_size
-                time.sleep(1)
+                time.sleep(0.5)
             except OSError as e:
                 print(f"Error accessing file {file_path}: {e}")
                 self.watcher.stop()  # Stop if there's an error accessing the file
