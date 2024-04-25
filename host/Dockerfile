@@ -72,8 +72,8 @@ RUN chmod +x /file_fix.sh && \
 
 # install a default crontab
 WORKDIR /etc/cron.d
-COPY ./cron/default_crontab /etc/crontab
-RUN crontab /etc/crontab
+COPY ./cron/default_crontab ./default_crontab
+RUN crontab ./default_crontab
 
 WORKDIR /home
 
