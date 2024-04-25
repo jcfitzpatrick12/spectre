@@ -1,0 +1,24 @@
+{
+    "watch_extension": ".bin",
+    "event_handler_key": "default",
+    "chunk_size": 5,
+    "samp_rate": 600000,
+    "integration_time": 0.01,
+    "Nx": 2048,
+    "chunk_key": "default",
+    "chunks_dir": "/home/spectre/host/chunks/",
+    "center_freq": 95800000.0,
+    "RF_gain": 0,
+    "bandwidth": 600000.0,
+    "window_type": "gaussian",
+    "IF_gain": -20,
+    "window_kwargs": {
+        "std": 1024
+    },
+    "STFFT_kwargs": {
+        "hop": 1024
+    },
+    "receiver": "RSPDuo",
+    "mode": "tuner_1_fixed",
+    "tag": "fmtest"
+}

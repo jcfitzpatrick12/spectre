@@ -1,0 +1,24 @@
+{
+    "watch_extension": ".bin",
+    "event_handler_key": "default",
+    "chunk_size": 5,
+    "samp_rate": 6000000,
+    "integration_time": 0.1,
+    "Nx": 1024,
+    "chunk_key": "default",
+    "chunks_dir": "/home/spectre/host/chunks/",
+    "center_freq": 68000000.0,
+    "RF_gain": 0,
+    "bandwidth": 6000000,
+    "window_type": "blackman",
+    "IF_gain": -20,
+    "window_kwargs": {
+    },
+    "STFFT_kwargs": {
+        "hop": 512
+    },
+    "receiver": "RSPDuo",
+    "mode": "tuner_1_fixed",
+    "tag": "jool"
+}
+
