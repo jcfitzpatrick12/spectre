@@ -15,9 +15,9 @@ class CaptureMount(ABC):
         pass
 
 
-    def start(self, mode: str, capture_config: dict) -> None:
+    def start(self, mode: str, capture_configs: list) -> None:
         capture_method = self.capture_methods.get(mode)
         if capture_method is None:
             raise ValueError(f"Invalid mode '{mode}'. Valid modes are: {self.valid_modes}")
-        capture_method(capture_config)
+        capture_method(capture_configs)
         return
