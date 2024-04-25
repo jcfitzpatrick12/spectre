@@ -13,7 +13,7 @@
     "window_type": "gaussian",
     "IF_gain": -20,
     "window_kwargs": {
-        "std": 1024
+        "std": 200
     },
     "STFFT_kwargs": {
         "hop": 1024
