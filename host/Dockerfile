@@ -70,6 +70,10 @@ COPY ./scripts/file_fix.sh /file_fix.sh
 RUN chmod +x /file_fix.sh && \
     /file_fix.sh && rm /file_fix.sh
 
+# install a default crontab
+WORKDIR /etc/cron.d
+COPY ./cron/default_crontab /etc/crontab
+RUN crontab /etc/crontab
 
 WORKDIR /home
 
@@ -77,11 +81,6 @@ WORKDIR /home
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
     cd spectre/host/ && \
     pip install -r requirements.txt
-
-COPY ./scripts/startup.sh /usr/local/bin/startup.sh
-RUN chmod +x /usr/local/bin/startup.sh
-
-WORKDIR /home/spectre/
 
 # Create an alias for running the script
 #RUN echo 'alias spectre="python3 -m cli"' >> ~/.bashrc
@@ -91,5 +90,10 @@ RUN echo '#!/bin/bash' > /usr/local/bin/spectre \
     && echo 'python3 -m host.cli "$@"' >> /usr/local/bin/spectre \
     && chmod +x /usr/local/bin/spectre
 
+
+COPY ./scripts/startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
+
+WORKDIR /home/spectre/
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
