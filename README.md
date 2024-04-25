@@ -1,4 +1,4 @@
-# SPECTRE
+# SPECTRE: Process, Explore and Capture Transient Radio Emissions
 
 ## Overview
 `SPECTRE` is a program under development for the automated recording, analysis, and visualisation of radio spectrograms. It consists of three primary components: 
@@ -13,7 +13,7 @@
 # spectre-host
 
 ## Introduction
-`spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Underpinned with gnuradio, the framework is in place to accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
+`spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Underpinned with gnuradio, the framework is in place to simply accommodate any SDR receiver with a gnuradio source block. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
 
 - **[`gnuradio`](https://github.com/gnuradio/gnuradio)**
 - **[`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3)**: includes SDRplay RSP* series gnuradio source blocks.
