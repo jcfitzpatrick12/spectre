@@ -2,11 +2,11 @@
 xhost local:
 
 # Create a volume so that storage persists
-docker volume create host-spectre-vol
+docker volume create spectre-host-vol
 
 # Run the Docker container with GUI support
 docker run --name spectre-host-container -it --rm \
-    --mount type=volume,src=host-spectre-vol,target=/home \
+    --mount type=volume,src=spectre-host-vol,target=/home \
     -v /dev/shm:/dev/shm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
