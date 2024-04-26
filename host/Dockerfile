@@ -77,7 +77,6 @@ RUN echo '#!/bin/bash' > spectre \
     && echo 'python3 -m host.cli "$@"' >> spectre \
     && chmod +x spectre
 
-
 # Copy the default crontab file to the cron.d directory
 WORKDIR /etc/cron.d
 # copy in the default crontab
@@ -88,16 +87,18 @@ RUN chmod 0644 default_crontab
 RUN crontab default_crontab
 
 WORKDIR /home
-
 # now clone the spectre repository
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
     cd spectre/host/ && \
     pip install -r requirements.txt
 
+WORKDIR /home/spectre/
+# make the chunks directory on startup
+RUN mkdir host/chunks
 
+# copy in the startup script, and make it executable
 COPY ./scripts/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-WORKDIR /home/spectre/
 
 ENTRYPOINT ["/usr/local/bin/startup.sh"]
