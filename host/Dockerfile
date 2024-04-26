@@ -81,8 +81,6 @@ RUN echo '#!/bin/bash' > spectre \
 WORKDIR /etc/cron.d
 # copy in the default crontab
 COPY ./cron/default_crontab default_crontab
-# give appropriate permissions
-RUN chmod 0644 default_crontab
 # install the crontab
 RUN crontab default_crontab
 
