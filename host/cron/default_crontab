@@ -21,4 +21,4 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-* * * * * /home/spectre/host/cron/daily_capture.sh >> /var/log/daily_capture.log 2>&1
+30 7 * * * /home/spectre/host/cron/daily_capture.sh >> /var/log/daily_capture.log 2>&1

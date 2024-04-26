@@ -8,7 +8,6 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # ensure the chunks directory is created prior to calling capture
 mkdir -p $SPECTREPARENTPATH/host/chunks
 
-spectre print capture-config -t jool
 spectre capture start-watcher -t jool
 spectre capture start --receiver RSPDuo --mode tuner_1_fixed --tag jool
 sleep 36000s
