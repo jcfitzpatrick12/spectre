@@ -1,3 +1,4 @@
+#!/bin/bash
 #Set SPECTREHOST as the parent directory of the package
 export SPECTREPARENTPATH=/home/spectre
 #add spectre to the python path so we can import modules properly
