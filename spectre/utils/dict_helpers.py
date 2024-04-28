@@ -23,21 +23,31 @@ def convert_types(string_valued_dict: dict, template: dict) -> dict:
                 type_converted_dict[key] = convert_to_bool(string_value)
             elif dynamic_type == dict:
                 # need a specific implementation for dictionaries
-                type_converted_dict[key] = ast.literal_eval(string_value)
+                type_converted_dict[key] = convert_to_dict(string_value)
             else:
                 type_converted_dict[key] = dynamic_type(string_value)
+
         except ValueError as e:
-            raise ValueError(f'Could not convert type for {key}. Received: {string_value} but expected {dynamic_type}.')
+            value_error_message = f'Could not convert type for {key}. Received: {string_value} but expected {dynamic_type}.'
+            if dynamic_type == dict:
+                value_error_message = value_error_message + ' Try the syntax {\\\"key\\\":value}.'
+
+            raise ValueError(value_error_message)
+        
     return type_converted_dict
 
 
-def convert_to_bool(value: str) -> bool:
-    if value.lower() in ('true', '1', 't', 'y', 'yes'):
+def convert_to_dict(string_value: str) -> dict:
+    return ast.literal_eval(string_value)
+
+
+def convert_to_bool(string_value: str) -> bool:
+    if string_value.lower() in ('true', '1', 't', 'y', 'yes'):
         return True
-    elif value.lower() in ('false', '0', 'f', 'n', 'no'):
+    elif string_value.lower() in ('false', '0', 'f', 'n', 'no'):
         return False
     else:
-        raise ValueError(f"Cannot convert {value} to bool.")
+        raise ValueError(f"Cannot convert {string_value} to bool.")
 
 
 def validate_keys(input_dict: dict, template: dict) -> None:
