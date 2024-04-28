@@ -131,4 +131,10 @@ class Spectrogram:
     
 
     def stack_panels(self, fig: Figure, panel_types: list[str]) -> None:
+        if panel_types is None:
+            raise ValueError(f"Panel types must be specified. Received {panel_types}.")
+        
+        if len(panel_types) == 0:
+            raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
+
         PanelStacker(self).create_figure(fig, panel_types)
