@@ -31,11 +31,13 @@ def convert_types(string_valued_dict: dict, template: dict) -> dict:
     return type_converted_dict
 
 
-def convert_to_bool(string_value):
-    bool_map = {'True': True, 'False': False, "1": True, "0": False}
-    if string_value not in bool_map:
-        raise ValueError(f"{string_value} must be one of True or False. Received {string_value}")
-    return bool_map[string_value]
+def convert_to_bool(value: str) -> bool:
+    if value.lower() in ('true', '1', 't', 'y', 'yes'):
+        return True
+    elif value.lower() in ('false', '0', 'f', 'n', 'no'):
+        return False
+    else:
+        raise ValueError(f"Cannot convert {value} to bool.")
 
 
 def validate_keys(input_dict: dict, template: dict) -> None:
