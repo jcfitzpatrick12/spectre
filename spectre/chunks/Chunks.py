@@ -113,7 +113,7 @@ class Chunks:
             # extract (only!) the datetimes from the fits file (too bulky loading every spectrogram!)
             datetimes = chunk.fits.get_datetimes()
 
-            if datetimes[0] <= requested_end_datetime and datetimes[-1] >= requested_start_datetime:
+            if datetimes[0] < requested_end_datetime and datetimes[-1] > requested_start_datetime:
                 S = chunk.fits.load_spectrogram()
                 S = factory.time_chop(S, requested_start_str, requested_end_str)
                 if S is None:
