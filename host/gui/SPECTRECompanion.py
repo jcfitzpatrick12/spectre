@@ -17,15 +17,17 @@ class SPECTRECompanion:
 
 
     def update_widgets(self):
-        tk.Button(self.master, text="Update", command=self.update_tag_from_entry).grid(row=0, column=2, sticky="ew")
+        tk.Button(self.master, text="Update", command=self.update).grid(row=7, column=0, sticky="ew")
         tk.Button(self.master, text="Plot", command=self.plot_data).grid(row=8, column=0, sticky="ew")
         self.figure, self.canvas = setup_plot(self.master)
         self.panel_type_frame, self.panel_type_vars = create_tickbox_frame(self.master, self.chunks_handler.get_panel_types(), "Plot Types")
 
 
-    def update_tag_from_entry(self):
+    def update(self):
         self.tag = self.entries['tag'].get()
-        self.chunks_handler.update_tag(self.tag)
+        # get the start time so we can optimise chunks file finding
+        start_time = self.entries['start_time'].get()
+        self.chunks_handler.set_attrs(self.tag, start_time=start_time)
         self.update_entries(self.chunks_handler.get_field_defaults())
 
 

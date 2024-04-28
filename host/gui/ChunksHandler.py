@@ -1,18 +1,31 @@
+from datetime import datetime
+
 from host.cfg import CONFIG
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram import factory
 from spectre.spectrogram.Panels import Panels
 
 class ChunksHandler:
-    def __init__(self, tag):
+    def __init__(self, tag, **kwargs):
+        self.set_attrs(tag, **kwargs)
+
+
+    def set_attrs(self, tag, **kwargs):
+        start_time = kwargs.get("start_time")
+        if start_time:
+            start_datetime = datetime.strptime(start_time, CONFIG.default_time_format)
+            year = start_datetime.year
+            month = start_datetime.month
+            day = start_datetime.day
+        else:
+            year = None
+            month = None
+            day = None
+            
         self.tag = tag
-        self.chunks = Chunks(tag, CONFIG.chunks_dir, CONFIG.json_configs_dir)
+        self.chunks = Chunks(tag, CONFIG.chunks_dir, CONFIG.json_configs_dir, year=year, month=month, day=day)
         self.set_default_spectrogram()
 
-    def update_tag(self, tag):
-        self.tag = tag
-        self.chunks = Chunks(tag, CONFIG.chunks_dir, CONFIG.json_configs_dir)
-        self.set_default_spectrogram()
 
     def get_spectrogram(self, entry_values):
         start_time = entry_values['start_time'].get()
@@ -21,6 +34,7 @@ class ChunksHandler:
         upper_freq = float(entry_values['upper_freq'].get())
         avg_over_int_time = int(entry_values['avg_over_int_time'].get())
         avg_over_int_freq = int(entry_values['avg_over_int_freq'].get())
+
         S = self.chunks.build_spectrogram_from_range(start_time, end_time)
         S = factory.frequency_chop(S, lower_freq, upper_freq)
         S = factory.frequency_average(S, avg_over_int_freq)
@@ -58,6 +72,7 @@ class ChunksHandler:
             'avg_over_int_time': "Average over (time): ",
             'avg_over_int_freq': "Average over (frequency): ",
         }
+
 
     def get_panel_types(self):
         return Panels(self.default_S).panel_type_dict.keys()
