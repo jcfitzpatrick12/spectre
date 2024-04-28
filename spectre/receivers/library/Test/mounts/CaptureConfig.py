@@ -24,7 +24,8 @@ class CaptureConfig(CaptureConfigMount):
                 'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'watch_extension': str # postprocessing will call proc defined in event handler for files appearing with this extension
+                'watch_extension': str, # postprocessing will call proc defined in event handler for files appearing with this extension
+                'integration_time': float # spectrograms will be averaged over a time integration_time
             },
             
             "key_value_test": {
