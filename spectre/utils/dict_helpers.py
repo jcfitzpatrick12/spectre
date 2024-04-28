@@ -57,9 +57,10 @@ def validate_keys(input_dict: dict, template: dict) -> None:
     
 
 def validate_types(input_dict: dict, template: dict) -> None:
-    # validate_keys(input_dict, template)
-    for key, value in input_dict.items():
-        actual_type = type(value)
-        expected_type = template[key]
-        if actual_type !=expected_type:
-            raise TypeError(f"For the key value pair \"{key}={value}\" expected type({value}) = {expected_type}, but received {actual_type}.")
+        # check the types match between the values of the capture config and the template
+        for key, value in input_dict.items():
+            expected_type = template.get(key)
+            if expected_type is None:
+                raise ValueError(f"Cannot have a type of value None, received {expected_type}.")
+            if not isinstance(value, expected_type):
+                raise TypeError(f"Expected {expected_type}, but received {value} which is of type {type(value)}.")
