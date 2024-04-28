@@ -32,8 +32,8 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
 @app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
-                   mode: str = typer.Option(..., "--mode", "-m", help=""),
                    receiver_name: str = typer.Option(..., "--receiver", "-r", help=""),
+                   mode: str = typer.Option(..., "--mode", "-m", help=""),
                    params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     
