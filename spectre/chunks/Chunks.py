@@ -2,40 +2,54 @@ from collections import OrderedDict
 import os
 import warnings
 from datetime import datetime
+from typing import Tuple
 
 from spectre.chunks.get_chunk import get_chunk_from_tag
-from spectre.utils import dir_helpers
+from spectre.utils import dir_helpers, datetime_helpers
 from spectre.cfg import CONFIG
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import factory
 
 class Chunks:
-    def __init__(self, tag: str, chunks_dir: str, json_configs_dir: str):
+    def __init__(self, tag: str, chunks_dir: str, json_configs_dir: str, **kwargs):
         self.tag = tag
         self.chunks_dir = chunks_dir
         self.json_configs_dir = json_configs_dir
+        
+        # if a specific date is specified via kwargs, set the attribute
+        # for chunks dir with the date dir appended.
+        self.chunks_dir_with_time_dir = None
+        year = kwargs.get("year")
+        month = kwargs.get("month")
+        day = kwargs.get("day")
+        if (not year is None) or (not month is None) or (not day is None):
+            # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
+            self.chunks_dir_with_time_dir = datetime_helpers.append_date_dir(self.chunks_dir, **kwargs)
 
         self.Chunk = get_chunk_from_tag(tag, json_configs_dir)
-        self.all_files = dir_helpers.list_all_files(chunks_dir)
-        self.set_dict()
+        self.dict = self.build_dict()
 
 
-    def set_dict(self) -> None:
-        self.dict = OrderedDict()
-        for file in self.all_files:
+    def build_dict(self) -> None:
+        chunks_dict = OrderedDict()
+
+        if self.chunks_dir_with_time_dir:
+            files = dir_helpers.list_all_files(self.chunks_dir_with_time_dir)
+        else:
+            files = dir_helpers.list_all_files(self.chunks_dir)
+
+        for file in files:
             file_name, ext = os.path.splitext(file)
             try:
                 chunk_start_time, tag = file_name.split("_", 1)
             except ValueError as e:
                 print(f"Error while splitting {file_name} at \"_\". Received {e}")
             # only consider chunks with the specified tag
-            if tag==self.tag:
-                self.dict[chunk_start_time] = self.Chunk(chunk_start_time, tag, self.chunks_dir, self.json_configs_dir)
-        self.sort_dict()
-
-
-    def sort_dict(self) -> None:
-        self.dict = OrderedDict(sorted(self.dict.items()))
+            if tag == self.tag:
+                chunks_dict[chunk_start_time] = self.Chunk(chunk_start_time, tag, self.chunks_dir, self.json_configs_dir)
+        
+        # sort the dictionary and set the attribute
+        return OrderedDict(sorted(chunks_dict.items()))
 
 
     def get_chunk_by_index(self, index: int):
@@ -104,16 +118,20 @@ class Chunks:
         # can now safely set the day requested
         requested_day = requested_start_datetime.day
 
+        # get the upper bound chunk intervals map
+        upper_bound_chunk_intervals = self.get_upper_bound_chunk_intervals()
+
         spectrogram_list = []
-        for chunk in self.dict.values():
+        for chunk_start_time, chunk in self.dict.items():
             # if the current chunk does not match the requested datetime, just continue
             if chunk.chunk_start_datetime.day!=requested_day or not chunk.fits.exists():
                 continue
             
-            # extract (only!) the datetimes from the fits file (too bulky loading every spectrogram!)
-            datetimes = chunk.fits.get_datetimes()
 
-            if datetimes[0] < requested_end_datetime and datetimes[-1] > requested_start_datetime:
+            lower_bound_datetime = upper_bound_chunk_intervals[chunk_start_time][0]
+            upper_bound_datetime = upper_bound_chunk_intervals[chunk_start_time][1]
+
+            if lower_bound_datetime < requested_end_datetime and upper_bound_datetime > requested_start_datetime:
                 S = chunk.fits.load_spectrogram()
                 S = factory.time_chop(S, requested_start_str, requested_end_str)
                 if S is None:
@@ -121,3 +139,35 @@ class Chunks:
                 spectrogram_list.append(S)
 
         return factory.join_spectrograms(spectrogram_list)
+    
+
+    def get_upper_bound_chunk_intervals(self) -> dict[str, Tuple[datetime, datetime]]: 
+
+        chunk_list = list(self.dict.values())
+        num_chunks = len(chunk_list)
+
+         # # get the upper bound chunk intervals as a map s.t.
+        # # chunk_start_time -> tuple[t0, t1]
+        # where t0 is the current chunk start time as a datetime
+        # and t1 is the upper bound on the chunk end time as a datetime
+        # which we define to be the start of the next chunk
+        upper_bound_chunk_intervals = {}
+
+        for i, chunk in enumerate(chunk_list):
+            if not chunk.fits.exists():
+                continue
+            
+            t0 = chunk.chunk_start_datetime
+
+            if i < num_chunks - 1:
+                next_chunk = chunk_list[i+1]
+                t1 = next_chunk.chunk_start_datetime
+            
+            # if we are at the last chunk, just explicately evaluate it
+            else:
+                datetimes = chunk.fits.get_datetimes()
+                t1 = datetimes[-1]
+            
+            upper_bound_chunk_intervals[chunk.chunk_start_time] = (t0, t1)
+        
+        return upper_bound_chunk_intervals

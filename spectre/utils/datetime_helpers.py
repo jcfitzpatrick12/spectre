@@ -15,6 +15,36 @@ def date_dir(dt: datetime, **kwargs) -> str:
         return os.path.join(base_dir, date_dir)
     else:
         return date_dir
+    
+    
+def append_date_dir(parent_dir: str, **kwargs):
+    # if the year, year month, or year month and day is specified, build the
+    year = kwargs.get("year")
+    month = kwargs.get("month")
+    day = kwargs.get("day")
+
+    if year is None and month is None and day is None:
+        return parent_dir
+
+    # Validate the combinations of year, month, and day
+    if day and not month:
+        raise ValueError("Day specified without month.")
+    if (month or day) and not year:
+        raise ValueError("Month or day specified without year.")
+    if day and not (year and month):
+        raise ValueError("Day specified without both year and month.")
+    
+    if year:
+        dt = datetime(year=year, month=1, day=1)
+        parent_dir = os.path.join(parent_dir, dt.strftime("%Y"))
+    if year and month:
+        dt = datetime(year=year, month=month, day=1)
+        parent_dir = os.path.join(parent_dir, dt.strftime("%m"))
+    if year and month and day:
+        dt = datetime(year=year, month=month, day=day)
+        parent_dir = os.path.join(parent_dir, dt.strftime("%d"))
+    
+    return parent_dir
 
 
 def build_chunks_dir(chunk_start_time: str, chunks_dir: str) -> str:
