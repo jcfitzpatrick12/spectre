@@ -33,8 +33,10 @@ class Chunks:
     def build_dict(self) -> None:
         chunks_dict = OrderedDict()
 
+        # if the user has specified a certain day, consider only files in that directory
         if self.chunks_dir_with_time_dir:
             files = dir_helpers.list_all_files(self.chunks_dir_with_time_dir)
+        # otherwise consider all chunks in the chunks directory
         else:
             files = dir_helpers.list_all_files(self.chunks_dir)
 
