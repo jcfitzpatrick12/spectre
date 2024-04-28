@@ -11,7 +11,7 @@ class ChunkFits(ChunkExt):
     
 
     #load the RadioSpectrogram from the fits file.
-    def load_spectrogram(self):
+    def load_spectrogram(self) -> Spectrogram:
         if self.exists():
             # Open the FITS file
             with fits.open(self.get_path(), mode='readonly') as hdulist:

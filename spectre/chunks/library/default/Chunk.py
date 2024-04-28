@@ -22,7 +22,7 @@ class Chunk(ChunkBase):
         self.fits = ChunkFits(chunk_start_time, tag, chunks_dir)
 
 
-    def build_spectrogram(self) -> Tuple[np.array, np.array, np.array]:
+    def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
         # load the capture config for the current tag
@@ -51,7 +51,7 @@ class Chunk(ChunkBase):
         return w
     
 
-    def do_STFFT(self, capture_config: dict, w: np.ndarray) -> Tuple[np.array, np.array, np.array]:
+    def do_STFFT(self, capture_config: dict, w: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         '''
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
