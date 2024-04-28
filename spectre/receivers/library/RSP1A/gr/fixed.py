@@ -71,14 +71,27 @@ class fixed(gr.top_block, Qt.QWidget):
             pass
 
         ##################################################
+        # Unpack capture config
+        ##################################################
+        samp_rate = capture_config['samp_rate']
+        chunks_dir = capture_config['chunks_dir']
+        tag = capture_config['tag']
+        chunk_size = capture_config['chunk_size']
+        center_freq = capture_config['center_freq']
+        bandwidth = capture_config['bandwidth']
+        IF_gain = capture_config['IF_gain']
+        RF_gain = capture_config['RF_gain']
+
+
+        ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = capture_config['samp_rate']
+        self.samp_rate = samp_rate
 
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(capture_config['chunks_dir'], capture_config['tag'], capture_config['chunk_size'], capture_config['samp_rate'])
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(chunks_dir, tag, chunk_size, samp_rate)
         self.sdrplay3_rsp1a_0 = sdrplay3.rsp1a(
             '',
             stream_args=sdrplay3.stream_args(
@@ -86,12 +99,12 @@ class fixed(gr.top_block, Qt.QWidget):
                 channels_size=1
             ),
         )
-        self.sdrplay3_rsp1a_0.set_sample_rate(capture_config['samp_rate'])
-        self.sdrplay3_rsp1a_0.set_center_freq(capture_config['center_freq'])
-        self.sdrplay3_rsp1a_0.set_bandwidth(capture_config['bandwidth'])
+        self.sdrplay3_rsp1a_0.set_sample_rate(samp_rate)
+        self.sdrplay3_rsp1a_0.set_center_freq(center_freq)
+        self.sdrplay3_rsp1a_0.set_bandwidth(bandwidth)
         self.sdrplay3_rsp1a_0.set_gain_mode(False)
-        self.sdrplay3_rsp1a_0.set_gain(capture_config['IF_gain'], 'IF')
-        self.sdrplay3_rsp1a_0.set_gain(capture_config['RF_gain'], 'RF')
+        self.sdrplay3_rsp1a_0.set_gain(IF_gain, 'IF')
+        self.sdrplay3_rsp1a_0.set_gain(RF_gain, 'RF')
         self.sdrplay3_rsp1a_0.set_freq_corr(0)
         self.sdrplay3_rsp1a_0.set_dc_offset_mode(False)
         self.sdrplay3_rsp1a_0.set_iq_balance_mode(False)
