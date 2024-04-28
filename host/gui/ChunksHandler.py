@@ -27,6 +27,7 @@ class ChunksHandler:
         S = factory.time_average(S, avg_over_int_time)
         return S
 
+
     def set_default_spectrogram(self):
         chunks_list = list(self.chunks.dict.values())
         for chunk in reversed(chunks_list):
@@ -35,8 +36,10 @@ class ChunksHandler:
                 return
         raise ValueError(f"No fits files exist for tag {self.tag}")
 
+
     def get_field_defaults(self):
         return {
+            'tag': self.tag,
             'start_time': self.default_S.datetimes[0].strftime(CONFIG.default_time_format),
             'end_time': self.default_S.datetimes[-1].strftime(CONFIG.default_time_format),
             'lower_freq': round(self.default_S.freq_MHz[0], 2),
@@ -47,6 +50,7 @@ class ChunksHandler:
 
     def get_field_labels(self):
         return {
+            'tag': 'Tag: ',
             'start_time': "Start time: ",
             'end_time': "End time: ",
             'lower_freq': "Lower frequency [MHz]: ",

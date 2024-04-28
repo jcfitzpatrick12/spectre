@@ -31,7 +31,7 @@ class SPECTRECompanion:
 
     def update_entries(self, field_values):
         field_labels = self.chunks_handler.get_field_labels()
-        for i, (field, value) in enumerate(field_values.items(), start=1):
+        for i, (field, value) in enumerate(field_values.items(), start=0):
             if field in self.entries:
                 entry = self.entries[field]
                 entry.delete(0, tk.END)
