@@ -18,7 +18,7 @@
 - **[`gnuradio`](https://github.com/gnuradio/gnuradio)**
 - **[`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3)**, which includes the SDRplay RSP* series gnuradio source blocks.
 - **[`gr-spectre`](https://github.com/jcfitzpatrick12/gr-spectre)**, which includes custom C++ gnuradio sink blocks for streaming IQ data capture.
-- The **`spectre` CLI tool**, for initiating data capture, creating configuration files and other utilities.
+- The **`spectre`** CLI tool, for initiating data capture, creating configuration files and other utilities.
 - **`cron`** and template scripts for daily data capture.
 - **`spectre-companion`**: a development GUI for displaying radio spectrograms captured by the program.
 
