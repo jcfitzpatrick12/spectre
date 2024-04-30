@@ -46,7 +46,7 @@ We're still in active development, so this setup is not the final intended deplo
 Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
 
 
-**Installing the RSP API on your host machine**  
+**Install the RSP API on your host machine**  
 First, download the RSP API from SDRPlay on your host machine by running (in your desired directory):  
 ```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.14.0.run```  
   
@@ -58,7 +58,7 @@ Run the API installation:
 With the installation successful, start the sdrplay API service:  
 ```sudo systemctl start sdrplay```
 
-**Installing SPECTRE**  
+**Install SPECTRE**  
 Clone the repository (in your desired directory):  
 ```git clone https://github.com/jcfitzpatrick12/spectre.git```
 
