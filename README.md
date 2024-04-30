@@ -49,7 +49,8 @@ Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubunt
 **Installing the RSP API on your host machine**  
 First, download the RSP API from SDRPlay on your host machine by running (in your desired directory):  
 ```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.14.0.run```  
-or by manually downloading [directly from the SDRPlay website](https://www.sdrplay.com/api/).
+  
+Alternatively, you can manually download it [directly from the SDRPlay website](https://www.sdrplay.com/api/).  
   
 Run the API installation:  
 ```chmod +x ./SDRplay_RSP_API-Linux-3.14.0.run && ./SDRplay_RSP_API-Linux-3.14.0.run```  
@@ -67,11 +68,8 @@ Navigate to the host directory:
 Build the Docker image:  
 ```docker build -t spectre-host .```
 
-Make the start script executable:  
-```chmod +x run.sh```
-
-Run the start script:  
-```./run.sh```
+Make the start script executable and run it:  
+```chmod +x run.sh && ./run.sh```  
 
 Now inside the container, check everything's up and running:  
 ```spectre -v ```
