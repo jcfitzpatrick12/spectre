@@ -37,15 +37,28 @@ This project is tested to be compatible with the following operating systems:
 
 - Ubuntu 22.04.3
 
-It may also work on other Linux distributions and other Ubuntu versions. Support for Windows is planned for the future.
+It may also work on other Linux distributions and other Ubuntu versions. Support for Raspberry Pi and Windows will be explored in the future.
 
 ## Installation
-We're still in active development, so this setup is not the final intended deployment method. In any case, feel free to dive in and tinker around with the current build. Here's how you can get started:
+We're still in active development, so this setup is not the final intended deployment method. In any case, feel free to dive in and tinker around with the current build. But be warned, everything might not be stable! Here's how you can get started:
 
 **Prerequisites:**
 Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
 
-Clone the repository:  
+
+**Installing the RSP API on your host machine**  
+First, download the RSP API from SDRPlay on your host machine by running (in your desired directory):  
+```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.14.0.run```  
+or by manually downloading [directly from the SDRPlay website](https://www.sdrplay.com/api/).
+  
+Run the API installation:  
+```chmod +x ./SDRplay_RSP_API-Linux-3.14.0.run && ./SDRplay_RSP_API-Linux-3.14.0.run```  
+  
+With the installation successful, start the sdrplay API service:  
+```sudo systemctl start sdrplay```
+
+**Installing SPECTRE**  
+Clone the repository (in your desired directory):  
 ```git clone https://github.com/jcfitzpatrick12/spectre.git```
 
 Navigate to the host directory:   
@@ -64,8 +77,6 @@ Now inside the container, check everything's up and running:
 ```spectre -v ```
 
 With the installation verified, you can freely use the suite of `spectre` CLI commands to capture data, create configuration files and launch `spectre-companion`. You can exit the container using: ```exit```
-
-...
 
 ## Contributing
 Once the testing framework is in place, we will be looking for contributors. In the meantime, feel free to contact jcfitzpatrick12@gmail.com if you are interested :)
