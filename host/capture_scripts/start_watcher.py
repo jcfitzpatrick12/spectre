@@ -17,11 +17,11 @@ if __name__ == "__main__":
 
     try:
         # load the particular extension to watch from the capture config from the capture config
-        capture_config_instance = CaptureConfig(tag, CONFIG.json_configs_dir)
+        capture_config_instance = CaptureConfig(tag)
         capture_config = capture_config_instance.load_as_dict()
         watch_extension = capture_config.get('watch_extension')
 
-        watcher = Watcher(tag, watch_extension, CONFIG.chunks_dir, CONFIG.json_configs_dir)
+        watcher = Watcher(tag, watch_extension)
         watcher.start()
 
     except Exception as e:

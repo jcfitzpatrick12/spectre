@@ -11,10 +11,8 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import factory
 
 class Chunks:
-    def __init__(self, tag: str, chunks_dir: str, json_configs_dir: str, **kwargs):
+    def __init__(self, tag: str, **kwargs):
         self.tag = tag
-        self.chunks_dir = chunks_dir
-        self.json_configs_dir = json_configs_dir
         
         # if a specific date is specified via kwargs, set the attribute
         # for chunks dir with the date dir appended.
@@ -24,9 +22,9 @@ class Chunks:
         day = kwargs.get("day")
         if (not year is None) or (not month is None) or (not day is None):
             # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-            self.chunks_dir_with_time_dir = datetime_helpers.append_date_dir(self.chunks_dir, **kwargs)
+            self.chunks_dir_with_time_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, **kwargs)
 
-        self.Chunk = get_chunk_from_tag(tag, json_configs_dir)
+        self.Chunk = get_chunk_from_tag(tag)
         self.dict = self.build_dict()
 
 
@@ -38,7 +36,7 @@ class Chunks:
             files = dir_helpers.list_all_files(self.chunks_dir_with_time_dir)
         # otherwise consider all chunks in the chunks directory
         else:
-            files = dir_helpers.list_all_files(self.chunks_dir)
+            files = dir_helpers.list_all_files(CONFIG.chunks_dir)
 
         for file in files:
             file_name, ext = os.path.splitext(file)
@@ -48,7 +46,7 @@ class Chunks:
                 print(f"Error while splitting {file_name} at \"_\". Received {e}")
             # only consider chunks with the specified tag
             if tag == self.tag:
-                chunks_dict[chunk_start_time] = self.Chunk(chunk_start_time, tag, self.chunks_dir, self.json_configs_dir)
+                chunks_dict[chunk_start_time] = self.Chunk(chunk_start_time, tag)
         
         # sort the dictionary and set the attribute
         return OrderedDict(sorted(chunks_dict.items()))

@@ -15,7 +15,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
 
     # try:
-    fits_config_instance = FitsConfig(tag, CONFIG.json_configs_dir)
+    fits_config_instance = FitsConfig(tag)
     json_helpers.delete_json_config(fits_config_instance, "fits_config")
 
     # except Exception as e:
@@ -37,7 +37,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
 
     # try:
-    capture_config_instance = CaptureConfig(tag, CONFIG.json_configs_dir)
+    capture_config_instance = CaptureConfig(tag)
     json_helpers.delete_json_config(capture_config_instance, "capture_config")
 
     # except Exception as e:

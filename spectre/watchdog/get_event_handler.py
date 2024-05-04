@@ -13,8 +13,8 @@ def get_event_handler(event_handler_key: str):
         raise ValueError(f"No chunk found for the event handler key: {event_handler_key}. Please specify one of the following event handler keys {valid_event_handler_keys}.")
     return event_handler
 
-def get_event_handler_from_tag(tag: str, json_configs_dir: str):
-    capture_config_instance = CaptureConfig(tag, json_configs_dir)
+def get_event_handler_from_tag(tag: str):
+    capture_config_instance = CaptureConfig(tag)
     capture_config = capture_config_instance.load_as_dict()
     event_handler_key = capture_config.get('event_handler_key', None)
     return get_event_handler(event_handler_key)

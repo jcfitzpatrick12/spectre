@@ -14,8 +14,8 @@ def get_chunk(chunk_key: str) -> ChunkBase:
         raise ValueError(f"No chunk found for the chunk key: {chunk_key}. Please specify one of the following chunk keys {valid_chunk_keys}.")
     return chunk
 
-def get_chunk_from_tag(tag: str, json_configs_dir: str) -> ChunkBase:
-    capture_config_instance = CaptureConfig(tag, json_configs_dir)
+def get_chunk_from_tag(tag: str) -> ChunkBase:
+    capture_config_instance = CaptureConfig(tag)
     capture_config = capture_config_instance.load_as_dict()
     chunk_key = capture_config.get('chunk_key', None)
     return get_chunk(chunk_key)

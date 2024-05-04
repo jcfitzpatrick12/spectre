@@ -4,8 +4,8 @@ from spectre.chunks.ChunkExt import ChunkExt
 
 
 class ChunkBin(ChunkExt):
-    def __init__(self, chunk_start_time: str, tag: str, chunks_dir: str):
-        super().__init__(chunk_start_time, tag, ".bin", chunks_dir)
+    def __init__(self, chunk_start_time: str, tag: str):
+        super().__init__(chunk_start_time, tag, ".bin")
 
     def get_IQ_data(self) -> np.ndarray:
         try:

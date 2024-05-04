@@ -15,18 +15,18 @@ from spectre.chunks.library.default.ChunkFits import ChunkFits
 
 @register_chunk('default')
 class Chunk(ChunkBase):
-    def __init__(self, chunk_start_time: str, tag: str, chunks_dir: str, json_configs_dir: str):
-        super().__init__(chunk_start_time, tag, chunks_dir, json_configs_dir) 
+    def __init__(self, chunk_start_time: str, tag: str):
+        super().__init__(chunk_start_time, tag) 
 
-        self.bin = ChunkBin(chunk_start_time, tag, chunks_dir)
-        self.fits = ChunkFits(chunk_start_time, tag, chunks_dir)
+        self.bin = ChunkBin(chunk_start_time, tag)
+        self.fits = ChunkFits(chunk_start_time, tag)
 
 
     def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
         # load the capture config for the current tag
-        capture_config = json_helpers.load_json_as_dict(f"capture_config_{self.tag}", self.json_configs_dir)
+        capture_config = json_helpers.load_json_as_dict(f"capture_config_{self.tag}")
 
         # fetch the window
         w = self.fetch_window(capture_config)

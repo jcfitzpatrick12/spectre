@@ -23,7 +23,7 @@ class ChunksHandler:
             day = None
             
         self.tag = tag
-        self.chunks = Chunks(tag, CONFIG.chunks_dir, CONFIG.json_configs_dir, year=year, month=month, day=day)
+        self.chunks = Chunks(tag, year=year, month=month, day=day)
         self.set_default_spectrogram()
 
 

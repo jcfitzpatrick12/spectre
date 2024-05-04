@@ -16,7 +16,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
 
     try:
-        fits_config_instance = FitsConfig(tag, CONFIG.json_configs_dir)
+        fits_config_instance = FitsConfig(tag)
         config_dict = fits_config_instance.load_as_dict()
         for key, value in config_dict.items():
             typer.secho(
@@ -36,7 +36,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
 
     try:
-        capture_config_instance = CaptureConfig(tag, CONFIG.json_configs_dir)
+        capture_config_instance = CaptureConfig(tag)
         config_dict = capture_config_instance.load_as_dict()
         for key, value in config_dict.items():
             typer.secho(
