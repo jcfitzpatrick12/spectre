@@ -106,7 +106,7 @@ Activate the virtual environment:
 Run the set-up using ```pip```:  
 ```pip install -e .```  
 And finally, run the GUI:  
-```python3 client/devgui/SPECTRECompanion.py```
+```python3 client/devgui/SPECTRECompanion.py --tag [capture tag]```, where ```[capture tag]``` is specified during data capture.
 
 
 # Contributing
