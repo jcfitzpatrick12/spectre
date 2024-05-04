@@ -1,5 +1,5 @@
 __pycache__
-chunks
+/chunks/
 scrap
 *egg*
 *venv

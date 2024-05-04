@@ -1,9 +1,9 @@
 import os
 
-from spectre.json_config.JsonConfig import JsonConfig
+from spectre.json_config.JsonConfigHandler import JsonConfigHandler
 from spectre.utils import dict_helpers
 
-class FitsConfig(JsonConfig):
+class FitsConfigHandler(JsonConfigHandler):
     def __init__(self, tag: str):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')

@@ -7,7 +7,7 @@ from host.utils import capture_session
 from cfg import CONFIG
 
 from spectre.receivers.Receiver import Receiver
-from spectre.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.watchdog.Watcher import Watcher
 
 
@@ -56,8 +56,8 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
             os.mkdir(CONFIG.chunks_dir)
 
         # load the particular extension to watch from the capture config from the capture config
-        capture_config_instance = CaptureConfig(tag)
-        capture_config = capture_config_instance.load_as_dict()
+        capture_config_handler = CaptureConfigHandler(tag)
+        capture_config = capture_config_handler.load_as_dict()
         watch_extension = capture_config.get('watch_extension')
 
         watcher = Watcher(tag, watch_extension)

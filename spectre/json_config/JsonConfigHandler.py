@@ -2,7 +2,7 @@ from cfg import CONFIG
 from spectre.utils import json_helpers
 import os
 
-class JsonConfig:
+class JsonConfigHandler:
     def __init__(self, name: str):
         self.name = name
 

@@ -9,7 +9,7 @@ from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from cfg import CONFIG
 from spectre.spectrogram.PanelStacker import PanelStacker
-from spectre.json_config.FitsConfig import FitsConfig
+from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 
 
 class Spectrogram:
@@ -52,8 +52,8 @@ class Spectrogram:
 
     def save_to_fits(self) -> None:
         try:
-            fits_config_instance = FitsConfig(self.tag)
-            fits_config = fits_config_instance.load_as_dict()
+            fits_config_handler = FitsConfigHandler(self.tag)
+            fits_config = fits_config_handler.load_as_dict()
         except (FileNotFoundError, IOError) as e:
             warnings.warn(f"fits_config for tag {self.tag} unable to be loaded, defaulting to empty dictionary. Received error {e}")
             fits_config = {}
