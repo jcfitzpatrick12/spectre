@@ -40,7 +40,7 @@ def save_spectrogram(S, fits_config: dict, path_to_fits: str):
     end_time = end_datetime.strftime("%H:%M:%S.%f")
 
     primary_hdu.header.set('DATE', start_date, 'time of observation')
-    primary_hdu.header.set('CONTENT', f'{start_date} power spectral density, grso (GLASGOW)', 'title of image')
+    primary_hdu.header.set('CONTENT', f'{start_date} dynamic spectrogram', 'title of image')
     primary_hdu.header.set('ORIGIN', f'{fits_config.get("ORIGIN")}')
     primary_hdu.header.set('TELESCOP', f'{fits_config.get("TELESCOP")} tag: {S.tag}', 'type of instrument')
     primary_hdu.header.set('INSTRUME', f'{fits_config.get("INSTRUME")}') 
