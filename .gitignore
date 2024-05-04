@@ -1,3 +1,5 @@
 __pycache__
-host/chunks
+chunks
 scrap
+*egg*
+*venv
