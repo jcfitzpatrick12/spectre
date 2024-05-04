@@ -22,7 +22,7 @@ def start(command: List[str]) -> None:
     
     # Check if the started process is still running
     if not process.poll() is None:
-        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Check the log for more details.", fg=typer.colors.RED)
+        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Check {CONFIG.path_to_capture_log} for more details.", fg=typer.colors.RED)
         raise typer.Exit(1)
     else:
         typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
