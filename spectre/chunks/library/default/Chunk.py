@@ -8,7 +8,7 @@ from spectre.chunks.ChunkBase import ChunkBase
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
 
-from spectre.json_config.CaptureConfigHandler import CaptureConfig
+from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits
@@ -28,8 +28,8 @@ class Chunk(ChunkBase):
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
         
         # load the capture config for the current tag
-        capture_config_instance = CaptureConfig(self.tag)
-        capture_config = capture_config_instance.load_as_dict()
+        capture_config_handler = CaptureConfigHandler(self.tag)
+        capture_config = capture_config_handler.load_as_dict()
 
         # fetch the window
         w = self.fetch_window(capture_config)
