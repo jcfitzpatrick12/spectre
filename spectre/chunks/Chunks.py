@@ -16,13 +16,13 @@ class Chunks:
         
         # if a specific date is specified via kwargs, set the attribute
         # for chunks dir with the date dir appended.
-        self.chunks_dir_with_time_dir = None
+        self.chunks_dir = CONFIG.chunks_dir
         year = kwargs.get("year")
         month = kwargs.get("month")
         day = kwargs.get("day")
         if (not year is None) or (not month is None) or (not day is None):
             # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-            self.chunks_dir_with_time_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, **kwargs)
+            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, **kwargs)
 
         self.Chunk = get_chunk_from_tag(tag)
         self.dict = self.build_dict()
@@ -31,12 +31,11 @@ class Chunks:
     def build_dict(self) -> None:
         chunks_dict = OrderedDict()
 
-        # if the user has specified a certain day, consider only files in that directory
-        if self.chunks_dir_with_time_dir:
-            files = dir_helpers.list_all_files(self.chunks_dir_with_time_dir)
-        # otherwise consider all chunks in the chunks directory
-        else:
-            files = dir_helpers.list_all_files(CONFIG.chunks_dir)
+        try:
+            files = dir_helpers.list_all_files(self.chunks_dir)
+        except NotADirectoryError:
+            os.mkdir(CONFIG.chunks_dir)
+            files = []
 
         for file in files:
             file_name, ext = os.path.splitext(file)
