@@ -66,11 +66,11 @@ Navigate to the ```spectre``` directory:
 ```cd spectre```
 
 Set the ```SPECTREPARENTPATH``` environment variable:  
-```export SPECTREPARENTPATH=$(pwd)```  
+```echo "export SPECTREPARENTPATH=$(pwd)" >> ~/.bashrc```  
 
 **Set up ```spectre-host```**  
-Navigate to the ```host``` directory:   
-```cd host```
+Please open a new shell and navigate to the ```host``` directory via:   
+```cd $SPECTREPARENTPATH/host```
 
 Build the Docker image:  
 ```docker build -t spectre-host .```
