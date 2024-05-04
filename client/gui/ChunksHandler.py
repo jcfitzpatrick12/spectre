@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from host.cfg import CONFIG
+from cfg import CONFIG
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram import factory
 from spectre.spectrogram.Panels import Panels
