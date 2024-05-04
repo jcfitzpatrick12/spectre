@@ -89,7 +89,7 @@ With the installation verified, you can freely use the suite of `spectre` CLI co
 # spectre-client
 
 ## Introduction
-While we are in development, we have created a placeholder GUI using [```tkinter```](https://docs.python.org/3/library/tkinter.html). Please follow the Installation section to get this up and running.
+While we are in development, we have created a placeholder GUI which runs locally using [```tkinter```](https://docs.python.org/3/library/tkinter.html). Please follow the Installation section to get this up and running.
 
 ## Installation
 
