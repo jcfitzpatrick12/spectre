@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 import os
 
 from spectre.watchdog.Watcher import Watcher
-from host.cfg import CONFIG
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from cfg import CONFIG
+from spectre.json_config.CaptureConfig import CaptureConfig
 from host.utils import capture_session
 
 if __name__ == "__main__":

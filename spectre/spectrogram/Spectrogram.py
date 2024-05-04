@@ -7,9 +7,9 @@ import warnings
 
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 from spectre.spectrogram.PanelStacker import PanelStacker
-from spectre.cfg.json_config.FitsConfig import FitsConfig
+from spectre.json_config.FitsConfig import FitsConfig
 
 
 class Spectrogram:

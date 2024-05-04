@@ -2,10 +2,10 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from host.cfg import CONFIG
+from cfg import CONFIG
 
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
-from spectre.cfg.json_config.FitsConfig import FitsConfig
+from spectre.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.FitsConfig import FitsConfig
 from spectre.utils import json_helpers
 
 app = typer.Typer()

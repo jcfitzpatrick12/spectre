@@ -3,7 +3,7 @@
 # this import will run the __init__.py within library, which will dynamically import all the event handlers
 import spectre.watchdog.library
 from spectre.watchdog.event_handler_register import event_handler_map
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 def get_event_handler(event_handler_key: str):
     # try and fetch the capture config mount

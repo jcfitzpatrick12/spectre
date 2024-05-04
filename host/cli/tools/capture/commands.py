@@ -4,7 +4,7 @@ from typing import List
 
 from host.cli import __app_name__, __version__
 from host.utils import capture_session 
-from host.cfg import CONFIG
+from cfg import CONFIG
 
 
 app = typer.Typer()

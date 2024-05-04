@@ -1,6 +1,6 @@
 from spectre.receivers.Receiver import Receiver
 from argparse import ArgumentParser
-from host.cfg import CONFIG
+from cfg import CONFIG
 from host.utils import capture_session
 import os
 

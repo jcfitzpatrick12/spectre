@@ -1,5 +1,5 @@
 from spectre.utils import dict_helpers
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 from spectre.receivers.get_mount import get_capture_config_mount, get_capture_mount
 
