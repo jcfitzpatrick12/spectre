@@ -1,8 +1,8 @@
 import os
 
-from spectre.json_config.JsonConfig import JsonConfig
+from spectre.json_config.JsonConfigHandler import JsonConfigHandler
 
-class CaptureConfig(JsonConfig):
+class CaptureConfigHandler(JsonConfigHandler):
     def __init__(self, tag: str):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')

@@ -8,7 +8,7 @@ import pkgutil
 # which is decorated to the global list of mounts
 # Iterate through all receiver directories within the library
 library_path = os.path.dirname(__file__)
-expected_modules_for_receiver = ['Capture', 'CaptureConfig']
+expected_modules_for_receiver = ['Capture', 'CaptureConfigHandler']
 
 def import_from_receiver(receiver):
     # create the full path to the receiver, 

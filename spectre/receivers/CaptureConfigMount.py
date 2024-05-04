@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class CaptureConfigMount(ABC):
+class CaptureConfigHandlerMount(ABC):
     def __init__(self):
         self.set_templates()
         self.set_validators()

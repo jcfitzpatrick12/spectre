@@ -8,7 +8,7 @@ from spectre.chunks.ChunkBase import ChunkBase
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
 
-from spectre.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfigHandler import CaptureConfig
 
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits

@@ -4,8 +4,8 @@ import os
 from host.cli import __app_name__, __version__
 from cfg import CONFIG
 
-from spectre.json_config.CaptureConfig import CaptureConfig
-from spectre.json_config.FitsConfig import FitsConfig
+from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
+from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 from spectre.utils import json_helpers
 
 app = typer.Typer()
@@ -15,8 +15,8 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
 
     # try:
-    fits_config_instance = FitsConfig(tag)
-    json_helpers.delete_json_config(fits_config_instance, "fits_config")
+    fits_config_handler = FitsConfigHandler(tag)
+    json_helpers.delete_json_config(fits_config_handler, "fits_config")
 
     # except Exception as e:
     #     typer.secho(
@@ -27,7 +27,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
 
     typer.secho(
-            f'File deleted: {fits_config_instance.absolute_path()}.',
+            f'File deleted: {fits_config_handler.absolute_path()}.',
             fg=typer.colors.YELLOW,
         )
 
@@ -37,8 +37,8 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
 
     # try:
-    capture_config_instance = CaptureConfig(tag)
-    json_helpers.delete_json_config(capture_config_instance, "capture_config")
+    capture_config_handler = CaptureConfigHandler(tag)
+    json_helpers.delete_json_config(capture_config_handler, "capture_config")
 
     # except Exception as e:
     #     typer.secho(
@@ -49,7 +49,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
 
     typer.secho(
-            f'File deleted: {capture_config_instance.absolute_path()}.',
+            f'File deleted: {capture_config_handler.absolute_path()}.',
             fg=typer.colors.YELLOW,
         )
 
