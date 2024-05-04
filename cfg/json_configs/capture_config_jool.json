@@ -6,7 +6,6 @@
     "integration_time": 0.1,
     "Nx": 1024,
     "chunk_key": "default",
-    "chunks_dir": "/home/spectre/host/chunks/",
     "center_freq": 68000000.0,
     "RF_gain": 0,
     "bandwidth": 6000000,

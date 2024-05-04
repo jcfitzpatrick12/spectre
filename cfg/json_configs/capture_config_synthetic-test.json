@@ -1,7 +1,6 @@
 {
-    "chunks_dir": "/home/spectre/host/chunks/",
     "Nx": 256,
-    "samp_rate": 32768,
+    "samp_rate": 2048,
     "window_kwargs": {},
     "STFFT_kwargs": {
         "hop": 128
@@ -9,7 +8,7 @@
     "chunk_key": "default",
     "amplitude": 1.0,
     "integration_time": 0.0,
-    "frequency": 2048,
+    "frequency": 512.0,
     "chunk_size": 5,
     "window_type": "boxcar",
     "event_handler_key": "default",

@@ -20,6 +20,7 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
+from cfg import CONFIG
 
 
 
@@ -32,7 +33,6 @@ class cosine_signal(gr.top_block):
         # Unpack capture config
         ##################################################
         samp_rate = capture_config['samp_rate']
-        chunks_dir = capture_config['chunks_dir']
         tag = capture_config['tag']
         chunk_size = capture_config['chunk_size']
         frequency = capture_config['frequency']
@@ -42,7 +42,7 @@ class cosine_signal(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(chunks_dir, tag, chunk_size, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.chunks_dir, tag, chunk_size, samp_rate)
         self.blocks_throttle_1 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, frequency, amplitude, 0, 0)
 

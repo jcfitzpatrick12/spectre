@@ -19,6 +19,7 @@ from gnuradio import eng_notation
 from gnuradio import sdrplay3
 from gnuradio import spectre
 
+from cfg import CONFIG
 
 class fixed(gr.top_block):
 
@@ -29,7 +30,6 @@ class fixed(gr.top_block):
         # Unpack capture config
         ##################################################
         samp_rate = capture_config['samp_rate']
-        chunks_dir = capture_config['chunks_dir']
         tag = capture_config['tag']
         chunk_size = capture_config['chunk_size']
         center_freq = capture_config['center_freq']
@@ -40,7 +40,7 @@ class fixed(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(chunks_dir, tag, chunk_size, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.chunks_dir, tag, chunk_size, samp_rate)
         self.sdrplay3_rsp1a_0 = sdrplay3.rsp1a(
             '',
             stream_args=sdrplay3.stream_args(
