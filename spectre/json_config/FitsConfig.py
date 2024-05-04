@@ -4,7 +4,7 @@ from spectre.json_config.JsonConfig import JsonConfig
 from spectre.utils import dict_helpers
 
 class FitsConfig(JsonConfig):
-    def __init__(self, tag: str, json_configs_dir: str):
+    def __init__(self, tag: str):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')
         
@@ -14,7 +14,7 @@ class FitsConfig(JsonConfig):
     
     
         name = f"fits_config_{tag}"
-        super().__init__(name, json_configs_dir)
+        super().__init__(name)
 
 
     def get_template(self,) -> dict:

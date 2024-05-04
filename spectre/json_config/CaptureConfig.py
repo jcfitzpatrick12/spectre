@@ -3,7 +3,7 @@ import os
 from spectre.json_config.JsonConfig import JsonConfig
 
 class CaptureConfig(JsonConfig):
-    def __init__(self, tag: str, json_configs_dir: str):
+    def __init__(self, tag: str):
         if tag == None:
             raise ValueError(f'tag cannot be None. Received {tag}.')
         
@@ -11,7 +11,7 @@ class CaptureConfig(JsonConfig):
             raise ValueError(f"Tags cannot contain an underscore. Received {tag}.")
         
         name = f"capture_config_{tag}"
-        super().__init__(name, json_configs_dir)
+        super().__init__(name)
     
 
 
