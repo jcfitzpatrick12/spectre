@@ -1,6 +1,6 @@
 import os
 
-from spectre.cfg.json_config.JsonConfig import JsonConfig
+from spectre.json_config.JsonConfig import JsonConfig
 from spectre.utils import dict_helpers
 
 class FitsConfig(JsonConfig):

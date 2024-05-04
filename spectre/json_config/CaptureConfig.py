@@ -1,6 +1,6 @@
 import os
 
-from spectre.cfg.json_config.JsonConfig import JsonConfig
+from spectre.json_config.JsonConfig import JsonConfig
 
 class CaptureConfig(JsonConfig):
     def __init__(self, tag: str, json_configs_dir: str):
