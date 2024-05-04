@@ -62,8 +62,14 @@ With the installation successful, start the sdrplay API service:
 Clone the repository (in your desired directory):  
 ```git clone https://github.com/jcfitzpatrick12/spectre.git```
 
-Navigate to the host directory:   
-```cd spectre/host```
+Navigate to into the ```spectre``` directory:   
+```cd spectre```
+
+Set the ```SPECTREPARENTPATH``` environment variable:  
+```export SPECTREPARENTPATH=$(pwd)```  
+
+Navigate to the ```host``` directory:   
+```cd host```
 
 Build the Docker image:  
 ```docker build -t spectre-host .```
@@ -74,9 +80,34 @@ Make the start script executable and run it:
 Now inside the container, check everything's up and running:  
 ```spectre -v ```
 
-With the installation verified, you can freely use the suite of `spectre` CLI commands to capture data, create configuration files and launch `spectre-companion`. You can exit the container using: ```exit```
+With the installation verified, you can freely use the suite of `spectre` CLI commands to create configuration files and capture data. You can exit the container using ```exit```
 
-## Contributing
+
+---
+
+# spectre-client
+
+## Introduction
+While we are in development, we have created a placeholder GUI using [```tkinter```](https://docs.python.org/3/library/tkinter.html). Please follow the Installation section to get this up and running.
+
+## Installation
+If you have not done so already, clone the ```spectre``` repository in your preferred directory:  
+```git clone https://github.com/jcfitzpatrick12/spectre.git```  
+Navigate to into the ```spectre``` directory:   
+```cd spectre```  
+Set the ```SPECTREPARENTPATH``` environment variable:  
+```export SPECTREPARENTPATH=$(cwd)```  
+Create the Python virtual environment:  
+```python3 -m venv .venv```  
+Activate the virtual environment:  
+```source .venv/bin/activate```  
+Run the set-up using ```pip```:  
+```pip install -e .```
+And finally, run the GUI:  
+```python3 client/devgui/SPECTRECompanion.py```
+
+
+# Contributing
 Once the testing framework is in place, we will be looking for contributors. In the meantime, feel free to contact jcfitzpatrick12@gmail.com if you are interested :)
 
 
