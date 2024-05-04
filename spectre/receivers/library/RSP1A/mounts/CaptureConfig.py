@@ -1,10 +1,10 @@
-from spectre.receivers.CaptureConfigHandlerMount import CaptureConfigHandlerMount
+from spectre.receivers.CaptureConfigMount import CaptureConfigMount
 from spectre.receivers.mount_register import register_capture_config_mount
 from spectre.utils import validator_helpers
 
 
 @register_capture_config_mount("RSP1A")
-class CaptureConfigHandler(CaptureConfigHandlerMount):
+class CaptureConfig(CaptureConfigMount):
     def __init__(self,):
         super().__init__()
         pass
