@@ -94,7 +94,7 @@ While we are in development, we have created a placeholder GUI using [```tkinter
 ## Installation
 
 **Prerequisites:**  
-We assume you have following the Installation section for ```spectre-host```
+We assume you have following the Installation section for ```spectre-host```.
 
 **Set up ```spectre-client```**  
 If not already, change directory into that specified by ```$SPECTREPARENTPATH$``` (where ```spectre``` was cloned):  
