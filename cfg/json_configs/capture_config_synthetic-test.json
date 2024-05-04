@@ -1,0 +1,19 @@
+{
+    "Nx": 256,
+    "samp_rate": 2048,
+    "window_kwargs": {},
+    "STFFT_kwargs": {
+        "hop": 128
+    },
+    "chunk_key": "default",
+    "amplitude": 1.0,
+    "integration_time": 0.0,
+    "frequency": 512.0,
+    "chunk_size": 5,
+    "window_type": "boxcar",
+    "event_handler_key": "default",
+    "watch_extension": ".bin",
+    "receiver": "Test",
+    "mode": "cosine_signal",
+    "tag": "synthetic-test"
+}

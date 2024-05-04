@@ -6,7 +6,7 @@ import time
 import typer
 from typing import List
 
-from host.cfg import CONFIG
+from cfg import CONFIG
 
 def start(command: List[str]) -> None:
 

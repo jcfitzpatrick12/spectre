@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import os
 import numpy as np
 
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 
 
 def date_dir(dt: datetime, **kwargs) -> str:
@@ -47,13 +47,13 @@ def append_date_dir(parent_dir: str, **kwargs):
     return parent_dir
 
 
-def build_chunks_dir(chunk_start_time: str, chunks_dir: str) -> str:
+def build_chunks_dir(chunk_start_time: str) -> str:
     # Parse the datetime string to a datetime object
     try:
         dt = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
     except ValueError as e:
         raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
-    return date_dir(dt, base_dir=chunks_dir)
+    return date_dir(dt, base_dir=CONFIG.chunks_dir)
 
 
 def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray) -> list:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from host.cfg import CONFIG
+from cfg import CONFIG
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram import factory
 from spectre.spectrogram.Panels import Panels
@@ -23,7 +23,7 @@ class ChunksHandler:
             day = None
             
         self.tag = tag
-        self.chunks = Chunks(tag, CONFIG.chunks_dir, CONFIG.json_configs_dir, year=year, month=month, day=day)
+        self.chunks = Chunks(tag, year=year, month=month, day=day)
         self.set_default_spectrogram()
 
 

@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 from spectre.chunks.ChunkBase import ChunkBase
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
-from spectre.spectrogram.Spectrogram import Spectrogram
+
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits
@@ -15,18 +16,20 @@ from spectre.chunks.library.default.ChunkFits import ChunkFits
 
 @register_chunk('default')
 class Chunk(ChunkBase):
-    def __init__(self, chunk_start_time: str, tag: str, chunks_dir: str, json_configs_dir: str):
-        super().__init__(chunk_start_time, tag, chunks_dir, json_configs_dir) 
+    def __init__(self, chunk_start_time: str, tag: str):
+        super().__init__(chunk_start_time, tag) 
 
-        self.bin = ChunkBin(chunk_start_time, tag, chunks_dir)
-        self.fits = ChunkFits(chunk_start_time, tag, chunks_dir)
+        self.bin = ChunkBin(chunk_start_time, tag)
+        self.fits = ChunkFits(chunk_start_time, tag)
 
 
     def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
+        
         # load the capture config for the current tag
-        capture_config = json_helpers.load_json_as_dict(f"capture_config_{self.tag}", self.json_configs_dir)
+        capture_config_instance = CaptureConfig(self.tag)
+        capture_config = capture_config_instance.load_as_dict()
 
         # fetch the window
         w = self.fetch_window(capture_config)

@@ -1,5 +1,5 @@
 from spectre.utils import dict_helpers
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 from spectre.receivers.get_mount import get_capture_config_mount, get_capture_mount
 
@@ -45,7 +45,7 @@ class Receiver:
         return
 
 
-    def save_capture_config(self, capture_config_as_dict: dict, tag: str, json_configs_dir: str) -> None:
+    def save_capture_config(self, capture_config_as_dict: dict, tag: str) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # extract the capture config template for the current mode of the receiver
@@ -60,14 +60,14 @@ class Receiver:
         capture_config_as_dict['mode'] = self.mode
         capture_config_as_dict['tag'] = tag
         # instantiate capture_config and save the newly constructed config_dict
-        capture_config_instance = CaptureConfig(tag, json_configs_dir)
+        capture_config_instance = CaptureConfig(tag)
         # save to file under the requested tag
         capture_config_instance.save_dict_as_json(capture_config_as_dict)
         return
 
 
     # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
-    def save_params_as_capture_config(self, params: list, tag: str, json_configs_dir: str) -> None:
+    def save_params_as_capture_config(self, params: list, tag: str) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # convert the user defined params to a raw_dict [key=string_value]
@@ -78,18 +78,18 @@ class Receiver:
         capture_config_as_dict = dict_helpers.convert_types(string_valued_dict, template)  
         # and finally, save the capture_config as dict. Internally performs validations on the config as specified
         # the capture config mount 
-        self.save_capture_config(capture_config_as_dict, tag, json_configs_dir)
+        self.save_capture_config(capture_config_as_dict, tag)
         return  
     
 
-    def start_capture(self, tags: list, json_configs_dir: str) -> None:
+    def start_capture(self, tags: list) -> None:
         # first check if the current mode is valid.
         if self.mode not in self.valid_modes:
             raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
 
         capture_configs = []
         for tag in tags:
-            capture_config = self.get_capture_config_for_capture(tag, json_configs_dir)
+            capture_config = self.get_capture_config_for_capture(tag)
             capture_configs.append(capture_config)
 
         # start the capture session
@@ -97,9 +97,9 @@ class Receiver:
         return
     
 
-    def get_capture_config_for_capture(self, tag: str, json_configs_dir: str) -> dict:
+    def get_capture_config_for_capture(self, tag: str) -> dict:
         # load the requested capture config
-        capture_config_instance = CaptureConfig(tag, json_configs_dir)
+        capture_config_instance = CaptureConfig(tag)
         capture_config = capture_config_instance.load_as_dict()
 
         # check the mode of the capture config matches the current mode of the receiver.

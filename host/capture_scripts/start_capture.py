@@ -1,6 +1,6 @@
 from spectre.receivers.Receiver import Receiver
 from argparse import ArgumentParser
-from host.cfg import CONFIG
+from cfg import CONFIG
 from host.utils import capture_session
 import os
 
@@ -19,7 +19,7 @@ def main():
     try:
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.start_capture(tags, CONFIG.json_configs_dir)
+        receiver.start_capture(tags)
 
     except Exception as e:
         capture_session.log_subprocess(os.getpid(), str(e))

@@ -2,9 +2,9 @@ import typer
 from typing import List
 
 from host.cli import __app_name__, __version__
-from host.cfg import CONFIG
+from cfg import CONFIG
 from spectre.receivers.Receiver import Receiver
-from spectre.cfg.json_config.FitsConfig import FitsConfig
+from spectre.json_config.FitsConfig import FitsConfig
 
 
 app = typer.Typer()
@@ -14,7 +14,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
                 params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE")
 ) -> None:
     try:
-        fits_config_instance = FitsConfig(tag, CONFIG.json_configs_dir)
+        fits_config_instance = FitsConfig(tag)
         fits_config_instance.save_params_as_fits_config(params)
 
     except KeyError as e:
@@ -42,7 +42,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     # # instantiate the receiver specific capture config class 
         receiver = Receiver(receiver_name)
         receiver.set_mode(mode)
-        receiver.save_params_as_capture_config(params, tag, CONFIG.json_configs_dir)
+        receiver.save_params_as_capture_config(params, tag)
 
     except KeyError as e:
         typer.secho(

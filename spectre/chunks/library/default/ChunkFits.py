@@ -6,8 +6,8 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.utils import datetime_helpers
 
 class ChunkFits(ChunkExt):
-    def __init__(self, chunk_start_time, tag: str, chunks_dir: str):
-        super().__init__(chunk_start_time, tag, ".fits", chunks_dir)
+    def __init__(self, chunk_start_time, tag: str):
+        super().__init__(chunk_start_time, tag, ".fits")
     
 
     #load the RadioSpectrogram from the fits file.

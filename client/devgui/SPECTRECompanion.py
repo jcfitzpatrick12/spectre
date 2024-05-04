@@ -1,6 +1,9 @@
 import tkinter as tk
-from host.gui.ui_components import create_labeled_entry, setup_plot, create_tickbox_frame
-from host.gui.ChunksHandler import ChunksHandler
+
+
+from argparse import ArgumentParser
+from client.devgui.ui_components import create_labeled_entry, setup_plot, create_tickbox_frame
+from client.devgui.ChunksHandler import ChunksHandler
 
 class SPECTRECompanion:
     def __init__(self, master, initial_tag: str):
@@ -49,7 +52,19 @@ class SPECTRECompanion:
         self.canvas.draw()
 
 
-def main(tag):
+def main(tag: str):
     root = tk.Tk()
     app = SPECTRECompanion(root, tag)
     root.mainloop()
+
+if __name__=="__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--tag", type=str, help="")
+    args = parser.parse_args()
+    tag = args.tag
+
+    if tag is None:
+        raise ValueError(f"Tag must be specified, received {tag}. Use --tag [TAG]")
+    
+    main(tag)
+

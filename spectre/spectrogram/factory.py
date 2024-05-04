@@ -3,7 +3,7 @@ from datetime import datetime
 
 from spectre.utils import array_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 
 
 def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Spectrogram:

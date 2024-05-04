@@ -4,18 +4,16 @@ from watchdog.events import FileSystemEventHandler
 from abc import ABC, abstractmethod
 
 from spectre.chunks.get_chunk import get_chunk_from_tag
-from spectre.cfg.json_config.CaptureConfig import CaptureConfig
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 class BaseEventHandler(FileSystemEventHandler, ABC):
-    def __init__(self, watcher, tag: str, extension: str, chunks_dir: str, json_configs_dir: str):
+    def __init__(self, watcher, tag: str, extension: str):
         self.watcher = watcher  # Pass the watcher instance to handle stopping events gracefully
         self.tag = tag
         self.extension = extension
-        self.chunks_dir = chunks_dir
-        self.json_configs_dir = json_configs_dir
-        self.capture_config = CaptureConfig(tag, json_configs_dir).load_as_dict()
+        self.capture_config = CaptureConfig(tag).load_as_dict()
 
-        self.Chunk = get_chunk_from_tag(tag, json_configs_dir)
+        self.Chunk = get_chunk_from_tag(tag)
 
 
     @abstractmethod
