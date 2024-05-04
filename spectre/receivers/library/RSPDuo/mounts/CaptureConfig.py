@@ -17,7 +17,6 @@ class CaptureConfig(CaptureConfigMount):
                 "samp_rate": int, 
                 "IF_gain": int,
                 "RF_gain": int,
-                'chunks_dir': str, # gr (directory where the chunks are stored)
                 'chunk_size': int, # gr (size of each batched file) [s]
                 'window_type': str, # post_proc (window type)
                 'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
