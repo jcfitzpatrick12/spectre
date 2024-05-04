@@ -58,7 +58,7 @@ Run the API installation:
 With the installation successful, start the sdrplay API service:  
 ```sudo systemctl start sdrplay```
 
-**Install SPECTRE**  
+**Set up ```spectre```**
 Clone the repository (in your desired directory):  
 ```git clone https://github.com/jcfitzpatrick12/spectre.git```
 
@@ -68,6 +68,7 @@ Navigate to into the ```spectre``` directory:
 Set the ```SPECTREPARENTPATH``` environment variable:  
 ```export SPECTREPARENTPATH=$(pwd)```  
 
+**Set up ```spectre-host```**
 Navigate to the ```host``` directory:   
 ```cd host```
 
@@ -91,12 +92,11 @@ With the installation verified, you can freely use the suite of `spectre` CLI co
 While we are in development, we have created a placeholder GUI using [```tkinter```](https://docs.python.org/3/library/tkinter.html). Please follow the Installation section to get this up and running.
 
 ## Installation
-If you have not done so already, clone the ```spectre``` repository in your preferred directory:  
-```git clone https://github.com/jcfitzpatrick12/spectre.git```  
-Navigate to into the ```spectre``` directory:   
-```cd spectre```  
-Set the ```SPECTREPARENTPATH``` environment variable:  
-```export SPECTREPARENTPATH=$(cwd)```  
+
+**Prerequisites:**
+We assume you have following the Installation section for ```spectre-host```
+
+**Set up ```spectre-client```**
 Create the Python virtual environment:  
 ```python3 -m venv .venv```  
 Activate the virtual environment:  
