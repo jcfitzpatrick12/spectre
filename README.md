@@ -62,7 +62,7 @@ With the installation successful, start the sdrplay API service:
 Clone the repository (in your desired directory):  
 ```git clone https://github.com/jcfitzpatrick12/spectre.git```
 
-Navigate to into the ```spectre``` directory:   
+Navigate to the ```spectre``` directory:   
 ```cd spectre```
 
 Set the ```SPECTREPARENTPATH``` environment variable:  
@@ -97,12 +97,14 @@ While we are in development, we have created a placeholder GUI using [```tkinter
 We assume you have following the Installation section for ```spectre-host```
 
 **Set up ```spectre-client```**  
+If not already, change directory into that specified by ```$SPECTREPARENTPATH$``` (where ```spectre``` was cloned):  
+```cd $SPECTREPARENTPATH```  
 Create the Python virtual environment:  
 ```python3 -m venv .venv```  
 Activate the virtual environment:  
 ```source .venv/bin/activate```  
 Run the set-up using ```pip```:  
-```pip install -e .```
+```pip install -e .```  
 And finally, run the GUI:  
 ```python3 client/devgui/SPECTRECompanion.py```
 
