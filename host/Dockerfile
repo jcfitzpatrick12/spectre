@@ -73,8 +73,8 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre.git && \
     pip install -r requirements.txt
 
 WORKDIR /home/spectre/
-# make the chunks directory on startup
-RUN mkdir host/chunks
+# make the chunks directory on startup (ignore if it already exists)
+RUN mkdir -p chunks
 
 # copy in the startup script, and make it executable
 COPY ./scripts/startup.sh /usr/local/bin/startup.sh
