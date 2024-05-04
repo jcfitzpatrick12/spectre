@@ -6,7 +6,7 @@ from typing import Tuple
 
 from spectre.chunks.get_chunk import get_chunk_from_tag
 from spectre.utils import dir_helpers, datetime_helpers
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import factory
 

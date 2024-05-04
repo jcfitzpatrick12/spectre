@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from spectre.utils import datetime_helpers
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 
 class ChunkExt:
     def __init__(self, chunk_start_time: str, tag: str, ext: str, chunks_dir: str):

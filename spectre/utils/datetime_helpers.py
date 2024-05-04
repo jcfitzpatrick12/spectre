@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import os
 import numpy as np
 
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 
 
 def date_dir(dt: datetime, **kwargs) -> str:

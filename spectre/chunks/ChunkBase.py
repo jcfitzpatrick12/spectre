@@ -1,5 +1,5 @@
 from datetime import datetime
-from spectre.cfg import CONFIG
+from cfg import CONFIG
 from spectre.utils import datetime_helpers
 
 class ChunkBase:
