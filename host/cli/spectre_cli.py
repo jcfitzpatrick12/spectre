@@ -2,8 +2,7 @@ import typer
 from typing import Optional
 
 from host.cli import __app_name__, __version__
-from host.cfg import CONFIG
-from host.gui.SPECTRECompanion import main as spectre_companion
+from cfg import CONFIG
 
 
 from host.cli.tools.create.commands import app as create_app
@@ -41,12 +40,6 @@ def main(
 ) -> None:
     return
 
-@app.command()
-def companion(
-    tag: str = typer.Option(..., "--tag", "-t", help="Specify the tag on start up of the gui.")
-) -> None:
-    spectre_companion(tag)
-    return
 
 
     
