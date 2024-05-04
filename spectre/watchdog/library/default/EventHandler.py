@@ -28,6 +28,7 @@ class EventHandler(BaseEventHandler):
         else:
             print(f"Chunk not found for start time {chunk_start_time}. Skipping.")
 
+
     def get_average_over_int(self, S: Spectrogram) -> int:
         requested_integration_time = self.capture_config.get('integration_time')
         if requested_integration_time is None:
