@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 from spectre.chunks.ChunkBase import ChunkBase
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
-from spectre.spectrogram.Spectrogram import Spectrogram
+
+from spectre.json_config.CaptureConfig import CaptureConfig
 
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits
@@ -25,8 +26,10 @@ class Chunk(ChunkBase):
     def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
+        
         # load the capture config for the current tag
-        capture_config = json_helpers.load_json_as_dict(f"capture_config_{self.tag}")
+        capture_config_instance = CaptureConfig(self.tag)
+        capture_config = capture_config_instance.load_as_dict()
 
         # fetch the window
         w = self.fetch_window(capture_config)
