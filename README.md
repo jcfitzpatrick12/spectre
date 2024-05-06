@@ -3,7 +3,7 @@
 ## Overview
 `SPECTRE` is a program under development for the automated recording, analysis, and visualisation of radio spectrograms. It consists of three primary components: 
 - `spectre` - a set of standalone Python modules for recording, analysing and visualising radio spectrograms 🐍
-- `spectre-host` - a containerised environment for recording radio spectrograms, which includes an accompanying CLI tool 📡 🐳
+- `spectre-host` - a containerised environment for recording radio spectrograms powered by gnuradio, which includes an accompanying CLI tool 📡 🐳
 - `spectre-client` - a web-based application for viewing and analysis 💻 (planned for the future)
   
 📢 **This project is under active development, with current efforts set on `spectre` and `spectre-host`. Once the testing framework is in place, we will be looking for contributors.**  📢 
@@ -13,7 +13,7 @@
 # spectre-host
 
 ## Introduction
-`spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Underpinned with gnuradio, the framework is in place to accommodate any SDR receiver with a gnuradio source block, simply. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
+`spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Powered by gnuradio, the framework is in place to accommodate any SDR receiver with a gnuradio source block, simply. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
 
 - **[`gnuradio`](https://github.com/gnuradio/gnuradio)**
 - **[`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3)**, which includes the SDRplay RSP* series gnuradio source blocks.
