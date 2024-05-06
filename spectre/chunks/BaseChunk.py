@@ -2,7 +2,7 @@ from datetime import datetime
 from cfg import CONFIG
 from spectre.utils import datetime_helpers
 
-class ChunkBase:
+class BaseChunk:
     def __init__(self, chunk_start_time: str, tag: str):
         self.chunk_start_time = chunk_start_time
         self.tag = tag
