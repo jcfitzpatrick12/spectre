@@ -15,7 +15,7 @@
 ## Introduction
 `spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Powered by GNU Radio, the framework is in place to accommodate any SDR receiver with a GNU Radio source block, simply. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
 
-- **[GNU Radio](https://github.com/gnuradio/gnuradio)**
+- **[`gnuradio`](https://github.com/gnuradio/gnuradio)**
 - **[`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3)**, which includes the SDRplay RSP* series GNU Radio source blocks.
 - **[`gr-spectre`](https://github.com/jcfitzpatrick12/gr-spectre)**, which includes custom C++ GNU Radio sink blocks for streaming IQ data capture.
 - The **`spectre`** CLI tool, for initiating data capture, creating configuration files and other utilities.
