@@ -4,7 +4,7 @@ from typing import Tuple
 from scipy.signal import ShortTimeFFT, get_window
 import matplotlib.pyplot as plt
 
-from spectre.chunks.ChunkBase import ChunkBase
+from spectre.chunks.BaseChunk import BaseChunk
 from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
 
@@ -15,7 +15,7 @@ from spectre.chunks.library.default.ChunkFits import ChunkFits
 
 
 @register_chunk('default')
-class Chunk(ChunkBase):
+class Chunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
 
