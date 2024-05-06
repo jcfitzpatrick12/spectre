@@ -48,7 +48,7 @@ class SPECTRECompanion:
         selected_panels = [ptype for ptype, var in self.panel_type_vars.items() if var.get()]
         spectrogram = self.chunks_handler.get_spectrogram(self.entries)
         self.figure.clear()  # Clear the existing plot
-        spectrogram.stack_panels(self.figure, selected_panels)
+        spectrogram.stack_panels(self.figure, selected_panels, time_type = "time_seconds")
         self.canvas.draw()
 
 
