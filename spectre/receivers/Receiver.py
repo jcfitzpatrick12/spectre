@@ -8,7 +8,6 @@ class Receiver:
         self.receiver_name = receiver_name 
         self.mode = None # must be set manually for instances of this class
         self.set_mounts(receiver_name)
-        self.capture = get_capture_mount(receiver_name)() # receiver specific mounting class
 
         if self.capture_config.valid_modes != self.capture.valid_modes:
             raise KeyError(f"Mismatch for defined valid modes between CaptureConfigHandler and Capture mounts. Check the keys.")

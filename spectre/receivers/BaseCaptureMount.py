@@ -3,7 +3,7 @@ from cfg import CONFIG
 
 
 
-class CaptureMount(ABC):
+class BaseCaptureMount(ABC):
     def __init__(self):
         self.set_capture_methods()
         self.valid_modes = list(self.capture_methods.keys())

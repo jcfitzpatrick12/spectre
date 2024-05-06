@@ -5,11 +5,11 @@ import spectre.receivers.library
 # after we decorate all the mounts, we can import the receiver -> mount mapsw
 from spectre.receivers.mount_register import capture_config_mounts, capture_mounts
 
-from spectre.receivers.CaptureConfigMount import CaptureConfigMount
-from spectre.receivers.CaptureMount import CaptureMount
+from spectre.receivers.BaseCaptureConfigMount import BaseCaptureConfigMount
+from spectre.receivers.BaseCaptureMount import BaseCaptureMount
 
 # fetch a capture config mount for a given receiver name
-def get_capture_config_mount(receiver_name: str) -> CaptureConfigMount:
+def get_capture_config_mount(receiver_name: str) -> BaseCaptureConfigMount:
     # try and fetch the capture config mount
     Mount = capture_config_mounts.get(receiver_name)
     if Mount is None:
@@ -19,7 +19,7 @@ def get_capture_config_mount(receiver_name: str) -> CaptureConfigMount:
 
 
 # fetch a capture mount for a given receiver name
-def get_capture_mount(receiver_name: str) -> CaptureMount:
+def get_capture_mount(receiver_name: str) -> BaseCaptureMount:
     # try and fetch the capture config mount
     Mount = capture_mounts.get(receiver_name)
     if Mount is None:
