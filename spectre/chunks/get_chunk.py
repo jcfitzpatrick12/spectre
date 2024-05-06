@@ -4,17 +4,17 @@
 import spectre.chunks.library
 # after we decorate all chunks, we can import the chunk_key -> chunk maps
 from spectre.chunks.chunk_register import chunk_map
-from spectre.chunks.ChunkBase import ChunkBase
+from spectre.chunks.BaseChunk import BaseChunk
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
-def get_chunk(chunk_key: str) -> ChunkBase:
+def get_chunk(chunk_key: str) -> BaseChunk:
     chunk = chunk_map.get(chunk_key)
     if chunk is None:
         valid_chunk_keys = list(chunk_map.keys())
         raise ValueError(f"No chunk found for the chunk key: {chunk_key}. Please specify one of the following chunk keys {valid_chunk_keys}.")
     return chunk
 
-def get_chunk_from_tag(tag: str) -> ChunkBase:
+def get_chunk_from_tag(tag: str) -> BaseChunk:
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.load_as_dict()
     chunk_key = capture_config.get('chunk_key', None)
