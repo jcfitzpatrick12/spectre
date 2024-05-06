@@ -9,7 +9,7 @@ fi
 # Run the Docker container with GUI support
 docker run --name spectre-host-container -it --rm \
     -v $SPECTREPARENTPATH/cfg:/home/spectre/cfg \
-    -v $SPECTREPARENTPATH/logs:/home/spectre/logs \
+    -v $SPECTREPARENTPATH/host/logs:/home/spectre/host/logs \
     -v $SPECTREPARENTPATH/chunks:/home/spectre/chunks \
     -v /dev/shm:/dev/shm \
     spectre-host

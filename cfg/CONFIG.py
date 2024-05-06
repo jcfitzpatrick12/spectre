@@ -8,7 +8,7 @@ if SPECTREPARENTPATH is None:
 
 default_time_format = "%Y-%m-%dT%H:%M:%S"
 chunks_dir = os.path.join(SPECTREPARENTPATH, 'chunks')
-path_to_capture_log = os.path.join(SPECTREPARENTPATH, 'logs', 'capture.log')
+path_to_capture_log = os.path.join(SPECTREPARENTPATH, 'host', 'logs','capture.log')
 json_configs_dir = os.path.join(SPECTREPARENTPATH, "cfg", "json_configs")
 
 path_to_capture_scripts = os.path.join(SPECTREPARENTPATH, 'host', 'capture_scripts')
