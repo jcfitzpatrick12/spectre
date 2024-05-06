@@ -30,7 +30,12 @@ class ChunkFits(ChunkExt):
                 # The column names ('TIME' and 'FREQUENCY') must match those in the FITS file
                 time_seconds = data['TIME'][0]
                 freq_MHz = data['FREQUENCY'][0]
-                return Spectrogram(dynamic_spectra, time_seconds, freq_MHz, self.chunk_start_time, self.tag, units=units)
+                return Spectrogram(dynamic_spectra, 
+                                   time_seconds, 
+                                   freq_MHz, 
+                                   self.tag, 
+                                   chunk_start_time = self.chunk_start_time, 
+                                   units=units)
         else:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
         

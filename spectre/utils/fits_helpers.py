@@ -8,6 +8,10 @@ from spectre.utils import datetime_helpers
 
 # Function to create a FITS file with the specified structure
 def save_spectrogram(S, fits_config: dict, path_to_fits: str):
+
+    if S.chunk_start_time is None:
+        raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}.")
+    
     # Primary HDU with data
     primary_data = S.dynamic_spectra.astype(dtype=np.float64) 
     primary_hdu = fits.PrimaryHDU(primary_data)

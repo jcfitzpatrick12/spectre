@@ -17,7 +17,6 @@ class Spectrogram:
                  dynamic_spectra: np.ndarray,
                  time_seconds: np.ndarray, 
                  freq_MHz: np.ndarray, 
-                 chunk_start_time: str, 
                  tag: str, 
                  **kwargs):
         
@@ -33,21 +32,31 @@ class Spectrogram:
             raise ValueError(f"Mismatch in number of rows: Expected {len(time_seconds)}, but got {dynamic_spectra.shape[1]}.")
 
         self.dynamic_spectra = dynamic_spectra 
-        self.shape = np.shape(dynamic_spectra)
         self.time_seconds = time_seconds
         self.freq_MHz = freq_MHz
+        self.tag = tag
+
+        self.shape = np.shape(dynamic_spectra)
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
         self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
-
-        self.chunk_start_time = chunk_start_time
-        self.tag = tag
 
         default_bvect = self.total_time_average()
         self.bvect = kwargs.get("bvect", default_bvect)
         self.units = kwargs.get("units", None)
 
+        self.chunk_start_time = kwargs.get("chunk_start_time", None)
+        self.chunk_start_datetime = None
+        self.datetimes = None
+         
+        if self.chunk_start_time:
+            self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
+            self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
+
+
+    def set_chunk_start_time(self, chunk_start_time):
+        self.chunk_start_time = chunk_start_time
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
-        self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
+        self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, self.time_seconds)
 
 
     def save_to_fits(self) -> None:
@@ -88,8 +97,11 @@ class Spectrogram:
 
         # Calculate the index based on the specified time identifier
         if at_datetime is not None:
+            if self.chunk_start_time is None:
+                raise ValueError(f"The \"at_datetime\" kwarg requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
             index_of_slice = datetime_helpers.find_closest_index(at_datetime, self.datetimes)
             time_of_slice = self.datetimes[index_of_slice]
+            
         else:
             index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds)
             time_of_slice = self.time_seconds[index_of_slice]
@@ -105,10 +117,15 @@ class Spectrogram:
             raise ValueError(f"Must specify \"at_frequency\", received {at_frequency}")
     
         index_of_slice = array_helpers.find_closest_index(at_frequency, self.freq_MHz)
+
         if return_time_type == "datetimes":
+            if self.chunk_start_time is None:
+                print(f"The \"datetimes\" time type requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
             times = self.datetimes
+
         elif return_time_type == "time_seconds":
             times = self.time_seconds
+
         else:
             raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"time_seconds\".")
 
@@ -130,11 +147,11 @@ class Spectrogram:
         return dynamic_spectra_as_dBb
     
 
-    def stack_panels(self, fig: Figure, panel_types: list[str]) -> None:
+    def stack_panels(self, fig: Figure, panel_types: list[str], **kwargs) -> None:
         if panel_types is None:
             raise ValueError(f"Panel types must be specified. Received {panel_types}.")
         
         if len(panel_types) == 0:
             raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
 
-        PanelStacker(self).create_figure(fig, panel_types)
+        PanelStacker(self, **kwargs).create_figure(fig, panel_types)

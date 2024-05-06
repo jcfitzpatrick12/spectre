@@ -28,7 +28,13 @@ def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Sp
     else:
         bvect = S.bvect[start_index:end_index+1]
     
-    return Spectrogram(chopped_dynamic_spectra, S.time_seconds, chopped_freq_MHz, S.chunk_start_time, S.tag, bvect = bvect, units = S.units)
+    return Spectrogram(chopped_dynamic_spectra, 
+                       S.time_seconds, 
+                       chopped_freq_MHz, 
+                       S.tag, 
+                       chunk_start_time = S.chunk_start_time, 
+                       bvect = bvect, 
+                       units = S.units)
 
 
 def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spectrogram:
@@ -57,7 +63,13 @@ def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spec
     # #extract the new chunk_start_time
     chopped_chunk_start_time = datetime.strftime(S.datetimes[start_index], CONFIG.default_time_format)
 
-    return Spectrogram(chopped_dynamic_spectra, chopped_time_seconds, S.freq_MHz, chopped_chunk_start_time, S.tag, bvect = S.bvect, units = S.units)
+    return Spectrogram(chopped_dynamic_spectra, 
+                       chopped_time_seconds, 
+                       S.freq_MHz, 
+                       S.tag, 
+                       chunk_start_time = S.chunk_start_time,
+                       bvect = S.bvect, 
+                       units = S.units)
 
 
 def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
@@ -73,7 +85,13 @@ def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
     block_count = num_full_blocks + (1 if remainder else 0)
     decimated_time_seconds = S.time_seconds[:(block_count * average_over):average_over]
 
-    return Spectrogram(averaged_dynamic_spectra, decimated_time_seconds, S.freq_MHz, S.chunk_start_time, S.tag, bvect=S.bvect, units = S.units)
+    return Spectrogram(averaged_dynamic_spectra, 
+                       decimated_time_seconds, 
+                       S.freq_MHz, 
+                       S.tag, 
+                       chunk_start_time = S.chunk_start_time,
+                       bvect=S.bvect, 
+                       units = S.units)
 
 
 def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
@@ -90,14 +108,19 @@ def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
     block_count = num_full_blocks + (1 if remainder else 0)
     decimated_freq_MHz = S.freq_MHz[:(block_count * average_over):average_over]
 
-    return Spectrogram(averaged_dynamic_spectra, S.time_seconds, decimated_freq_MHz, S.chunk_start_time, S.tag, bvect=averaged_bvect, units = S.units)
+    return Spectrogram(averaged_dynamic_spectra, 
+                       S.time_seconds, 
+                       decimated_freq_MHz, 
+                       S.tag,
+                       chunk_start_time = S.chunk_start_time, 
+                       bvect=averaged_bvect, 
+                       units = S.units)
 
 
 
+# assumes that the spectrogram list is ORDERED chronologically.
+# assumes there is no time overlap in any of the spectrograms in the list.
 def join_spectrograms(spectrogram_list: list) -> Spectrogram:
-
-    ##### !!! this needs adjusted because time_seconds always starts from t=0!
-    ##### !!! need to work with the datetime arrays !
 
     # check that the input spectrogram_list is a list
     if not isinstance(spectrogram_list, list):
@@ -119,6 +142,8 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
             raise ValueError(f"All tags must be equal for each spectrogram in the input list!")
         if S.units != Sref.units:
             raise ValueError(f"All units must be equal for each spectrogram in the input list!")
+        if S.chunk_start_time is None:
+            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {S.chunk_start_time}.")
 
 
     # build a list of the time array of each spectrogram in the list
@@ -136,6 +161,12 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
 
     conc_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
 
-    return Spectrogram(conc_dynamic_spectra, conc_time_seconds, Sref.freq_MHz, Sref.chunk_start_time, Sref.tag, bvect=Sref.bvect, units=Sref.units)
+    return Spectrogram(conc_dynamic_spectra, 
+                       conc_time_seconds, 
+                       Sref.freq_MHz, 
+                       Sref.tag, 
+                       chunk_start_time = Sref.chunk_start_time,
+                       bvect = Sref.bvect, 
+                       units = Sref.units)
 
 
