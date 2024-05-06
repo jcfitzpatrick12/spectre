@@ -80,8 +80,8 @@ def save_spectrogram(S, fits_config: dict, path_to_fits: str):
     freqs_MHz_wrapped = np.array([S.freq_MHz.astype(np.float64)])
     
     # Binary Table HDU (extension)
-    col1 = fits.Column(name='TIME', format='D', array=time_array_wrapped)
-    col2 = fits.Column(name='FREQUENCY', format='D', array=freqs_MHz_wrapped)
+    col1 = fits.Column(name='TIME', format='PD', array=time_array_wrapped)
+    col2 = fits.Column(name='FREQUENCY', format='PD', array=freqs_MHz_wrapped)
     cols = fits.ColDefs([col1, col2])
 
     bin_table_hdu = fits.BinTableHDU.from_columns(cols)
