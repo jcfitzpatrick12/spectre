@@ -5,8 +5,14 @@ from spectre.spectrogram.Panels import Panels
  
 
 class PanelStacker(Panels):  
-    def __init__(self, S):
-        super().__init__(S)
+    def __init__(self, S, **kwargs):
+        self.time_type = kwargs.get("time_type", "time_seconds")
+
+        self.valid_time_types = ["datetimes", "time_seconds"]
+        if self.time_type not in self.valid_time_types:
+            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
+             
+        super().__init__(S, self.time_type, **kwargs)
     
     def create_figure(self, fig: Figure, panel_types: str):
             # Create a figure with subplots for plots and colorbars
@@ -35,7 +41,15 @@ class PanelStacker(Panels):
                     first_ax = ax  # Set the first axis
 
                 if i == len(panel_types) - 1:
-                    ax.set_xlabel('Time [GMT]', size=self.fsize_head)  # Set x-label for the bottom plot
+
+                    if self.time_type == "datetimes":
+                        ax.set_xlabel(f'Time (Start Time: {self.S.chunk_start_time}) [GMT]', size=self.fsize_head)
+
+                    elif self.time_type == "time_seconds":
+                        ax.set_xlabel(f'Time [s]', size=self.fsize_head) 
+                    
+                    else:
+                        raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
                 else:
                     ax.tick_params(labelbottom=False)  # Hide x-tick labels for all but the last ax
 

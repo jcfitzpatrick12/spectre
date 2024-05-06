@@ -19,7 +19,14 @@ class EventHandler(BaseEventHandler):
         chunk = self.Chunk(chunk_start_time, self.tag)
         if chunk:
             time_seconds, freq_MHz, dynamic_spectra = chunk.build_spectrogram()
-            S = Spectrogram(dynamic_spectra, time_seconds, freq_MHz, chunk.chunk_start_time, chunk.tag, units="amplitude")
+            
+            S = Spectrogram(dynamic_spectra, 
+                            time_seconds, 
+                            freq_MHz, 
+                            chunk.tag, 
+                            chunk_start_time = chunk.chunk_start_time, 
+                            units="amplitude")
+            
             average_over_int = self.get_average_over_int(S)
             S = factory.time_average(S, average_over_int)
             S.save_to_fits()
