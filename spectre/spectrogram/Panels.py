@@ -7,9 +7,8 @@ from math import ceil
 
 
 class Panels:
-    def __init__(self, S, time_type, **kwargs):
+    def __init__(self, S, **kwargs):
         self.S = S
-        self.time_type = time_type
 
         self.panel_type_dict = {
                 "integrated_power": self.integrated_power,
@@ -20,6 +19,12 @@ class Panels:
         
         self.valid_panel_types = self.panel_type_dict.keys()
         self.seconds_interval = ceil(self.S.time_seconds[-1]/6)
+
+        self.time_type = kwargs.get("time_type", "time_seconds")
+
+        self.valid_time_types = ["datetimes", "time_seconds"]
+        if self.time_type not in self.valid_time_types:
+            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
 
         self.fsize_head = kwargs.get("fsize_head", 20)        
         self.fsize = kwargs.get("fsize", 15)
@@ -37,10 +42,16 @@ class Panels:
 
 
     def integrated_power(self, ax: Axes, cax: Axes) -> None:
-        datetimes = self.S.datetimes
+
+        if self.time_type == "datetimes":
+            times = self.S.datetimes
+        
+        if self.time_type == "time_seconds":
+            times = self.S.time_seconds
+
         power = self.S.integrated_power()
 
-        ax.step(datetimes, power, where='mid')
+        ax.step(times, power, where='mid')
 
         if self.time_type == "datetimes":
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
@@ -52,7 +63,13 @@ class Panels:
 
 
     def dBb(self, ax: Axes, cax: Axes) -> None:
-        datetimes = self.S.datetimes
+
+        if self.time_type == "datetimes":
+            times = self.S.datetimes
+        
+        if self.time_type == "time_seconds":
+            times = self.S.time_seconds
+
         freq_MHz = self.S.freq_MHz
 
         if self.S.bvect is None:
@@ -60,8 +77,7 @@ class Panels:
 
         dynamic_spectra = self.S.dynamic_spectra_as_dBb()
 
-
-        pcolor_plot = ax.pcolormesh(datetimes, 
+        pcolor_plot = ax.pcolormesh(times, 
                                     freq_MHz, 
                                     dynamic_spectra, 
                                     vmin=self.vmin, 
@@ -72,6 +88,7 @@ class Panels:
             # Format the x-axis to display time in HH:MM:SS
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
             ax.xaxis.set_major_locator(mdates.SecondLocator(interval=self.seconds_interval))
+
         # Assign the x and y labels with specified font size
         ax.set_ylabel('Frequency [MHz]', size=self.fsize_head)
         # Format the x and y tick labels with specified font size
@@ -85,12 +102,18 @@ class Panels:
 
     
     def rawlog(self, ax: Axes, cax: Axes) -> None:
+
+        if self.time_type == "datetimes":
+            times = self.S.datetimes
+        
+        if self.time_type == "time_seconds":
+            times = self.S.time_seconds
+
         freq_MHz = self.S.freq_MHz
-        datetimes = self.S.datetimes
         dynamic_spectra = self.S.dynamic_spectra
 
         # Plot the spectrogram with LogNorm
-        pcolor_plot = ax.pcolormesh(datetimes, 
+        pcolor_plot = ax.pcolormesh(times, 
                                     freq_MHz, 
                                     dynamic_spectra, 
                                     norm=LogNorm(vmin=np.min(dynamic_spectra[dynamic_spectra > 0]), vmax=np.max(dynamic_spectra)),
@@ -106,15 +129,22 @@ class Panels:
         # Format the x and y tick labels with specified font size
         ax.tick_params(axis='x', labelsize=self.fsize)
         ax.tick_params(axis='y', labelsize=self.fsize)
+
         cax.axis("On")
         cbar = plt.colorbar(pcolor_plot,ax=ax,cax=cax)
 
 
     def raw(self, ax: Axes ,cax: Axes) -> None:
+
+        if self.time_type == "datetimes":
+            times = self.S.datetimes
+        
+        if self.time_type == "time_seconds":
+            times = self.S.time_seconds
+
         freq_MHz = self.S.freq_MHz
-        datetimes = self.S.datetimes
         dynamic_spectra = self.S.dynamic_spectra
-        pcolor_plot = ax.pcolormesh(datetimes, 
+        pcolor_plot = ax.pcolormesh(times, 
                                     freq_MHz, 
                                     dynamic_spectra, 
                                     cmap=self.cmap)
