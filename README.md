@@ -32,12 +32,15 @@ The framework is in place to integrate the following receivers, this is planned 
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
 - AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO, RTLSDR (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
 
-## Supported Operating Systems
-This project is tested to be compatible with the following operating systems:
+## Supported Operating Systems and Platforms
+This project is tested to be compatible with the following operating systems and architectures:
 
-- Ubuntu 22.04.3
+- Ubuntu 22.04.3 on (x86-64, arm64) architectures
+- Debian GNU/Linux 12 (bookworm) on (arm64) architectures
 
-It may also work on other Linux distributions and other Ubuntu versions. Support for Raspberry Pi and Windows will be explored in the future.
+It may also work on other Linux distributions. Specifcally, I have personally tested it on a Thinkpad P1G5 running Ubuntu 22.04.3 and a Raspberry Pi 4 Model B running both Ubuntu & Raspian Pi OS.
+
+Support for Windows will be explored in the future.
 
 ## Installation
 We're still in active development, so this setup is not the final intended deployment method. In any case, feel free to dive in and tinker around with the current build. But be warned, everything might not be stable! Here's how you can get started:
