@@ -10,7 +10,7 @@ def create_labeled_entry(master, label, default, row):
     return entry
 
 def setup_plot(master):
-    figure = Figure(figsize=(17, 10))
+    figure = Figure(figsize=(9, 9))
     canvas = FigureCanvasTkAgg(figure, master)
     canvas.get_tk_widget().grid(row=9, column=0, columnspan=4)
     return figure, canvas
