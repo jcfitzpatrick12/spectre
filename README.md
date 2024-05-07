@@ -38,7 +38,7 @@ This project is tested to be compatible with the following operating systems and
 - Ubuntu 22.04.3 on (x86-64, arm64) architectures
 - Debian GNU/Linux 12 (bookworm) on (arm64) architectures
 
-It may also work on other Linux distributions. Specifcally, I have personally tested it on a Thinkpad P1G5 running Ubuntu 22.04.3 and a Raspberry Pi 4 Model B running both Ubuntu & Raspian Pi OS.
+It may also work on other Linux distributions. Specifically, I have personally tested it on a Thinkpad P1G5 running Ubuntu 22.04.3 and a Raspberry Pi 4 Model B running both Ubuntu & Raspberry Pi OS.
 
 Support for Windows will be explored in the future.
 
