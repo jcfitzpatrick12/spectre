@@ -47,10 +47,16 @@ class Spectrogram:
         self.chunk_start_time = kwargs.get("chunk_start_time", None)
         self.chunk_start_datetime = None
         self.datetimes = None
+
+        # chunk_start_times are precise up to the second (due to our default time format)
+        # include an optional microsecond correction
+        self.microsecond_correction = kwargs.get("microsecond_correction", 0)
          
         if self.chunk_start_time:
             self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
-            self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
+            self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, 
+                                                                   time_seconds,
+                                                                   microsecond_correction = self.microsecond_correction)
 
 
     def set_chunk_start_time(self, chunk_start_time):

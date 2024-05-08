@@ -1,5 +1,6 @@
 from astropy.io import fits
 import numpy as np
+from datetime import datetime
 
 from spectre.chunks.ChunkExt import ChunkExt
 from spectre.spectrogram.Spectrogram import Spectrogram
@@ -22,6 +23,12 @@ class ChunkFits(ChunkExt):
                 # Retrieve units of the data
                 units = primary_hdu.header.get('BUNIT', None)
 
+                ### add a microsecond correction
+                date_obs = primary_hdu.header.get('DATE-OBS', None)
+                time_obs = primary_hdu.header.get('TIME-OBS', None)
+                datetime_obs = datetime.strptime(f"{date_obs}T{time_obs}", "%Y-%m-%dT%H:%M:%S.%f")
+                microsecond_correction = datetime_obs.microsecond
+
                 # The index of the BINTABLE varies; commonly, it's the first extension, hence hdul[1]
                 bintable_hdu = hdulist[1]
                 # Access the data within the BINTABLE
@@ -35,7 +42,8 @@ class ChunkFits(ChunkExt):
                                    freq_MHz, 
                                    self.tag, 
                                    chunk_start_time = self.chunk_start_time, 
-                                   units=units)
+                                   units = units,
+                                   microsecond_correction = microsecond_correction)
         else:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
         
