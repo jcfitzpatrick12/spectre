@@ -65,7 +65,7 @@ def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, **k
     
     microsecond_correction = kwargs.get("microsecond_correction", 0)
     try:    
-        return [start_datetime + timedelta(seconds=ts + microsecond_correction*10**6) for ts in time_seconds]
+        return [start_datetime + timedelta(seconds=ts + microsecond_correction*10**-6) for ts in time_seconds]
     except ValueError:
         raise ValueError("time_seconds must only contain numeric values")
 
