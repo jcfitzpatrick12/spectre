@@ -34,7 +34,8 @@ def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Sp
                        S.tag, 
                        chunk_start_time = S.chunk_start_time, 
                        bvect = bvect, 
-                       units = S.units)
+                       units = S.units,
+                       microsecond_correction = S.microsecond_correction)
 
 
 def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spectrogram:
@@ -61,15 +62,20 @@ def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spec
     #translate the chopped time array to again start at zero
     chopped_time_seconds-=chopped_time_seconds[0]
     # #extract the new chunk_start_time
-    chopped_chunk_start_time = datetime.strftime(S.datetimes[start_index], CONFIG.default_time_format)
+    chopped_start_datetime = S.datetimes[start_index]
+    chopped_chunk_start_time = datetime.strftime(chopped_start_datetime, CONFIG.default_time_format)
+
+    # # add the microsecond correction
+    microsecond_correction = chopped_start_datetime.microsecond
 
     return Spectrogram(chopped_dynamic_spectra, 
                        chopped_time_seconds, 
                        S.freq_MHz, 
                        S.tag, 
-                       chunk_start_time = S.chunk_start_time,
+                       chunk_start_time = chopped_chunk_start_time,
                        bvect = S.bvect, 
-                       units = S.units)
+                       units = S.units,
+                       microsecond_correction = microsecond_correction)
 
 
 def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
@@ -91,7 +97,8 @@ def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
                        S.tag, 
                        chunk_start_time = S.chunk_start_time,
                        bvect=S.bvect, 
-                       units = S.units)
+                       units = S.units,
+                       microsecond_correction = S.microsecond_correction)
 
 
 def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
@@ -114,7 +121,8 @@ def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
                        S.tag,
                        chunk_start_time = S.chunk_start_time, 
                        bvect=averaged_bvect, 
-                       units = S.units)
+                       units = S.units,
+                       microsecond_correction = S.microsecond_correction)
 
 
 
@@ -167,6 +175,7 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
                        Sref.tag, 
                        chunk_start_time = Sref.chunk_start_time,
                        bvect = Sref.bvect, 
-                       units = Sref.units)
+                       units = Sref.units,
+                       microsecond_correction = 0)
 
 
