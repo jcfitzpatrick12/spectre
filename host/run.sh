@@ -6,7 +6,7 @@ if [ ! -d "$SPECTREPARENTPATH/chunks" ]; then
     mkdir -p "$SPECTREPARENTPATH/chunks"
 fi
 
-# Run the Docker container with GUI support
+# Run the Docker container (no GUI support)
 sudo docker run --name spectre-host-container -it --rm \
     -v $SPECTREPARENTPATH/cfg:/home/spectre/cfg \
     -v $SPECTREPARENTPATH/host/logs:/home/spectre/host/logs \
