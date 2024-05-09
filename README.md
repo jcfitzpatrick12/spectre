@@ -20,7 +20,6 @@
 - **[`gr-spectre`](https://github.com/jcfitzpatrick12/gr-spectre)**, which includes custom C++ GNU Radio sink blocks for streaming IQ data capture.
 - The **`spectre`** CLI tool, for initiating data capture, creating configuration files and other utilities.
 - **`cron`** and template scripts for daily data capture.
-- **`spectre-companion`**: a development GUI for displaying radio spectrograms captured by the program.
 
 ## Supported Receivers
 
