@@ -71,3 +71,15 @@ def average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
     averaged_array = np.nanmean(reshaped_array, axis=axis + 1)
     # return the averaged array
     return averaged_array
+
+
+def move_to_front(lst, target):
+    if not all(isinstance(item, type(lst[0])) for item in lst):
+        raise ValueError("All elements in the list must be of the same type.")
+
+    if target not in lst:
+        raise ValueError("The target is not in the list.")
+
+    non_target_items = [item for item in lst if item != target]
+    target_count = lst.count(target)
+    return [target] * target_count + non_target_items
