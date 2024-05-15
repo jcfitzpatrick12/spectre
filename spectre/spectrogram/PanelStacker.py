@@ -73,7 +73,8 @@ class PanelStacker(Panels):
             # Hide x-tick labels for all but the last ax
                 else:
                     ax.tick_params(labelbottom=False) 
-
+    
+            fig.align_ylabels() 
 
 
             
