@@ -65,8 +65,6 @@ class Panels:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_times is None:
                 raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_times}.")
-            
-            freq_MHz = self.S.freq_MHz 
 
             ax.set_xlabel('Frequency [MHz]', size=self.fsize_head)
             ax.set_ylabel(f'DFT [{self.S.units}]', size=self.fsize_head)
@@ -76,7 +74,7 @@ class Panels:
             slices = []
             labels = []
             for time in self.slice_at_times:
-                specific_time_of_slice, _, slice = self.S.slice_at_time(at_time = time)
+                specific_time_of_slice, freq_MHz, slice = self.S.slice_at_time(at_time = time)
                 # Adding annotation on the plot
                 label_time = f"{round(specific_time_of_slice, 3)} [s]" if self.time_type == "time_seconds" else datetime.strftime(specific_time_of_slice, "%H:%M:%S.%f")
                 slices.append(slice)
@@ -90,8 +88,6 @@ class Panels:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_frequencies is None:
                 raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_times}.")
-            
-            times = self.times
 
             ax.set_ylabel(f'DFT [{self.S.units}]', size=self.fsize_head)
             ax.tick_params(axis='x', labelsize=self.fsize)
@@ -100,7 +96,8 @@ class Panels:
             slices = []
             labels = []
             for frequency in self.slice_at_frequencies:
-                _, specific_frequency_of_slice, slice = self.S.slice_at_frequency(at_frequency=frequency)
+                times, specific_frequency_of_slice, slice = self.S.slice_at_frequency(at_frequency=frequency,
+                                                                                      return_time_type = self.time_type)
                 # Adding annotation on the plot
                 label_frequency = f"{round(specific_frequency_of_slice, 3)} [MHz]" 
                 slices.append(slice)
