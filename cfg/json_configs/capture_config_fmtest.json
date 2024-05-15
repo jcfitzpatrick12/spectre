@@ -17,7 +17,7 @@
     "STFFT_kwargs": {
         "hop": 1024
     },
-    "receiver": "RSP1A",
-    "mode": "fixed",
+    "receiver": "RSPDuo",
+    "mode": "tuner_1_fixed",
     "tag": "fmtest"
 }
