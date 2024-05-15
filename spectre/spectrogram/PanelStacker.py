@@ -15,7 +15,7 @@ class PanelStacker(Panels):
             axs = fig.subplots(len(panel_types), 2, 
                             gridspec_kw={'width_ratios': [3, 0.1], 
                                          'wspace': 0.05,
-                                         'hspace': 0.3,
+                                         'hspace': 0.4,
                                          },
                             squeeze=False)
 
@@ -26,30 +26,30 @@ class PanelStacker(Panels):
             # this is handled differently since it does not share the time axes with the other panels
             # and does not have units of time on the x-axis
             if "frequency_slices" in panel_types:
-                # set the panel type explicitly in this case
-                panel_type = "frequency_slices"
                 # move this to the front
                 panel_types = array_helpers.move_to_front(panel_types, "frequency_slices")
                 # Get the plotting function
-                plot_method = self.get_plot_method(panel_type)
+                plot_method = self.get_plot_method("frequency_slices")
                 # ax and cax will be the first panels
                 ax, cax = axs[0, 0], axs[0, 1]
-                # Call the plotting function with its specific kwargs
-                plot_method(ax=ax, cax=cax)
                 # Turn the colorbar axis off
                 cax.axis('off')
-
+                # Call the plotting function with its specific kwargs
+                plot_method(ax=ax, cax=cax)
+ 
 
             # Iterate over the plot types with Time on the x-axis, and plot
             for i, (ax, cax) in enumerate(zip(axs[:, 0], axs[:, 1])):
                 panel_type = panel_types[i]
 
+                # frequency slices panel (if specified)
+                # has already been handled, so ignore
                 if panel_type == "frequency_slices":
                     continue
 
                 # Turn the colorbar axis off initially; it will be turned on if needed
                 cax.axis('off')
-                # Get the plotting function
+                # Get the plotting method
                 plot_method = self.get_plot_method(panel_type)
 
                 # Call the plotting function with its specific kwargs
@@ -60,7 +60,7 @@ class PanelStacker(Panels):
                 else:
                     first_ax = ax  # Set the first axis
 
-
+                # depending on the time type, label the final panel
                 if i == len(panel_types) - 1:
                     if self.time_type == "datetimes":
                         ax.set_xlabel(f'Time [UTC]', size=self.fsize_head)
@@ -70,12 +70,10 @@ class PanelStacker(Panels):
                     
                     else:
                         raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
-
+            # Hide x-tick labels for all but the last ax
                 else:
-                    ax.tick_params(labelbottom=False)  # Hide x-tick labels for all but the last ax
+                    ax.tick_params(labelbottom=False) 
 
-            # # Align all x-axes and labels
-            # plt.subplots_adjust()  # Adjust horizontal space to zero
 
 
             

@@ -21,41 +21,37 @@ class Panels:
                 "frequency_slices": self.frequency_slices,
             }
 
-        
         self.valid_panel_types = self.panel_type_dict.keys()
 
         self.seconds_interval = ceil((self.S.time_seconds[-1] - self.S.time_seconds[0])/6)
-        self.frequency_interval = ceil((self.S.freq_MHz[-1] - self.S.freq_MHz[0])/6)
-
+        
         self.time_type = kwargs.get("time_type", "time_seconds")
-
         if self.time_type == "datetimes":
             self.times = S.datetimes
         elif self.time_type == "time_seconds":
             self.times = S.time_seconds
         else:
             raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
-
-        self.fsize_head = kwargs.get("fsize_head", 20)        
-        self.fsize = kwargs.get("fsize", 15)
-
-        self.dB_vmin = kwargs.get("dB_vmin", -1)
-        self.dB_vmax = kwargs.get("dB_vmax", 2)
         
         self.slice_at_times = kwargs.get("slice_at_times", None)
         if not self.slice_at_times is None:
             self.__check_requested_slice_at_times(self.slice_at_times)
+        
 
         self.slice_at_frequencies = kwargs.get("slice_at_frequencies", None)
         if not self.slice_at_frequencies is None:
             self.__check_requested_slice_at_frequencies(self.slice_at_frequencies)
 
+
+        self.fsize_head = kwargs.get("fsize_head", 20)        
+        self.fsize = kwargs.get("fsize", 15)
+        self.dB_vmin = kwargs.get("dB_vmin", -1)
+        self.dB_vmax = kwargs.get("dB_vmax", 2)
         self.spectrogram_cmap = kwargs.get("spectrogram_cmap", 'gnuplot2')
         self.slice_cmap = kwargs.get("slice_cmap", cm.rainbow)
         self.slice_overlay_color = kwargs.get("slice_overlay_color", "lime")
         
         self.annotation_offset_step = kwargs.get("annotation_offset_step", 12)
-
 
        
     def get_plot_method(self, panel_type: str):
@@ -89,6 +85,7 @@ class Panels:
             self.__plot_slices(ax, cax, freq_MHz, slices, labels)
             return
     
+
     def time_slices(self, ax: Axes, cax: Axes) -> None:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_frequencies is None:
@@ -249,29 +246,33 @@ class Panels:
             # color_iterator = iter(self.slice_color_base(np.linspace(0, 1, len(self.slice_at_times))))
             for slice in self.slice_at_times:
                 # c = next(color_iterator)
-                ax.axvline(x = slice, color = self.slice_overlay_color, linestyle='--')
+                ax.axvline(x = slice, 
+                           color = self.slice_overlay_color, 
+                           linestyle='--')
 
         if not self.slice_at_frequencies is None:
                 # color_iterator = iter(self.slice_color_base(np.linspace(0, 1, len(self.slice_at_frequencies))))
                 for slice in self.slice_at_frequencies:
                     # c = next(color_iterator)
-                    ax.axhline(y = slice, color = self.slice_overlay_color, linestyle='--')
+                    ax.axhline(y = slice, 
+                               color = self.slice_overlay_color, 
+                               linestyle='--')
 
 
     def __plot_slices(self, ax: Axes, cax: Axes, xvals: list, slices: list, labels: list):
-            vertical_offset = 0  # Initial offset from the top
             offset_step = self.annotation_offset_step # Vertical spacing between annotations
-
             color_iterator = iter(self.slice_cmap(np.linspace(0, 1, len(slices))))
+
+            vertical_offset = 0  # Initial offset from the top
             for slice, label in zip(slices, labels):
                 c = next(color_iterator)
                 ax.step(xvals, slice, where='mid', color=c)
-                # Adding annotation on the plot
-                # Fixed position for annotations in the top left corner
                 ax.annotate(label, 
                             xy=(1.02, 0.98 - vertical_offset), 
                             xycoords='axes fraction',
                             color=c, 
                             verticalalignment='top', 
                             fontsize=self.fsize)
-                vertical_offset += offset_step / ax.figure.dpi  # Adjust offset for the next annotation
+                
+                # update the vertical offset
+                vertical_offset += offset_step / ax.figure.dpi
