@@ -8,7 +8,8 @@ import warnings
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from cfg import CONFIG
-from spectre.spectrogram.PanelStacker import PanelStacker
+from spectre.spectrogram.PanelStack import PanelStack
+from spectre.spectrogram.ComparisonStack import ComparisonStack
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 
 
@@ -157,11 +158,16 @@ class Spectrogram:
         return dynamic_spectra_as_dBb
     
 
-    def stack_panels(self, fig: Figure, panel_types: list[str], **kwargs) -> None:
+    def stack_panels(self, fig: Figure, **kwargs) -> None:
+        panel_types = kwargs.get("panel_types", ["integrated_power", "raw"])
         if panel_types is None:
             raise ValueError(f"Panel types must be specified. Received {panel_types}.")
         
         if len(panel_types) == 0:
             raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
 
-        PanelStacker(self, **kwargs).create_figure(fig, panel_types)
+        PanelStack(self, **kwargs).create_figure(fig, panel_types)
+
+
+    def compare_with(self, fig: Figure, S, **kwargs):
+        ComparisonStack().compare(fig, self, S, **kwargs)
