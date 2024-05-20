@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 import numpy as np
+import warnings
 
 from cfg import CONFIG
 
@@ -88,7 +89,7 @@ def seconds_of_day(dt: datetime) -> float:
     return (dt - start_of_day).total_seconds()
 
 
-def find_closest_index(val: datetime, ar: np.ndarray) -> int:
+def find_closest_index(val: datetime, ar: np.ndarray, **kwargs) -> int:
     # Convert Python datetime to numpy datetime64 if necessary
     if isinstance(val, datetime):
         val = np.datetime64(val)
@@ -100,6 +101,20 @@ def find_closest_index(val: datetime, ar: np.ndarray) -> int:
     # Validate data types
     if not np.issubdtype(ar.dtype, np.datetime64) or not isinstance(val, np.datetime64):
         raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
+
+    enforce_strict_bounds = kwargs.get("enforce_strict_bounds", False)
+    if val > np.nanmax(ar):
+        error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
+        if enforce_strict_bounds:
+            raise ValueError(error_message)
+        else:
+            warnings.warn(error_message)
+    if val < np.nanmin(ar):
+        error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
+        if enforce_strict_bounds:
+            raise ValueError(error_message)
+        else:
+            warnings.warn(error_message)
 
     # Calculate absolute differences in nanoseconds and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))
