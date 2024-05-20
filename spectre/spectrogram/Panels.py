@@ -37,7 +37,6 @@ class Panels:
         if not self.slice_at_times is None:
             self.__check_requested_slice_at_times(self.slice_at_times)
         
-
         self.slice_at_frequencies = kwargs.get("slice_at_frequencies", None)
         if not self.slice_at_frequencies is None:
             self.__check_requested_slice_at_frequencies(self.slice_at_frequencies)
@@ -47,11 +46,13 @@ class Panels:
         self.fsize = kwargs.get("fsize", 15)
         self.dB_vmin = kwargs.get("dB_vmin", -1)
         self.dB_vmax = kwargs.get("dB_vmax", 2)
-        self.spectrogram_cmap = kwargs.get("spectrogram_cmap", 'gnuplot2')
+        self.spectrogrwam_cmap = kwargs.get("spectrogram_cmap", 'gnuplot2')
         self.slice_cmap = kwargs.get("slice_cmap", cm.rainbow)
         self.slice_overlay_color = kwargs.get("slice_overlay_color", "lime")
         
         self.annotation_offset_step = kwargs.get("annotation_offset_step", 12)
+        self.annotation_horizontal_offset = kwargs.get("annotation_horizontal_offset", 1.02)
+        self.add_tag_to_annotation = kwargs.get("add_tag_to_annotation", False)
 
        
     def get_plot_method(self, panel_type: str):
@@ -77,6 +78,8 @@ class Panels:
                 specific_time_of_slice, freq_MHz, slice = self.S.slice_at_time(at_time = time)
                 # Adding annotation on the plot
                 label_time = f"{round(specific_time_of_slice, 3)} [s]" if self.time_type == "time_seconds" else datetime.strftime(specific_time_of_slice, "%H:%M:%S.%f")
+                if self.add_tag_to_annotation:
+                    label_time = f"{label_time} "
                 slices.append(slice)
                 labels.append(label_time)
 
@@ -156,6 +159,7 @@ class Panels:
         cbar = plt.colorbar(pcolor_plot,ax=ax,cax=cax)
         cbar.set_label('dB above background', size=self.fsize_head)
         cbar.set_ticks(range(self.dB_vmin, self.dB_vmax+1, 1))
+        # cbar.ax.tick_params(labelsize=self.fsize)
 
     
     def rawlog(self, ax: Axes, cax: Axes) -> None:
@@ -186,6 +190,7 @@ class Panels:
         self.__overlay_slices(ax, cax)
         cax.axis("On")
         cbar = plt.colorbar(pcolor_plot, ax=ax, cax=cax)
+        # cbar.ax.tick_params(labelsize=self.fsize)
 
 
     def raw(self, ax: Axes ,cax: Axes) -> None:
@@ -265,7 +270,7 @@ class Panels:
                 c = next(color_iterator)
                 ax.step(xvals, slice, where='mid', color=c)
                 ax.annotate(label, 
-                            xy=(1.02, 0.98 - vertical_offset), 
+                            xy=(self.annotation_horizontal_offset, 0.98 - vertical_offset), 
                             xycoords='axes fraction',
                             color=c, 
                             verticalalignment='top', 
