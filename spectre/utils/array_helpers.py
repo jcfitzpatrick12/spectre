@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 
-def find_closest_index(val, ar: np.ndarray) -> int:
+def find_closest_index(val, ar: np.ndarray, **kwargs) -> int:
     # Ensure input array is not empty
     if ar.size == 0:
         raise ValueError("Input array 'ar' is empty.")
@@ -14,24 +14,41 @@ def find_closest_index(val, ar: np.ndarray) -> int:
         # Handle case where conversion to float is not possible
         raise ValueError("Both 'val' and elements of 'ar' must be valid numeric types.")
     
+    enforce_strict_bounds = kwargs.get("enforce_strict_bounds", False)
+    if val > np.nanmax(ar):
+        error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
+        if enforce_strict_bounds:
+            raise ValueError(error_message)
+        else:
+            warnings.warn(error_message)
+    if val < np.nanmin(ar):
+        error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
+        if enforce_strict_bounds:
+            raise ValueError(error_message)
+        else:
+            warnings.warn(error_message)
+    
     # Compute absolute differences and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))
     return closest_index
 
 
 def compute_resolution(array: np.ndarray) -> float:
+    # Check that the array is one-dimensional
+    if array.ndim != 1:
+        raise ValueError("Input array must be one-dimensional.")
+    
     if len(array) < 2:
         raise ValueError("Input array must contain at least two elements.")
     
     # Calculate differences between consecutive elements.
     resolutions = np.diff(array)
     
-    # Verify that resolution is consistent.
-    # often flagged when using join_spectrograms (time resolution will not be consistent for gaps in the spectrograms)
+    # if the resolution is not constant across the array, 
     if not np.allclose(resolutions, resolutions[0]):
-        warnings.warn("Resolution is not consistent across all elements. Returning first difference.", UserWarning)
-    
-    return resolutions[0]
+        warnings.warn("Resolution is not consistent across all elements.", UserWarning)
+
+    return np.nanmedian(resolutions)
 
 
 def average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
@@ -71,3 +88,15 @@ def average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
     averaged_array = np.nanmean(reshaped_array, axis=axis + 1)
     # return the averaged array
     return averaged_array
+
+
+def move_to_front(lst, target):
+    if not all(isinstance(item, type(lst[0])) for item in lst):
+        raise ValueError("All elements in the list must be of the same type.")
+
+    if target not in lst:
+        raise ValueError("The target is not in the list.")
+
+    non_target_items = [item for item in lst if item != target]
+    target_count = lst.count(target)
+    return [target] * target_count + non_target_items

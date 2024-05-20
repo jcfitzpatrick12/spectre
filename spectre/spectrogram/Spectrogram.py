@@ -8,7 +8,8 @@ import warnings
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from cfg import CONFIG
-from spectre.spectrogram.PanelStacker import PanelStacker
+from spectre.spectrogram.PanelStack import PanelStack
+from spectre.spectrogram.ComparisonStack import ComparisonStack
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 
 
@@ -94,24 +95,28 @@ class Spectrogram:
     
     
     def slice_at_time(self, **kwargs) -> Tuple[datetime|float, np.array, np.array]:
-        at_datetime = kwargs.get("at_datetime", None)  # input datetime
         at_time = kwargs.get("at_time", None)  # in seconds
 
-        # Validate input: only one of 'at_datetime' or 'at_time' should be specified
-        if (at_datetime is not None) == (at_time is not None):
-            raise KeyError("Please specify exactly one of 'at_datetime' or 'at_time'.")
+        if at_time is None:
+            raise KeyError("Please specify the \"at_time\" keyword argument.")
 
+        time_type = type(at_time)
         # Calculate the index based on the specified time identifier
-        if at_datetime is not None:
+        if time_type == datetime:
             if self.chunk_start_time is None:
-                raise ValueError(f"The \"at_datetime\" kwarg requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
-            index_of_slice = datetime_helpers.find_closest_index(at_datetime, self.datetimes)
+                raise ValueError(f"With at_time specified as a datetime object, the kwarg requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
+            index_of_slice = datetime_helpers.find_closest_index(at_time, self.datetimes)
             time_of_slice = self.datetimes[index_of_slice]
             
-        else:
+        elif time_type == float or time_type == int:
             index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds)
             time_of_slice = self.time_seconds[index_of_slice]
 
+        else:
+            raise TypeError(f"Unexpected time type. Received {time_type} expected one of datetime, float or int.")
+        
+        # time_of_slice is distinct from that requested at input
+        # time_of_slice is the EXACT time of the slice, to which the input was rounded to
         return time_of_slice, self.freq_MHz, self.dynamic_spectra[:, index_of_slice]
 
 
@@ -148,16 +153,21 @@ class Spectrogram:
         elif self.units == "power":
             dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bvect_array)
         else:
-            raise ValueError(f"Units not specified, uncertain decibel conversions!")
+            raise ValueError(f"{self.units} unrecognised, uncertain decibel conversion!")
         
         return dynamic_spectra_as_dBb
     
 
-    def stack_panels(self, fig: Figure, panel_types: list[str], **kwargs) -> None:
+    def stack_panels(self, fig: Figure, **kwargs) -> None:
+        panel_types = kwargs.get("panel_types", ["integrated_power", "raw"])
         if panel_types is None:
             raise ValueError(f"Panel types must be specified. Received {panel_types}.")
         
         if len(panel_types) == 0:
             raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
 
-        PanelStacker(self, **kwargs).create_figure(fig, panel_types)
+        PanelStack(self, **kwargs).create_figure(fig, panel_types)
+
+
+    def compare_with(self, fig: Figure, S, **kwargs):
+        ComparisonStack().compare(fig, self, S, **kwargs)
