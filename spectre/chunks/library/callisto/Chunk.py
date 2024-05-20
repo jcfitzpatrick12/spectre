@@ -1,7 +1,7 @@
 from spectre.chunks.BaseChunk import BaseChunk
 from spectre.chunks.chunk_register import register_chunk
 
-from spectre.chunks.library.default.ChunkFits import ChunkFits
+from spectre.chunks.library.callisto.ChunkFits import ChunkFits
 
 
 @register_chunk('callisto')
