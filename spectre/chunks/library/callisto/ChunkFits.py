@@ -24,9 +24,8 @@ class ChunkFits(ChunkExt):
                 ### add a microsecond correction
                 date_obs = primary_hdu.header.get('DATE-OBS', None)
                 time_obs = primary_hdu.header.get('TIME-OBS', None)
-                datetime_obs = datetime.strptime(f"{date_obs}T{time_obs}", "%Y-%m-%dT%H:%M:%S.%f")
+                datetime_obs = datetime.strptime(f"{date_obs}T{time_obs}", "%Y/%m/%dT%H:%M:%S.%f")
                 microsecond_correction = datetime_obs.microsecond
-
                 # The index of the BINTABLE varies; commonly, it's the first extension, hence hdul[1]
                 bintable_hdu = hdulist[1]
                 # Access the data within the BINTABLE
@@ -45,7 +44,8 @@ class ChunkFits(ChunkExt):
                     digits_floats = np.array(digits, dtype = 'float')
                     # conversion as per ADC specs [see email from C. Monstein]
                     dB  = (digits_floats/255)*(2500/25)
-                    return Spectrogram(dynamic_spectra, 
+                    dynamic_spectra_linearised = 10**(dB/10)
+                    return Spectrogram(dynamic_spectra_linearised, 
                                     time_seconds, 
                                     freq_MHz, 
                                     self.tag, 
