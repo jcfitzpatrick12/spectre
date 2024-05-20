@@ -6,7 +6,7 @@ from spectre.spectrogram.Panels import Panels
 from spectre.utils import array_helpers
  
 
-class PanelStacker(Panels):  
+class PanelStack(Panels):  
     def __init__(self, S, **kwargs):
         super().__init__(S, **kwargs)
     
@@ -22,20 +22,17 @@ class PanelStacker(Panels):
             # Store the first axis to link subsequent axes
             first_ax = None
 
-            # if the user has requested "slices_at_times" we consider this first
+            # if the user has requested "frequency_slices" we consider this first
             # this is handled differently since it does not share the time axes with the other panels
-            # and does not have units of time on the x-axis
             if "frequency_slices" in panel_types:
                 # move this to the front
                 panel_types = array_helpers.move_to_front(panel_types, "frequency_slices")
-                # Get the plotting function
-                plot_method = self.get_plot_method("frequency_slices")
                 # ax and cax will be the first panels
                 ax, cax = axs[0, 0], axs[0, 1]
                 # Turn the colorbar axis off
                 cax.axis('off')
                 # Call the plotting function with its specific kwargs
-                plot_method(ax=ax, cax=cax)
+                self.frequency_slices(ax=ax, cax=cax)
  
 
             # Iterate over the plot types with Time on the x-axis, and plot
