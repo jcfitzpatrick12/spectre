@@ -79,14 +79,10 @@ class Spectrogram:
         return
     
 
-    def integrated_power(self,):
-        df = self.freq_res_MHz*10**-6 # Hz
-        dt = self.time_res_seconds # seconds
-        # find the (raw) integrated power over frequency
-        integrated_power = np.sum(self.dynamic_spectra, axis=0)*df
-        # normalise to integrate to one
-        integrated_power/=np.trapz(integrated_power,dx=dt)
-        return integrated_power
+    def integrate_over_frequency(self):
+            freq_Hz = self.freq_MHz * 1e-6  # Convert MHz to Hz
+            I = np.nansum(self.dynamic_spectra * freq_Hz[:, np.newaxis], axis=0)
+            return I
     
 
     def total_time_average(self,):
@@ -105,19 +101,20 @@ class Spectrogram:
         if time_type == datetime:
             if self.chunk_start_time is None:
                 raise ValueError(f"With at_time specified as a datetime object, the kwarg requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
-            index_of_slice = datetime_helpers.find_closest_index(at_time, self.datetimes)
+            index_of_slice = datetime_helpers.find_closest_index(at_time, self.datetimes, enforce_strict_bounds = True)
             time_of_slice = self.datetimes[index_of_slice]
             
         elif time_type == float or time_type == int:
-            index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds)
+            index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
             time_of_slice = self.time_seconds[index_of_slice]
 
         else:
             raise TypeError(f"Unexpected time type. Received {time_type} expected one of datetime, float or int.")
         
+        slice = self.dynamic_spectra[:, index_of_slice].copy()
         # time_of_slice is distinct from that requested at input
         # time_of_slice is the EXACT time of the slice, to which the input was rounded to
-        return time_of_slice, self.freq_MHz, self.dynamic_spectra[:, index_of_slice]
+        return time_of_slice, self.freq_MHz, slice
 
 
     def slice_at_frequency(self, **kwargs):
@@ -127,7 +124,7 @@ class Spectrogram:
         if at_frequency is None:
             raise ValueError(f"Must specify \"at_frequency\", received {at_frequency}")
     
-        index_of_slice = array_helpers.find_closest_index(at_frequency, self.freq_MHz)
+        index_of_slice = array_helpers.find_closest_index(at_frequency, self.freq_MHz, enforce_strict_bounds = True)
 
         if return_time_type == "datetimes":
             if self.chunk_start_time is None:
@@ -143,12 +140,13 @@ class Spectrogram:
         # the requested frequency is probably not an exact bin value. Return the exact bin value.
         frequency_of_slice = self.freq_MHz[index_of_slice]
 
-        return times, frequency_of_slice, self.dynamic_spectra[index_of_slice, :]
+        slice = self.dynamic_spectra[index_of_slice, :].copy()
+        return times, frequency_of_slice, slice 
 
     def dynamic_spectra_as_dBb(self):
         bvect_array = np.outer(self.bvect, np.ones(self.shape[1]))
 
-        if self.units == "amplitude":
+        if self.units == "amplitude" or self.units == "digits":
             dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bvect_array)
         elif self.units == "power":
             dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bvect_array)
@@ -169,5 +167,5 @@ class Spectrogram:
         PanelStack(self, **kwargs).create_figure(fig, panel_types)
 
 
-    def compare_with(self, fig: Figure, S, **kwargs):
-        ComparisonStack().compare(fig, self, S, **kwargs)
+    def compare_with_callisto(self, fig: Figure, callisto_S, **kwargs):
+        ComparisonStack().compare_with_callisto(fig, self, callisto_S, **kwargs)
