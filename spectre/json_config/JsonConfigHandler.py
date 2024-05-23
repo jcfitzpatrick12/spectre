@@ -10,8 +10,7 @@ class JsonConfigHandler:
         json_as_dict = json_helpers.load_json_as_dict(self.name, CONFIG.json_configs_dir)
         return json_as_dict
     
-    def save_dict_as_json(self, input_dict: dict, **kwargs) -> None:
-        doublecheck_overwrite = kwargs.get("doublecheck_overwrite", True)
+    def save_dict_as_json(self, input_dict: dict, doublecheck_overwrite = True) -> None:
         json_helpers.save_dict_as_json(input_dict, self.name, CONFIG.json_configs_dir, doublecheck_overwrite=doublecheck_overwrite)
 
     def absolute_path(self) -> str:

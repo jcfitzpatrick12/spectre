@@ -10,8 +10,7 @@ class ChunksHandler:
         self.set_attrs(tag, **kwargs)
 
 
-    def set_attrs(self, tag, **kwargs):
-        start_time = kwargs.get("start_time")
+    def set_attrs(self, tag, start_time=None):
         if start_time:
             start_datetime = datetime.strptime(start_time, CONFIG.default_time_format)
             year = start_datetime.year

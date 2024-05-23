@@ -11,18 +11,18 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import factory
 
 class Chunks:
-    def __init__(self, tag: str, **kwargs):
+    def __init__(self, tag: str, year=None, month=None, day=None):
         self.tag = tag
         
         # if a specific date is specified via kwargs, set the attribute
         # for chunks dir with the date dir appended.
         self.chunks_dir = CONFIG.chunks_dir
-        year = kwargs.get("year")
-        month = kwargs.get("month")
-        day = kwargs.get("day")
         if (not year is None) or (not month is None) or (not day is None):
             # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, **kwargs)
+            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, 
+                                                               year=year, 
+                                                               month=month, 
+                                                               day=day)
 
         self.Chunk = get_chunk_from_tag(tag)
         self.dict = self.build_dict()
