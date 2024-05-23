@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 
-def find_closest_index(val, ar: np.ndarray, **kwargs) -> int:
+def find_closest_index(val, ar: np.ndarray, enforce_strict_bounds = False) -> int:
     # Ensure input array is not empty
     if ar.size == 0:
         raise ValueError("Input array 'ar' is empty.")
@@ -14,19 +14,20 @@ def find_closest_index(val, ar: np.ndarray, **kwargs) -> int:
         # Handle case where conversion to float is not possible
         raise ValueError("Both 'val' and elements of 'ar' must be valid numeric types.")
     
-    enforce_strict_bounds = kwargs.get("enforce_strict_bounds", False)
     if val > np.nanmax(ar):
         error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
         if enforce_strict_bounds:
             raise ValueError(error_message)
         else:
-            warnings.warn(error_message)
+            pass
+            # warnings.warn(error_message)
     if val < np.nanmin(ar):
         error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
         if enforce_strict_bounds:
             raise ValueError(error_message)
         else:
-            warnings.warn(error_message)
+            pass
+            # warnings.warn(error_message)
     
     # Compute absolute differences and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))
@@ -90,7 +91,7 @@ def average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
     return averaged_array
 
 
-def move_to_front(lst, target):
+def move_to_front(lst: list, target) -> list:
     if not all(isinstance(item, type(lst[0])) for item in lst):
         raise ValueError("All elements in the list must be of the same type.")
 
@@ -100,3 +101,21 @@ def move_to_front(lst, target):
     non_target_items = [item for item in lst if item != target]
     target_count = lst.count(target)
     return [target] * target_count + non_target_items
+
+
+def normalise_integral_to_unity(yvals: np.ndarray, xvals: np.ndarray):
+    return yvals/np.trapz(yvals, xvals)
+
+
+def normalise_peak_intensity(yvals: np.ndarray):
+    return yvals/np.nanmax(yvals)
+
+
+def background_subtract(yvals: np.ndarray, background_indices: list | None):
+    if background_indices is None:
+        warnings.warn(f"No background interval set. Subtracting total mean.")
+        yvals -= np.nanmean(yvals)
+    else:
+        yvals -= np.nanmean(yvals[background_indices[0]:
+                                  background_indices[1]])
+    return yvals

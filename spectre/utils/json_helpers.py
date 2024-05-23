@@ -30,11 +30,9 @@ def doublecheck_overwrite_at_path(fpath: str) -> None:
             proceed_with_overwrite = False
 
 
-def save_dict_as_json(data_dict: dict, name: str, dir_path: str, **kwargs) -> None:
+def save_dict_as_json(data_dict: dict, name: str, dir_path: str, doublecheck_overwrite=True) -> None:
     """
     """
-    doublecheck_overwrite = kwargs.get('doublecheck_overwrite', True)
-
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
         # raise NotADirectoryError(f"The directory '{dir_path}' does not exist.")

@@ -6,23 +6,19 @@ import warnings
 from cfg import CONFIG
 
 
-def date_dir(dt: datetime, **kwargs) -> str:
+def date_dir(dt: datetime, base_dir = None) -> str:
     # Format the datetime object to the desired string format
     year, month, day = dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d")
     date_dir = os.path.join(year, month, day)
     # Format the datetime object to the desired string format
-    base_dir = kwargs.get('base_dir', None)
     if base_dir:
         return os.path.join(base_dir, date_dir)
     else:
         return date_dir
     
     
-def append_date_dir(parent_dir: str, **kwargs):
+def append_date_dir(parent_dir: str, year=None, month=None, day=None):
     # if the year, year month, or year month and day is specified, build the
-    year = kwargs.get("year")
-    month = kwargs.get("month")
-    day = kwargs.get("day")
 
     if year is None and month is None and day is None:
         return parent_dir
@@ -57,14 +53,13 @@ def build_chunks_dir(chunk_start_time: str) -> str:
     return date_dir(dt, base_dir=CONFIG.chunks_dir)
 
 
-def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, **kwargs) -> list:
+def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, microsecond_correction=0) -> list:
     # Validate input types      
     if not isinstance(start_datetime, datetime):
         raise TypeError("start_datetime must be a datetime object")
     if not isinstance(time_seconds, (np.ndarray, list, tuple)):
         raise TypeError("time_seconds must be an array, list, or tuple of numbers")
     
-    microsecond_correction = kwargs.get("microsecond_correction", 0)
     try:    
         return [start_datetime + timedelta(seconds=ts + microsecond_correction*10**-6) for ts in time_seconds]
     except ValueError:
@@ -89,7 +84,7 @@ def seconds_of_day(dt: datetime) -> float:
     return (dt - start_of_day).total_seconds()
 
 
-def find_closest_index(val: datetime, ar: np.ndarray, **kwargs) -> int:
+def find_closest_index(val: datetime, ar: np.ndarray, enforce_strict_bounds=False) -> int:
     # Convert Python datetime to numpy datetime64 if necessary
     if isinstance(val, datetime):
         val = np.datetime64(val)
@@ -102,19 +97,20 @@ def find_closest_index(val: datetime, ar: np.ndarray, **kwargs) -> int:
     if not np.issubdtype(ar.dtype, np.datetime64) or not isinstance(val, np.datetime64):
         raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
 
-    enforce_strict_bounds = kwargs.get("enforce_strict_bounds", False)
     if val > np.nanmax(ar):
         error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
         if enforce_strict_bounds:
             raise ValueError(error_message)
         else:
-            warnings.warn(error_message)
+            pass
+            # warnings.warn(error_message)
     if val < np.nanmin(ar):
         error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
         if enforce_strict_bounds:
             raise ValueError(error_message)
         else:
-            warnings.warn(error_message)
+            pass
+            # warnings.warn(error_message)
 
     # Calculate absolute differences in nanoseconds and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))

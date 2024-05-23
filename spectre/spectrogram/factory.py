@@ -6,7 +6,9 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from cfg import CONFIG
 
 
-def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Spectrogram:
+def frequency_chop(S: Spectrogram, 
+                   start_freq_MHz: any, 
+                   end_freq_MHz: any) -> Spectrogram:
     #find the index of the nearest matching frequencies in the input spectrogram
     start_index = array_helpers.find_closest_index(start_freq_MHz,S.freq_MHz)
     end_index = array_helpers.find_closest_index(end_freq_MHz,S.freq_MHz)
@@ -32,15 +34,17 @@ def frequency_chop(S: Spectrogram, start_freq_MHz: any, end_freq_MHz: any) -> Sp
                        S.time_seconds, 
                        chopped_freq_MHz, 
                        S.tag, 
-                       chunk_start_time = S.chunk_start_time, 
-                       bvect = bvect, 
                        units = S.units,
-                       microsecond_correction = S.microsecond_correction)
+                       chunk_start_time = S.chunk_start_time, 
+                       microsecond_correction = S.microsecond_correction,
+                       bvect = bvect, 
+                       background_interval = S.background_interval
+                       )
 
 
-def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spectrogram:
-    time_format = kwargs.get("time_format", CONFIG.default_time_format)
-
+def time_chop(S, start_time_as_str: str, 
+              end_time_as_str: str, 
+              time_format = CONFIG.default_time_format) -> Spectrogram:
     start_dt = datetime.strptime(start_time_as_str, time_format)
     end_dt = datetime.strptime(end_time_as_str, time_format)
 
@@ -73,12 +77,15 @@ def time_chop(S, start_time_as_str: str, end_time_as_str: str, **kwargs) -> Spec
                        S.freq_MHz, 
                        S.tag, 
                        chunk_start_time = chopped_chunk_start_time,
-                       bvect = S.bvect, 
                        units = S.units,
-                       microsecond_correction = microsecond_correction)
+                       microsecond_correction = microsecond_correction,
+                       bvect = S.bvect, 
+                       background_interval = None # if time chop, need to manually reset background interval
+                       )
 
 
-def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
+def time_average(S: Spectrogram, 
+                 average_over: int) -> Spectrogram:
     if average_over == 1:
         return S
 
@@ -96,12 +103,15 @@ def time_average(S: Spectrogram, average_over: int) -> Spectrogram:
                        S.freq_MHz, 
                        S.tag, 
                        chunk_start_time = S.chunk_start_time,
-                       bvect=S.bvect, 
                        units = S.units,
-                       microsecond_correction = S.microsecond_correction)
+                       microsecond_correction = S.microsecond_correction,
+                       bvect = S.bvect, 
+                       background_interval = S.background_interval
+                       )
 
 
-def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
+def frequency_average(S: Spectrogram, 
+                      average_over: int) -> Spectrogram:
     if average_over == 1:
         return S
 
@@ -120,9 +130,11 @@ def frequency_average(S: Spectrogram, average_over: int) -> Spectrogram:
                        decimated_freq_MHz, 
                        S.tag,
                        chunk_start_time = S.chunk_start_time, 
-                       bvect=averaged_bvect, 
                        units = S.units,
-                       microsecond_correction = S.microsecond_correction)
+                       microsecond_correction = S.microsecond_correction,
+                       bvect = averaged_bvect, 
+                       background_interval = S.background_interval
+                       )
 
 
 
@@ -174,8 +186,10 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
                        Sref.freq_MHz, 
                        Sref.tag, 
                        chunk_start_time = Sref.chunk_start_time,
-                       bvect = Sref.bvect, 
                        units = Sref.units,
-                       microsecond_correction = 0)
+                       microsecond_correction = 0,
+                       bvect = Sref.bvect, 
+                       background_interval = S.background_interval
+                       )
 
 

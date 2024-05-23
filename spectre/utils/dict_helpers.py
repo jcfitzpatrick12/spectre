@@ -74,3 +74,9 @@ def validate_types(input_dict: dict, template: dict) -> None:
                 raise ValueError(f"Cannot have a type of value None, received {expected_type}.")
             if not isinstance(value, expected_type):
                 raise TypeError(f"Expected {expected_type}, but received {value} which is of type {type(value)}.")
+            
+
+def inject_dict(input_dict: dict, overwrite_dict: dict):
+    for key, value in overwrite_dict.items():
+        input_dict[key] = value
+    return input_dict
