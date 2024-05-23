@@ -64,7 +64,7 @@ class Panels:
 
         self.background_interval = background_interval
         if not self.background_interval is None:
-            self.S.set_background_interval(self.background_interval)
+            self.S.set_background(self.background_interval)
         
         self.normalise_line_plots = normalise_line_plots
 
