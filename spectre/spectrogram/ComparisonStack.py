@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 from matplotlib.figure import Figure
 from datetime import datetime
+import matplotlib.dates as mdates
 
 from spectre.spectrogram.Panels import Panels
 from spectre.utils import dict_helpers
@@ -67,8 +68,9 @@ class ComparisonStack:
         axs[4,1].axis('off')
         S1_spectrogram_plot_method = S1_panels.get_plot_method(spectrogram_type)
         S1_spectrogram_plot_method(axs[4,0], axs[4,1])
-        axs[4,0].sharex(axs[1,0])
         axs[4,0].set_xlabel(f'Time [UTC]', size = S1_panels.fsize_head)
+        axs[4,0].sharex(axs[1,0])
+        axs[4,0].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
     
         fig.align_ylabels() 
         return
