@@ -61,7 +61,7 @@ class Spectrogram:
         self.background_interval = background_interval
         self.background_indices = None
         if not self.background_interval is None:
-            self.set_background_interval(self.background_interval)
+            self.set_background(self.background_interval)
 
 
     def set_chunk_start_time(self, chunk_start_time: str):
@@ -72,7 +72,7 @@ class Spectrogram:
                                                                 microsecond_correction = self.microsecond_correction)
 
 
-    def set_background_interval(self, background_interval: list):
+    def set_background(self, background_interval: list):
         self.background_indices = self.background_interval_to_indices(background_interval)
         start_background_index = self.background_indices[0]
         end_background_index = self.background_indices[1]
@@ -204,11 +204,7 @@ class Spectrogram:
         return dynamic_spectra_as_dBb
     
 
-    def stack_panels(self, fig: Figure, **kwargs) -> None:
-        panel_types = kwargs.get("panel_types", ["integrated_power", "raw"])
-        if panel_types is None:
-            raise ValueError(f"Panel types must be specified. Received {panel_types}.")
-        
+    def stack_panels(self, fig: Figure, panel_types = ["raw"], **kwargs) -> None:        
         if len(panel_types) == 0:
             raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
 
