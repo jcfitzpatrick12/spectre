@@ -36,13 +36,13 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         }
 
     
-    def fixed_validator(self, capture_config_dict: dict) -> None:
-        center_freq = capture_config_dict['center_freq']
-        bandwidth = capture_config_dict['bandwidth']
-        samp_rate = capture_config_dict['samp_rate']
-        IF_gain = capture_config_dict['IF_gain']
-        RF_gain = capture_config_dict['RF_gain']
-        chunk_size = capture_config_dict['chunk_size']
+    def fixed_validator(self, capture_config: dict) -> None:
+        center_freq = capture_config['center_freq']
+        bandwidth = capture_config['bandwidth']
+        samp_rate = capture_config['samp_rate']
+        IF_gain = capture_config['IF_gain']
+        RF_gain = capture_config['RF_gain']
+        chunk_size = capture_config['chunk_size']
 
         validator_helpers.validate_center_freq(center_freq)
         validator_helpers.validate_bandwidth(bandwidth, samp_rate)
