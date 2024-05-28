@@ -6,7 +6,7 @@
     "integration_time": 0.075,
     "Nx": 1024,
     "chunk_key": "default",
-    "center_freq": 160000000.0,
+    "center_freq": 140000000.0,
     "RF_gain": 0,
     "bandwidth": 8000000,
     "window_type": "blackman",
