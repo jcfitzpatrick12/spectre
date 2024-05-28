@@ -17,7 +17,7 @@ RUN apt-get update -y && \
     bash=5.1-6ubuntu1.1 \
     # expect is used while installing the RSP API (auto accepts licence agreement etc.)
     expect=5.45.4-2build1 \
-    git=1:2.34.1-1ubuntu1.10 \
+    git=1:2.34.1-1ubuntu1.11 \
     # cmake is required for installing OOT modules for gnuradio
     cmake=3.22.1-1ubuntu1.22.04.2 \
     gnuradio=3.10.1.1-2  \
