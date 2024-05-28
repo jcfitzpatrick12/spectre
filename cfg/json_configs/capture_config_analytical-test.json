@@ -1,9 +1,9 @@
 {
     "amplitude": 1.0,
-    "frequency": 512000.0,
+    "frequency": 32000.0,
     "integration_time": 0.0,
-    "samp_rate": 2048000,
-    "chunk_size": 5,
+    "samp_rate": 1024000,
+    "chunk_size": 3,
     "window_type": "boxcar",
     "window_kwargs": {},
     "STFFT_kwargs": {
