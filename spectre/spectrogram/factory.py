@@ -181,13 +181,15 @@ def join_spectrograms(spectrogram_list: list) -> Spectrogram:
 
     conc_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
 
+    microsecond_correction = conc_datetimes[0].microsecond
+
     return Spectrogram(conc_dynamic_spectra, 
                        conc_time_seconds, 
                        Sref.freq_MHz, 
                        Sref.tag, 
                        chunk_start_time = Sref.chunk_start_time,
                        units = Sref.units,
-                       microsecond_correction = 0,
+                       microsecond_correction = microsecond_correction,
                        bvect = Sref.bvect, 
                        background_interval = S.background_interval
                        )

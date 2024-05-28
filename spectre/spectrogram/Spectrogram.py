@@ -207,12 +207,11 @@ class Spectrogram:
     def stack_panels(self, fig: Figure, panel_types = ["raw"], **kwargs) -> None:        
         if len(panel_types) == 0:
             raise ValueError(f"At least one panel type must be specified. Received {panel_types}.")
-
         PanelStack(self, **kwargs).create_figure(fig, panel_types)
 
 
     def compare_with(self, fig: Figure, callisto_S, **kwargs):
-        ComparisonStack().compare_with(fig, self, callisto_S, **kwargs)
+        ComparisonStack().compare(fig, self, callisto_S, **kwargs)
 
 
     def background_interval_to_indices(self, background_interval: list):

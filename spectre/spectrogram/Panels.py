@@ -82,7 +82,6 @@ class Panels:
         self.dB_vmin = dB_vmin
         self.dB_vmax = dB_vmax
         self.spectrogram_cmap = spectrogram_cmap
-
         self.annotation_horizontal_offset = annotation_horizontal_offset
         self.annotation_vertical_offset= annotation_vertical_offset
        
@@ -98,18 +97,6 @@ class Panels:
             if self.slice_at_time is None:
                 raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_time}.")
 
-            ax.set_xlabel('Frequency [MHz]', size=self.fsize_head)
-
-            if self.S.slice_type == "dBb":
-                ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
-            elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
-                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
-            else:
-                pass
-
-            ax.tick_params(axis='x', labelsize=self.fsize)
-            ax.tick_params(axis='y', labelsize=self.fsize)
-
             if self.normalise_line_plots:
                 normalise_frequency_slice = True
             else:
@@ -118,6 +105,18 @@ class Panels:
             specific_time_of_slice, freq_MHz, slice = self.S.slice_at_time(at_time = self.slice_at_time,
                                                                            normalise_frequency_slice = normalise_frequency_slice,
                                                                            slice_type = self.slice_type)
+
+
+            if self.S.slice_type == "dBb":
+                ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
+            elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
+                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
+            else:
+                pass
+
+            ax.set_xlabel('Frequency [MHz]', size=self.fsize_head)
+            ax.tick_params(axis='x', labelsize=self.fsize)
+            ax.tick_params(axis='y', labelsize=self.fsize)
 
             label = f"tag:{self.S.tag}"
 
@@ -128,17 +127,7 @@ class Panels:
     def time_slice(self, ax: Axes, cax: Axes) -> None:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_frequency is None:
-                raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_time}.")
-
-            if self.S.slice_type == "dBb":
-                ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
-            elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
-                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
-            else:
-                pass
-
-            ax.tick_params(axis='x', labelsize=self.fsize)
-            ax.tick_params(axis='y', labelsize=self.fsize)
+                raise ValueError(f"No frequencies specified to slice spectrogram. Received {self.slice_at_time}.")
 
             if self.normalise_line_plots:
                 normalise_time_slice = True
@@ -153,6 +142,15 @@ class Panels:
                                                                                     slice_type = self.slice_type,
                                                                                     background_subtract = background_subtract)
             
+            if self.S.slice_type == "dBb":
+                ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
+            elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
+                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
+            else:
+                pass
+
+            ax.tick_params(axis='x', labelsize=self.fsize)
+            ax.tick_params(axis='y', labelsize=self.fsize)
             label = f"tag:{self.S.tag}"
 
             self.plot_slice(ax, cax, times, slice, label)

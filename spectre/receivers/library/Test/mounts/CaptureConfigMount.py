@@ -12,7 +12,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_templates(self) -> None:
         self.templates = {
-            "cosine_signal": {
+            "cosine_signal_test_1": {
                 'samp_rate': int, # gr (sampling rate)
                 'frequency': float, # gr (frequency of the cosine signal)
                 'amplitude': float, # gr (ampltude of the cosine signal)
@@ -39,25 +39,25 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_validators(self) -> None:
         self.validators = {
-            "cosine_signal": self.cosine_validator,
+            "cosine_signal_test_1": self.cosine_signal_test_1_validator,
             "key_value_test": self.key_value_test_validator,
         }
 
-    
-    def cosine_validator(self, capture_config_dict: dict) -> None:
-        return
 
+    def cosine_signal_test_1_validator(self, capture_config: dict) -> None:
+        return
     
-    def key_value_test_validator(self, capture_config_dict: dict) -> None:
+
+    def key_value_test_validator(self, capture_config: dict) -> None:
         print("Performing key value test.")
         template = self.templates.get('key_value_test')
         if template is None:
             raise ValueError("Could not find template for the key value test.")
         
-        dict_helpers.validate_keys(capture_config_dict, template)
+        dict_helpers.validate_keys(capture_config, template)
         print("Keys verified.")
 
-        dict_helpers.validate_types(capture_config_dict, template)
+        dict_helpers.validate_types(capture_config, template)
         print("Values verified.")
 
         print("Validated capture config is consistent with the template")
