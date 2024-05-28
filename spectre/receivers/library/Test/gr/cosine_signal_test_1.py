@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: cosine_signal
+# Title: Not titled yet
 # GNU Radio version: 3.10.1.1
 
 from gnuradio import analog
@@ -22,12 +22,10 @@ from gnuradio import spectre
 
 from cfg import CONFIG
 
-
-
-class cosine_signal(gr.top_block):
+class cosine_signal_test_1(gr.top_block):
 
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "cosine_signal", catch_exceptions=True)
+        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
 
         ##################################################
         # Unpack capture config
@@ -38,27 +36,29 @@ class cosine_signal(gr.top_block):
         frequency = capture_config['frequency']
         amplitude = capture_config['amplitude']
 
-
         ##################################################
         # Blocks
         ##################################################
         self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.chunks_dir, tag, chunk_size, samp_rate)
-        self.blocks_throttle_1 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
-        self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, frequency, amplitude, 0, 0)
+        self.blocks_throttle_0_1 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
+        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
+        self.blocks_null_source_1 = blocks.null_source(gr.sizeof_float*1)
+        self.blocks_float_to_complex_1 = blocks.float_to_complex(1)
+        self.analog_sig_source_x_0 = analog.sig_source_f(samp_rate, analog.GR_COS_WAVE, frequency, amplitude, 0, 0)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_throttle_1, 0))
-        self.connect((self.blocks_throttle_1, 0), (self.spectre_batched_file_sink_0, 0))
+        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_float_to_complex_1, 0), (self.spectre_batched_file_sink_0, 0))
+        self.connect((self.blocks_null_source_1, 0), (self.blocks_throttle_0_1, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.blocks_float_to_complex_1, 0))
+        self.connect((self.blocks_throttle_0_1, 0), (self.blocks_float_to_complex_1, 1))
 
 
-
-
-
-def main(capture_config: dict, top_block_cls=cosine_signal, options=None):
-    tb = top_block_cls(capture_config)
+def main(top_block_cls=cosine_signal_test_1, options=None):
+    tb = top_block_cls()
 
     def sig_handler(sig=None, frame=None):
         tb.stop()
@@ -73,3 +73,6 @@ def main(capture_config: dict, top_block_cls=cosine_signal, options=None):
 
     tb.wait()
 
+
+if __name__ == '__main__':
+    main()
