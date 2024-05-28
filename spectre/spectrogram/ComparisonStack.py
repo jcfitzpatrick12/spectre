@@ -8,24 +8,25 @@ from spectre.spectrogram.Panels import Panels
 from spectre.utils import dict_helpers
  
 
-class ComparisonStack:  
-    def compare_with(self, 
-                     fig: Figure,
-                     S0, 
-                     S1, 
-                     override_S0_kwargs=None, 
-                     override_S1_kwargs=None, 
-                     spectrogram_type = "raw",
-                     **kwargs): 
+class ComparisonStack:      
+    def compare(self, 
+                    fig: Figure,
+                    S0, 
+                    S1, 
+                    override_S0_kwargs=None, 
+                    override_S1_kwargs=None, 
+                    spectrogram_type = "raw",
+                    time_type = "datetimes",
+                    **kwargs) -> None: 
         axs = fig.subplots(5, 2, 
                         gridspec_kw={'width_ratios': [2.5, 0.1], 
                                      'wspace': 0.05,
                                      'hspace': 0.4,
                                      },
                         squeeze=False)
-        
+
+        kwargs['time_type'] = time_type
         kwargs['normalise_line_plots'] = True
-        kwargs['time_type'] = "datetimes"
 
         S0_kwargs = kwargs.copy()
         if not override_S0_kwargs is None:
