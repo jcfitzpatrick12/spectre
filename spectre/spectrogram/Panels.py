@@ -110,7 +110,7 @@ class Panels:
             if self.S.slice_type == "dBb":
                 ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
             elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
-                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
+                ax.set_ylabel(f'{self.S.units}', size=self.fsize_head)
             else:
                 pass
 
@@ -145,7 +145,7 @@ class Panels:
             if self.S.slice_type == "dBb":
                 ax.set_ylabel(f"{self.S.slice_type}", size=self.fsize_head)
             elif (self.S.slice_type == "raw") and not self.normalise_line_plots:
-                ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
+                ax.set_ylabel(f'{self.S.units}', size=self.fsize_head)
             else:
                 pass
 
@@ -179,7 +179,7 @@ class Panels:
         ax.tick_params(axis='y', labelsize=self.fsize)
 
         if not self.normalise_line_plots:
-            ax.set_ylabel(f'raw [{self.S.units}]', size=self.fsize_head)
+            ax.set_ylabel(f'{self.S.units}', size=self.fsize_head)
 
         label = f"tag:{self.S.tag}"
         ax.annotate(label, 
