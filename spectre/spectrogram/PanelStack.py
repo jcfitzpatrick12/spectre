@@ -24,15 +24,15 @@ class PanelStack(Panels):
 
             # if the user has requested "frequency_slices" we consider this first
             # this is handled differently since it does not share the time axes with the other panels
-            if "frequency_slices" in panel_types:
+            if "frequency_slice" in panel_types:
                 # move this to the front
-                panel_types = array_helpers.move_to_front(panel_types, "frequency_slices")
+                panel_types = array_helpers.move_to_front(panel_types, "frequency_slice")
                 # ax and cax will be the first panels
                 ax, cax = axs[0, 0], axs[0, 1]
                 # Turn the colorbar axis off
                 cax.axis('off')
                 # Call the plotting function with its specific kwargs
-                self.frequency_slices(ax=ax, cax=cax)
+                self.frequency_slice(ax=ax, cax=cax)
  
 
             # Iterate over the plot types with Time on the x-axis, and plot
@@ -41,7 +41,7 @@ class PanelStack(Panels):
 
                 # frequency slices panel (if specified)
                 # has already been handled, so ignore
-                if panel_type == "frequency_slices":
+                if panel_type == "frequency_slice":
                     continue
 
                 # Turn the colorbar axis off initially; it will be turned on if needed
