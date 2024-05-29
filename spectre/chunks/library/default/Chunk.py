@@ -49,8 +49,8 @@ class Chunk(BaseChunk):
         window_type = capture_config.get('window_type')
         window_kwargs = capture_config.get('window_kwargs')
         window_params = (window_type, *window_kwargs.values())
-        Nx = capture_config.get('Nx')
-        w = get_window(window_params, Nx)
+        window_size = capture_config.get('window_size')
+        w = get_window(window_params, window_size)
         return w
     
 

@@ -20,7 +20,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'chunk_size': int, # gr (size of each batched file) [s]
                 'window_type': str, # post_proc (window type)
                 'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
-                'Nx': int, # post_proc (number of samples for window)
+                'window_size': int, # post_proc (number of samples for window)
                 'integration_time': float, # time over which to average spectra in postprocessing
                 'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
                 'chunk_key': str, # tag will map to the chunk with this key

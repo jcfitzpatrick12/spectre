@@ -4,7 +4,7 @@
     "chunk_size": 5,
     "samp_rate": 8000000,
     "integration_time": 0.075,
-    "Nx": 1024,
+    "window_size": 1024,
     "chunk_key": "default",
     "center_freq": 140000000.0,
     "RF_gain": 0,
