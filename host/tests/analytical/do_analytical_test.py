@@ -40,13 +40,15 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram) -> None:
             typer.secho(f"Chunk:{S.chunk_start_time} partial success", fg=typer.colors.YELLOW)
             failed_indices = np.where(~is_close)
             index_set_of_failed_spectral_slices = set(failed_indices[1])
+            failed_times = []
             for index in index_set_of_failed_spectral_slices:
                 time_of_failed_spectral_slice = S.time_seconds[index]
-                print(f"Comparison failed for slice at t={time_of_failed_spectral_slice}.")
+                failed_times.append(time_of_failed_spectral_slice)
+            print(f"Comparison failed for spectral slice at t={failed_times}.")
 
         # return
 
-def main(test_mode: str, test_tag: str) -> None:
+def main(test_tag: str) -> None:
     # load the capture config corresponding to the input test tag
     capture_config_handler = CaptureConfigHandler(test_tag)
     capture_config = capture_config_handler.load_as_dict()
@@ -57,10 +59,7 @@ def main(test_mode: str, test_tag: str) -> None:
         raise ValueError(f"Receiver for the specified capture config must be \"Test\". Got {receiver}")
     
     # check that the user specified mode is that specified in the capture config
-    mode = capture_config['mode']
-    if test_mode != mode:
-        raise ValueError(f"Test mode must be \"{test_mode}\". Got {mode}")
-    
+    test_mode = capture_config['mode']    
     # check the mode is a defined mode for the Test receiver
     test_receiver = Receiver("Test")
     if test_mode not in test_receiver.valid_modes:
