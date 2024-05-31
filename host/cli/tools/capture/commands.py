@@ -81,9 +81,9 @@ def stop(
 
 @app.command()
 def analytical_test(
-    test_mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode used to capture with the \"Test\" receiver."),
-    test_tag: str = typer.Option(..., "--tag", "-t", help="Tag for the analytical test.")
+    test_tag: str = typer.Option(..., "--tag", "-t", help="Tag for the analytical test."),
+    show_slice_status: bool = typer.Option(False, "--show-slice-status", help="If partial success, print the times of the spectral slices which failed validation.")
 ) -> None: 
-    do_analytical_test.main(test_mode, test_tag)
+    do_analytical_test.main(test_tag, show_slice_status = show_slice_status)
     return
 

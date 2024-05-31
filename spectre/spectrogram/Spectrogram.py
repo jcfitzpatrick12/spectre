@@ -19,8 +19,8 @@ class Spectrogram:
                  time_seconds: np.ndarray, 
                  freq_MHz: np.ndarray, 
                  tag: str, 
-                 units=None,
                  chunk_start_time=None,
+                 units=None,
                  microsecond_correction=0,
                  bvect=None,
                  background_interval=None):
@@ -41,10 +41,11 @@ class Spectrogram:
         self.freq_MHz = freq_MHz
         self.tag = tag
 
-        self.units = units
         self.shape = np.shape(dynamic_spectra)
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
         self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
+        
+        self.units = units
 
         self.chunk_start_datetime = None
         self.datetimes = None
