@@ -12,7 +12,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_templates(self) -> None:
         self.templates = {
-            "cosine_signal_test_1": {
+            "cosine-signal-test-1": {
                 'samp_rate': int, # gr (sampling rate)
                 'frequency': float, # gr (frequency of the cosine signal)
                 'amplitude': float, # gr (ampltude of the cosine signal)
@@ -39,7 +39,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_validators(self) -> None:
         self.validators = {
-            "cosine_signal_test_1": self.cosine_signal_test_1_validator,
+            "cosine-signal-test-1": self.cosine_signal_test_1_validator,
             "key_value_test": self.key_value_test_validator,
         }
 

@@ -4,6 +4,7 @@ from typing import List
 
 from host.cli import __app_name__, __version__
 from host.utils import capture_session 
+from host.tests.analytical import do_analytical_test
 from cfg import CONFIG
 
 from spectre.receivers.Receiver import Receiver
@@ -76,4 +77,13 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
 def stop(
 ) -> None:
     capture_session.stop()
+
+
+@app.command()
+def analytical_test(
+    test_mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode used to capture with the \"Test\" receiver."),
+    test_tag: str = typer.Option(..., "--tag", "-t", help="Tag for the analytical test.")
+) -> None: 
+    do_analytical_test.main(test_mode, test_tag)
+    return
 
