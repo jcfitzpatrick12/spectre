@@ -46,8 +46,12 @@ class AnalyticalSpectrogramFactory:
         if shape_type != tuple:
             raise TypeError(f"\"shape\" must be set as a tuple. Received {shape_type}")
 
+        # a defines the ratio of the sampling rate to the frequency of the synthetic signal
         a = int(samp_rate / frequency)
+        # p is the "number of sampled periods"
+        # which can be found equal to the ratio of window_size to a
         p = int(window_size / a)
+        # infer the number of frequency samples
         num_frequency_samples = shape[0]
         num_time_samples = shape[1]
 
@@ -55,12 +59,22 @@ class AnalyticalSpectrogramFactory:
         derived_spectral_amplitude = amplitude * window_size / 2
         spectral_slice[p] = derived_spectral_amplitude
         spectral_slice[window_size - p] = derived_spectral_amplitude
+        # analytical solution is derived for 0 <= k <= N-1 indexing
+        # so, we need to fftshift the array to align the slices to the naturally
+        # ordered frequency array (-ve -> +ve for increasing indices from 0 -> N-1)
+        spectral_slice = np.fft.fftshift(spectral_slice)
 
+        # build teh analytical spectrogram
         analytical_dynamic_spectra = np.ones(shape)
         analytical_dynamic_spectra = analytical_dynamic_spectra*spectral_slice[:, np.newaxis]   
 
-        time_seconds = np.array([n*hop*(1/samp_rate) for n in range(num_time_samples)])
-        freq_MHz = np.array([(n*samp_rate/num_frequency_samples)*1e-6 for n in range(num_frequency_samples)])
+        time_seconds = np.array([tau*hop*(1/samp_rate) for tau in range(num_time_samples)])
+
+        if num_frequency_samples % 2 != 0:
+            raise ValueError("The number of frequency samples must be even (identically, the window size must be even).")
+        
+        freq_bound = int(num_frequency_samples/2)
+        freq_MHz = np.array([(m*samp_rate/num_frequency_samples)*1e-6 for m in range(-freq_bound, freq_bound)])
 
         S = Spectrogram(analytical_dynamic_spectra,
                                    time_seconds,
