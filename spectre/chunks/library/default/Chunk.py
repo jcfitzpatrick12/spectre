@@ -9,7 +9,7 @@ from spectre.chunks.chunk_register import register_chunk
 from spectre.utils import json_helpers
 
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-
+from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.chunks.library.default.ChunkBin import ChunkBin
 from spectre.chunks.library.default.ChunkFits import ChunkFits
 
@@ -30,18 +30,23 @@ class Chunk(BaseChunk):
         # load the capture config for the current tag
         capture_config_handler = CaptureConfigHandler(self.tag)
         capture_config = capture_config_handler.load_as_dict()
+        # fetch the IQ data
+        IQ_data = self.bin.get_IQ_data()
 
-        # fetch the window
-        w = self.fetch_window(capture_config)
-
-        time_seconds, freq_MHz, dynamic_spectra = self.do_STFFT(capture_config, w)
+        # do the short time fft
+        time_seconds, freq_MHz, dynamic_spectra = self.do_STFFT(IQ_data, capture_config)
 
         # convert all arrays to the standard type
         time_seconds = np.array(time_seconds, dtype = 'float64')
         freq_MHz = np.array(freq_MHz, dtype = 'float64')
         dynamic_spectra = np.array(dynamic_spectra, dtype = 'float64')
 
-        return time_seconds, freq_MHz, dynamic_spectra
+        return Spectrogram(dynamic_spectra, 
+                time_seconds, 
+                freq_MHz, 
+                self.tag, 
+                chunk_start_time = self.chunk_start_time, 
+                units="amplitude")
 
     
     def fetch_window(self, capture_config: dict) -> np.ndarray:
@@ -54,13 +59,12 @@ class Chunk(BaseChunk):
         return w
     
 
-    def do_STFFT(self, capture_config: dict, w: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def do_STFFT(self, IQ_data: np.array, capture_config: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         '''
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
-
-        # fetch the IQ data
-        IQ_data = self.bin.get_IQ_data()
+        # fetch the window
+        w = self.fetch_window(capture_config)
         # find the number of samples 
         num_samples = len(IQ_data)
         # fetch the sample rate
