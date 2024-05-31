@@ -55,11 +55,8 @@ class AnalyticalSpectrogramFactory:
 
         time_seconds = np.array([tau*hop*(1/samp_rate) for tau in range(num_time_samples)])
 
-        if num_frequency_samples % 2 != 0:
-            raise ValueError("The number of frequency samples must be even (identically, the window size must be even).")
-        
-        freq_bound = int(num_frequency_samples/2)
-        freq_MHz = np.array([(m*samp_rate/num_frequency_samples)*1e-6 for m in range(-freq_bound, freq_bound)])
+        freq_MHz = np.fft.fftfreq(num_frequency_samples, 1/samp_rate)*1e-6
+        freq_MHz = np.fft.fftshift(freq_MHz)
 
         S = Spectrogram(analytical_dynamic_spectra,
                                    time_seconds,
