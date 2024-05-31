@@ -8,23 +8,26 @@ from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
 from spectre.spectrogram.Spectrogram import Spectrogram
 
-def times_of_failed_spectral_slices(S: Spectrogram, is_close: np.array) -> list:
-    failed_indices = np.where(~is_close)
-    index_set_of_failed_spectral_slices = set(failed_indices[1])
-    times = []
-    for index in index_set_of_failed_spectral_slices:
-        time_of_failed_spectral_slice = S.time_seconds[index]
-        times.append(time_of_failed_spectral_slice)
-    return times
+def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
+    for i, time in enumerate(S.time_seconds):
+        formatted_time = f"{time:.4f}"
+        is_close_slice = is_close[:,i]
+        successful_slice = np.all(is_close_slice)
+        if successful_slice:
+            typer.secho(f"slice:t={formatted_time} analytically validated", fg=typer.colors.GREEN)
+        else:
+            if np.all(~is_close_slice):
+                typer.secho(f"slice:t={formatted_time} failed validation", fg=typer.colors.RED)
+            else:
+                typer.secho(f"slice:t={formatted_time} partially validated", fg=typer.colors.YELLOW)
 
 
-def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram) -> None:
+def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_status = False) -> None:
     if not S.shape == analytical_S.shape:
         raise ValueError(f"Shape mismatch between synthesised spectra: {S.shape}, and analytical spectra: {analytical_S}.")
     
     synthesised_dynamic_spectra = S.dynamic_spectra
     analytical_dynamic_spectra = analytical_S.dynamic_spectra
-
     num_time_samples = S.shape[1]
     
     is_close = np.isclose(
@@ -39,21 +42,19 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram) -> None:
     # if all are true, we have had a total success
     if analytically_verified:
         typer.secho(f"Chunk:{S.chunk_start_time} analytically validated", fg=typer.colors.GREEN)
-
     else:
         total_failure = np.all(~is_close)
         # if every value does not match (according to isclose) then we have a total failure
         if total_failure:
-            typer.secho(f"Chunk:{S.chunk_start_time} failed validation.", fg=typer.colors.RED)
+            typer.secho(f"Chunk:{S.chunk_start_time} failed validation", fg=typer.colors.RED)
         # otherwise, we had a partial success (at least one isclose evaluated to true)
         else:
-            typer.secho(f"Chunk:{S.chunk_start_time} partial success", fg=typer.colors.YELLOW)
-            failure_times = times_of_failed_spectral_slices(S, is_close)
-            print(f"Comparison failed for spectral slice at t={failure_times}.")
+            typer.secho(f"Chunk:{S.chunk_start_time} partially validated", fg=typer.colors.YELLOW)
+            if show_slice_status:
+                print_slice_status(S, is_close)
 
-        # return
 
-def main(test_tag: str) -> None:
+def main(test_tag: str, show_slice_status = False) -> None:
     # load the capture config corresponding to the input test tag
     capture_config_handler = CaptureConfigHandler(test_tag)
     capture_config = capture_config_handler.load_as_dict()
@@ -80,8 +81,7 @@ def main(test_tag: str) -> None:
             chunkf = chunk
             S = chunkf.fits.load_spectrogram()  
             analytical_S = asf.get_spectrogram(test_mode, S.shape, capture_config)
-
-            compare_spectrograms(S, analytical_S,)
+            compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
     if chunkf is None:
         raise ValueError(f"No .fits files found with the tag \"{test_tag}\" in {my_chunks.chunks_dir}.")
