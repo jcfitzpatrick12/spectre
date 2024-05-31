@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 from spectre.chunks.BaseChunk import BaseChunk
 from spectre.chunks.chunk_register import register_chunk
-from spectre.utils import json_helpers
 
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.spectrogram.Spectrogram import Spectrogram
@@ -24,14 +23,14 @@ class Chunk(BaseChunk):
 
 
     def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
-        
+        # fetch the IQ data
+        IQ_data = self.bin.get_IQ_data()
         # load the capture config for the current tag
         capture_config_handler = CaptureConfigHandler(self.tag)
         capture_config = capture_config_handler.load_as_dict()
-        # fetch the IQ data
-        IQ_data = self.bin.get_IQ_data()
 
         # do the short time fft
         time_seconds, freq_MHz, dynamic_spectra = self.do_STFFT(IQ_data, capture_config)
@@ -72,9 +71,8 @@ class Chunk(BaseChunk):
         # fetch the STFFT kwargs
         STFFT_kwargs = capture_config.get('STFFT_kwargs')
 
-        # perform the short time FFT (specifying explicately keywords centered and magnitude)
+        # perform the short time FFT (specifying explicately keywords centered)
         SFT = ShortTimeFFT(w, fs=samp_rate, fft_mode='centered', **STFFT_kwargs)
-        # SFT = ShortTimeFFT(w, fs=samp_rate, **STFFT_kwargs)
 
         # set p0=0, since by convention in the STFFT docs, p=0 corresponds to the slice centred at t=0
         p0=0
