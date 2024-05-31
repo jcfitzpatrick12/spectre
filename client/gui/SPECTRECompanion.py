@@ -2,8 +2,8 @@ import tkinter as tk
 
 
 from argparse import ArgumentParser
-from client.devgui.ui_components import create_labeled_entry, setup_plot, create_tickbox_frame
-from client.devgui.ChunksHandler import ChunksHandler
+from client.gui.ui_components import create_labeled_entry, setup_plot, create_tickbox_frame
+from client.gui.ChunksHandler import ChunksHandler
 
 class SPECTRECompanion:
     def __init__(self, master, initial_tag: str):
