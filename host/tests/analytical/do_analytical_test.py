@@ -14,12 +14,12 @@ def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
         is_close_slice = is_close[:,i]
         successful_slice = np.all(is_close_slice)
         if successful_slice:
-            typer.secho(f"slice:t={formatted_time} analytically validated", fg=typer.colors.GREEN)
+            typer.secho(f"spectral-slice:t={formatted_time} analytically validated", fg=typer.colors.GREEN)
         else:
             if np.all(~is_close_slice):
-                typer.secho(f"slice:t={formatted_time} failed validation", fg=typer.colors.RED)
+                typer.secho(f"spectral-slice:t={formatted_time} failed validation", fg=typer.colors.RED)
             else:
-                typer.secho(f"slice:t={formatted_time} partially validated", fg=typer.colors.YELLOW)
+                typer.secho(f"spectral-slice:t={formatted_time} partially validated", fg=typer.colors.YELLOW)
 
 
 def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_status = False) -> None:
