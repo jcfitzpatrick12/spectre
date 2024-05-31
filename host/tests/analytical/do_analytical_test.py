@@ -8,6 +8,16 @@ from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
 from spectre.spectrogram.Spectrogram import Spectrogram
 
+def times_of_failed_spectral_slices(S: Spectrogram, is_close: np.array) -> list:
+    failed_indices = np.where(~is_close)
+    index_set_of_failed_spectral_slices = set(failed_indices[1])
+    times = []
+    for index in index_set_of_failed_spectral_slices:
+        time_of_failed_spectral_slice = S.time_seconds[index]
+        times.append(time_of_failed_spectral_slice)
+    return times
+
+
 def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram) -> None:
     if not S.shape == analytical_S.shape:
         raise ValueError(f"Shape mismatch between synthesised spectra: {S.shape}, and analytical spectra: {analytical_S}.")
@@ -38,13 +48,8 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram) -> None:
         # otherwise, we had a partial success (at least one isclose evaluated to true)
         else:
             typer.secho(f"Chunk:{S.chunk_start_time} partial success", fg=typer.colors.YELLOW)
-            failed_indices = np.where(~is_close)
-            index_set_of_failed_spectral_slices = set(failed_indices[1])
-            failed_times = []
-            for index in index_set_of_failed_spectral_slices:
-                time_of_failed_spectral_slice = S.time_seconds[index]
-                failed_times.append(time_of_failed_spectral_slice)
-            print(f"Comparison failed for spectral slice at t={failed_times}.")
+            failure_times = times_of_failed_spectral_slices(S, is_close)
+            print(f"Comparison failed for spectral slice at t={failure_times}.")
 
         # return
 
