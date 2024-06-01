@@ -108,7 +108,7 @@ Activate the virtual environment:
 Run the set-up using ```pip```:  
 ```pip install -e .```  
 And finally, run the GUI:  
-```python3 client/devgui/SPECTRECompanion.py --tag [capture tag]```  
+```python3 client/gui/SPECTRECompanion.py --tag [capture tag]```  
 
 
 # Contributing
