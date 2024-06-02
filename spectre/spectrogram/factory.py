@@ -1,5 +1,5 @@
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from spectre.utils import array_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
@@ -89,22 +89,24 @@ def time_average(S: Spectrogram,
     if average_over == 1:
         return S
 
-    num_temporal_samples = S.dynamic_spectra.shape[1]
-    num_full_blocks = num_temporal_samples // average_over
-    remainder = num_temporal_samples % average_over
-
     averaged_dynamic_spectra = array_helpers.average_array(S.dynamic_spectra, average_over, axis=1)
-    # Ensuring the time array matches the length of the averaged dynamic_spectra
-    block_count = num_full_blocks + (1 if remainder else 0)
-    decimated_time_seconds = S.time_seconds[:(block_count * average_over):average_over]
+    averaged_time_seconds = array_helpers.average_array(S.time_seconds, average_over)
+
+    averaged_t0_seconds = averaged_time_seconds[0]
+    t0_datetime = S.t0_datetime
+
+    updated_t0_datetime = t0_datetime + timedelta(seconds=averaged_t0_seconds)
+    updated_chunk_start_time = updated_t0_datetime.strftime(CONFIG.default_time_format)
+    updated_microsecond_correction = updated_t0_datetime.microsecond
+    updated_time_seconds = averaged_time_seconds - averaged_t0_seconds
 
     return Spectrogram(averaged_dynamic_spectra, 
-                       decimated_time_seconds, 
+                       updated_time_seconds, 
                        S.freq_MHz, 
                        S.tag, 
-                       chunk_start_time = S.chunk_start_time,
+                       chunk_start_time = updated_chunk_start_time,
                        units = S.units,
-                       microsecond_correction = S.microsecond_correction,
+                       microsecond_correction = updated_microsecond_correction,
                        bvect = S.bvect, 
                        background_interval = S.background_interval
                        )
