@@ -44,7 +44,7 @@ class AnalyticalSpectrogramFactory:
         derived_spectral_amplitude = amplitude * window_size / 2
         spectral_slice[p] = derived_spectral_amplitude
         spectral_slice[window_size - p] = derived_spectral_amplitude
-        # analytical solution is derived for 0 <= k <= N-1 indexing
+        # analytical solution is derived for 0 <= k <= N-1 DFT summation indexing
         # so, we need to fftshift the array to align the slices to the naturally
         # ordered frequency array (-ve -> +ve for increasing indices from 0 -> N-1)
         spectral_slice = np.fft.fftshift(spectral_slice)

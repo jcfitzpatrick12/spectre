@@ -53,7 +53,16 @@ def compute_resolution(array: np.ndarray) -> float:
 
 
 def average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
-    # each "full block" will contain (along the requested axis) average_over elements
+
+    # Check if average_over is an integer
+    if type(average_over) != int:
+        raise TypeError(f"average_over must be an integer. Got {type(average_over)}.")
+
+    # Get the size of the specified axis which we will average over
+    axis_size = array.shape[axis]
+    # Check if average_over is within the valid range
+    if not 1 <= average_over <= axis_size:
+        raise ValueError(f"average_over must be between 1 and the length of the axis ({axis_size}).")
     
     max_axis_index = len(np.shape(array)) - 1
     if axis > max_axis_index: # zero indexing on specifying axis, so minus one
