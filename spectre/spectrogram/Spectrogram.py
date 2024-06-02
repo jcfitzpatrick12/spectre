@@ -37,6 +37,11 @@ class Spectrogram:
             raise ValueError(f"Mismatch in number of rows: Expected {len(time_seconds)}, but got {dynamic_spectra.shape[1]}.")
 
         self.dynamic_spectra = dynamic_spectra 
+
+        t0_seconds = time_seconds[0]
+        if t0_seconds != 0:
+            raise ValueError(f"Input time_seconds array must be translated so that the first element lies at t=0. Got t0={t0_seconds} [s]")
+        
         self.time_seconds = time_seconds
         self.freq_MHz = freq_MHz
         self.tag = tag
@@ -49,6 +54,7 @@ class Spectrogram:
 
         self.chunk_start_datetime = None
         self.datetimes = None
+        self.t0_datetime = None
         self.microsecond_correction = microsecond_correction
         # chunk_start_times are precise up to the second (due to our default time format)
         # include an optional microsecond correction
@@ -71,6 +77,7 @@ class Spectrogram:
         self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, 
                                                                 self.time_seconds,
                                                                 microsecond_correction = self.microsecond_correction)
+        self.t0_datetime = self.datetimes[0]
 
 
     def set_background(self, background_interval: list):
