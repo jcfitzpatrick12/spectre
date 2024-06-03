@@ -115,6 +115,18 @@ class Receiver:
         self.capture_config.validate(capture_config, self.mode)
         return capture_config
     
+    def template_to_command(self, tag: str, as_string = False) -> str:
+        command_as_list = ["spectre", "create", "capture-config", "-r", self.receiver_name, "-m", self.mode, "-t", tag]
+        template = self.capture_config.get_template(self.mode)
+        for key, value in template.items():
+            command_as_list += ["-p"]
+            command_as_list += [f"{key}={value.__name__}"]
+        if as_string:
+            return " ".join(command_as_list)
+        else:
+            return command_as_list
+
+
  
 
 
