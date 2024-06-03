@@ -27,3 +27,8 @@ def get_capture_mount(receiver_name: str) -> BaseCaptureMount:
         raise ValueError(f"No capture mount found for receiver: {receiver_name}. Please specify one of the following receivers {valid_receivers}.")
     return Mount
 
+def list_all_receivers() -> list:
+    if capture_config_mounts.keys() != capture_mounts.keys():
+        raise ValueError("Receiver key mismatch between capture-config mounts, and capture mounts.")
+    return list(capture_config_mounts.keys())
+

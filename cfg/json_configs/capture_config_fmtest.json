@@ -1,9 +1,9 @@
 {
-    "watch_extension": ".bin",
+    "watch_extension": "bin",
     "event_handler_key": "default",
     "chunk_size": 5,
     "samp_rate": 600000,
-    "integration_time": 0.01,
+    "integration_time": 0.005,
     "window_size": 2048,
     "chunk_key": "default",
     "center_freq": 95800000.0,
@@ -17,7 +17,7 @@
     "STFFT_kwargs": {
         "hop": 1024
     },
-    "receiver": "RSPDuo",
+    "receiver": "RSPduo",
     "mode": "tuner_1_fixed",
     "tag": "fmtest"
 }

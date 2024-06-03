@@ -11,7 +11,11 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import factory
 
 class Chunks:
-    def __init__(self, tag: str, year=None, month=None, day=None):
+    def __init__(self, 
+                 tag: str, 
+                 year=None, 
+                 month=None, 
+                 day=None):
         self.tag = tag
         
         # if a specific date is specified via kwargs, set the attribute
@@ -31,12 +35,11 @@ class Chunks:
     def build_dict(self) -> None:
         chunks_dict = OrderedDict()
 
-        try:
-            files = dir_helpers.list_all_files(self.chunks_dir)
-        except NotADirectoryError:
-            os.mkdir(CONFIG.chunks_dir)
-            files = []
-
+        files = dir_helpers.list_all_files(self.chunks_dir)
+        
+        if len(files) == 0:
+            raise FileNotFoundError(f"No chunks found at {self.chunks_dir}.")
+        
         for file in files:
             file_name, ext = os.path.splitext(file)
             try:

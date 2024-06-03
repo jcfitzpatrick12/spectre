@@ -1,5 +1,6 @@
 import numpy as np
 from datetime import datetime, timedelta
+from typing import Any
 
 from spectre.utils import array_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
@@ -7,8 +8,8 @@ from cfg import CONFIG
 
 
 def frequency_chop(S: Spectrogram, 
-                   start_freq_MHz: any, 
-                   end_freq_MHz: any) -> Spectrogram:
+                   start_freq_MHz: Any, 
+                   end_freq_MHz: Any) -> Spectrogram:
     #find the index of the nearest matching frequencies in the input spectrogram
     start_index = array_helpers.find_closest_index(start_freq_MHz,S.freq_MHz)
     end_index = array_helpers.find_closest_index(end_freq_MHz,S.freq_MHz)

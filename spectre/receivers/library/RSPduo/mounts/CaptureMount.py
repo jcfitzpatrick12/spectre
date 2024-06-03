@@ -1,10 +1,10 @@
 from spectre.receivers.BaseCaptureMount import BaseCaptureMount
 from spectre.receivers.mount_register import register_capture_mount
 
-from spectre.receivers.library.RSPDuo.gr import tuner_1_fixed
+from spectre.receivers.library.RSPduo.gr import tuner_1_fixed
 
 
-@register_capture_mount("RSPDuo")
+@register_capture_mount("RSPduo")
 class CaptureMount(BaseCaptureMount):
     def __init__(self):
         super().__init__()

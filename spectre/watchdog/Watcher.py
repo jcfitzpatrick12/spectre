@@ -10,7 +10,7 @@ class Watcher:
     def __init__(self, tag: str, extension: str):
         self.observer = Observer()
         self.tag = tag
-        self.extension = extension
+        self.extension = f".{extension}"
 
         EventHandler = get_event_handler_from_tag(tag)
         # create an instance of the event handler

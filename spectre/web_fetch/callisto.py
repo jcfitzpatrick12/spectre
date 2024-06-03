@@ -4,6 +4,7 @@ import subprocess
 import shutil
 
 from spectre.utils import callisto_helpers
+from cfg import CONFIG
 
 temp_dir = os.path.join(os.environ['SPECTREPARENTPATH'], "tmp")
 
@@ -18,18 +19,14 @@ def copy_to_chunks():
             
 
 # fetches all .fits.gz files and saves them inside fpath for a particular date and callisto station
-def wget_callisto_station(station: str, date_as_string: str):
+def wget_callisto_station(station: str, year: int, month: int, day: int):
 
-    date_format = "%Y-%m-%d"
-    try:
-        fetch_from_datetime = datetime.strptime(date_as_string, date_format)
-    except ValueError as e:
-        raise ValueError(f"Expected date format is {date_format} but got {date_as_string}. Received the error: {e}.")
-    
-    year = fetch_from_datetime.strftime("%Y")
-    month = fetch_from_datetime.strftime("%m")
-    day = fetch_from_datetime.strftime("%d")
-    base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{year}/{month}/{day}/"
+    temp_datetime = datetime(year=year, month=month, day=day)
+    formatted_year = temp_datetime.strftime("%Y")
+    formatted_month = temp_datetime.strftime("%m")
+    formatted_day = temp_datetime.strftime("%d")
+
+    base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{formatted_year}/{formatted_month}/{formatted_day}/"
 
     # wget -r -l1 -H -t1 -nd -N -np -e robots=off -A 'GLASGOW*.fit.gz' http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/2024/05/20/
     command = [
@@ -46,11 +43,23 @@ def wget_callisto_station(station: str, date_as_string: str):
         print(f"An error occurred: {e}")
 
 
-def fetch_chunks(station: str, date_as_string: str):
+def fetch_chunks(station: str, 
+                 year=None, 
+                 month=None, 
+                 day=None):
+    
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
-    wget_callisto_station(station, date_as_string)
+    # Validate the combinations of year, month, and day
+    if day and not month:
+        raise ValueError("Day specified without month.")
+    if (month or day) and not year:
+        raise ValueError("Month or day specified without year.")
+    if day and not (year and month):
+        raise ValueError("Day specified without both year and month.")
+    
+    wget_callisto_station(station, year, month, day)
     copy_to_chunks()
 
     shutil.rmtree(temp_dir)

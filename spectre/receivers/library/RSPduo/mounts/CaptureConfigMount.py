@@ -3,7 +3,7 @@ from spectre.receivers.mount_register import register_capture_config_mount
 from spectre.utils import validator_helpers
 
 
-@register_capture_config_mount("RSPDuo")
+@register_capture_config_mount("RSPduo")
 class CaptureConfigMount(BaseCaptureConfigMount):
     def __init__(self,):
         super().__init__()
