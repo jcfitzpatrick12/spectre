@@ -61,8 +61,8 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         if integration_time != 0:
             raise ValueError(f"Integration time must be zero. Received {integration_time}")
 
-        if watch_extension != ".bin":
-            raise ValueError(f"watch_extension must be \".bin\". Received {watch_extension}")
+        if watch_extension != "bin":
+            raise ValueError(f"watch_extension must be \"bin\". Received {watch_extension}")
 
         if chunk_key != "default":
             raise ValueError(f"chunk_key must be \"default\". Received {chunk_key}")
