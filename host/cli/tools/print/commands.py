@@ -22,6 +22,25 @@ def capture_log() -> None:
     file_helpers.cat(CONFIG.path_to_capture_log)
     raise typer.Exit(1)
 
+@app.command()
+def fits_template(
+    tag: str = typer.Option(None, "--tag", "-t", help=""),
+    as_command: bool = typer.Option(False, "--as-command", help="")
+) -> None:
+    fits_config_handler = FitsConfigHandler(tag)
+    if as_command:
+        if not tag:
+            raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t.")
+        command_as_string = fits_config_handler.template_to_command(tag, as_string=True)
+        typer.secho(command_as_string)
+    else:
+        template = fits_config_handler.get_template()
+        for key, value in template.items():
+            typer.secho(
+                f"{key}: {value.__name__}"
+            )
+    typer.Exit(1)
+
 
 @app.command()
 def template(
