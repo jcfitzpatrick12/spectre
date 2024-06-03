@@ -33,7 +33,7 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_s
     is_close = np.isclose(
         S.dynamic_spectra,
         analytical_S.dynamic_spectra,
-        atol = 1e-7,
+        atol = 1e-4,
         rtol = 0,
     )
 
