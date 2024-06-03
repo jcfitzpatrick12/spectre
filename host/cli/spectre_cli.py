@@ -10,6 +10,8 @@ from host.cli.tools.list.commands import app as list_app
 from host.cli.tools.print.commands import app as print_app
 from host.cli.tools.delete.commands import app as delete_app
 from host.cli.tools.capture.commands import app as capture_app
+from host.cli.tools.update.commands import app as update_app
+from host.cli.tools.web_fetch.commands import app as web_fetch_app
 
 
 app = typer.Typer()
@@ -19,6 +21,8 @@ app.add_typer(list_app, name='list')
 app.add_typer(print_app, name='print')
 app.add_typer(delete_app, name='delete')
 app.add_typer(capture_app, name='capture')
+app.add_typer(update_app, name='update')
+app.add_typer(web_fetch_app, name='web-fetch')
 
 
 def _version_callback(value: bool) -> None:
