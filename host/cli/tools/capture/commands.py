@@ -42,6 +42,7 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
             subprocess_command += [tag]
 
         capture_session.start(subprocess_command)
+        raise typer.Exit(1)
 
 @app.command()
 def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture session",),
@@ -71,12 +72,14 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
             '--tag', tag,
         ]
         capture_session.start(subprocess_command)
+        raise typer.Exit(1)
 
 
 @app.command()
 def stop(
 ) -> None:
     capture_session.stop()
+    raise typer.Exit(1)
 
 
 @app.command()
@@ -85,5 +88,5 @@ def analytical_test(
     show_slice_status: bool = typer.Option(False, "--show-slice-status", help="If partial success, print the times of the spectral slices which failed validation.")
 ) -> None: 
     do_analytical_test.main(test_tag, show_slice_status = show_slice_status)
-    return
+    raise typer.Exit(1)
 
