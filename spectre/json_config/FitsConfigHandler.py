@@ -36,3 +36,14 @@ class FitsConfigHandler(JsonConfigHandler):
         # and finally, save the fits config as a json
         self.save_dict_as_json(fits_config_as_dict)
     
+
+    def template_to_command(self, tag: str, as_string = False) -> str:
+        command_as_list = ["spectre", "create", "fits-config", "-t", tag]
+        template = self.get_template()
+        for key, value in template.items():
+            command_as_list += ["-p"]
+            command_as_list += [f"{key}={value.__name__}"]
+        if as_string:
+            return " ".join(command_as_list)
+        else:
+            return command_as_list
