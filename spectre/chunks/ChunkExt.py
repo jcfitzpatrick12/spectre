@@ -22,9 +22,15 @@ class ChunkExt:
         return os.path.exists(self.get_path())
     
 
-    def delete_self(self, doublecheck_delete = True) -> None:
+    def delete_self(self, doublecheck_delete = True, ignore_file_existance = True) -> None:
         if doublecheck_delete:
             file_helpers.doublecheck_delete(self.get_path())
-        os.remove(self.get_path())
+        try:
+            os.remove(self.get_path())
+        except FileNotFoundError:
+            if ignore_file_existance:
+                pass
+            else:
+                raise
         return
     
