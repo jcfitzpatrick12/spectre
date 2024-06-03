@@ -37,6 +37,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 
     # validate the capture config following the update
     receiver.capture_config.validate(capture_config, mode)
+    capture_config_handler.save_dict_as_json(capture_config, doublecheck_overwrite=False)
     raise typer.Exit(1)
 
 
