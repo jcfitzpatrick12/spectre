@@ -1,5 +1,5 @@
 {
-    "amplitude": 1.0,
+    "amplitude": 2.0,
     "frequency": 32000.0,
     "integration_time": 0.0,
     "samp_rate": 128000,
@@ -10,7 +10,7 @@
         "hop": 512
     },
     "window_size": 256,
-    "watch_extension": ".bin",
+    "watch_extension": "bin",
     "event_handler_key": "default",
     "chunk_key": "default",
     "receiver": "Test",
