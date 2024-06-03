@@ -27,7 +27,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'integration_time': float # spectrograms will be averaged over a time integration_time
             },
             
-            "key_value_test": {
+            "key-value-test": {
                 'int_key': int,
                 'str_key': str,
                 'dict_key': dict,
@@ -40,7 +40,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
     def set_validators(self) -> None:
         self.validators = {
             "cosine-signal-test-1": self.cosine_signal_test_1_validator,
-            "key_value_test": self.key_value_test_validator,
+            "key-value-test": self.key_value_test_validator,
         }
 
 
@@ -102,7 +102,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def key_value_test_validator(self, capture_config: dict) -> None:
         print("Performing key value test.")
-        template = self.templates.get('key_value_test')
+        template = self.templates.get('key-value-test')
         if template is None:
             raise ValueError("Could not find template for the key value test.")
         

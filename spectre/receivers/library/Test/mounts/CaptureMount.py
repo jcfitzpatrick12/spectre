@@ -13,7 +13,7 @@ class CaptureMount(BaseCaptureMount):
     def set_capture_methods(self) -> None:
         self.capture_methods = {
             "cosine-signal-test-1": self.cosine_signal_test_1,
-            "key_value_test": self.dummy,
+            "key-value-test": self.dummy,
 
         }
 
