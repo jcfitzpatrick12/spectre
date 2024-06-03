@@ -25,7 +25,7 @@
 
 Current supported receivers include:
 - RSP1A
-- RSPDuo
+- RSPduo
 
 The framework is in place to integrate the following receivers, this is planned for the near future:
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))

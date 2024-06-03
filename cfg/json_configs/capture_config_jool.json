@@ -16,7 +16,7 @@
     "STFFT_kwargs": {
         "hop": 512
     },
-    "receiver": "RSPDuo",
+    "receiver": "RSPduo",
     "mode": "tuner_1_fixed",
     "tag": "jool"
 }
