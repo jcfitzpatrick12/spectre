@@ -13,6 +13,7 @@ app = typer.Typer()
 @app.command()
 def chunks(
     tag: str = typer.Option(..., "--tag", "-t", help=""),
+    ext: str = typer.Option(..., "--ext", "-e", help=""),
     year: int = typer.Option(None, "--year", "-y", help=""),
     month: int = typer.Option(None, "--month", "-m", help=""),
     day: int = typer.Option(None, "--day", "-d", help=""),
@@ -22,7 +23,13 @@ def chunks(
                     month=month,
                     day=day)
     for chunk_start_time, chunk in chunks.dict.items():
-        print(f"{chunk_start_time}_{tag}")
+        # Use getattr to dynamically get the attribute based on 'ext'
+        attribute = getattr(chunk, ext, None)
+        if attribute is None:
+            typer.echo(f"No attribute '{ext}' found on chunk")
+            continue
+        if attribute.exists():
+            print(f"{chunk_start_time}_{tag}.{ext}")
     typer.Exit()
 
 @app.command()
