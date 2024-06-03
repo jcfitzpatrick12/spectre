@@ -1,4 +1,5 @@
 import ast
+from typing import Any
 
 def unpack(param: str) -> tuple:
     if '=' not in param or param.startswith('=') or param.endswith('='):
@@ -15,8 +16,11 @@ def convert_types(string_valued_dict: dict, template: dict) -> dict:
     type_converted_dict = {}
     for key, string_value in string_valued_dict.items():          
         dynamic_type = template.get(key)
+
+        template_keys = list(template.keys())
         if dynamic_type is None:
-            raise ValueError(f"Dynamic type must be specified in the template. Received: {dynamic_type}.")
+            raise KeyError(f"The key \"{key}\" is not found in template, expected one of {template_keys}")
+        
         try:
             if dynamic_type == bool:
                 # need a specific implementation for boolean types
@@ -79,4 +83,12 @@ def validate_types(input_dict: dict, template: dict) -> None:
 def inject_dict(input_dict: dict, overwrite_dict: dict):
     for key, value in overwrite_dict.items():
         input_dict[key] = value
+    return input_dict
+
+
+def update_key_value(input_dict: dict, key: Any, value: Any) -> dict:
+    valid_keys = list(input_dict.keys())
+    if not key in valid_keys:
+        raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
+    input_dict[key] = value
     return input_dict
