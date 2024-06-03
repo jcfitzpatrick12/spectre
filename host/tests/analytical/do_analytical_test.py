@@ -60,9 +60,9 @@ def main(test_tag: str, show_slice_status = False) -> None:
     capture_config = capture_config_handler.load_as_dict()
     
     # first check the receiver specified in the capture config is a Test receiver
-    receiver = capture_config['receiver']
-    if receiver != "Test":
-        raise ValueError(f"Receiver for the specified capture config must be \"Test\". Got {receiver}")
+    receiver_name = capture_config['receiver']
+    if receiver_name != "Test":
+        raise ValueError(f"Receiver for the specified capture config must be \"Test\". Got {receiver_name}")
     
     # check that the user specified mode is that specified in the capture config
     test_mode = capture_config['mode']    
