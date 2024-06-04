@@ -23,7 +23,7 @@ def capture_log() -> None:
     raise typer.Exit()
 
 @app.command()
-def fits_template(
+def fits_config_template(
     tag: str = typer.Option(None, "--tag", "-t", help=""),
     as_command: bool = typer.Option(False, "--as-command", help="")
 ) -> None:
@@ -43,7 +43,7 @@ def fits_template(
 
 
 @app.command()
-def template(
+def capture_config_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name"),
     mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode for capture"),
     as_command: bool = typer.Option(False, "--as-command", help=""),
