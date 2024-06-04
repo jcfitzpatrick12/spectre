@@ -35,7 +35,7 @@ def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
             doublecheck_delete = True
         # Assuming the attribute itself is an object that has a 'delete_self' method
         attribute.delete_self(doublecheck_delete=doublecheck_delete)
-    typer.Exit(1)
+    typer.Exit()
 
 @app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
@@ -47,7 +47,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
             f'File deleted: {fits_config_handler.absolute_path()}.',
             fg=typer.colors.YELLOW,
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -62,7 +62,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
             fg=typer.colors.YELLOW,
         )
     
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 

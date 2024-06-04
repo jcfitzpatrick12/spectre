@@ -38,7 +38,7 @@ def receivers(
     receiver_list = get_mount.list_all_receivers()
     for receiver_name in receiver_list:
         typer.secho(f"{receiver_name}")
-    typer.Exit(1)
+    typer.Exit()
 
 
 @app.command()
@@ -50,7 +50,7 @@ def modes(
     
     for i, mode in enumerate(valid_modes):
         typer.secho(f"{mode}")
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def fits_configs(
@@ -61,7 +61,7 @@ def fits_configs(
             typer.secho(
                 f'{json_config_file}',
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -73,7 +73,7 @@ def capture_configs(
             typer.secho(
                 f'{json_config_file}',
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 
@@ -113,5 +113,5 @@ def tags(
     else:
         for tag in sorted(tags):
             typer.secho(f"{tag}")
-    raise typer.Exit(1)
+    raise typer.Exit()
 

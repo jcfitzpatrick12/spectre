@@ -14,13 +14,13 @@ app = typer.Typer()
 @app.command()
 def cron_log() -> None:
     file_helpers.cat("/var/log/daily_capture.log")
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
 def capture_log() -> None:
     file_helpers.cat(CONFIG.path_to_capture_log)
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def fits_template(
@@ -39,7 +39,7 @@ def fits_template(
             typer.secho(
                 f"{key}: {value.__name__}"
             )
-    typer.Exit(1)
+    typer.Exit()
 
 
 @app.command()
@@ -62,7 +62,7 @@ def template(
             typer.secho(
                 f"{key}: {value.__name__}"
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -74,7 +74,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         typer.secho(
             f"{key}: {value}"
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
@@ -85,6 +85,6 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         typer.secho(
             f"{key}: {value}"
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
     
