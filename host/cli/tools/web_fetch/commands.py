@@ -7,10 +7,10 @@ app = typer.Typer()
 
 @app.command()
 def callisto(
-    station: str = typer.Option(..., "--station", "-s", help=""),
+    instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=""),
     year: int = typer.Option(None, "--year", "-y", help=""),
     month: int = typer.Option(None, "--month", "-m", help=""),
     day: int = typer.Option(None, "--day", "-d", help=""),
 ) -> None:
-    fetch_chunks(station, year=year, month=month, day=day)
+    fetch_chunks(instrument_code, year=year, month=month, day=day)
     raise typer.Exit()

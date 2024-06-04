@@ -2,13 +2,21 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
+from cfg import CONFIG, callisto_stations
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.Receiver import Receiver
 from spectre.receivers import get_mount
 from spectre.chunks.Chunks import Chunks
 
 app = typer.Typer()
+
+@app.command()
+def callisto_instrument_codes(
+
+) -> None:
+    for callisto_instrument_code in callisto_stations.instrument_codes:
+        typer.secho(f"{callisto_instrument_code}")
+    raise typer.Exit()
 
 @app.command()
 def chunks(
