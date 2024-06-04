@@ -9,7 +9,7 @@ app = typer.Typer()
 
 @app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
-                   params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+                   params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     
     # extract the current capture config saved (which will be type cast!)
@@ -35,13 +35,14 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         capture_config = dict_helpers.update_key_value(capture_config, key, value)
 
     # save the updated capture config
-    receiver.save_capture_config(capture_config, tag)
+    receiver.save_capture_config(capture_config, tag, doublecheck_overwrite=False)
+    typer.secho(f"The capture-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
     raise typer.Exit()
 
 
 @app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
-                   params: List[str] = typer.Option([], "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+                   params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
     fits_config = fits_config_handler.load_as_dict()
@@ -54,4 +55,5 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         fits_config = dict_helpers.update_key_value(fits_config, key, value)
     
     fits_config_handler.save_dict_as_json(fits_config, doublecheck_overwrite=False)
+    typer.secho(f"The fits-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
     raise typer.Exit()

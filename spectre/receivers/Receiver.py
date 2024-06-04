@@ -44,7 +44,10 @@ class Receiver:
         return
 
     # save capture config assumes the input capture config is correctly type cast in lines with the template
-    def save_capture_config(self, capture_config: dict, tag: str) -> None:
+    def save_capture_config(self, 
+                            capture_config: dict, 
+                            tag: str, 
+                            doublecheck_overwrite: bool = True) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # extract the capture config template for the current mode of the receiver
@@ -61,12 +64,16 @@ class Receiver:
         # instantiate capture_config and save the newly constructed config_dict
         capture_config_handler = CaptureConfigHandler(tag)
         # save to file under the requested tag
-        capture_config_handler.save_dict_as_json(capture_config, doublecheck_overwrite=False)
+        capture_config_handler.save_dict_as_json(capture_config, 
+                                                 doublecheck_overwrite=doublecheck_overwrite)
         return
 
 
     # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
-    def save_params_as_capture_config(self, params: list, tag: str) -> None:
+    def save_params_as_capture_config(self, 
+                                      params: list, 
+                                      tag: str,
+                                      doublecheck_overwrite: bool = True) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # convert the user defined params to a raw_dict [key=string_value]
@@ -77,7 +84,9 @@ class Receiver:
         capture_config = dict_helpers.convert_types(string_valued_dict, template)  
         # and finally, save the capture_config as dict. Internally performs validations on the config as specified
         # the capture config mount 
-        self.save_capture_config(capture_config, tag)
+        self.save_capture_config(capture_config, 
+                                 tag, 
+                                 doublecheck_overwrite=doublecheck_overwrite)
         return  
     
 
