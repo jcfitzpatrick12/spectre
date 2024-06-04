@@ -12,14 +12,9 @@ class Watcher:
         self.observer = Observer()
         self.tag = tag
 
-        capture_config_handler = CaptureConfigHandler(tag)
-        capture_config = capture_config_handler.load_as_dict()
-        watch_extension = capture_config.get('watch_extension')
-        self.extension = f".{watch_extension}"
-
         EventHandler = get_event_handler_from_tag(tag)
         # create an instance of the event handler
-        self.event_handler = EventHandler(self, tag, extension)
+        self.event_handler = EventHandler(self, tag)
 
         self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
 
