@@ -4,9 +4,10 @@ from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.receivers.get_mount import get_capture_config_mount, get_capture_mount
 
 class Receiver:
-    def __init__(self, receiver_name: str):
+    def __init__(self, 
+                 receiver_name: str,
+                 mode: str = None):
         self.receiver_name = receiver_name 
-        self.mode = None # must be set manually for instances of this class
         self.set_mounts(receiver_name)
 
         if self.capture_config.valid_modes != self.capture.valid_modes:
@@ -14,6 +15,9 @@ class Receiver:
 
         # after verifying that both mounts have the same modes specified, we can safely define valid modes
         self.valid_modes = self.capture_config.valid_modes
+
+        if mode:
+            self.set_mode(mode)
 
 
     def set_mounts(self, receiver_name: str) -> None:
@@ -43,13 +47,14 @@ class Receiver:
         self.mode = mode
         return
 
-    # save capture config assumes the input capture config is correctly type cast in lines with the template
+
+    # method assumes the input capture config is correctly type cast in line with the template
     def save_capture_config(self, 
                             capture_config: dict, 
                             tag: str, 
                             doublecheck_overwrite: bool = True) -> None:
         # extract the capture config template for the current mode of the receiver
-        template = self.capture_config.get_template(self.mode)
+        template = self.get_template()
         # extract the capture config template for the current mode of the receiver
         dict_helpers.validate_keys(capture_config, template, ignore_keys=['receiver', 'mode', 'tag'])
         # validate the types according to the template
@@ -74,14 +79,15 @@ class Receiver:
                                       params: list, 
                                       tag: str,
                                       doublecheck_overwrite: bool = True) -> None:
-        # extract the capture config template for the current mode of the receiver
-        template = self.capture_config.get_template(self.mode)
+        
         # convert the user defined params to a raw_dict [key=string_value]
         string_valued_dict = dict_helpers.params_list_to_string_valued_dict(params)
-        # verify the keys of the raw dict against the template
+        # extract the capture config template for the current mode of the receiver
+        template = self.get_template()
+        # verify the keys of the string valued dict against the template
         dict_helpers.validate_keys(string_valued_dict, template)
         # convert the raw dict string values to those defined in the template
-        capture_config = dict_helpers.convert_types(string_valued_dict, template)  
+        capture_config = dict_helpers.convert_types(string_valued_dict, template)
         # and finally, save the capture_config as dict. Internally performs validations on the config as specified
         # the capture config mount 
         self.save_capture_config(capture_config, 
@@ -123,6 +129,7 @@ class Receiver:
         # validate the capture config before returning
         self.capture_config.validate(capture_config, self.mode)
         return capture_config
+    
     
     def template_to_command(self, tag: str, as_string = False) -> str:
         command_as_list = ["spectre", "create", "capture-config", "-r", self.receiver_name, "-m", self.mode, "-t", tag]
