@@ -23,22 +23,20 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     # and use them to instantiate a receiver
     receiver = Receiver(receiver_name)
     receiver.set_mode(mode)
-
+    # fetch the corresponding template so we can type cast the params list
+    template = receiver.get_template()
     # convert the params to update (passed in via --param arguments) into a string valued dict
     params_as_string_dict = dict_helpers.params_list_to_string_valued_dict(params)
-
-    # type cast this dict via the appropraite template
-    template = receiver.capture_config.get_template(mode)
+    # type cast this dict via the template
     params_as_dict = dict_helpers.convert_types(params_as_string_dict, template)
 
     # update the capture config
     for key, value in params_as_dict.items():
         capture_config = dict_helpers.update_key_value(capture_config, key, value)
 
-    # validate the capture config following the update
-    receiver.capture_config.validate(capture_config, mode)
-    capture_config_handler.save_dict_as_json(capture_config, doublecheck_overwrite=False)
-    raise typer.Exit(1)
+    # save the updated capture config
+    receiver.save_capture_config(capture_config, tag)
+    raise typer.Exit()
 
 
 @app.command()
@@ -56,4 +54,4 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         fits_config = dict_helpers.update_key_value(fits_config, key, value)
     
     fits_config_handler.save_dict_as_json(fits_config, doublecheck_overwrite=False)
-    raise typer.Exit(1)
+    raise typer.Exit()

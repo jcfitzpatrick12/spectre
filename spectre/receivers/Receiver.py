@@ -43,14 +43,14 @@ class Receiver:
         self.mode = mode
         return
 
-
+    # save capture config assumes the input capture config is correctly type cast in lines with the template
     def save_capture_config(self, capture_config: dict, tag: str) -> None:
         # extract the capture config template for the current mode of the receiver
         template = self.capture_config.get_template(self.mode)
         # extract the capture config template for the current mode of the receiver
-        dict_helpers.validate_keys(capture_config, template)
+        dict_helpers.validate_keys(capture_config, template, ignore_keys=['receiver', 'mode', 'tag'])
         # validate the types according to the template
-        dict_helpers.validate_types(capture_config, template)
+        dict_helpers.validate_types(capture_config, template, ignore_keys=['receiver', 'mode', 'tag'])
         # validate according to receiver-specific constraints
         self.capture_config.validate(capture_config, self.mode)
         
@@ -61,7 +61,7 @@ class Receiver:
         # instantiate capture_config and save the newly constructed config_dict
         capture_config_handler = CaptureConfigHandler(tag)
         # save to file under the requested tag
-        capture_config_handler.save_dict_as_json(capture_config)
+        capture_config_handler.save_dict_as_json(capture_config, doublecheck_overwrite=False)
         return
 
 
@@ -125,6 +125,10 @@ class Receiver:
             return " ".join(command_as_list)
         else:
             return command_as_list
+        
+        
+    def get_template(self):
+        return self.capture_config.get_template(self.mode)
 
 
  

@@ -57,7 +57,7 @@ def template(
         command_as_string = receiver.template_to_command(tag, as_string=True)
         typer.secho(command_as_string)
     else:
-        template = receiver.capture_config.get_template(mode)
+        template = receiver.get_template()
         for key, value in template.items():
             typer.secho(
                 f"{key}: {value.__name__}"
