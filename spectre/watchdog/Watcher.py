@@ -5,12 +5,17 @@ import threading
 
 from cfg import CONFIG
 from spectre.watchdog.get_event_handler import get_event_handler_from_tag
+from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
     def __init__(self, tag: str, extension: str):
         self.observer = Observer()
         self.tag = tag
-        self.extension = f".{extension}"
+
+        capture_config_handler = CaptureConfigHandler(tag)
+        capture_config = capture_config_handler.load_as_dict()
+        watch_extension = capture_config.get('watch_extension')
+        self.extension = f".{watch_extension}"
 
         EventHandler = get_event_handler_from_tag(tag)
         # create an instance of the event handler
