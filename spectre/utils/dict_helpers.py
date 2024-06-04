@@ -54,7 +54,7 @@ def convert_to_bool(string_value: str) -> bool:
         raise ValueError(f"Cannot convert {string_value} to bool.")
 
 
-def validate_keys(input_dict: dict, template: dict, ignore_keys: list = []) -> None:
+def validate_keys(input_dict: dict, template: dict, ignore_keys: list = None) -> None:
     template_keys = set(template.keys())
     keys_to_check = set(input_dict.keys())
 
@@ -63,6 +63,8 @@ def validate_keys(input_dict: dict, template: dict, ignore_keys: list = []) -> N
         if not ignore_keys_type == list:
             raise TypeError(f"ignore_keys must be of type list. Received: {ignore_keys_type}")
         ignore_keys = set(ignore_keys)
+    else:
+        ignore_keys = set()
 
     missing_keys = template_keys - keys_to_check
     invalid_keys = keys_to_check - template_keys  - ignore_keys
