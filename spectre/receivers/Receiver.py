@@ -46,8 +46,48 @@ class Receiver:
             raise ValueError(f'{mode} is not a defined mode for the receiver: {self.receiver_name}. Need one of {self.valid_modes}')
         self.mode = mode
         return
+    
+    
+    def get_template(self):
+        return self.capture_config.get_template(self.mode)
 
 
+    def start_capture(self, tags: list) -> None:
+        # first check if the current mode is valid.
+        if self.mode not in self.valid_modes:
+            raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
+
+        capture_configs = []
+        for tag in tags:
+            capture_config = self.get_capture_config_for_capture(tag)
+            capture_configs.append(capture_config)
+
+        # start the capture session
+        self.capture.start(self.mode, capture_configs)
+        return
+    
+
+    # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
+    def save_params_as_capture_config(self, 
+                                      params: list, 
+                                      tag: str,
+                                      doublecheck_overwrite: bool = True) -> None:
+        
+        # convert the user defined params to a raw_dict [key=string_value]
+        string_valued_dict = dict_helpers.params_list_to_string_valued_dict(params)
+        # extract the capture config template for the current mode of the receiver
+        template = self.get_template()
+        # verify the keys of the string valued dict against the template
+        dict_helpers.validate_keys(string_valued_dict, template)
+        # convert the raw dict string values to those defined in the template
+        capture_config = dict_helpers.convert_types(string_valued_dict, template)
+        # and finally, save the capture_config as dict. Internally performs validations on the config as specified
+        # the capture config mount 
+        self.save_capture_config(capture_config, 
+                                 tag, 
+                                 doublecheck_overwrite=doublecheck_overwrite)
+        return  
+    
     # method assumes the input capture config is correctly type cast in line with the template
     def save_capture_config(self, 
                             capture_config: dict, 
@@ -71,43 +111,6 @@ class Receiver:
         # save to file under the requested tag
         capture_config_handler.save_dict_as_json(capture_config, 
                                                  doublecheck_overwrite=doublecheck_overwrite)
-        return
-
-
-    # save params to file as a capture config with tag [tag], validated according to the receiver in mode [mode]
-    def save_params_as_capture_config(self, 
-                                      params: list, 
-                                      tag: str,
-                                      doublecheck_overwrite: bool = True) -> None:
-        
-        # convert the user defined params to a raw_dict [key=string_value]
-        string_valued_dict = dict_helpers.params_list_to_string_valued_dict(params)
-        # extract the capture config template for the current mode of the receiver
-        template = self.get_template()
-        # verify the keys of the string valued dict against the template
-        dict_helpers.validate_keys(string_valued_dict, template)
-        # convert the raw dict string values to those defined in the template
-        capture_config = dict_helpers.convert_types(string_valued_dict, template)
-        # and finally, save the capture_config as dict. Internally performs validations on the config as specified
-        # the capture config mount 
-        self.save_capture_config(capture_config, 
-                                 tag, 
-                                 doublecheck_overwrite=doublecheck_overwrite)
-        return  
-    
-
-    def start_capture(self, tags: list) -> None:
-        # first check if the current mode is valid.
-        if self.mode not in self.valid_modes:
-            raise ValueError(f'Current receiver mode is not valid. Received {self.mode}, need one of {self.valid_modes}.')
-
-        capture_configs = []
-        for tag in tags:
-            capture_config = self.get_capture_config_for_capture(tag)
-            capture_configs.append(capture_config)
-
-        # start the capture session
-        self.capture.start(self.mode, capture_configs)
         return
     
 
@@ -142,9 +145,6 @@ class Receiver:
         else:
             return command_as_list
         
-        
-    def get_template(self):
-        return self.capture_config.get_template(self.mode)
 
 
  
