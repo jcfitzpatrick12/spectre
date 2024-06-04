@@ -14,32 +14,32 @@ app = typer.Typer()
 @app.command()
 def cron_log() -> None:
     file_helpers.cat("/var/log/daily_capture.log")
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
 def capture_log() -> None:
     file_helpers.cat(CONFIG.path_to_capture_log)
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def fits_template(
     tag: str = typer.Option(None, "--tag", "-t", help=""),
     as_command: bool = typer.Option(False, "--as-command", help="")
 ) -> None:
-    fits_config_handler = FitsConfigHandler(tag)
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t.")
+        fits_config_handler = FitsConfigHandler(tag)
         command_as_string = fits_config_handler.template_to_command(tag, as_string=True)
         typer.secho(command_as_string)
     else:
-        template = fits_config_handler.get_template()
+        template = FitsConfigHandler.get_template()
         for key, value in template.items():
             typer.secho(
                 f"{key}: {value.__name__}"
             )
-    typer.Exit(1)
+    typer.Exit()
 
 
 @app.command()
@@ -57,12 +57,12 @@ def template(
         command_as_string = receiver.template_to_command(tag, as_string=True)
         typer.secho(command_as_string)
     else:
-        template = receiver.capture_config.get_template(mode)
+        template = receiver.get_template()
         for key, value in template.items():
             typer.secho(
                 f"{key}: {value.__name__}"
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -74,7 +74,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         typer.secho(
             f"{key}: {value}"
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
@@ -85,6 +85,6 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         typer.secho(
             f"{key}: {value}"
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
     

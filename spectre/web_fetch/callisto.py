@@ -4,7 +4,7 @@ import subprocess
 import shutil
 
 from spectre.utils import callisto_helpers
-from cfg import CONFIG
+from cfg import CONFIG, callisto_stations
 
 temp_dir = os.path.join(os.environ['SPECTREPARENTPATH'], "tmp")
 
@@ -19,7 +19,7 @@ def copy_to_chunks():
             
 
 # fetches all .fits.gz files and saves them inside fpath for a particular date and callisto station
-def wget_callisto_station(station: str, year: int, month: int, day: int):
+def wget_callisto_station(instrument_code: str, year: int, month: int, day: int):
 
     temp_datetime = datetime(year=year, month=month, day=day)
     formatted_year = temp_datetime.strftime("%Y")
@@ -32,7 +32,7 @@ def wget_callisto_station(station: str, year: int, month: int, day: int):
     command = [
         'wget', '-r', '-l1', '-nd', '-np', 
         '-R', '.tmp', # reject all .tmp file 
-        '-A', f'{station}*.fit.gz', # download all .fit.gz for the appropriate station
+        '-A', f'{instrument_code}*.fit.gz', # download all .fit.gz for the appropriate station
         '-P', f'{temp_dir}', # download the files into the temp directory
         f"{base_url}" 
     ]
@@ -43,7 +43,7 @@ def wget_callisto_station(station: str, year: int, month: int, day: int):
         print(f"An error occurred: {e}")
 
 
-def fetch_chunks(station: str, 
+def fetch_chunks(instrument_code: str, 
                  year=None, 
                  month=None, 
                  day=None):
@@ -51,6 +51,16 @@ def fetch_chunks(station: str,
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
+    found_code_match = False
+    for callisto_instrument_code in callisto_stations.instrument_codes:
+        if instrument_code in callisto_instrument_code:
+            found_code_match = True
+            break
+    if not found_code_match:
+        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {callisto_stations.instrument_codes}")
+
+    if not year:
+        raise ValueError("Year, month and day must all be specified.")
     # Validate the combinations of year, month, and day
     if day and not month:
         raise ValueError("Day specified without month.")
@@ -59,7 +69,7 @@ def fetch_chunks(station: str,
     if day and not (year and month):
         raise ValueError("Day specified without both year and month.")
     
-    wget_callisto_station(station, year, month, day)
+    wget_callisto_station(instrument_code, year, month, day)
     copy_to_chunks()
 
     shutil.rmtree(temp_dir)

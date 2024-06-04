@@ -2,13 +2,21 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
+from cfg import CONFIG, callisto_stations
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.Receiver import Receiver
 from spectre.receivers import get_mount
 from spectre.chunks.Chunks import Chunks
 
 app = typer.Typer()
+
+@app.command()
+def callisto_instrument_codes(
+
+) -> None:
+    for callisto_instrument_code in callisto_stations.instrument_codes:
+        typer.secho(f"{callisto_instrument_code}")
+    raise typer.Exit()
 
 @app.command()
 def chunks(
@@ -38,7 +46,7 @@ def receivers(
     receiver_list = get_mount.list_all_receivers()
     for receiver_name in receiver_list:
         typer.secho(f"{receiver_name}")
-    typer.Exit(1)
+    typer.Exit()
 
 
 @app.command()
@@ -50,7 +58,7 @@ def modes(
     
     for i, mode in enumerate(valid_modes):
         typer.secho(f"{mode}")
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 @app.command()
 def fits_configs(
@@ -61,7 +69,7 @@ def fits_configs(
             typer.secho(
                 f'{json_config_file}',
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -73,7 +81,7 @@ def capture_configs(
             typer.secho(
                 f'{json_config_file}',
             )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 
@@ -113,5 +121,5 @@ def tags(
     else:
         for tag in sorted(tags):
             typer.secho(f"{tag}")
-    raise typer.Exit(1)
+    raise typer.Exit()
 

@@ -54,28 +54,39 @@ def convert_to_bool(string_value: str) -> bool:
         raise ValueError(f"Cannot convert {string_value} to bool.")
 
 
-def validate_keys(input_dict: dict, template: dict) -> None:
+def validate_keys(input_dict: dict, template: dict, ignore_keys: list = None) -> None:
     template_keys = set(template.keys())
     keys_to_check = set(input_dict.keys())
 
+    if ignore_keys:
+        ignore_keys_type = type(ignore_keys)
+        if not ignore_keys_type == list:
+            raise TypeError(f"ignore_keys must be of type list. Received: {ignore_keys_type}")
+        ignore_keys = set(ignore_keys)
+    else:
+        ignore_keys = set()
+
     missing_keys = template_keys - keys_to_check
-    invalid_keys = keys_to_check - template_keys
+    invalid_keys = keys_to_check - template_keys  - ignore_keys
 
     if missing_keys or invalid_keys:
         errors = []
         if missing_keys:
             errors.append(f"Missing keys: {', '.join(missing_keys)}.")
+
         if invalid_keys:
             errors.append(f"Invalid keys: {', '.join(invalid_keys)}.")
         raise KeyError("Key errors found! " + " ".join(errors))
     
 
-def validate_types(input_dict: dict, template: dict) -> None:
+def validate_types(input_dict: dict, template: dict, ignore_keys: list = []) -> None:
         # check the types match between the values of the capture config and the template
         for key, value in input_dict.items():
+            if key in ignore_keys:
+                continue
             expected_type = template.get(key)
             if expected_type is None:
-                raise ValueError(f"Cannot have a type of value None, received {expected_type}.")
+                raise ValueError(f"Cannot find type in template for the key \"{key}\".")
             if not isinstance(value, expected_type):
                 raise TypeError(f"Expected {expected_type}, but received {value} which is of type {type(value)}.")
             

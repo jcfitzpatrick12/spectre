@@ -22,20 +22,22 @@ def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
                 year=year, 
                 month=month,
                 day=day)
+    
     for chunk in chunks.dict.values():
         # Use getattr to dynamically get the attribute based on 'ext'
-        attribute = getattr(chunk, ext, None)
-        if attribute is None:
+        chunk_ext = getattr(chunk, ext, None)
+        if chunk_ext is None:
             typer.echo(f"No attribute '{ext}' found on chunk")
             continue
-
         if suppress_doublecheck:
             doublecheck_delete = False
         else:
             doublecheck_delete = True
-        # Assuming the attribute itself is an object that has a 'delete_self' method
-        attribute.delete_self(doublecheck_delete=doublecheck_delete)
-    typer.Exit(1)
+        chunk_ext.delete_self(doublecheck_delete=doublecheck_delete)
+        typer.secho(f"File deleted: {chunk_ext.get_path()}.", fg=typer.colors.YELLOW)
+    
+    typer.Exit()
+
 
 @app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
@@ -47,7 +49,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
             f'File deleted: {fits_config_handler.absolute_path()}.',
             fg=typer.colors.YELLOW,
         )
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 @app.command()
@@ -61,8 +63,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
             f'File deleted: {capture_config_handler.absolute_path()}.',
             fg=typer.colors.YELLOW,
         )
-    
-    raise typer.Exit(1)
+    raise typer.Exit()
 
 
 

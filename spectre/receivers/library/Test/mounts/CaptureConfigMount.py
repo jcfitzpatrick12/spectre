@@ -80,7 +80,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         
         # ensuring the window type is rectangular
         if window_type != "boxcar":
-            raise ValueError(f"Window type must be \"box\". Received {window_type}")
+            raise ValueError(f"Window type must be \"boxcar\". Received {window_type}")
 
         # ensuring that the hop is specified as a keyword argument
         if set(STFFT_kwargs.keys()) != {"hop"}:
