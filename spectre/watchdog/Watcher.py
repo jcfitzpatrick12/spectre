@@ -8,7 +8,7 @@ from spectre.watchdog.get_event_handler import get_event_handler_from_tag
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
-    def __init__(self, tag: str, extension: str):
+    def __init__(self, tag: str):
         self.observer = Observer()
         self.tag = tag
 
