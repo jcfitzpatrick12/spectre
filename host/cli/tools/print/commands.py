@@ -27,14 +27,14 @@ def fits_template(
     tag: str = typer.Option(None, "--tag", "-t", help=""),
     as_command: bool = typer.Option(False, "--as-command", help="")
 ) -> None:
-    fits_config_handler = FitsConfigHandler(tag)
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t.")
+        fits_config_handler = FitsConfigHandler(tag)
         command_as_string = fits_config_handler.template_to_command(tag, as_string=True)
         typer.secho(command_as_string)
     else:
-        template = fits_config_handler.get_template()
+        template = FitsConfigHandler.get_template()
         for key, value in template.items():
             typer.secho(
                 f"{key}: {value.__name__}"

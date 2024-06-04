@@ -7,8 +7,8 @@ class FitsConfigHandler(JsonConfigHandler):
     def __init__(self, tag: str):
         super().__init__("fits", tag)
 
-
-    def get_template(self,) -> dict:
+    @classmethod
+    def get_template(cls) -> dict:
         return {
             "ORIGIN": str,
             "TELESCOP": str,
@@ -18,11 +18,6 @@ class FitsConfigHandler(JsonConfigHandler):
             "OBS_LONG": float,
             "OBS_ALT": float
         }
-
-
-    def set_template(self,) -> None:
-        return self.template
-    
 
     def save_params_as_fits_config(self, params: list[str]) -> None:
         # convert the user defined params to a raw_dict [key=string_value]
