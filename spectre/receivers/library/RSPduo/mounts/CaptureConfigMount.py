@@ -80,12 +80,12 @@ class CaptureConfigMount(BaseCaptureConfigMount):
             raise ValueError(f"bandiwdth must be between {bandwidth_lower_bound*1e-3} [kHz] and {8*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
         
         IF_gain_upper_bound = -20 # [dB]
-        if not (IF_gain < IF_gain_upper_bound):
-            raise ValueError(f"IF_gain must be strictly less than -20 [dB]")
+        if not (IF_gain <= IF_gain_upper_bound):
+            raise ValueError(f"IF_gain must be strictly less than -20 [dB]. Got {IF_gain} [dB]")
 
         RF_gain_lower_bound = 0 # [dB]
-        if not (RF_gain < RF_gain_lower_bound):
-            raise ValueError(f"RF_gain must be strictly less than 0 [dB]")
+        if not (RF_gain <= RF_gain_lower_bound):
+            raise ValueError(f"RF_gain must be strictly less than 0 [dB]. Got {RF_gain} [dB]")
         return
 
 
