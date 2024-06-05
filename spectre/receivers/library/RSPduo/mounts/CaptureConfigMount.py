@@ -18,6 +18,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 "IF_gain": int,
                 "RF_gain": int,
                 'chunk_size': int, # gr (size of each batched file) [s]
+                'integration_time': float, # time over which to average spectra in postprocessing
                 'window_type': str, # post_proc (window type)
                 'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
                 'window_size': int, # post_proc (number of samples for window)
@@ -25,7 +26,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
                 'watch_extension': str, # postprocessing will call proc defined in event handler for files appearing with this extension
-                'integration_time': float # time over which to average spectra in postprocessing
             },
         }
 
@@ -43,13 +43,49 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         IF_gain = capture_config['IF_gain']
         RF_gain = capture_config['RF_gain']
         chunk_size = capture_config['chunk_size']
+        integration_time = capture_config['integration_time']
+        window_type = capture_config['window_type']
+        window_kwargs = capture_config['window_kwargs']
+        window_size = capture_config['window_size']
+        STFFT_kwargs = capture_config['STFFT_kwargs']
+        chunk_key = capture_config['chunk_key']
+        event_handler_key = capture_config['event_handler_key']
+        watch_extension = capture_config['watch_extension']
 
-        validator_helpers.validate_center_freq(center_freq)
-        validator_helpers.validate_bandwidth(bandwidth, samp_rate)
-        validator_helpers.validate_samp_rate(bandwidth, samp_rate)
-        validator_helpers.validate_IF_gain(IF_gain)
-        validator_helpers.validate_RF_gain(RF_gain)
-        validator_helpers.validate_chunk_size(chunk_size)
+        # generic validations
+        validator_helpers.default_validate_center_freq(center_freq)
+        validator_helpers.default_validate_bandwidth(bandwidth, samp_rate)
+        validator_helpers.default_validate_samp_rate(bandwidth, samp_rate)
+        validator_helpers.default_validate_chunk_size(chunk_size)
+        validator_helpers.default_validate_integration_time(integration_time, chunk_size)
+        validator_helpers.default_validate_watch_extension(watch_extension)
+        validator_helpers.default_validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.default_validate_window_size(window_size)
+        
+
+        # RSPduo specific validations in single tuner mode
+        center_freq_lower_bound = 1e3 # [Hz]
+        center_freq_upper_bound = 2e9 # [Hz]
+        if not (center_freq_lower_bound <= center_freq <= center_freq_upper_bound):
+            raise ValueError(f"center_freq must be between {center_freq_lower_bound*1e-3} [kHz] and {center_freq_upper_bound*1e-9} [GHz]. Received {center_freq*1e-6} [MHz]")
+
+        samp_rate_lower_bound = 2e6 # [Hz]
+        samp_rate_upper_bound = 10e6 # [Hz]
+        if not (samp_rate_lower_bound <= samp_rate <= samp_rate_upper_bound):
+            raise ValueError(f"samp_rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz].")
+
+        bandwidth_lower_bound = 200e3 # [Hz]
+        bandwidth_upper_bound = 8e6 # [Hz]
+        if not (bandwidth_lower_bound <= bandwidth <= bandwidth_upper_bound):
+            raise ValueError(f"bandiwdth must be between {bandwidth_lower_bound*1e-3} [kHz] and {8*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
+        
+        IF_gain_upper_bound = -20 # [dB]
+        if not (IF_gain < IF_gain_upper_bound):
+            raise ValueError(f"IF_gain must be strictly less than -20 [dB]")
+
+        RF_gain_lower_bound = 0 # [dB]
+        if not (RF_gain < RF_gain_lower_bound):
+            raise ValueError(f"RF_gain must be strictly less than 0 [dB]")
         return
 
 
