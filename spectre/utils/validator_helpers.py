@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 def validate_center_freq(proposed_center_freq: float):
     if proposed_center_freq <= 0:
         raise ValueError(f"Center frequency must be non-negative. Received {proposed_center_freq}")

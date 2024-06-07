@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import numpy as np
 from typing import Tuple
@@ -6,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from spectre.chunks.BaseChunk import BaseChunk
 from spectre.chunks.chunk_register import register_chunk
-
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.chunks.library.default.ChunkBin import ChunkBin

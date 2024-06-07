@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
 # GNU Radio version: 3.10.1.1
+
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from gnuradio import gr
 from gnuradio.filter import firdes

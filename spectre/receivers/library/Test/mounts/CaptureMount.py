@@ -1,6 +1,8 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.BaseCaptureMount import BaseCaptureMount
 from spectre.receivers.mount_register import register_capture_mount
-
 from spectre.receivers.library.Test.gr import cosine_signal_test_1
 from spectre.receivers.library.Test.gr import dummy
 
