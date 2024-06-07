@@ -1,9 +1,9 @@
-# spectre/receivers/library/__init__.py
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
 import importlib
 import pkgutil 
-
 
 library_path = os.path.dirname(__file__)
 

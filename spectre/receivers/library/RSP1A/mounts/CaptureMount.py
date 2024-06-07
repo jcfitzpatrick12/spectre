@@ -1,6 +1,8 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.BaseCaptureMount import BaseCaptureMount
 from spectre.receivers.mount_register import register_capture_mount
-
 from spectre.receivers.library.RSP1A.gr import fixed
 
 

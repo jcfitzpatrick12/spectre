@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 ######## Note ##########
 # file fix is required on both raspberry pi and standard x86 architectures

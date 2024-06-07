@@ -1,5 +1,7 @@
-import os
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
 
 SPECTREPARENTPATH = os.environ.get("SPECTREPARENTPATH")
 if SPECTREPARENTPATH is None:

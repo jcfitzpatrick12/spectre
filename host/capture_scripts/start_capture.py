@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.Receiver import Receiver
 from argparse import ArgumentParser
 from cfg import CONFIG

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Use an Ubuntu image
 FROM ubuntu:22.04
 

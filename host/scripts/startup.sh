@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Set the text color to cyan
 echo -e "\e[92m   _____ ____  ______________________  ______"
