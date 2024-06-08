@@ -11,6 +11,6 @@ export PYTHONPATH="${SPECTREPARENTPATH}:${PYTHONPATH}"
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 spectre capture start-watcher -t sol
-spectre capture start --receiver RSPduo --mode tuner_1_fixed --tag sol
+spectre capture start --receiver RSPduo --mode tuner-1-fixed --tag sol
 sleep 36000s
 spectre capture stop

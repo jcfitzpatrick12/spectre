@@ -15,7 +15,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_templates(self) -> None:
         self.templates = {
-            "tuner_1_fixed": {
+            "tuner-1-fixed": {
                 "center_freq": float,
                 "bandwidth": float,
                 "samp_rate": int, 
@@ -35,7 +35,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
     def set_validators(self) -> None:
         self.validators = {
-            "tuner_1_fixed": self.tuner_1_fixed_validator,
+            "tuner-1-fixed": self.tuner_1_fixed_validator,
         }
 
     

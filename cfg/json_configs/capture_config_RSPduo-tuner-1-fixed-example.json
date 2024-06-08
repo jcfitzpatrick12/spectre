@@ -17,6 +17,6 @@
         "hop": 512
     },
     "receiver": "RSPduo",
-    "mode": "tuner_1_fixed",
+    "mode": "tuner-1-fixed",
     "tag": "RSPduo-tuner-1-fixed-example"
 }

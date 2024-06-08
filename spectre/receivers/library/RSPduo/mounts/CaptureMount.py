@@ -15,7 +15,7 @@ class CaptureMount(BaseCaptureMount):
 
     def set_capture_methods(self) -> None:
         self.capture_methods = {
-            "tuner_1_fixed": self.tuner_1_fixed,
+            "tuner-1-fixed": self.tuner_1_fixed,
         }
 
 
