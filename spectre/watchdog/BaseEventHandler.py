@@ -15,6 +15,8 @@ class BaseEventHandler(FileSystemEventHandler, ABC):
         self.watcher = watcher  # Pass the watcher instance to handle stopping events gracefully
         self.tag = tag
         self.Chunk = get_chunk_from_tag(tag)
+        capture_config_handler = CaptureConfigHandler(tag)
+        self.capture_config = capture_config_handler.load_as_dict()
         self.extension = extension
 
 
