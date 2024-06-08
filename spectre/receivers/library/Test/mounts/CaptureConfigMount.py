@@ -29,21 +29,12 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
                 'integration_time': float # spectrograms will be averaged over a time integration_time
             },
-            
-            "key-value-test": {
-                'int_key': int,
-                'str_key': str,
-                'dict_key': dict,
-                'float_key': float,
-                'bool_key': bool, 
-            }
         }
 
 
     def set_validators(self) -> None:
         self.validators = {
             "cosine-signal-test-1": self.cosine_signal_test_1_validator,
-            "key-value-test": self.key_value_test_validator,
         }
 
 
@@ -60,26 +51,20 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         event_handler_key = capture_config.get("event_handler_key")
         integration_time = capture_config.get("integration_time")
 
-        # do default validations
-        validator_helpers.default_validate(samp_rate = samp_rate,
-                                           chunk_size = chunk_size,
-                                           integration_time = integration_time,
-                                           window_type = window_type,
-                                           window_kwargs = {},
-                                           window_size = window_size,
-                                           STFFT_kwargs = STFFT_kwargs,
-                                           chunk_key = chunk_key,
-                                           event_handler_key = event_handler_key,
-                                           )
+        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
+        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
+        validator_helpers.validate_integration_time(integration_time, chunk_size) 
+        validator_helpers.validate_window(window_type, 
+                                {}, 
+                                window_size,
+                                chunk_size,
+                                samp_rate)
+        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.validate_chunk_key(chunk_key, "default")
+        validator_helpers.validate_event_handler_key(event_handler_key, "default")
 
         if integration_time != 0:
-            raise ValueError(f"Integration time must be zero. Received {integration_time}")
-
-        if chunk_key != "default":
-            raise ValueError(f"chunk_key must be \"default\". Received {chunk_key}")
-
-        if event_handler_key != "default":
-            raise ValueError(f"event_handler_key must be \"default\". Received {event_handler_key}")
+            raise ValueError(f"Integration time must be zero. Received: {integration_time}")
         
         # check that the sample rate is an integer multiple of the underlying signal frequency
         if samp_rate % frequency != 0:
@@ -87,20 +72,20 @@ class CaptureConfigMount(BaseCaptureConfigMount):
 
         a = samp_rate/frequency
         if a < 2:
-            raise ValueError(f"The ratio samp_rate/frequency must be a natural number greater than two.  Received {a}")
+            raise ValueError(f"The ratio samp_rate/frequency must be a natural number greater than two.  Received: {a}")
         
         # ensuring the window type is rectangular
         if window_type != "boxcar":
-            raise ValueError(f"Window type must be \"boxcar\". Received {window_type}")
+            raise ValueError(f"Window type must be \"boxcar\". Received: {window_type}")
 
         # ensuring that the hop is specified as a keyword argument
         if set(STFFT_kwargs.keys()) != {"hop"}:
-            raise KeyError(f"Only allowed kwarg is STFFT_kwargs is \"hop\". Received {STFFT_kwargs.keys()}")
+            raise KeyError(f"Only allowed kwarg is STFFT_kwargs is \"hop\". Received: {STFFT_kwargs.keys()}")
         
         # checking that hop is of integer type
         hop = STFFT_kwargs.get("hop")
         if type(hop) != int:
-            raise TypeError(f"hop must an integer. Received {hop}")
+            raise TypeError(f"hop must an integer. Received: {hop}")
         
         # analytical requirement
         # if p is the number of sampled cycles, we can find that p = window_size / a
@@ -108,22 +93,10 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         p = window_size / a
         if window_size % a != 0:
             raise ValueError(f"The number of sampled cycles must be a positive natural number. Computed that p={p}")
-        return
     
-
-    def key_value_test_validator(self, capture_config: dict) -> None:
-        print("Performing key value test.")
-        template = self.templates.get('key-value-test')
-        if template is None:
-            raise ValueError("Could not find template for the key value test.")
-        
-        dict_helpers.validate_keys(capture_config, template)
-        print("Keys verified.")
-
-        dict_helpers.validate_types(capture_config, template)
-        print("Values verified.")
-
-        print("Validated capture config is consistent with the template")
+    
+        if amplitude <= 0:
+            raise ValueError(f"amplitude must be strictly positive. Received: {amplitude}")
         return
 
 

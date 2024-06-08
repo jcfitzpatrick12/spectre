@@ -53,20 +53,21 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         STFFT_kwargs = capture_config['STFFT_kwargs']
         chunk_key = capture_config['chunk_key']
         event_handler_key = capture_config['event_handler_key']
-
-        # do default validations
-        validator_helpers.default_validate(center_freq = center_freq,
-                                           samp_rate = samp_rate,
-                                           bandwidth = bandwidth,
-                                           chunk_size = chunk_size,
-                                           integration_time = integration_time,
-                                           window_type = window_type,
-                                           window_kwargs = window_kwargs,
-                                           window_size = window_size,
-                                           STFFT_kwargs = STFFT_kwargs,
-                                           chunk_key = chunk_key,
-                                           event_handler_key = event_handler_key,
-                                           )
+    
+        validator_helpers.validate_center_freq_strictly_positive(center_freq)
+        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
+        validator_helpers.validate_bandwidth_strictly_positive(bandwidth)
+        validator_helpers.validate_nyquist_criterion(samp_rate, bandwidth)
+        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
+        validator_helpers.validate_integration_time(integration_time, chunk_size) 
+        validator_helpers.validate_window(window_type, 
+                                window_kwargs, 
+                                window_size,
+                                chunk_size,
+                                samp_rate)
+        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.validate_chunk_key(chunk_key, "default")
+        validator_helpers.validate_event_handler_key(event_handler_key, "default")
         
 
         # RSPduo specific validations in single tuner mode
