@@ -62,6 +62,19 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         watch_extension = capture_config.get("watch_extension")
         integration_time = capture_config.get("integration_time")
 
+        # do default validations
+        validator_helpers.default_validate(samp_rate = samp_rate,
+                                           chunk_size = chunk_size,
+                                           integration_time = integration_time,
+                                           window_type = window_type,
+                                           window_kwargs = {},
+                                           window_size = window_size,
+                                           STFFT_kwargs = STFFT_kwargs,
+                                           chunk_key = chunk_key,
+                                           event_handler_key = event_handler_key,
+                                           watch_extension = watch_extension
+                                           )
+
         if integration_time != 0:
             raise ValueError(f"Integration time must be zero. Received {integration_time}")
 
