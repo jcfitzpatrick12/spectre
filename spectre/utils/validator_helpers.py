@@ -30,7 +30,7 @@ def closed_confine_samp_rate(samp_rate: int, samp_rate_lower_bound: int, samp_ra
 
 def closed_confine_bandwidth(bandwidth: float, bandwidth_lower_bound: float, bandwidth_upper_bound: float) -> None:
     if not (bandwidth_lower_bound <= bandwidth <= bandwidth_upper_bound):
-        raise ValueError(f"bandiwdth must be between {bandwidth_lower_bound*1e-3} [kHz] and {8*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
+        raise ValueError(f"bandwidth must be between {bandwidth_lower_bound*1e-3} [kHz] and {bandwidth_upper_bound*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
     return
 
 
