@@ -56,15 +56,20 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         event_handler_key = capture_config['event_handler_key']
         watch_extension = capture_config['watch_extension']
 
-        # generic validations
-        validator_helpers.default_validate_center_freq(center_freq)
-        validator_helpers.default_validate_bandwidth(bandwidth, samp_rate)
-        validator_helpers.default_validate_samp_rate(bandwidth, samp_rate)
-        validator_helpers.default_validate_chunk_size(chunk_size)
-        validator_helpers.default_validate_integration_time(integration_time, chunk_size)
-        validator_helpers.default_validate_watch_extension(watch_extension)
-        validator_helpers.default_validate_STFFT_kwargs(STFFT_kwargs)
-        validator_helpers.default_validate_window_size(window_size)
+        # do default validations
+        validator_helpers.default_validate(center_freq = center_freq,
+                                           samp_rate = samp_rate,
+                                           bandwidth = bandwidth,
+                                           chunk_size = chunk_size,
+                                           integration_time = integration_time,
+                                           window_type = window_type,
+                                           window_kwargs = window_kwargs,
+                                           window_size = window_size,
+                                           STFFT_kwargs = STFFT_kwargs,
+                                           chunk_key = chunk_key,
+                                           event_handler_key = event_handler_key,
+                                           watch_extension = watch_extension
+                                           )
         
 
         # RSPduo specific validations in single tuner mode
@@ -85,11 +90,11 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         
         IF_gain_upper_bound = -20 # [dB]
         if not (IF_gain <= IF_gain_upper_bound):
-            raise ValueError(f"IF_gain must be strictly less than -20 [dB]. Got {IF_gain} [dB]")
+            raise ValueError(f"IF_gain must be strictly less than or equal to -20 [dB]. Got {IF_gain} [dB]")
 
         RF_gain_lower_bound = 0 # [dB]
         if not (RF_gain <= RF_gain_lower_bound):
-            raise ValueError(f"RF_gain must be strictly less than 0 [dB]. Got {RF_gain} [dB]")
+            raise ValueError(f"RF_gain must be strictly less than or equal to 0 [dB]. Got {RF_gain} [dB]")
         return
 
 
