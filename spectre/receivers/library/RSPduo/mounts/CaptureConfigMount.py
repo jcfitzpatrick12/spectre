@@ -75,26 +75,24 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         # RSPduo specific validations in single tuner mode
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
-        if not (center_freq_lower_bound <= center_freq <= center_freq_upper_bound):
-            raise ValueError(f"center_freq must be between {center_freq_lower_bound*1e-3} [kHz] and {center_freq_upper_bound*1e-9} [GHz]. Received {center_freq*1e-6} [MHz]")
+        validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
 
         samp_rate_lower_bound = 2e6 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]
-        if not (samp_rate_lower_bound <= samp_rate <= samp_rate_upper_bound):
-            raise ValueError(f"samp_rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz].")
+        validator_helpers.closed_confine_samp_rate(samp_rate, samp_rate_lower_bound, samp_rate_upper_bound)
 
         bandwidth_lower_bound = 200e3 # [Hz]
         bandwidth_upper_bound = 8e6 # [Hz]
-        if not (bandwidth_lower_bound <= bandwidth <= bandwidth_upper_bound):
-            raise ValueError(f"bandiwdth must be between {bandwidth_lower_bound*1e-3} [kHz] and {8*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
-        
-        IF_gain_upper_bound = -20 # [dB]
-        if not (IF_gain <= IF_gain_upper_bound):
-            raise ValueError(f"IF_gain must be strictly less than or equal to -20 [dB]. Got {IF_gain} [dB]")
+        validator_helpers.closed_confine_bandwidth(bandwidth, bandwidth_lower_bound, bandwidth_upper_bound)
 
-        RF_gain_lower_bound = 0 # [dB]
-        if not (RF_gain <= RF_gain_lower_bound):
-            raise ValueError(f"RF_gain must be strictly less than or equal to 0 [dB]. Got {RF_gain} [dB]")
+        ## make a function in validator helper BOUND IF_GAIN
+        IF_gain_upper_bound = -20 # [dB]
+        validator_helpers.closed_upper_bound_IF_gain(IF_gain, IF_gain_upper_bound)
+        
+        
+        ## make a function in validator helpers BOUND RF_GAIN
+        RF_gain_upper_bound = 0 # [dB]
+        validator_helpers.closed_upper_bound_RF_gain(RF_gain, RF_gain_upper_bound)
         return
 
 
