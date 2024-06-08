@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.BaseCaptureConfigMount import BaseCaptureConfigMount
 from spectre.receivers.mount_register import register_capture_config_mount
 from spectre.utils import validator_helpers

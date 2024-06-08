@@ -1,4 +1,8 @@
 #!/usr/bin/expect
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 exp_internal 1
 
 exec chmod +x ./SDRplay_RSP_API-Linux-3.14.0.run

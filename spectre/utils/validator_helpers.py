@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 def default_validate_window_size(window_size: int):
     if window_size < 0:
         raise ValueError(f"\"window_size\" must be strictly positive.")
@@ -18,7 +22,11 @@ def default_validate_STFFT_kwargs(STFFT_kwargs: dict):
     
     if hop_value < 0:
         raise ValueError("\"hop\" must be strictly positive.")
-    return
+    
+
+def validate_center_freq(proposed_center_freq: float):
+    if proposed_center_freq <= 0:
+        raise ValueError(f"Center frequency must be non-negative. Received {proposed_center_freq}")
 
 
 def default_validate_center_freq(center_freq: float):

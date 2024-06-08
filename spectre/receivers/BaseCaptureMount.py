@@ -1,7 +1,9 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from abc import ABC, abstractmethod
 from cfg import CONFIG
-
-
 
 class BaseCaptureMount(ABC):
     def __init__(self):

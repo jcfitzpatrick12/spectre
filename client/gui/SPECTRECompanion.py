@@ -1,5 +1,8 @@
-import tkinter as tk
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
 
+import tkinter as tk
 
 from argparse import ArgumentParser
 from client.gui.ui_components import create_labeled_entry, setup_plot, create_tickbox_frame
