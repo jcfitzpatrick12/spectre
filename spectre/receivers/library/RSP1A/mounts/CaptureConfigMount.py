@@ -29,7 +29,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'watch_extension': str # postprocessing will call proc defined in event handler for files appearing with this extension
             },
         }
 
@@ -47,13 +46,51 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         IF_gain = capture_config['IF_gain']
         RF_gain = capture_config['RF_gain']
         chunk_size = capture_config['chunk_size']
+        integration_time = capture_config['integration_time']
+        window_type = capture_config['window_type']
+        window_kwargs = capture_config['window_kwargs']
+        window_size = capture_config['window_size']
+        STFFT_kwargs = capture_config['STFFT_kwargs']
+        chunk_key = capture_config['chunk_key']
+        event_handler_key = capture_config['event_handler_key']
 
-        validator_helpers.validate_center_freq(center_freq)
-        validator_helpers.validate_bandwidth(bandwidth, samp_rate)
-        validator_helpers.validate_samp_rate(bandwidth, samp_rate)
-        validator_helpers.validate_IF_gain(IF_gain)
-        validator_helpers.validate_RF_gain(RF_gain)
-        validator_helpers.validate_chunk_size(chunk_size)
+        validator_helpers.validate_center_freq_strictly_positive(center_freq)
+        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
+        validator_helpers.validate_bandwidth_strictly_positive(bandwidth)
+        validator_helpers.validate_nyquist_criterion(samp_rate, bandwidth)
+        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
+        validator_helpers.validate_integration_time(integration_time, chunk_size) 
+        validator_helpers.validate_window(window_type, 
+                                window_kwargs, 
+                                window_size,
+                                chunk_size,
+                                samp_rate)
+        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.validate_chunk_key(chunk_key, "default")
+        validator_helpers.validate_event_handler_key(event_handler_key, "default")
+        
+
+        # RSPduo specific validations in single tuner mode
+        center_freq_lower_bound = 1e3 # [Hz]
+        center_freq_upper_bound = 2e9 # [Hz]
+        validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
+
+        samp_rate_lower_bound = 2e6 # [Hz]
+        samp_rate_upper_bound = 10e6 # [Hz]
+        validator_helpers.closed_confine_samp_rate(samp_rate, samp_rate_lower_bound, samp_rate_upper_bound)
+
+        bandwidth_lower_bound = 200e3 # [Hz]
+        bandwidth_upper_bound = 8e6 # [Hz]
+        validator_helpers.closed_confine_bandwidth(bandwidth, bandwidth_lower_bound, bandwidth_upper_bound)
+
+        ## make a function in validator helper BOUND IF_GAIN
+        IF_gain_upper_bound = -20 # [dB]
+        validator_helpers.closed_upper_bound_IF_gain(IF_gain, IF_gain_upper_bound)
+        
+        
+        ## make a function in validator helpers BOUND RF_GAIN
+        RF_gain_upper_bound = 0 # [dB]
+        validator_helpers.closed_upper_bound_RF_gain(RF_gain, RF_gain_upper_bound)
         return
 
 

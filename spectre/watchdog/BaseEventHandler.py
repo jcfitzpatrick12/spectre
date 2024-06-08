@@ -11,13 +11,13 @@ from spectre.chunks.get_chunk import get_chunk_from_tag
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class BaseEventHandler(FileSystemEventHandler, ABC):
-    def __init__(self, watcher, tag: str):
+    def __init__(self, watcher, tag: str, extension: str):
         self.watcher = watcher  # Pass the watcher instance to handle stopping events gracefully
         self.tag = tag
-        self.capture_config = CaptureConfigHandler(tag).load_as_dict()
-        self.extension = self.capture_config.get("watch_extension")
-
         self.Chunk = get_chunk_from_tag(tag)
+        capture_config_handler = CaptureConfigHandler(tag)
+        self.capture_config = capture_config_handler.load_as_dict()
+        self.extension = extension
 
 
     @abstractmethod

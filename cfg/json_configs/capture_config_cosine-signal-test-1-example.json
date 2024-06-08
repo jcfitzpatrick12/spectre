@@ -10,7 +10,6 @@
         "hop": 512
     },
     "window_size": 256,
-    "watch_extension": "bin",
     "event_handler_key": "default",
     "chunk_key": "default",
     "receiver": "Test",

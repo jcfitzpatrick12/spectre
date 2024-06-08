@@ -37,8 +37,9 @@ def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
             doublecheck_delete = False
         else:
             doublecheck_delete = True
-        chunk_ext.delete_self(doublecheck_delete=doublecheck_delete)
-        typer.secho(f"File deleted: {chunk_ext.get_path()}.", fg=typer.colors.YELLOW)
+        if chunk_ext.exists():
+            chunk_ext.delete_self(doublecheck_delete=doublecheck_delete)
+            typer.secho(f"File deleted: {chunk_ext.get_path()}.", fg=typer.colors.YELLOW)
     
     typer.Exit()
 

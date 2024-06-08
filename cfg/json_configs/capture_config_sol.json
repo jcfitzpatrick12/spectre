@@ -1,5 +1,4 @@
 {
-    "watch_extension": "bin",
     "event_handler_key": "default",
     "chunk_size": 5,
     "samp_rate": 8000000,
@@ -8,7 +7,7 @@
     "chunk_key": "default",
     "center_freq": 140000000.0,
     "RF_gain": 0,
-    "bandwidth": 8000000,
+    "bandwidth": 8000000.0,
     "window_type": "blackman",
     "IF_gain": -20,
     "window_kwargs": {

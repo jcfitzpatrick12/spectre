@@ -64,9 +64,7 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
         # load the particular extension to watch from the capture config from the capture config
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.load_as_dict()
-        watch_extension = capture_config.get('watch_extension')
-
-        watcher = Watcher(tag, watch_extension)
+        watcher = Watcher(tag)
         watcher.start()
 
     else:

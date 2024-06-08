@@ -24,7 +24,7 @@ class Chunk(BaseChunk):
         self.fits = ChunkFits(chunk_start_time, tag)
 
 
-    def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def build_spectrogram(self) -> Spectrogram:
         
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
@@ -54,6 +54,7 @@ class Chunk(BaseChunk):
         # fetch the window params and get the appropriate window
         window_type = capture_config.get('window_type')
         window_kwargs = capture_config.get('window_kwargs')
+        ## note the implementation ignores the keys by necessity, due to the scipy implementation of get_window
         window_params = (window_type, *window_kwargs.values())
         window_size = capture_config.get('window_size')
         w = get_window(window_params, window_size)
