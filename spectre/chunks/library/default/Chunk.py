@@ -24,7 +24,7 @@ class Chunk(BaseChunk):
         self.fits = ChunkFits(chunk_start_time, tag)
 
 
-    def build_spectrogram(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def build_spectrogram(self) -> Spectrogram:
         
         if not self.bin.exists():
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
