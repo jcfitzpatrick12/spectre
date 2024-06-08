@@ -14,7 +14,7 @@ from spectre.watchdog.event_handler_register import register_event_handler
 @register_event_handler("default")
 class EventHandler(BaseEventHandler):
     def __init__(self, watcher, tag: str):
-        super().__init__(watcher, tag)
+        super().__init__(watcher, tag, "bin")
 
     def process(self, file_path: str):
         print(f"Processing {file_path}")

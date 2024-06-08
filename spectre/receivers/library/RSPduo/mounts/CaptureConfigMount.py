@@ -29,7 +29,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'watch_extension': str, # postprocessing will call proc defined in event handler for files appearing with this extension
             },
         }
 
@@ -54,7 +53,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         STFFT_kwargs = capture_config['STFFT_kwargs']
         chunk_key = capture_config['chunk_key']
         event_handler_key = capture_config['event_handler_key']
-        watch_extension = capture_config['watch_extension']
 
         # do default validations
         validator_helpers.default_validate(center_freq = center_freq,
@@ -68,7 +66,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                                            STFFT_kwargs = STFFT_kwargs,
                                            chunk_key = chunk_key,
                                            event_handler_key = event_handler_key,
-                                           watch_extension = watch_extension
                                            )
         
 

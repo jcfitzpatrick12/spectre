@@ -45,7 +45,6 @@ def default_validate(center_freq: float = None,
                      STFFT_kwargs: dict = None,
                      chunk_key: str = None,
                      event_handler_key: str = None,
-                     watch_extension: str = None,
                      ) -> None:
     
     if not chunk_key == "default":
@@ -93,10 +92,6 @@ def default_validate(center_freq: float = None,
 
     if not STFFT_kwargs is None:
         default_validate_STFFT_kwargs(STFFT_kwargs)
-    
-
-    if not watch_extension is None:
-        default_validate_watch_extension(watch_extension)
 
     return
     
@@ -180,10 +175,4 @@ def default_validate_integration_time(integration_time: int, chunk_size: int) ->
     
     if integration_time > chunk_size:
         raise ValueError(f'integration_time must be less than or equal to chunk_size.')
-    return
-
-
-def default_validate_watch_extension(watch_extension: str) -> None:
-    if "." in watch_extension:
-        raise ValueError(f"Extension should be specified without \".\". Received: {watch_extension}")
     return

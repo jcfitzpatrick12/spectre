@@ -1,5 +1,4 @@
 {
-    "watch_extension": "bin",
     "event_handler_key": "default",
     "chunk_size": 5,
     "samp_rate": 2000000,

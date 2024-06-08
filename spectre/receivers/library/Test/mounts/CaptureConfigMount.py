@@ -27,7 +27,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'watch_extension': str, # postprocessing will call proc defined in event handler for files appearing with this extension
                 'integration_time': float # spectrograms will be averaged over a time integration_time
             },
             
@@ -59,7 +58,6 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         STFFT_kwargs = capture_config.get("STFFT_kwargs")
         chunk_key = capture_config.get("chunk_key")
         event_handler_key = capture_config.get("event_handler_key")
-        watch_extension = capture_config.get("watch_extension")
         integration_time = capture_config.get("integration_time")
 
         # do default validations
@@ -72,14 +70,10 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                                            STFFT_kwargs = STFFT_kwargs,
                                            chunk_key = chunk_key,
                                            event_handler_key = event_handler_key,
-                                           watch_extension = watch_extension
                                            )
 
         if integration_time != 0:
             raise ValueError(f"Integration time must be zero. Received {integration_time}")
-
-        if watch_extension != "bin":
-            raise ValueError(f"watch_extension must be \"bin\". Received {watch_extension}")
 
         if chunk_key != "default":
             raise ValueError(f"chunk_key must be \"default\". Received {chunk_key}")
