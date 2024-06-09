@@ -74,8 +74,8 @@ Set the ```SPECTREPARENTPATH``` environment variable:
 Please open a new shell and navigate to the ```host``` directory via:   
 ```cd $SPECTREPARENTPATH/host```
 
-Build the Docker image (you may need to use ```sudo docker build``` if you are receiving permission errors):  
-```docker build -t spectre-host .```
+Build the Docker image:  
+```sudo docker build -t spectre-host .```
 
 Make the start script executable and run it:  
 ```chmod +x run.sh && ./run.sh```  
