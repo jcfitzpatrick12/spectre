@@ -13,9 +13,9 @@ class ChunkBin(ChunkExt):
         super().__init__(chunk_start_time, tag, ".bin")
 
 
-    def read(file_path: str) -> Tuple[int, np.ndarray]:
+    def read(self) -> Tuple[int, np.ndarray]:
         try:
-            with open(file_path, "rb") as fh:
+            with open(self.get_path(), "rb") as fh:
                 # As per the functionality of batched file sink block
                 # we store the ms correction correction at the start of the byte stream
                 # as a 32 bit integer. We first extract this ...
