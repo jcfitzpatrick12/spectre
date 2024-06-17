@@ -1,0 +1,22 @@
+{
+    "event_handler_key": "default",
+    "chunk_size": 5,
+    "samp_rate": 2000000,
+    "integration_time": 0.075,
+    "window_size": 1024,
+    "chunk_key": "default",
+    "center_freq": 95800000.0,
+    "RF_gain": 0,
+    "bandwidth": 2000000.0,
+    "window_type": "gaussian",
+    "IF_gain": -20,
+    "window_kwargs": {
+        "std": 200
+    },
+    "STFFT_kwargs": {
+        "hop": 512
+    },
+    "receiver": "RSPduo",
+    "mode": "tuner_1_fixed",
+    "tag": "RSPduo-tuner-1-fixed-example"
+}

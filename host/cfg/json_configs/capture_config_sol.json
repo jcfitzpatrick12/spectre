@@ -1,0 +1,22 @@
+{
+    "event_handler_key": "default",
+    "chunk_size": 5,
+    "samp_rate": 8000000,
+    "integration_time": 0.075,
+    "window_size": 1024,
+    "chunk_key": "default",
+    "center_freq": 140000000.0,
+    "RF_gain": 0,
+    "bandwidth": 8000000.0,
+    "window_type": "blackman",
+    "IF_gain": -20,
+    "window_kwargs": {
+    },
+    "STFFT_kwargs": {
+        "hop": 512
+    },
+    "receiver": "RSPduo",
+    "mode": "tuner_1_fixed",
+    "tag": "sol"
+}
+

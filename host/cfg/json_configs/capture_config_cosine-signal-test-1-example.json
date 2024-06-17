@@ -1,0 +1,18 @@
+{
+    "amplitude": 2.0,
+    "frequency": 32000.0,
+    "integration_time": 0.0,
+    "samp_rate": 128000,
+    "chunk_size": 2,
+    "window_type": "boxcar",
+    "window_kwargs": {},
+    "STFFT_kwargs": {
+        "hop": 512
+    },
+    "window_size": 256,
+    "event_handler_key": "default",
+    "chunk_key": "default",
+    "receiver": "Test",
+    "mode": "cosine-signal-test-1",
+    "tag": "cosine-signal-test-1-example"
+}
