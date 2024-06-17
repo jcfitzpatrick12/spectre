@@ -30,6 +30,8 @@ class Chunk(BaseChunk):
             raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
         # fetch the IQ data
         millisecond_correction, IQ_data = self.bin.read()
+        # convert the millisecond correction to microseconds
+        microsecond_correction = millisecond_correction * 1000
         # load the capture config for the current tag
         capture_config_handler = CaptureConfigHandler(self.tag)
         capture_config = capture_config_handler.load_as_dict()
@@ -48,7 +50,7 @@ class Chunk(BaseChunk):
                 self.tag, 
                 chunk_start_time = self.chunk_start_time, 
                 units="amplitude",
-                millisecond_correction = millisecond_correction)
+                microsecond_correction = microsecond_correction)
 
     
     def fetch_window(self, capture_config: dict) -> np.ndarray:
