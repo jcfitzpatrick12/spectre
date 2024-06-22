@@ -3,7 +3,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-git clone https://github.com/jcfitzpatrick12/gr-spectre.git
+# clone the sweep driver branch
+git clone -b sweep-driver --single-branch https://github.com/jcfitzpatrick12/gr-spectre.git
 #cd into the cloned repo
 cd gr-spectre
 #built the OOT module
