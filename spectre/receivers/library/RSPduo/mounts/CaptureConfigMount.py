@@ -153,6 +153,13 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         
         RF_gain_upper_bound = 0 # [dB]
         validator_helpers.closed_upper_bound_RF_gain(RF_gain, RF_gain_upper_bound)
+
+
+        ## sweep specific validations
+        validator_helpers.validate_samples_per_step_exact_multiple(samples_per_step, window_size)
+
+        hop = STFFT_kwargs['hop']
+        validator_helpers.validate_hop_even_fraction_of_window_size(hop, window_size)
         return
 
 
