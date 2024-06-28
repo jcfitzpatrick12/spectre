@@ -66,7 +66,7 @@ RUN chmod +x /install_gr_sdrplay3.sh && \
     /install_gr_sdrplay3.sh && rm /install_gr_sdrplay3.sh
 
 # dummy line
-RUN echo "dummy6"
+RUN echo "dummy14"
 
 # Now copy the script which will install the gr-spectre custom OOT module
 COPY ./scripts/install_gr_spectre.sh /install_gr_spectre.sh
