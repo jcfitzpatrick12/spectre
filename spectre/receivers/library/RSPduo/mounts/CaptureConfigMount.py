@@ -30,12 +30,30 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
             },
+            "tuner-1-sweep": {
+                "bandwidth": float,
+                "samp_rate": int, 
+                "IF_gain": int,
+                "RF_gain": int,
+                "chunk_size": int,
+                "min_freq": float,
+                "max_freq": float,
+                "freq_step": float,
+                "samples_per_step": int,
+                "window_type": str,
+                "window_size": int,
+                "window_kwargs": dict,
+                "STFFT_kwargs": dict,
+                "chunk_key": str,
+                "event_handler_key": str
+            }
         }
 
 
     def set_validators(self) -> None:
         self.validators = {
             "tuner-1-fixed": self.tuner_1_fixed_validator,
+            "tuner-1-sweep": self.tuner_1_sweep_validator
         }
 
     
@@ -83,12 +101,56 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         bandwidth_upper_bound = 8e6 # [Hz]
         validator_helpers.closed_confine_bandwidth(bandwidth, bandwidth_lower_bound, bandwidth_upper_bound)
 
-        ## make a function in validator helper BOUND IF_GAIN
         IF_gain_upper_bound = -20 # [dB]
         validator_helpers.closed_upper_bound_IF_gain(IF_gain, IF_gain_upper_bound)
         
+        RF_gain_upper_bound = 0 # [dB]
+        validator_helpers.closed_upper_bound_RF_gain(RF_gain, RF_gain_upper_bound)
+        return
+
+    def tuner_1_sweep_validator(self, capture_config: dict) -> None:
+        bandwidth = capture_config["bandwidth"]
+        samp_rate = capture_config["samp_rate"]
+        IF_gain = capture_config["IF_gain"]
+        RF_gain = capture_config["RF_gain"]
+        chunk_size = capture_config["chunk_size"]
+        window_type = capture_config["window_type"]
+        window_size = capture_config["window_size"]
+        window_kwargs = capture_config["window_kwargs"]
+        STFFT_kwargs = capture_config["STFFT_kwargs"]
+        chunk_key = capture_config["chunk_key"]
+        event_handler_key = capture_config["event_handler_key"]
+
+        ## ! make sweep specific validator functions ! ##
+        min_freq = capture_config["min_freq"]
+        max_freq = capture_config["max_freq"]
+        freq_step = capture_config["freq_step"]
+        samples_per_step = capture_config["samples_per_step"]
+
+        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
+        validator_helpers.validate_bandwidth_strictly_positive(bandwidth)
+        validator_helpers.validate_nyquist_criterion(samp_rate, bandwidth)
+        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
+        validator_helpers.validate_window(window_type, 
+                                window_kwargs, 
+                                window_size,
+                                chunk_size,
+                                samp_rate)
+        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.validate_chunk_key(chunk_key, "sweep")
+        validator_helpers.validate_event_handler_key(event_handler_key, "sweep")
+
+        samp_rate_lower_bound = 2e6 # [Hz]
+        samp_rate_upper_bound = 10e6 # [Hz]
+        validator_helpers.closed_confine_samp_rate(samp_rate, samp_rate_lower_bound, samp_rate_upper_bound)
+
+        bandwidth_lower_bound = 200e3 # [Hz]
+        bandwidth_upper_bound = 8e6 # [Hz]
+        validator_helpers.closed_confine_bandwidth(bandwidth, bandwidth_lower_bound, bandwidth_upper_bound)
+
+        IF_gain_upper_bound = -20 # [dB]
+        validator_helpers.closed_upper_bound_IF_gain(IF_gain, IF_gain_upper_bound)
         
-        ## make a function in validator helpers BOUND RF_GAIN
         RF_gain_upper_bound = 0 # [dB]
         validator_helpers.closed_upper_bound_RF_gain(RF_gain, RF_gain_upper_bound)
         return
