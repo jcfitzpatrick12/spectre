@@ -125,3 +125,16 @@ def validate_event_handler_key(event_handler_key: str, expected_event_handler_ke
     if event_handler_key != expected_event_handler_key:
         raise ValueError(f"Expected \"{expected_event_handler_key}\" for the event_handler_key, received: {event_handler_key}")
     return
+
+
+def validate_samples_per_step_exact_multiple(samples_per_step: int, window_size: int) -> None:
+    if samples_per_step % window_size != 0:
+        raise ValueError(f"samples_per_step ({samples_per_step}) is not a multiple of window_size ({window_size})")
+    return
+
+
+def validate_hop_even_fraction_of_window_size(hop: int, window_size: int) -> None:
+    frac = int(window_size/hop)
+    if frac % 2 != 0:
+        raise ValueError(f"hop: {hop}, must be some even fraction of window_size: {window_size}.")
+    return
