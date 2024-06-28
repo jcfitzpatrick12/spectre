@@ -7,12 +7,12 @@
     "min_freq": 80000000.0,
     "max_freq": 120000000.0,
     "freq_step": 8000000.0,
-    "samples_per_step": 300000,
+    "samples_per_step": 307200,
     "window_type": "blackman",
     "window_size": 2048,
     "window_kwargs": {},
     "STFFT_kwargs": {
-        "hop": 2048
+        "hop": 1024
     },
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
