@@ -4,7 +4,9 @@
 
 from datetime import datetime
 from cfg import CONFIG
+
 from spectre.utils import datetime_helpers
+from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class BaseChunk:
     def __init__(self, chunk_start_time: str, tag: str):
@@ -17,3 +19,5 @@ class BaseChunk:
         
         self.chunk_dir = datetime_helpers.build_chunks_dir(self.chunk_start_time)
         self.chunk_start_datetime = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
+        self.capture_config_handler = CaptureConfigHandler(self.tag)
+        self.capture_config = self.capture_config_handler.load_as_dict()

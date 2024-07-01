@@ -56,4 +56,8 @@ class JsonConfigHandler:
         else:
             file_helpers.doublecheck_delete(self.absolute_path())
             os.remove(self.absolute_path())
+
+    def get_value(self, key) -> Any:
+        json_config = self.load_as_dict()
+        return json_config.get(key)
             

@@ -132,3 +132,18 @@ def background_subtract(yvals: np.ndarray, background_indices: list | None):
         yvals -= np.nanmean(yvals[background_indices[0]:
                                   background_indices[1]])
     return yvals
+
+
+def compute_step_start_indices(stepped_ar: np.ndarray) -> np.ndarray:
+    if stepped_ar.ndim != 1:
+        raise ValueError(f"Expected a 1D array, received {stepped_ar.ndim}")
+
+    # diffs d[i] computes stepped_ar[i+1] - stepped_ar[i]
+    diffs = np.diff(stepped_ar)
+    # so where diffs is non-zero, we have found the END of a step
+    step_end_indices = np.where(diffs!=0)[0]
+    # the start indices are therefor, one index above the end step
+    step_start_indices = [i + 1 for i in step_end_indices]
+    # finally, include the (trivial) first index as the start
+    step_start_indices.insert(0,0)
+    return step_start_indices
