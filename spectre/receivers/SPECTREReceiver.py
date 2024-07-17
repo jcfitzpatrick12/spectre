@@ -8,8 +8,8 @@ from spectre.utils import validator_helpers
 
 # optional parent class which provides default templates and validators
 class SPECTREReceiver(BaseReceiver):
-    def __init__(self, mode: str):
-        super().__init__(mode)
+    def __init__(self, receiver_name: str, mode: str):
+        super().__init__(receiver_name, mode)
         self.__set_default_templates()
         return
     

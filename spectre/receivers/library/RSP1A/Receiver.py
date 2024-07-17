@@ -5,7 +5,7 @@ from spectre.utils import validator_helpers
 
 @register_receiver("RSP1A")
 class Receiver(SPECTREReceiver):
-    def __init__(self, mode: str):
+    def __init__(self, receiver_name: str, mode: str):
         super().__init__(mode)
 
 
