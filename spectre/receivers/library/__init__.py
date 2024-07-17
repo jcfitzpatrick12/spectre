@@ -27,7 +27,6 @@ def import_from_receiver(receiver):
         raise ValueError(f"Could not find Receiver.py in {receiver}")
 
     full_module_name = f'spectre.receivers.library.{receiver}.Receiver'
-    print(f"Importing module: {full_module_name}")  # Debug statement
     importlib.import_module(full_module_name)
 
 # List all directories which are not __pycache__
