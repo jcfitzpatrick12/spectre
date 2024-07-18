@@ -75,7 +75,7 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         center_freq_upper_bound = 2e9 # [Hz]
         validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
 
-        samp_rate_lower_bound = 2e6 # [Hz]
+        samp_rate_lower_bound = 200e3 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]
         validator_helpers.closed_confine_samp_rate(samp_rate, samp_rate_lower_bound, samp_rate_upper_bound)
 
