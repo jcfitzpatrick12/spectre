@@ -7,9 +7,9 @@
 # this import will run the __init__.py within library, which will dynamically import all the receivers
 import spectre.receivers.library
 from spectre.receivers.receiver_register import receivers
-
 from spectre.receivers.BaseReceiver import BaseReceiver
-# fetch a capture mount for a given receiver name
+
+# used to fetch an instance of the receiver class
 def get_receiver(receiver_name: str, mode: str) -> BaseReceiver:
     # try and fetch the capture config mount
     Receiver = receivers.get(receiver_name)
