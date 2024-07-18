@@ -38,7 +38,10 @@ class Receiver(SPECTREReceiver):
 
     def __fixed_validator(self, capture_config: dict) -> None:
         self._default_fixed_validator(capture_config)
+        self.__RSP1A_validator(capture_config)
 
+    
+    def __RSP1A_validator(self, capture_config: dict) -> None:
         # RSP1A specific validations
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
