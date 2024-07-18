@@ -6,12 +6,16 @@
 receivers = {}
 
 # classes decorated with @register_receiver("<receiver_name>")
-# will be added to the global map of capture_config_mounts with key "receiver_name"
+# will be added to the global map of receivers with key "receiver_name"
 def register_receiver(receiver_name: str):
     def decorator(cls):
         receivers[receiver_name] = cls
         return cls
     return decorator
+
+# return a list of all receiver names
+def list_all_receiver_names():
+    return list(receivers.keys())
 
 
 
