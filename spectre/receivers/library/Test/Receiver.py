@@ -42,7 +42,7 @@ class Receiver(SPECTREReceiver):
         return
 
 
-    def __cosine_signal_test_1(self, capture_configs: list):
+    def __cosine_signal_test_1(self, capture_configs: list) -> None:
         capture_config = capture_configs[0]
         cosine_signal_test_1.main(capture_config)
         return
