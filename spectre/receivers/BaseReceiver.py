@@ -10,9 +10,12 @@ from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 
 class BaseReceiver(ABC):
-    def __init__(self, receiver_name: str, mode: str):
+    def __init__(self, receiver_name: str, mode: str = None):
         self.receiver_name = receiver_name
-        self.set_mode(mode)
+
+        if not mode is None:
+            self.set_mode(mode)
+            
         self._set_capture_methods()
         self._set_templates()
         self._set_validators()

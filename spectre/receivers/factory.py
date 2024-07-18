@@ -18,4 +18,4 @@ def get_receiver(receiver_name: str, mode: str) -> BaseReceiver:
         raise ValueError(f"No capture mount found for receiver: {receiver_name}. Please specify one of the following receivers {valid_receivers}.")
     
     # return an instance of the receiver
-    return Receiver(receiver_name, mode)
+    return Receiver(receiver_name, mode = mode)

@@ -5,8 +5,8 @@ from spectre.utils import validator_helpers
 
 @register_receiver("Test")
 class Receiver(SPECTREReceiver):
-    def __init__(self, receiver_name: str, mode: str):
-        super().__init__(receiver_name, mode)
+    def __init__(self, receiver_name: str, mode: str = None):
+        super().__init__(receiver_name, mode = mode)
 
 
     def _set_capture_methods(self) -> None:
