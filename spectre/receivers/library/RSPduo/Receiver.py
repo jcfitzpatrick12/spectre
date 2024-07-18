@@ -36,13 +36,13 @@ class Receiver(SPECTREReceiver):
         return
     
 
-    def __tuner_1_fixed_validator(self, capture_config: dict):
+    def __tuner_1_fixed_validator(self, capture_config: dict) -> None:
         self._default_fixed_validator(capture_config)
-        self.__RSPduo_validator
+        self.__RSPduo_validator(capture_config)
         return
     
 
-    def __RSPduo_validator(self, capture_config: dict):
+    def __RSPduo_validator(self, capture_config: dict) -> None:
         # RSPduo specific validations in single tuner mode
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
