@@ -4,11 +4,13 @@
 
 import os
 from datetime import datetime
+from abc import ABC, abstractmethod
+from typing import Any
 
 from spectre.utils import datetime_helpers, file_helpers
 from cfg import CONFIG
 
-class ChunkExt:
+class ChunkExt(ABC):
     def __init__(self, chunk_start_time: str, tag: str, ext: str):
         self.chunk_start_time = chunk_start_time
         self.tag = tag
@@ -18,15 +20,20 @@ class ChunkExt:
         self.chunk_start_datetime = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
 
 
+    @abstractmethod
+    def read(self) -> Any:
+        pass
+
+
     def get_path(self) -> str:
         return os.path.join(self.chunk_dir, f"{self.chunk_start_time}_{self.tag}{self.ext}")
     
 
     def exists(self) -> bool:
-        return os.path.exists(self.get_path())
-    
+        return os.path.exists(self.get_path()) 
 
-    def delete_self(self, doublecheck_delete = True, ignore_file_existance = True) -> None:
+
+    def delete(self, doublecheck_delete = True, ignore_file_existance = True) -> None:
         if not self.exists():
             return
         else:

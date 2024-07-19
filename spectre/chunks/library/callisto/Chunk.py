@@ -11,6 +11,7 @@ from spectre.chunks.library.callisto.ChunkFits import ChunkFits
 class Chunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
+        
         self.fits = ChunkFits(chunk_start_time, tag)
 
 
