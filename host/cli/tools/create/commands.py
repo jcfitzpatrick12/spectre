@@ -7,7 +7,7 @@ from typing import List
 
 from host.cli import __app_name__, __version__
 from cfg import CONFIG
-from spectre.receivers.Receiver import Receiver
+from spectre.receivers.factory import get_receiver
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 
 
@@ -44,8 +44,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     # # # # #save the params to file as a validated capture config
     try:
     # # instantiate the receiver specific capture config class 
-        receiver = Receiver(receiver_name)
-        receiver.set_mode(mode)
+        receiver = get_receiver(receiver_name, mode = mode)
         receiver.save_params_as_capture_config(params, tag)
 
     except KeyError as e:

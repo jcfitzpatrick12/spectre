@@ -11,7 +11,7 @@ from host.utils import capture_session
 from host.tests.analytical import do_analytical_test
 from cfg import CONFIG
 
-from spectre.receivers.Receiver import Receiver
+from spectre.receivers.factory import get_receiver
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.watchdog.Watcher import Watcher
 
@@ -29,8 +29,7 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
         raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_capture}.")
     
     if run_as_foreground_ps:
-        receiver = Receiver(receiver_name)
-        receiver.set_mode(mode)
+        receiver = get_receiver(receiver_name, mode = mode)
         receiver.start_capture(tags)
 
     else:

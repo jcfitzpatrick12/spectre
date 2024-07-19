@@ -2,11 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from spectre.receivers.Receiver import Receiver
 from argparse import ArgumentParser
+import os
+
 from cfg import CONFIG
 from host.utils import capture_session
-import os
+from spectre.receivers.factory import get_receiver
 
 def main():
     parser = ArgumentParser()
@@ -21,8 +22,7 @@ def main():
     tags = args.tags
 
     try:
-        receiver = Receiver(receiver_name)
-        receiver.set_mode(mode)
+        receiver = get_receiver(receiver_name, mode = mode)
         receiver.start_capture(tags)
 
     except Exception as e:

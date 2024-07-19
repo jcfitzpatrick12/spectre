@@ -5,7 +5,7 @@
 import typer
 from typing import List
 
-from spectre.receivers.Receiver import Receiver
+from spectre.receivers.factory import get_receiver
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 from spectre.utils import dict_helpers 
@@ -25,8 +25,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     mode = capture_config.get("mode")
 
     # and use them to instantiate a receiver
-    receiver = Receiver(receiver_name)
-    receiver.set_mode(mode)
+    receiver = get_receiver(receiver_name, mode)
     # fetch the corresponding template so we can type cast the params list
     template = receiver.get_template()
     # convert the params to update (passed in via --param arguments) into a string valued dict
