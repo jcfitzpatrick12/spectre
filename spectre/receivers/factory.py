@@ -10,7 +10,7 @@ from spectre.receivers.receiver_register import receivers
 from spectre.receivers.BaseReceiver import BaseReceiver
 
 # used to fetch an instance of the receiver class
-def get_receiver(receiver_name: str, mode: str) -> BaseReceiver:
+def get_receiver(receiver_name: str, mode: str = None) -> BaseReceiver:
     # try and fetch the capture config mount
     Receiver = receivers.get(receiver_name)
     if Receiver is None:
