@@ -12,13 +12,14 @@ from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 class BaseReceiver(ABC):
     def __init__(self, receiver_name: str, mode: str = None):
         self.receiver_name = receiver_name
-
-        if not mode is None:
-            self.set_mode(mode)
             
         self._set_capture_methods()
         self._set_templates()
         self._set_validators()
+        self._set_valid_modes()
+
+        if not mode is None:
+            self.set_mode(mode)
 
 
     @abstractmethod
@@ -35,9 +36,24 @@ class BaseReceiver(ABC):
     def _set_templates(self) -> None:
         pass
 
+    
+    # ensure that all receiver maps define the same modes for the receiver
+    def _set_valid_modes(self) -> None:
+        capture_method_modes = list(self.capture_methods.keys())
+        validator_modes = list(self.validators.keys())
+        template_modes = list(self.templates.keys())
+
+        if capture_method_modes == validator_modes == template_modes:
+            self.valid_modes = capture_method_modes
+        else:
+            raise KeyError(f"Mode key mismatch for the receiver {self.receiver_name}. Could not define valid modes.")
+
 
     def set_mode(self, mode: str) -> None:
+        if not mode in self.valid_modes:
+            raise ValueError(f"{mode} is not a defined mode for the receiver {self.receiver_name}. Expected one of {self.valid_modes}.")
         self.mode = mode
+
 
 
     def get_capture_method(self) -> Callable:
@@ -64,12 +80,14 @@ class BaseReceiver(ABC):
     def validate(self, capture_config: dict) -> None:
         validator = self.get_validator()
         validator(capture_config)
+        return
 
 
     def start_capture(self, tags: list) -> None:
         capture_configs = [self.load_capture_config(tag) for tag in tags]
         capture_method = self.get_capture_method()
         capture_method(capture_configs)
+        return
 
 
     def save_params_as_capture_config(self, params: list, tag: str, doublecheck_overwrite: bool = True) -> None:
@@ -77,6 +95,7 @@ class BaseReceiver(ABC):
         template = self.get_template()
         capture_config = dict_helpers.convert_types(string_valued_dict, template)
         self.save_capture_config(tag, capture_config, doublecheck_overwrite)
+        return
 
 
     def save_capture_config(self, tag: str, capture_config: dict, doublecheck_overwrite: bool = True) -> None:
@@ -88,6 +107,7 @@ class BaseReceiver(ABC):
 
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config_handler.save_dict_as_json(capture_config, doublecheck_overwrite=doublecheck_overwrite)
+        return
 
 
     def load_capture_config(self, tag: str) -> dict:
