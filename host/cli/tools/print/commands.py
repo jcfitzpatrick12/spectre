@@ -10,7 +10,7 @@ from cfg import CONFIG
 
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
-from spectre.receivers.Receiver import Receiver
+from spectre.receivers.factory import get_receiver
 from spectre.utils import file_helpers
 
 app = typer.Typer()
@@ -53,8 +53,9 @@ def capture_config_template(
     as_command: bool = typer.Option(False, "--as-command", help=""),
     tag: str = typer.Option(None, "--tag", "-t", help="")
 ) -> None:
-    receiver = Receiver(receiver_name)
-    receiver.set_mode(mode)
+    
+    receiver = get_receiver(receiver_name, mode = mode)
+    
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t.")

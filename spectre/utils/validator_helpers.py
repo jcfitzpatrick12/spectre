@@ -10,6 +10,7 @@ def closed_upper_bound_RF_gain(RF_gain: float, RF_gain_upper_bound: float) -> No
         raise ValueError(f"RF_gain must be strictly less than or equal to {RF_gain_upper_bound} [dB]. Got {RF_gain} [dB]")
     return
 
+
 def closed_upper_bound_IF_gain(IF_gain: float, IF_gain_upper_bound: float) -> None:
     if not (IF_gain <= IF_gain_upper_bound):
         raise ValueError(f"IF_gain must be strictly less than or equal to {IF_gain_upper_bound} [dB]. Got {IF_gain} [dB]")
@@ -39,10 +40,10 @@ def is_power_of_two(n):
 
 
 def validate_window(window_type: str, 
-                            window_kwargs: dict, 
-                            window_size: int,
-                            chunk_size: int,
-                            samp_rate: float) -> None:
+                        window_kwargs: dict, 
+                        window_size: int,
+                        chunk_size: int,
+                        samp_rate: float) -> None:
     
     if not is_power_of_two(window_size):
         raise ValueError(f"window_size must be some power of two. Received: {window_size}")
@@ -115,6 +116,7 @@ def validate_integration_time(integration_time: int, chunk_size: int) -> None:
         raise ValueError(f'integration_time must be less than or equal to chunk_size.')
     return
 
+
 def validate_chunk_key(chunk_key: str, expected_chunk_key: str) -> None:
     if chunk_key != expected_chunk_key:
         raise ValueError(f"Expected \"{expected_chunk_key}\" for the chunk_key, received: {chunk_key}")
@@ -125,3 +127,8 @@ def validate_event_handler_key(event_handler_key: str, expected_event_handler_ke
     if event_handler_key != expected_event_handler_key:
         raise ValueError(f"Expected \"{expected_event_handler_key}\" for the event_handler_key, received: {event_handler_key}")
     return
+
+
+def validate_gain_is_negative(gain: float):
+    if gain > 0:
+        raise ValueError(f"Gain must be non-positive. Received {gain}")

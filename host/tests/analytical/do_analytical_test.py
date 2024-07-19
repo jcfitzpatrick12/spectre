@@ -7,10 +7,10 @@ import numpy as np
 import typer
 
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-from spectre.receivers.Receiver import Receiver
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
 from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.receivers.factory import get_receiver
 
 def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
     for i, time in enumerate(S.time_seconds):
@@ -70,8 +70,9 @@ def main(test_tag: str, show_slice_status = False) -> None:
     
     # check that the user specified mode is that specified in the capture config
     test_mode = capture_config['mode']    
+    
     # check the mode is a defined mode for the Test receiver
-    test_receiver = Receiver("Test")
+    test_receiver = get_receiver("Test")
     if test_mode not in test_receiver.valid_modes:
         raise ValueError(f"{test_mode} is not a valid mode. Expected one of {test_receiver.valid_modes}.")
     

@@ -8,8 +8,9 @@ import os
 from host.cli import __app_name__, __version__
 from cfg import CONFIG, callisto_stations
 from spectre.utils import dir_helpers, datetime_helpers
-from spectre.receivers.Receiver import Receiver
-from spectre.receivers import get_mount
+
+from spectre.receivers.factory import get_receiver
+from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.chunks.Chunks import Chunks
 
 app = typer.Typer()
@@ -47,7 +48,7 @@ def chunks(
 @app.command()
 def receivers(
 ) -> None:
-    receiver_list = get_mount.list_all_receivers()
+    receiver_list = list_all_receiver_names()
     for receiver_name in receiver_list:
         typer.secho(f"{receiver_name}")
     typer.Exit()
@@ -57,7 +58,7 @@ def receivers(
 def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name")
 ) -> None:
-    receiver = Receiver(receiver_name)
+    receiver = get_receiver(receiver_name)
     valid_modes = receiver.valid_modes
     
     for i, mode in enumerate(valid_modes):

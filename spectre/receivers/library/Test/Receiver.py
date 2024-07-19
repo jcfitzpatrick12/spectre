@@ -1,20 +1,29 @@
-# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
-# This file is part of SPECTRE
-# SPDX-License-Identifier: GPL-3.0-or-later
-
-from spectre.receivers.BaseCaptureConfigMount import BaseCaptureConfigMount
-from spectre.receivers.mount_register import register_capture_config_mount
+from spectre.receivers.receiver_register import register_receiver
+from spectre.receivers.SPECTREReceiver import SPECTREReceiver
+from spectre.receivers.library.Test.gr import cosine_signal_test_1
 from spectre.utils import validator_helpers
-from spectre.utils import dict_helpers
+
+@register_receiver("Test")
+class Receiver(SPECTREReceiver):
+    def __init__(self, receiver_name: str, mode: str = None):
+        super().__init__(receiver_name, mode = mode)
 
 
-@register_capture_config_mount("Test")
-class CaptureConfigMount(BaseCaptureConfigMount):
-    def __init__(self,):
-        super().__init__()
-        pass
+    def _set_capture_methods(self) -> None:
+        self.capture_methods = {
+            "cosine-signal-test-1": self.__cosine_signal_test_1
+        }
+        return
+    
 
-    def set_templates(self) -> None:
+    def _set_validators(self) -> None:
+        self.validators = {
+            "cosine-signal-test-1": self.__cosine_signal_test_1_validator
+        }
+        return
+    
+
+    def _set_templates(self) -> None:
         self.templates = {
             "cosine-signal-test-1": {
                 'samp_rate': int, # gr (sampling rate)
@@ -30,15 +39,16 @@ class CaptureConfigMount(BaseCaptureConfigMount):
                 'integration_time': float # spectrograms will be averaged over a time integration_time
             },
         }
+        return
 
 
-    def set_validators(self) -> None:
-        self.validators = {
-            "cosine-signal-test-1": self.cosine_signal_test_1_validator,
-        }
+    def __cosine_signal_test_1(self, capture_configs: list) -> None:
+        capture_config = capture_configs[0]
+        cosine_signal_test_1.main(capture_config)
+        return
+    
 
-
-    def cosine_signal_test_1_validator(self, capture_config: dict) -> None:
+    def __cosine_signal_test_1_validator(self, capture_config: dict) -> None:
         # unpack the capture config
         samp_rate = capture_config.get("samp_rate")
         frequency = capture_config.get("frequency")
@@ -55,10 +65,10 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
         validator_helpers.validate_integration_time(integration_time, chunk_size) 
         validator_helpers.validate_window(window_type, 
-                                {}, 
-                                window_size,
-                                chunk_size,
-                                samp_rate)
+                                          {}, 
+                                          window_size,
+                                          chunk_size,
+                                          samp_rate)
         validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
         validator_helpers.validate_chunk_key(chunk_key, "default")
         validator_helpers.validate_event_handler_key(event_handler_key, "default")
@@ -98,6 +108,4 @@ class CaptureConfigMount(BaseCaptureConfigMount):
         if amplitude <= 0:
             raise ValueError(f"amplitude must be strictly positive. Received: {amplitude}")
         return
-
-
     
