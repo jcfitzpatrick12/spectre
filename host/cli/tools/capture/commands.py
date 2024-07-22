@@ -7,7 +7,7 @@ import os
 from typing import List
 
 from host.cli import __app_name__, __version__
-from host.utils import capture_session 
+from host.capture_scripts import capture_session 
 from host.tests.analytical import do_analytical_test
 from cfg import CONFIG
 

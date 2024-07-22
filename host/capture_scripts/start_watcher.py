@@ -8,7 +8,7 @@ import os
 from spectre.watchdog.Watcher import Watcher
 from cfg import CONFIG
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-from host.utils import capture_session
+from host.capture_scripts import capture_session
 
 if __name__ == "__main__":
     parser = ArgumentParser()

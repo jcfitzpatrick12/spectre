@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 import os
 
 from cfg import CONFIG
-from host.utils import capture_session
+from host.capture_scripts import capture_session
 from spectre.receivers.factory import get_receiver
 
 def main():
