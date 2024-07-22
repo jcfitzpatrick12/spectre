@@ -5,9 +5,9 @@
 import numpy as np
 from typing import Tuple
 
-from spectre.chunks.ChunkExt import ChunkExt
+from spectre.chunks.ExtChunk import ExtChunk
 
-class ChunkHdr(ChunkExt):
+class HdrChunk(ExtChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag, ".hdr")
     

@@ -11,7 +11,7 @@ from spectre.utils import datetime_helpers, file_helpers
 from spectre.chunks.BaseChunk import BaseChunk
 from cfg import CONFIG
 
-class ChunkExt(ABC, BaseChunk):
+class ExtChunk(ABC, BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str, ext: str):
         super().__init__(chunk_start_time, tag)
         self.ext = ext

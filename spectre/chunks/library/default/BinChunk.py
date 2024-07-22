@@ -5,9 +5,9 @@
 import numpy as np
 from typing import Tuple
 
-from spectre.chunks.ChunkExt import ChunkExt
+from spectre.chunks.ExtChunk import ExtChunk
 
-class ChunkBin(ChunkExt):
+class BinChunk(ExtChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag, ".bin")
 

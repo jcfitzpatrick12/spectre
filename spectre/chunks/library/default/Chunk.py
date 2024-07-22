@@ -10,18 +10,18 @@ import matplotlib.pyplot as plt
 from spectre.chunks.SPECTREChunk import SPECTREChunk
 from spectre.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.chunks.library.default.ChunkBin import ChunkBin
-from spectre.chunks.library.default.ChunkFits import ChunkFits
-from spectre.chunks.library.default.ChunkHdr import ChunkHdr
+from spectre.chunks.library.default.BinChunk import BinChunk
+from spectre.chunks.library.default.FitsChunk import FitsChunk
+from spectre.chunks.library.default.HdrChunk import HdrChunk
 
 @register_chunk('default')
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
-
-        self.bin = ChunkBin(chunk_start_time, tag)
-        self.fits = ChunkFits(chunk_start_time, tag)
-        self.hdr = ChunkHdr(chunk_start_time, tag)
+        
+        self.bin = BinChunk(chunk_start_time, tag)
+        self.fits = FitsChunk(chunk_start_time, tag)
+        self.hdr = HdrChunk(chunk_start_time, tag)
 
 
     def build_spectrogram(self) -> Spectrogram:
