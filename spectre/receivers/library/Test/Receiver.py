@@ -147,8 +147,8 @@ class Receiver(SPECTREReceiver):
         validator_helpers.validate_integration_time(integration_time, chunk_size)
         validator_helpers.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
         validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
-        validator_helpers.validate_chunk_key(chunk_key, "default")
-        validator_helpers.validate_event_handler_key(event_handler_key, "default")
+        validator_helpers.validate_chunk_key(chunk_key, "sweep")
+        validator_helpers.validate_event_handler_key(event_handler_key, "sweep")
 
         if min_samples_per_step <= 0:
             raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")
