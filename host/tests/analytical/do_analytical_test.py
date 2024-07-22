@@ -83,8 +83,7 @@ def main(test_tag: str, show_slice_status = False) -> None:
     chunkf = None
     for chunk_start_time, chunk in my_chunks.dict.items():
         if chunk.fits.exists():
-            chunkf = chunk
-            S = chunkf.fits.load_spectrogram()  
+            S = chunk.fits.read()  
             analytical_S = asf.get_spectrogram(test_mode, S.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
@@ -93,5 +92,4 @@ def main(test_tag: str, show_slice_status = False) -> None:
 
     return
 
-    return
 
