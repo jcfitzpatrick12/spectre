@@ -49,7 +49,7 @@ class ChunksHandler:
         chunks_list = list(self.chunks.dict.values())
         for chunk in reversed(chunks_list):
             if chunk.fits.exists():
-                self.default_S = chunk.fits.load_spectrogram()
+                self.default_S = chunk.fits.read()
                 return
         raise ValueError(f"No fits files exist for tag {self.tag}")
 
