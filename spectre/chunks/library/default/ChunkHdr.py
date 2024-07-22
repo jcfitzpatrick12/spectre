@@ -13,4 +13,4 @@ class ChunkHdr(ChunkExt):
     
     # TO BE IMPLEMENTED
     def read(self) -> int:
-        pass
+        return 0
