@@ -138,7 +138,7 @@ class Chunks:
             upper_bound_datetime = upper_bound_chunk_intervals[chunk_start_time][1]
 
             if lower_bound_datetime < requested_end_datetime and upper_bound_datetime > requested_start_datetime:
-                S = chunk.fits.load_spectrogram()
+                S = chunk.fits.read()
                 S = factory.time_chop(S, requested_start_str, requested_end_str)
                 if S is None:
                     raise ValueError(f"Could not time chop spectrogram while building from range.")
