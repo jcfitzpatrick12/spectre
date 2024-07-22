@@ -8,7 +8,7 @@ import threading
 
 
 from cfg import CONFIG
-from spectre.watchdog.get_event_handler import get_event_handler_from_tag
+from spectre.watchdog.factory import get_event_handler_from_tag
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
