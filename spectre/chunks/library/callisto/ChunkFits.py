@@ -17,15 +17,19 @@ class ChunkFits(ChunkExt):
                 primary_hdu = self._get_primary_hdu(hdulist)
                 dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
                 microsecond_correction = self._get_microsecond_correction(primary_hdu)
-                
                 bintable_hdu = self._get_bintable_hdu(hdulist)
                 time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
-                
                 units = self._get_units(primary_hdu)
 
                 if units == "digits":
                     dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
-                    return self._create_spectrogram(dynamic_spectra_linearised, time_seconds, freq_MHz, units, microsecond_correction)
+                    return Spectrogram(dynamic_spectra, 
+                           time_seconds, 
+                           freq_MHz, 
+                           self.tag, 
+                           chunk_start_time=self.chunk_start_time, 
+                           units=units,
+                           microsecond_correction=microsecond_correction)
                 else:
                     raise ValueError(f"SPECTRE does not currently support units {units}")
                 
@@ -70,16 +74,6 @@ class ChunkFits(ChunkExt):
         # conversion as per ADC specs [see email from C. Monstein]
         dB = (digits_floats / 255) * (2500 / 25)
         return 10 ** (dB / 10)
-
-
-    def _create_spectrogram(self, dynamic_spectra, time_seconds, freq_MHz, units, microsecond_correction):
-        return Spectrogram(dynamic_spectra, 
-                           time_seconds, 
-                           freq_MHz, 
-                           self.tag, 
-                           chunk_start_time=self.chunk_start_time, 
-                           units=units,
-                           microsecond_correction=microsecond_correction)
 
 
     def get_datetimes(self) -> np.ndarray:
