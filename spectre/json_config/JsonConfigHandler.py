@@ -16,7 +16,7 @@ class JsonConfigHandler:
     
     def set_tag(self, tag):
         if tag == None:
-            raise ValueError(f'tag cannot be None. Received {tag}.')
+            raise ValueError(f'Tag cannot be None. Received {tag}.')
         
         if "_" in tag:
             raise ValueError(f"Tags cannot contain an underscore. Received {tag}.")
