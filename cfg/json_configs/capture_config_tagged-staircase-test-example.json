@@ -1,5 +1,5 @@
 {
-    "samp_rate": 32000,
+    "samp_rate": 128000,
     "min_samples_per_step": 4000,
     "max_samples_per_step": 5000,
     "step_increment": 200,
