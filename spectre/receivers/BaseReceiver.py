@@ -100,6 +100,9 @@ class BaseReceiver(ABC):
 
     def save_capture_config(self, tag: str, capture_config: dict, doublecheck_overwrite: bool = True) -> None:
         template = self.get_template()
+        print(capture_config)
+        print(template)
+        exit()
         dict_helpers.validate_keys(capture_config, template, ignore_keys=['receiver', 'mode', 'tag'])
         dict_helpers.validate_types(capture_config, template, ignore_keys=['receiver', 'mode', 'tag'])
         self.validate(capture_config)
