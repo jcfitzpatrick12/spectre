@@ -30,10 +30,6 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_s
     if not S.shape == analytical_S.shape:
         raise ValueError(f"Shape mismatch between synthesised spectra: {S.shape}, and analytical spectra: {analytical_S}.")
     
-    synthesised_dynamic_spectra = S.dynamic_spectra
-    analytical_dynamic_spectra = analytical_S.dynamic_spectra
-    num_time_samples = S.shape[1]
-    
     is_close = np.isclose(
         S.dynamic_spectra,
         analytical_S.dynamic_spectra,
