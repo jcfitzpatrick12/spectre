@@ -46,8 +46,8 @@ class ChunksHandler:
 
 
     def set_default_spectrogram(self):
-        chunks_list = list(self.chunks.dict.values())
-        for chunk in reversed(chunks_list):
+        chunk_list = self.chunks.get_chunk_list()
+        for chunk in reversed(chunk_list):
             if chunk.fits.exists():
                 self.default_S = chunk.fits.read()
                 return
