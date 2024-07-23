@@ -35,7 +35,8 @@ def chunks(
                     year=year, 
                     month=month,
                     day=day)
-    for chunk_start_time, chunk in chunks.dict.items():
+    
+    for chunk_start_time, chunk in chunks.chunk_map.items():
         # Use getattr to dynamically get the attribute based on 'ext'
         attribute = getattr(chunk, ext, None)
         if attribute is None:

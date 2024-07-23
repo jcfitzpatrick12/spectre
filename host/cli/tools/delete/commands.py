@@ -27,7 +27,8 @@ def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
                 month=month,
                 day=day)
     
-    for chunk in chunks.dict.values():
+    chunk_list = chunks.get_chunk_list()
+    for chunk in chunk_list:
         # Use getattr to dynamically get the attribute based on 'ext'
         chunk_ext = getattr(chunk, ext, None)
         if chunk_ext is None:
