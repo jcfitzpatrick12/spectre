@@ -54,7 +54,7 @@ def build_chunks_dir(chunk_start_time: str) -> str:
         dt = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
     except ValueError as e:
         raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
-    return date_dir(dt, base_dir=CONFIG.chunks_dir)
+    return date_dir(dt, base_dir=CONFIG.path_to_chunks_dir)
 
 
 def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, microsecond_correction=0) -> list:

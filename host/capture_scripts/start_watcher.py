@@ -7,7 +7,6 @@ import os
 
 from spectre.watchdog.Watcher import Watcher
 from cfg import CONFIG
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from host.capture_scripts import capture_session
 
 if __name__ == "__main__":
@@ -16,8 +15,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     tag = args.tag
 
-    if not os.path.exists(CONFIG.chunks_dir):
-        os.mkdir(CONFIG.chunks_dir)
+    if not os.path.exists(CONFIG.path_to_chunks_dir):
+        os.mkdir(CONFIG.path_to_chunks_dir)
 
     try:
         watcher = Watcher(tag)

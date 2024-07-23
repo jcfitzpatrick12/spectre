@@ -29,16 +29,16 @@ class JsonConfigHandler:
     
 
     def load_as_dict(self) -> dict:
-        json_as_dict = json_helpers.load_json_as_dict(self.name, CONFIG.json_configs_dir)
+        json_as_dict = json_helpers.load_json_as_dict(self.name, CONFIG.path_to_json_configs_dir)
         return json_as_dict
     
 
     def save_dict_as_json(self, input_dict: dict, doublecheck_overwrite = True) -> None:
-        json_helpers.save_dict_as_json(input_dict, self.name, CONFIG.json_configs_dir, doublecheck_overwrite=doublecheck_overwrite)
+        json_helpers.save_dict_as_json(input_dict, self.name, CONFIG.path_to_json_configs_dir, doublecheck_overwrite=doublecheck_overwrite)
 
 
     def absolute_path(self) -> str:
-        return os.path.join(CONFIG.json_configs_dir, f"{self.name}.json")
+        return os.path.join(CONFIG.path_to_json_configs_dir, f"{self.name}.json")
     
 
     def update_key_value(self, key: Any, value: Any, doublecheck_overwrite = False) -> None:
@@ -47,7 +47,7 @@ class JsonConfigHandler:
             dict_helpers.update_key_value(json_config_dict, key, value)
             self.save_dict_as_json(json_config_dict, doublecheck_overwrite=doublecheck_overwrite)
         except (IOError, PermissionError) as e:
-            raise RuntimeError(f"Failed to update {self.name} at '{CONFIG.json_configs_dir}': {e}") from e
+            raise RuntimeError(f"Failed to update {self.name} at '{CONFIG.path_to_json_configs_dir}': {e}") from e
 
 
     def delete_self(self) -> None:

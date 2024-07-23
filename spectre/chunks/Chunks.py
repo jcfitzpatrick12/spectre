@@ -24,10 +24,10 @@ class Chunks:
         
         # if a specific date is specified via kwargs, set the attribute
         # for chunks dir with the date dir appended.
-        self.chunks_dir = CONFIG.chunks_dir
+        self.chunks_dir = CONFIG.path_to_chunks_dir
         if (not year is None) or (not month is None) or (not day is None):
             # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, 
+            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
                                                                year=year, 
                                                                month=month, 
                                                                day=day)

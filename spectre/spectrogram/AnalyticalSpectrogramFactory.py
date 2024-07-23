@@ -11,12 +11,12 @@ class AnalyticalSpectrogramFactory:
         self.builder_methods = {
             "cosine-signal-test-1": self.cosine_signal_test_1
         }
-        self.known_cases = list(self.builder_methods.keys())
+        self.test_modes = list(self.builder_methods.keys())
 
     def get_spectrogram(self, test_mode: str, shape: tuple, capture_config: dict) -> Spectrogram:
         builder_method = self.builder_methods.get(test_mode)
         if builder_method is None:
-            raise ValueError(f"Invalid analytical case. Expected one of {self.known_cases}, but received {analytical_case}.")
+            raise ValueError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}.")
         S = builder_method(shape, capture_config)
         return S
     
