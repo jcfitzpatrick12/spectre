@@ -9,7 +9,7 @@ from spectre.chunks.ExtChunk import ExtChunk
 
 class BinChunk(ExtChunk):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, ".bin")
+        super().__init__(chunk_start_time, tag, "bin")
 
     def read(self) -> np.ndarray:
         try:

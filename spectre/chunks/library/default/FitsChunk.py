@@ -8,7 +8,7 @@ from spectre.utils import datetime_helpers
 
 class FitsChunk(ExtChunk):
     def __init__(self, chunk_start_time, tag: str):
-        super().__init__(chunk_start_time, tag, ".fits")
+        super().__init__(chunk_start_time, tag, "fits")
 
     def read(self) -> Spectrogram:
         try:

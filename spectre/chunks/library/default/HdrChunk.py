@@ -9,7 +9,7 @@ from spectre.chunks.ExtChunk import ExtChunk
 
 class HdrChunk(ExtChunk):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, ".hdr")
+        super().__init__(chunk_start_time, tag, "hdr")
 
 
     def read(self) -> int:
