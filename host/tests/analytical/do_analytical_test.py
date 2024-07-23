@@ -80,14 +80,15 @@ def main(test_tag: str, show_slice_status = False) -> None:
 
     today = datetime.now()
     my_chunks = Chunks(test_tag, year=today.year, month=today.month, day=today.day)
-    chunkf = None
+    current_chunk = None
     for chunk_start_time, chunk in my_chunks.dict.items():
-        if chunk.fits.exists():
+        current_chunk = chunk
+        if current_chunk.fits.exists():
             S = chunk.fits.read()  
             analytical_S = asf.get_spectrogram(test_mode, S.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
-    if chunkf is None:
+    if current_chunk is None:
         raise ValueError(f"No .fits files found with the tag \"{test_tag}\" in {my_chunks.chunks_dir}.")
 
     return
