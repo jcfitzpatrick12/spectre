@@ -51,7 +51,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     fits_config_handler.delete_self()
 
     typer.secho(
-            f'File deleted: {fits_config_handler.absolute_path()}.',
+            f'File deleted: {fits_config_handler.get_path()}.',
             fg=typer.colors.YELLOW,
         )
     raise typer.Exit()
@@ -65,7 +65,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     capture_config_handler.delete_self()
 
     typer.secho(
-            f'File deleted: {capture_config_handler.absolute_path()}.',
+            f'File deleted: {capture_config_handler.get_path()}.',
             fg=typer.colors.YELLOW,
         )
     raise typer.Exit()

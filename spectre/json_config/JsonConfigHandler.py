@@ -37,7 +37,7 @@ class JsonConfigHandler:
         json_helpers.save_dict_as_json(input_dict, self.name, CONFIG.path_to_json_configs_dir, doublecheck_overwrite=doublecheck_overwrite)
 
 
-    def absolute_path(self) -> str:
+    def get_path(self) -> str:
         return os.path.join(CONFIG.path_to_json_configs_dir, f"{self.name}.json")
     
 
@@ -51,9 +51,9 @@ class JsonConfigHandler:
 
 
     def delete_self(self) -> None:
-        if not os.path.exists(self.absolute_path()):
-            raise FileNotFoundError(f'Could not delete {self.name}.json: {self.absolute_path()} does not exist.')
+        if not os.path.exists(self.get_path()):
+            raise FileNotFoundError(f'Could not delete {self.name}.json: {self.get_path()} does not exist.')
         else:
-            file_helpers.doublecheck_delete(self.absolute_path())
-            os.remove(self.absolute_path())
+            file_helpers.doublecheck_delete(self.get_path())
+            os.remove(self.get_path())
             
