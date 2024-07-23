@@ -15,7 +15,7 @@ class ExtChunk(ABC, BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str, ext: str):
         super().__init__(chunk_start_time, tag)
         self.ext = ext
-        self.file = f"{self.chunk_start_time}_{tag}.{self.ext}"
+        self.file_name = f"{self.chunk_start_time}_{tag}.{self.ext}"
 
 
     @abstractmethod
@@ -24,7 +24,7 @@ class ExtChunk(ABC, BaseChunk):
 
 
     def get_path(self) -> str:
-        return os.path.join(self.parent_path, self.file)
+        return os.path.join(self.parent_path, self.file_name)
     
 
     def exists(self) -> bool:
