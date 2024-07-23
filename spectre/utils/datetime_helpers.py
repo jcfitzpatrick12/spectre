@@ -45,7 +45,7 @@ def append_date_dir(base_dir_path: str, year=None, month=None, day=None):
     return get_date_dir(dt, base_dir_path = base_dir_path)
 
 
-# based on an input chunk_start_time, returns the 
+# based on an input chunk_start_time, returns the parent path for that chunk
 def get_chunk_parent_path(chunk_start_time: str) -> str:
     # Parse the datetime string to a datetime object
     try:
