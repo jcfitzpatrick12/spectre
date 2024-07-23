@@ -25,13 +25,13 @@ class HdrChunk(ExtChunk):
 
 
     def _read_file_contents(self) -> np.ndarray:
-        """Reads the contents of the .hdr file into a NumPy array."""
+        # Reads the contents of the .hdr file into a numpy array
         with open(self.get_path(), "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
 
 
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
-        """Extracts and returns the millisecond correction from the file contents."""
+        # Extracts and returns the millisecond correction from the file contents
         millisecond_correction_as_float = hdr_contents[0]
         if millisecond_correction_as_float.is_integer():
             return int(millisecond_correction_as_float)
@@ -39,12 +39,12 @@ class HdrChunk(ExtChunk):
 
 
     def _get_center_frequencies(self, hdr_contents: np.ndarray) -> np.ndarray:
-        """Extracts center frequencies from the file contents."""
+        # Extracts center frequencies from the file contents
         return hdr_contents[1::2]
 
 
     def _get_num_samples(self, hdr_contents: np.ndarray) -> np.ndarray:
-        """Extracts the number of samples per frequency from the file contents."""
+        # Extracts the number of samples per frequency from the file contents
         num_samples_as_float = hdr_contents[2::2]
         if not all(num_samples_as_float == num_samples_as_float.astype(int)):
             raise ValueError("Number of samples per frequency is expected to describe an integer.")
