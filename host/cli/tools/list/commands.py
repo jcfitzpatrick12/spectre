@@ -99,14 +99,13 @@ def tags(
     day: int = typer.Option(None, "--day", "-d", help=""),
     
 ) -> None:
-    chunks_dir = CONFIG.path_to_chunks_dir
     if (not year is None) or (not month is None) or (not day is None):
         # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        chunks_dir = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
+        chunks_dir_for_date = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
                                                         year=year, 
                                                         month=month, 
                                                         day=day)
-    all_files = dir_helpers.list_all_files(chunks_dir)
+    all_files = dir_helpers.list_all_files(chunks_dir_for_date)
     
     if tag_type not in [None, "native", "callisto"]:
         raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")

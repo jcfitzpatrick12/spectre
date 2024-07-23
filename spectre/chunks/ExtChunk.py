@@ -24,7 +24,7 @@ class ExtChunk(ABC, BaseChunk):
 
 
     def get_path(self) -> str:
-        return os.path.join(self.chunk_dir, f"{self.chunk_start_time}_{self.tag}{self.ext}")
+        return os.path.join(self.parent_path, f"{self.chunk_start_time}_{self.tag}{self.ext}")
     
 
     def exists(self) -> bool:

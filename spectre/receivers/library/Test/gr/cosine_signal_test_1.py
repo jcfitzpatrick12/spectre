@@ -43,7 +43,7 @@ class cosine_signal_test_1(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.chunks_dir, tag, chunk_size, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate)
         self.blocks_throttle_0_1 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
         self.blocks_null_source_1 = blocks.null_source(gr.sizeof_float*1)
