@@ -4,50 +4,41 @@
 
 import json
 import os
+from pathlib import Path
 
 from spectre.utils import file_helpers
 
 
-def save_dict_as_json(data_dict: dict, name: str, dir_path: str, doublecheck_overwrite=True) -> None:
-    """
-    """
-    if not os.path.exists(dir_path):
-        os.mkdir(dir_path)
-        # raise NotADirectoryError(f"The directory '{dir_path}' does not exist.")
+def save_dict_as_json(d: dict, file_path: str, doublecheck_overwrite=True) -> None:
+    parent_path = Path(file_path).parent
+    if not os.path.exists(parent_path):
+        os.mkdir(parent_path)
 
-    fpath = os.path.join(dir_path, f"{name}.json")
-
-    if os.path.exists(fpath) and doublecheck_overwrite:
-        file_helpers.doublecheck_overwrite_at_path(fpath)
+    if os.path.exists(file_path) and doublecheck_overwrite:
+        file_helpers.doublecheck_overwrite_at_path(file_path)
         
     try:
-        with open(fpath, 'w') as json_file:
-            json.dump(data_dict, json_file, indent=4)
-        # print(f"File '{fpath}' has been saved successfully.")
+        with open(file_path, 'w') as file:
+            json.dump(d, file, indent=4)
+
     except (IOError, PermissionError) as e:
-        raise RuntimeError(f"Failed to save '{fpath}': {e}") from e
+        raise RuntimeError(f"Failed to save '{file_path}': {e}") from e
 
 
+def load_json_as_dict(file_path: str) -> dict:
 
-
-def load_json_as_dict(name: str, dir_path: str) -> dict:
-    """
-
-    """
-    if not os.path.exists(dir_path):
-        # change this to a IsNotDirectory error
-        raise NotADirectoryError(f"The directory {dir_path} does not exist.")
-    
-    fpath = os.path.join(dir_path, f"{name}.json")
+    parent_path = Path(file_path).parent
+    if not os.path.exists(parent_path):
+        os.mkdir(parent_path)
 
     try:
-        with open(fpath, 'r') as json_file:
+        with open(file_path, 'r') as json_file:
             return json.load(json_file)
     
     except FileNotFoundError:
-        raise FileNotFoundError(f"File does not exist: {fpath}")
+        raise FileNotFoundError(f"File does not exist: {file_path}")
     except IOError as e:
-        raise IOError(f"Error reading file: {fpath}") from e
+        raise IOError(f"Error reading file: {file_path}") from e
  
     
         
