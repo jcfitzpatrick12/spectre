@@ -12,7 +12,7 @@ class JsonConfigHandler:
     def __init__(self, config_type: str, tag: str):
         self.set_tag(tag)
         self.config_type = config_type
-        self.file = f"{config_type}_config_{tag}.json"
+        self.file_name = f"{config_type}_config_{tag}.json"
         self.parent_path = CONFIG.path_to_json_configs_dir
     
 
@@ -31,7 +31,7 @@ class JsonConfigHandler:
     
     
     def get_path(self) -> str:
-        return os.path.join(self.parent_path, self.file)
+        return os.path.join(self.parent_path, self.file_name)
     
 
     def load_as_dict(self) -> dict:
