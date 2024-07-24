@@ -18,9 +18,9 @@ from cfg import CONFIG
 class Chunks:
     def __init__(self, 
                  tag: str, 
-                 year: int =None, 
-                 month: int =None, 
-                 day: int =None):
+                 year: int = None, 
+                 month: int = None, 
+                 day: int = None):
         self.tag = tag
         
         # if a specific date is specified via kwargs, set the attribute
