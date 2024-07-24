@@ -63,7 +63,9 @@ def get_chunk_parent_path(chunk_start_time: str) -> str:
     return get_date_dir(dt, base_dir_path=CONFIG.path_to_chunks_dir)
 
 
-def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, microsecond_correction=0) -> list:
+def create_datetime_array(start_datetime: datetime, 
+                          time_seconds: np.ndarray, 
+                          microsecond_correction: int = 0) -> list:
     # Validate input types      
     if not isinstance(start_datetime, datetime):
         raise TypeError("start_datetime must be a datetime object")

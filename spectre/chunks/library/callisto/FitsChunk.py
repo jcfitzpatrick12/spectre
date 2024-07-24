@@ -81,7 +81,7 @@ class FitsChunk(ExtChunk):
             with fits.open(self.get_path(), mode='readonly') as hdulist:
                 bintable_data = hdulist[1].data
                 time_seconds = bintable_data['TIME'][0]
-                return datetime_helpers.build_datetime_array(self.chunk_start_datetime, time_seconds)
+                return datetime_helpers.create_datetime_array(self.chunk_start_datetime, time_seconds)
         except FileNotFoundError:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
         except Exception as e:
