@@ -132,3 +132,7 @@ def background_subtract(yvals: np.ndarray, background_indices: list | None):
         yvals -= np.nanmean(yvals[background_indices[0]:
                                   background_indices[1]])
     return yvals
+
+
+def check_strictly_increasing(ar: np.ndarray):
+    return np.all(np.diff(ar) > 0)
