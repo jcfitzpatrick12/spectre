@@ -46,8 +46,8 @@ class Chunk(SPECTREChunk):
                 freq_MHz, 
                 self.tag, 
                 chunk_start_time = self.chunk_start_time, 
-                units="amplitude",
-                microsecond_correction = microsecond_correction)
+                microsecond_correction = microsecond_correction,
+                spectrum_type="amplitude")
 
     
     def __fetch_window(self, capture_config: dict) -> np.ndarray:
