@@ -8,7 +8,7 @@ from math import floor
 
 from spectre.watchdog.BaseEventHandler import BaseEventHandler
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.spectrogram import factory
+from spectre.spectrogram import transform
 from spectre.watchdog.event_handler_register import register_event_handler
 
 @register_event_handler("default")
@@ -23,7 +23,7 @@ class EventHandler(BaseEventHandler):
         chunk = self.Chunk(chunk_start_time, self.tag)
         S = chunk.build_spectrogram()
         average_over_int = self.get_average_over_int(S)
-        S = factory.time_average(S, average_over_int)
+        S = transform.time_average(S, average_over_int)
         S.save_to_fits()
         print(f"Processing complete. Removing {file_path}.")
         os.remove(file_path)

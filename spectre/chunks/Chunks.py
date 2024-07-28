@@ -12,7 +12,7 @@ from spectre.chunks.factory import get_chunk_from_tag
 from spectre.chunks.BaseChunk import BaseChunk
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.spectrogram import factory
+from spectre.spectrogram import transform
 from cfg import CONFIG
 
 class Chunks:
@@ -120,12 +120,12 @@ class Chunks:
 
             if lower_bound < end_time and upper_bound > start_time:
                 spectrogram = chunk.fits.read()
-                chopped_spectrogram = factory.time_chop(spectrogram, start_time_str, end_time_str)
+                chopped_spectrogram = transform.time_chop(spectrogram, start_time_str, end_time_str)
                 if chopped_spectrogram is None:
                     raise ValueError("Error chopping spectrogram within the specified time range.")
                 spectrograms.append(chopped_spectrogram)
 
-        return factory.join_spectrograms(spectrograms)
+        return transform.join_spectrograms(spectrograms)
 
     
 
