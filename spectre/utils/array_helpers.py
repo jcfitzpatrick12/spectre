@@ -51,7 +51,7 @@ def compute_resolution(array: np.ndarray) -> float:
     
     # if the resolution is not constant across the array, 
     if not np.allclose(resolutions, resolutions[0]):
-        warnings.warn("Resolution is not consistent across all elements.", UserWarning)
+        warnings.warn("Resolution is not consistent across all elements. Returning the median difference.", UserWarning)
 
     return np.nanmedian(resolutions)
 
