@@ -61,7 +61,7 @@ def save_spectrogram(S, fits_config: dict, path_to_fits: str):
 
     primary_hdu.header.set('BZERO', 0, 'scaling offset')
     primary_hdu.header.set('BSCALE', 1, 'scaling factor')
-    primary_hdu.header.set('BUNIT', f"{S.units}", 'z-axis title') 
+    primary_hdu.header.set('BUNIT', f"{S.spectrum_type}", 'z-axis title') 
 
     primary_hdu.header.set('DATAMIN', np.nanmin(S.dynamic_spectra), 'minimum element in image')
     primary_hdu.header.set('DATAMAX', np.nanmax(S.dynamic_spectra), 'maximum element in image')

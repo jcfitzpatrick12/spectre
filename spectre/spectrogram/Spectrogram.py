@@ -40,6 +40,9 @@ class Spectrogram:
         self.spectrum_type = spectrum_type
         self.background_spectrum = background_spectrum
         self.background_interval = background_interval
+        # directly computed attributes
+        self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
+        self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
         # dependent attributes
         self.chunk_start_datetime = None # the datetime associated with the first spectrum (floored second precision)
         self.corrected_start_datetime = None # the datetime associated with the first spectrum (accounting for the optional microsecond correction)
@@ -68,11 +71,11 @@ class Spectrogram:
 
     def _update_background_spectrum(self) -> None:
         # if the user has explictly specified a background vector, return without action
-        if self.background_spectrum:
+        if not self.background_spectrum is None:
             return
         
         # otherwise, check if an interval was specified
-        elif self.background_interval:
+        elif not self.background_interval is None:
             # if the background interval is specified, we can set the background indices
             self._set_background_indices()
             # if it was, set the background spectrum based off the specified interval
@@ -174,13 +177,14 @@ class Spectrogram:
 
         if time_type == "time_seconds":
             times = self.time_seconds
+            ax.set_xlabel(f'Time [s]', size=15)
         # If the chunk start time is specified, plot with datetimes
         elif time_type == "datetimes":
             if self.chunk_start_time is None:
                 raise ValueError(f"Cannot plot with time type \"datetimes\" if chunk start time is not set.")
             times = self.datetimes
+            ax.set_xlabel(f'Time [UTC]', size=15)
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-            # ax.xaxis.set_major_locator(mdates.SecondLocator(interval=self.))
         else:
             raise ValueError(f"Unexpected time type. Expected \"time_seconds\" or \"datetimes\", but received {time_type}.")
 
@@ -227,8 +231,4 @@ class Spectrogram:
 
 
     # def compare_with(self, fig: Figure, callisto_S, **kwargs):
-    #     return
-
-
-    # def background_interval_to_indices(self, background_interval: list):
     #     return
