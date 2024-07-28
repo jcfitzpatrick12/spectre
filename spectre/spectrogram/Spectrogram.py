@@ -40,7 +40,7 @@ class Spectrogram:
         self.spectrum_type = spectrum_type
         self.background_spectrum = background_spectrum
         self.background_interval = background_interval
-        # directly computed attributes
+        # directly compute the array resolutions
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
         self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
         # dependent attributes
