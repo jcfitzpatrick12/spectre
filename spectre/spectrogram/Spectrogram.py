@@ -6,9 +6,10 @@ import numpy as np
 import os
 from datetime import datetime
 from typing import Tuple
-from matplotlib.figure import Figure
 import warnings
-from typing import Union
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.colors import LogNorm
 
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
@@ -22,8 +23,8 @@ class Spectrogram:
                  time_seconds: np.ndarray, # holds the time stamp [s] for each spectrum
                  freq_MHz: np.ndarray,  # physical frequencies [MHz] for each spectral component
                  tag: str,  # the tag associated with that spectrogram
-                 chunk_start_time: str = None, # (optional) the chunk start time assigned to the first spectrum in the spectrogram (floored second precision)
-                 microsecond_correction: int = 0, # (optional) a correction to the datetime 
+                 chunk_start_time: str = None, # (optional) the datetime (as a string) assigned to the first spectrum in the spectrogram (floored second precision)
+                 microsecond_correction: int = 0, # (optional) a correction to the chunk start time
                  spectrum_type: str = None, # (optional) string which denotes the type of the spectrogram
                  background_spectrum: np.ndarray = None, # (optional) reference background spectrum, used to compute dB above background
                  background_interval: list = None): # (optional) specify an interval over which to compute the background spectrum
@@ -40,7 +41,7 @@ class Spectrogram:
         self.background_spectrum = background_spectrum
         self.background_interval = background_interval
         # dependent attributes
-        self.chunk_start_datetime = None # the datetime associated with the first spectrum (second precision)
+        self.chunk_start_datetime = None # the datetime associated with the first spectrum (floored second precision)
         self.corrected_start_datetime = None # the datetime associated with the first spectrum (accounting for the optional microsecond correction)
         self.datetimes = None # an array with datetimes assigned to each spectrogram
         self.background_indices = None # background indices computed based on background interval
@@ -111,11 +112,11 @@ class Spectrogram:
                 start_background = datetime.strptime(start_background, CONFIG.default_time_format)
                 end_background = datetime.strptime(end_background, CONFIG.default_time_format)
             self.background_indices = [datetime_helpers.find_closest_index(start_background, self.datetimes, enforce_strict_bounds=True),
-                    datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds=True)]
+                                       datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds=True)]
 
         elif background_type in [int, float]:
             self.background_indices = [array_helpers.find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=True),
-                    array_helpers.find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=True)]
+                                       array_helpers.find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=True)]
 
         else:
             raise TypeError(f"Unrecognized background interval type! Received {background_type}.")
@@ -163,8 +164,47 @@ class Spectrogram:
         if normalise_integral_over_frequency:
             I = array_helpers.normalise_peak_intensity(I)
         return I
+    
 
-    # TO BE IMPLEMENTED #
+    def quick_plot(self,
+                   time_type: str = "time_seconds",
+                   log_norm: bool = False):
+        # create a figure
+        fig, ax = plt.subplots(1)
+
+        if time_type == "time_seconds":
+            times = self.time_seconds
+        # If the chunk start time is specified, plot with datetimes
+        elif time_type == "datetimes":
+            if self.chunk_start_time is None:
+                raise ValueError(f"Cannot plot with time type \"datetimes\" if chunk start time is not set.")
+            times = self.datetimes
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+            # ax.xaxis.set_major_locator(mdates.SecondLocator(interval=self.))
+        else:
+            raise ValueError(f"Unexpected time type. Expected \"time_seconds\" or \"datetimes\", but received {time_type}.")
+
+        if log_norm:
+            norm = LogNorm(vmin=np.min(self.dynamic_spectra[self.dynamic_spectra > 0]), vmax=np.max(self.dynamic_spectra))
+        else:
+            norm = None
+
+        # Assign the x and y labels with specified font size
+        ax.set_ylabel('Frequency [MHz]', size=15)
+        # Format the x and y tick labels with specified font size
+        ax.tick_params(axis='x', labelsize=15)
+        ax.tick_params(axis='y', labelsize=15)
+
+        pcolor_plot = ax.pcolormesh(times, 
+                                    self.freq_MHz, 
+                                    self.dynamic_spectra, 
+                                    norm=norm,
+                                    cmap="gnuplot2")
+
+        plt.show()
+        return
+
+    # TO BE IMPLEMENTED #import matplotlib.dates as mdates
     def slice_at_time(self, 
                       at_time: float|int|str|datetime,
                       normalise_slice: bool = False, 
