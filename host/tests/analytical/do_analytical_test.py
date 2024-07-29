@@ -27,8 +27,8 @@ def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
 
 
 def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_status = False) -> None:
-    if not S.shape == analytical_S.shape:
-        raise ValueError(f"Shape mismatch between synthesised spectra: {S.shape}, and analytical spectra: {analytical_S}.")
+    if not S.dynamic_spectra.shape == analytical_S.dynamic_spectra.shape:
+        raise ValueError(f"Shape mismatch between synthesised spectra: {S.dynamic_spectra.shape}, and analytical spectra: {analytical_S}.")
     
     is_close = np.isclose(
         S.dynamic_spectra,
@@ -82,7 +82,7 @@ def main(test_tag: str, show_slice_status = False) -> None:
         current_chunk = chunk
         if current_chunk.fits.exists():
             S = chunk.fits.read()  
-            analytical_S = asf.get_spectrogram(test_mode, S.shape, capture_config)
+            analytical_S = asf.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
     if current_chunk is None:
