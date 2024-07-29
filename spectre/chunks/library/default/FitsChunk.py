@@ -15,7 +15,7 @@ class FitsChunk(ExtChunk):
             with fits.open(self.get_path(), mode='readonly') as hdulist:
                 primary_hdu = self._get_primary_hdu(hdulist)
                 dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
-                units = self._get_units(primary_hdu)
+                spectrum_type = self._get_spectrum_type(primary_hdu)
                 microsecond_correction = self._get_microsecond_correction(primary_hdu)
                 
                 bintable_hdu = self._get_bintable_hdu(hdulist)
@@ -26,8 +26,8 @@ class FitsChunk(ExtChunk):
                                    freq_MHz, 
                                    self.tag, 
                                    chunk_start_time=self.chunk_start_time, 
-                                   units=units,
-                                   microsecond_correction=microsecond_correction)
+                                   microsecond_correction=microsecond_correction,
+                                   spectrum_type = spectrum_type)
         except FileNotFoundError:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
         except Exception as e:
@@ -41,7 +41,7 @@ class FitsChunk(ExtChunk):
         return primary_hdu.data
 
 
-    def _get_units(self, primary_hdu):
+    def _get_spectrum_type(self, primary_hdu):
         return primary_hdu.header.get('BUNIT', None)
 
 
