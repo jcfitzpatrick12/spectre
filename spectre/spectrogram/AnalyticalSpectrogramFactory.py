@@ -66,6 +66,6 @@ class AnalyticalSpectrogramFactory:
                                    time_seconds,
                                    freq_MHz,
                                    'analytically-derived-spectrogram',
-                                   units = "amplitude",)
+                                   spectrum_type = "amplitude",)
         
         return S
