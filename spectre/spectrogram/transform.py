@@ -20,6 +20,10 @@ def frequency_chop(input_S: Spectrogram,
     if is_entirely_below_frequency_range or is_entirely_above_frequency_range:
         return None
     
+    #find the index of the nearest matching frequency bins in the spectrogram
+    start_index = array_helpers.find_closest_index(start_freq_MHz, input_S.freq_MHz)
+    end_index = array_helpers.find_closest_index(end_freq_MHz, input_S.freq_MHz)
+    
     # enforce distinct start and end indices
     if start_index == end_index:
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")  
@@ -27,10 +31,6 @@ def frequency_chop(input_S: Spectrogram,
     # if start index is more than end index, swap the ordering so to enforce start_index <= end_index
     if start_index > end_index:
         start_index, end_index = end_index, start_index
-    
-    #find the index of the nearest matching frequency bins in the spectrogram
-    start_index = array_helpers.find_closest_index(start_freq_MHz,S.freq_MHz)
-    end_index = array_helpers.find_closest_index(end_freq_MHz,S.freq_MHz)
     
     # chop the spectrogram accordingly
     transformed_dynamic_spectra = input_S.dynamic_spectra[start_index:end_index+1, :]
@@ -75,14 +75,14 @@ def time_chop(input_S: Spectrogram,
     if is_entirely_below_time_range or is_entirely_above_time_range:
         return None
     
+    start_index = datetime_helpers.find_closest_index(start_datetime, input_S.datetimes)
+    end_index = datetime_helpers.find_closest_index(end_datetime, input_S.datetimes)
+    
     if start_index == end_index:
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
     
     if start_index > end_index:
         start_index, end_index = end_index, start_index
-    
-    start_index = datetime_helpers.find_closest_index(start_datetime, input_S.datetimes)
-    end_index = datetime_helpers.find_closest_index(end_datetime, input_S.datetimes)
 
     # chop the spectrogram 
     transformed_dynamic_spectra = input_S.dynamic_spectra[:, start_index:end_index+1]
