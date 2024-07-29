@@ -29,67 +29,86 @@ class Spectrogram:
                  background_spectrum: np.ndarray = None, # (optional) reference background spectrum, used to compute dB above background
                  background_interval: list = None): # (optional) specify an interval over which to compute the background spectrum
 
-        # mandatory attributes
+        # set the mandatory attributes
         self.dynamic_spectra = dynamic_spectra
         self.time_seconds = time_seconds
         self.freq_MHz = freq_MHz
         self.tag = tag
-        # optional attributes
-        self.chunk_start_time = chunk_start_time
-        self.microsecond_correction = microsecond_correction
-        self.spectrum_type = spectrum_type
-        self.background_spectrum = background_spectrum
-        self.background_interval = background_interval
+        # set all dependent attributes initially to None to ensure a defined state for the class
+        self.time_res_seconds = None
+        self.freq_res_MHz = None
+        self.spectrum_type = None
+        self.chunk_start_time = None
+        self.microsecond_correction = None
+        self.chunk_start_datetime = None
+        self.datetimes = None
+        self.corrected_start_datetime = None
+        self.background_spectrum = None
+        self.background_interval = None
+        self.background_indices = None
+        self.dynamic_spectra_as_dBb = None
+
         # directly compute the array resolutions
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
         self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
-        # dependent attributes
-        self.chunk_start_datetime = None # the datetime associated with the first spectrum (floored second precision)
-        self.corrected_start_datetime = None # the datetime associated with the first spectrum (accounting for the optional microsecond correction)
-        self.datetimes = None # an array with datetimes assigned to each spectrogram
-        self.background_indices = None # background indices computed based on background interval
-        self.dynamic_spectra_as_dBb = None # dynamic spectra in units of dB above the background (dBb)
 
-        # if the user has specified the chunk start time, assign datetimes to each spectrum
+        # set the spectrum type based on constructor inputs
+        self.spectrum_type = spectrum_type
+
+        # if the user has passed in a chunk start time via kwargs, assign datetimes to each spectrum
         if chunk_start_time:
-            self._update_datetimes()
+            self.assign_datetimes(chunk_start_time,
+                                  microsecond_correction)
         
-        # with the datetimes specified if required, we can now update the background spectrum based on constructor inputs
-        self._update_background_spectrum()
-        # with the background spectrum computed, we can now compute the dynamic spectra in units of dBb
-        self._update_dynamic_spectra_as_dBb()
+        # with the datetimes specified (if required), we can now update the background spectrum based on constructor inputs
+        self.assign_background(background_spectrum = background_spectrum,
+                               background_interval = background_interval)
         return
     
-    def _update_datetimes(self) -> None:
+
+    def assign_datetimes(self, 
+                         chunk_start_time: str,
+                         microsecond_correction: float = 0) -> None:
+        self.chunk_start_time = chunk_start_time
+        self.microsecond_correction = microsecond_correction
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
         self.datetimes = datetime_helpers.create_datetime_array(self.chunk_start_datetime, 
                                                                 self.time_seconds,
-                                                                microsecond_correction = self.microsecond_correction)
+                                                                microsecond_correction = microsecond_correction)
         self.corrected_start_datetime = self.datetimes[0]
         return
 
 
-    def _update_background_spectrum(self) -> None:
-        # if the user has explictly specified a background vector, return without action
-        if not self.background_spectrum is None:
-            return
+    def assign_background(self,
+                          background_spectrum: np.ndarray = None,
+                          background_interval: list = None) -> None:
         
-        # otherwise, check if an interval was specified
-        elif not self.background_interval is None:
+        # first check if the background spectrum has been specified explictly
+        if not (background_spectrum is None):
+            # if it has, but the interval was also specified, raise an error (as we cannot use both)
+            if background_interval:
+                raise ValueError(f"Cannot specify both background spectrum and background interval!")
+            # otherwise, set the background spectrum and proceed
+            self.background_spectrum = background_spectrum
+
+        # if the background spectrum was not set explictly, check instead for the background interval
+        elif not (background_interval is None):
             # if the background interval is specified, we can set the background indices
             self._set_background_indices()
-            # if it was, set the background spectrum based off the specified interval
+            # then set the background spectrum based off the specified interval
             self._set_background_spectrum_from_interval()
 
         # if neither has been specified, compute the default by averaging over the entire spectrogram
         else:
             self._set_background_spectrum_as_default()
+        
+        # with the background spectrum in a defined state, update the dynamic spectra as dBb
+        self._update_dynamic_spectra_as_dBb()
         return
     
 
     def _set_background_spectrum_from_interval(self) -> None:
-        background_indices = self._get_background_indices()
-        start_index, end_index = background_indices
+        start_index, end_index = self.background_indices
         self.background_spectrum = np.nanmean(self.dynamic_spectra[:, start_index:end_index+1], axis=-1)
         return
     
