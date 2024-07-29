@@ -25,8 +25,9 @@ class EventHandler(BaseEventHandler):
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
         S.save_to_fits()
-        print(f"Processing complete. Removing {file_path}.")
-        os.remove(file_path)
+        print(f"Processing complete. Removing binary and header chunks with chunk start time: {chunk_start_time}.")
+        chunk.bin.delete()
+        chunk.hdr.delete()
 
 
     def get_average_over_int(self, S: Spectrogram) -> int:
