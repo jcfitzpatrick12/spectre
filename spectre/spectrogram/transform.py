@@ -4,7 +4,6 @@
 
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Any
 
 from spectre.utils import array_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
