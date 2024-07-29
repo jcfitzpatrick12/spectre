@@ -101,16 +101,14 @@ def find_closest_index(val: datetime, ar: np.ndarray, enforce_strict_bounds=Fals
         raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
 
     if val > np.nanmax(ar):
-        error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
         else:
             pass
             # warnings.warn(error_message)
     if val < np.nanmin(ar):
-        error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
         else:
             pass
             # warnings.warn(error_message)
