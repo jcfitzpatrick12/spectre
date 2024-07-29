@@ -93,6 +93,7 @@ class Spectrogram:
 
         # if the background spectrum was not set explictly, check instead for the background interval
         elif not (background_interval is None):
+            self.background_interval = background_interval
             # if the background interval is specified, we can set the background indices
             self._set_background_indices()
             # then set the background spectrum based off the specified interval
@@ -133,12 +134,12 @@ class Spectrogram:
             if background_type is str:
                 start_background = datetime.strptime(start_background, CONFIG.default_time_format)
                 end_background = datetime.strptime(end_background, CONFIG.default_time_format)
-            self.background_indices = [datetime_helpers.find_closest_index(start_background, self.datetimes, enforce_strict_bounds=True),
-                                       datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds=True)]
+            self.background_indices = [datetime_helpers.find_closest_index(start_background, self.datetimes, enforce_strict_bounds=False),
+                                       datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds=False)]
 
         elif background_type in [int, float]:
-            self.background_indices = [array_helpers.find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=True),
-                                       array_helpers.find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=True)]
+            self.background_indices = [array_helpers.find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=False),
+                                       array_helpers.find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=False)]
 
         else:
             raise TypeError(f"Unrecognized background interval type! Received {background_type}.")
