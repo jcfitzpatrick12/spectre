@@ -52,7 +52,7 @@ class Spectrogram:
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
         self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
 
-        # set the spectrum type based on constructor inputs
+        # set the spectrum type based on constructor input
         self.spectrum_type = spectrum_type
 
         # if the user has passed in a chunk start time via kwargs, assign datetimes to each spectrum
@@ -89,7 +89,7 @@ class Spectrogram:
         if not (background_spectrum is None):
             # if it has, but the interval was also specified, raise an error (as we cannot use both)
             if background_interval:
-                raise ValueError(f"Cannot specify both background spectrum and background interval!")
+                raise ValueError(f"Cannot specify both background spectrum and background interval! Background must be assigned either explictly or via the interval.")
             # otherwise, set the background spectrum and proceed
             self.background_spectrum = background_spectrum
 
@@ -150,7 +150,7 @@ class Spectrogram:
         return
 
     def _update_dynamic_spectra_as_dBb(self) -> None:
-        # for ease of computation, create an array (bsa) of the same shape as the input dynamic spectra
+        # for ease of computation, create a background spectrum array (bsa) of the same shape as the input dynamic spectra
         # except each spectrum is identically the background spectrum
         bsa = np.outer(self.background_spectrum, np.ones(self.dynamic_spectra.shape[1])) 
         # depending on the spectrum type, we compute the dBb values differently:
@@ -202,14 +202,14 @@ class Spectrogram:
 
     def integrate_over_frequency(self, 
                                  background_subtract: bool = False, 
-                                 normalise_integral_over_frequency: bool = False):
+                                 peak_normalise: bool = False):
             
         freq_Hz = self.freq_MHz * 1e-6  # Convert MHz to Hz
         I = np.nansum(self.dynamic_spectra * freq_Hz[:, np.newaxis], axis=0) # integrate over frequency
 
         if background_subtract:
             I = array_helpers.background_subtract(I, self.background_indices)
-        if normalise_integral_over_frequency:
+        if peak_normalise:
             I = array_helpers.normalise_peak_intensity(I)
         return I
     
@@ -257,7 +257,7 @@ class Spectrogram:
     def slice_at_time(self, 
                       at_time: float|int|str|datetime,
                       slice_type: str = "raw",
-                      normalise_slice: bool = False) -> Tuple[datetime|float, np.array, np.array]:
+                      peak_normalise: bool = False) -> Tuple[datetime|float, np.array, np.array]:
         
         # it is important to note that the "at time" specified by the user likely does not correspond
         # exactly to one of the times assigned to each spectrogram. So, we compute the nearest achievable,
@@ -289,7 +289,7 @@ class Spectrogram:
         
         frequency_slice = ds[:, index_of_slice].copy() # make a copy so to preserve the spectrum on transformations of the slice
 
-        if normalise_slice and time_of_slice != "dBb":
+        if peak_normalise and time_of_slice != "dBb":
             frequency_slice = array_helpers.normalise_peak_intensity(frequency_slice)
         
         return (time_of_slice, self.freq_MHz, frequency_slice)
@@ -299,7 +299,7 @@ class Spectrogram:
     def slice_at_frequency(self,
                            at_frequency: float,
                            slice_type="raw",
-                           normalise_slice = False,
+                           peak_normalise = False,
                            background_subtract = False,
                            return_time_type: str = "datetimes") -> Tuple[float, np.array, np.array]:
         
@@ -333,7 +333,7 @@ class Spectrogram:
         if background_subtract and self.slice_type != "dBb":
             time_slice = array_helpers.background_subtract(slice, self.background_indices)
             
-        if normalise_slice and self.slice_type != "dBb":
+        if peak_normalise and self.slice_type != "dBb":
             time_slice = array_helpers.normalise_peak_intensity(slice)
 
         return (frequency_of_slice, times, time_slice)
