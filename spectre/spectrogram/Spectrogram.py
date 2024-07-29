@@ -63,6 +63,8 @@ class Spectrogram:
         # with the datetimes specified (if required), we can now update the background spectrum based on constructor inputs
         self.assign_background(background_spectrum = background_spectrum,
                                background_interval = background_interval)
+        
+        self._check_shapes()
         return
     
 
@@ -102,7 +104,8 @@ class Spectrogram:
         # if neither has been specified, compute the default by averaging over the entire spectrogram
         else:
             self._set_background_spectrum_as_default()
-        
+            
+        self._check_shapes()   
         # with the background spectrum in a defined state, update the dynamic spectra as dBb
         self._update_dynamic_spectra_as_dBb()
         return
@@ -159,6 +162,28 @@ class Spectrogram:
             raise ValueError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
         
         self.dynamic_spectra_as_dBb = dynamic_spectra_as_dBb
+        return
+    
+
+    def _check_shapes(self) -> None:
+        num_spectrogram_dims = np.ndim(self.dynamic_spectra)
+        # Check if 'dynamic_spectra' is a 2D array
+        if num_spectrogram_dims != 2:
+            raise ValueError(f"Expected 'dynamic_spectra' to be a 2D array, but got {num_spectrogram_dims}D array.")
+
+        dynamic_spectra_shape = self.dynamic_spectra.shape
+        num_freq_bins = len(self.freq_MHz)
+        num_time_bins = len(self.time_seconds)
+        # Check if the dimensions of 'dynamic_spectra' are consistent with 'time_seconds' and 'freq_MHz'
+        if dynamic_spectra_shape[0] != num_freq_bins:
+            raise ValueError(f"Mismatch in number of columns: Expected {num_freq_bins}, but got {dynamic_spectra_shape[0]}.")
+        
+        if dynamic_spectra_shape[1] != num_time_bins:
+            raise ValueError(f"Mismatch in number of rows: Expected {num_time_bins}, but got {dynamic_spectra_shape[1]}.")
+        
+        num_freq_bins_in_background_spectrum = len(self.background_spectrum)
+        if dynamic_spectra_shape[0] != num_freq_bins_in_background_spectrum:
+            raise ValueError(f"Shape of background spectrum must be consistent with dynamic spectra. Expected {dynamic_spectra_shape[0]} frequency bins, got {num_freq_bins_in_background_spectrum}")
         return
 
 
@@ -228,21 +253,90 @@ class Spectrogram:
         plt.show()
         return
 
-    # TO BE IMPLEMENTED #import matplotlib.dates as mdates
+
     def slice_at_time(self, 
                       at_time: float|int|str|datetime,
-                      normalise_slice: bool = False, 
-                      slice_type: str = "raw") -> Tuple[datetime|float, np.array, np.array]:
-        return
+                      slice_type: str = "raw",
+                      normalise_slice: bool = False) -> Tuple[datetime|float, np.array, np.array]:
+        
+        # it is important to note that the "at time" specified by the user likely does not correspond
+        # exactly to one of the times assigned to each spectrogram. So, we compute the nearest achievable,
+        # and return it from the function as output too.
+
+        # if at_time is passed in as a string, try and parse as a datetime then proceed
+        if isinstance(at_time, str):
+            at_time = datetime.strptime(at_time, CONFIG.default_time_format)
+
+        if isinstance(at_time, datetime):
+            if self.chunk_start_time is None:
+                raise ValueError(f"With at_time specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}.")
+            index_of_slice = datetime_helpers.find_closest_index(at_time, self.datetimes, enforce_strict_bounds = False)
+            time_of_slice = self.datetimes[index_of_slice]  
+        elif isinstance(at_time, float) or isinstance(at_time, int):
+            index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
+            time_of_slice = self.time_seconds[index_of_slice]       
+        else:
+            raise TypeError(f"Unexpected time type. Received {type(at_time)} expected one of str, datetime, float or int.")
+
+        # dependent on the requested slice type, we return the dynamic spectra in the preferred units
+        if slice_type == "raw":
+            ds = self.dynamic_spectra
+        
+        elif slice_type == "dBb":
+            ds = self.dynamic_spectra_as_dBb
+        else:
+            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\".")
+        
+        frequency_slice = ds[:, index_of_slice].copy() # make a copy so to preserve the spectrum on transformations of the slice
+
+        if normalise_slice and time_of_slice != "dBb":
+            frequency_slice = array_helpers.normalise_peak_intensity(frequency_slice)
+        
+        return (time_of_slice, self.freq_MHz, frequency_slice)
+
         
     # TO BE IMPLEMENTED # 
     def slice_at_frequency(self,
                            at_frequency: float,
-                           normalise_slice = False,
                            slice_type="raw",
+                           normalise_slice = False,
                            background_subtract = False,
                            return_time_type: str = "datetimes") -> Tuple[float, np.array, np.array]:
-        return
+        
+        # it is important to note that the "at frequency" specified by the user likely does not correspond
+        # exactly to one of the physical frequencies assigned to each spectral component. So, we compute the nearest achievable,
+        # and return it from the function as output too.
+        index_of_slice = array_helpers.find_closest_index(at_frequency, self.freq_MHz, enforce_strict_bounds = False)
+        frequency_of_slice = self.freq_MHz[index_of_slice]
+
+        if return_time_type == "datetimes":
+            if self.chunk_start_time is None:
+                raise ValueError(f"With return_time_type specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}")
+            times = self.datetimes
+        elif return_time_type == "time_seconds":
+            times = self.time_seconds
+        else:
+            raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"time_seconds\".")
+
+
+        # dependent on the requested slice type, we return the dynamic spectra in the preferred units
+        if slice_type == "raw":
+            ds = self.dynamic_spectra
+        
+        elif slice_type == "dBb":
+            ds = self.dynamic_spectra_as_dBb
+        else:
+            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\".")
+        
+        time_slice = ds[index_of_slice,:].copy() # make a copy so to preserve the spectrum on transformations of the slice
+
+        if background_subtract and self.slice_type != "dBb":
+            time_slice = array_helpers.background_subtract(slice, self.background_indices)
+            
+        if normalise_slice and self.slice_type != "dBb":
+            time_slice = array_helpers.normalise_peak_intensity(slice)
+
+        return (frequency_of_slice, times, time_slice)
 
     
     # TO BE REVISED # 
