@@ -88,7 +88,7 @@ class Spectrogram:
         # first check if the background spectrum has been specified explictly
         if not (background_spectrum is None):
             # if it has, but the interval was also specified, raise an error (as we cannot use both)
-            if background_interval:
+            if not (background_interval is None):
                 raise ValueError(f"Cannot specify both background spectrum and background interval! Background must be assigned either explictly or via the interval.")
             # otherwise, set the background spectrum and proceed
             self.background_spectrum = background_spectrum
