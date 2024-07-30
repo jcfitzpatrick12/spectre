@@ -181,6 +181,7 @@ class Spectrogram:
         if dynamic_spectra_shape[1] != num_time_bins:
             raise ValueError(f"Mismatch in number of rows: Expected {num_time_bins}, but got {dynamic_spectra_shape[1]}.")
         
+        # Check if the shape of the background spectrum is consistent with the shape of dynamic spectrum
         num_freq_bins_in_background_spectrum = len(self.background_spectrum)
         if dynamic_spectra_shape[0] != num_freq_bins_in_background_spectrum:
             raise ValueError(f"Shape of background spectrum must be consistent with dynamic spectra. Expected {dynamic_spectra_shape[0]} frequency bins, got {num_freq_bins_in_background_spectrum}")
