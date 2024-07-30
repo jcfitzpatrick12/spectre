@@ -37,7 +37,7 @@ def frequency_chop(input_S: Spectrogram,
     transformed_freq_MHz = input_S.freq_MHz[start_index:end_index+1]
 
     # if the background spectrum is specified, chop identically in frequency
-    if input_S.background_spectrum:
+    if not (input_S.background_spectrum is None):
         transformed_background_spectrum = input_S.background_spectrum[start_index:end_index+1]
     
     # return the spectrogram instance
