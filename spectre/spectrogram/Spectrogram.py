@@ -295,7 +295,6 @@ class Spectrogram:
         return (time_of_slice, self.freq_MHz, frequency_slice)
 
         
-    # TO BE IMPLEMENTED # 
     def slice_at_frequency(self,
                            at_frequency: float,
                            slice_type="raw",
