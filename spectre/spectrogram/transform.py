@@ -177,7 +177,7 @@ def frequency_average(input_S: Spectrogram,
                        microsecond_correction = input_S.microsecond_correction,
                        spectrum_type = input_S.spectrum_type,
                        background_spectrum = transformed_background_spectrum, 
-                       background_interval = input_S.background_spectrum
+                       background_interval = input_S.background_interval
                        )
 
 
