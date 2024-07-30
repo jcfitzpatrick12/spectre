@@ -47,8 +47,8 @@ def derive_fits_chunk_path(gz_path: str):
     station, date, time, instrument_code = get_chunk_components(gz_path)
     fits_chunk_name = get_chunk_name(station, date, time, instrument_code)
     chunk_start_time = fits_chunk_name.split('_')[0]
-    chunks_dir = datetime_helpers.build_chunks_dir(chunk_start_time)
-    return os.path.join(chunks_dir, fits_chunk_name)
+    chunk_parent_path = datetime_helpers.get_chunk_parent_path(chunk_start_time)
+    return os.path.join(chunk_parent_path, fits_chunk_name)
 
 
 def unzip_to_chunks_dir(gz_path: str):

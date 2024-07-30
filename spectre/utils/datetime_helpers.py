@@ -8,56 +8,64 @@ import numpy as np
 import warnings
 
 from cfg import CONFIG
-
-
-def date_dir(dt: datetime, base_dir = None) -> str:
-    # Format the datetime object to the desired string format
-    year, month, day = dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d")
-    date_dir = os.path.join(year, month, day)
-    # Format the datetime object to the desired string format
-    if base_dir:
-        return os.path.join(base_dir, date_dir)
-    else:
-        return date_dir
     
-    
-def append_date_dir(parent_dir: str, year=None, month=None, day=None):
-    # if the year, year month, or year month and day is specified, build the
 
+# Given a parent directory, appends the year, month, and day as a date directory
+def append_date_dir(base_dir_path: str, 
+                    year: int = None, 
+                    month: int = None,
+                    day: int = None) -> str:
     if year is None and month is None and day is None:
-        return parent_dir
+        return base_dir_path
 
     # Validate the combinations of year, month, and day
     if day and not month:
         raise ValueError("Day specified without month.")
-    if (month or day) and not year:
+    if (day or month) and not year:
         raise ValueError("Month or day specified without year.")
-    if day and not (year and month):
+    if day and not (month and year):
         raise ValueError("Day specified without both year and month.")
     
+    date_dir = base_dir_path
+
+    # Append year, month, and day to the base directory path
     if year:
-        dt = datetime(year=year, month=1, day=1)
-        parent_dir = os.path.join(parent_dir, dt.strftime("%Y"))
-    if year and month:
-        dt = datetime(year=year, month=month, day=1)
-        parent_dir = os.path.join(parent_dir, dt.strftime("%m"))
-    if year and month and day:
-        dt = datetime(year=year, month=month, day=day)
-        parent_dir = os.path.join(parent_dir, dt.strftime("%d"))
+        date_dir = os.path.join(date_dir, f"{year:04}")
+    if month:
+        date_dir = os.path.join(date_dir, f"{month:02}")
+    if day:
+        date_dir = os.path.join(date_dir, f"{day:02}")
+
+    return date_dir
+
+
+# Returns a directory of the form %Y/%m/%d based on a datetime, 
+# prepending a base path if specified
+def get_date_dir(dt: datetime, base_dir_path: str = None) -> str:
+    # Format the datetime object to the desired string format
+    date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
     
-    return parent_dir
+    # Prepend base_dir_path if specified
+    if base_dir_path:
+        return os.path.join(base_dir_path, date_dir)
+    return date_dir
 
 
-def build_chunks_dir(chunk_start_time: str) -> str:
+# Based on an input chunk_start_time, returns the parent path for that chunk
+def get_chunk_parent_path(chunk_start_time: str) -> str:
     # Parse the datetime string to a datetime object
     try:
         dt = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
     except ValueError as e:
         raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
-    return date_dir(dt, base_dir=CONFIG.chunks_dir)
+    
+    # Use the get_date_dir function to get the parent path
+    return get_date_dir(dt, base_dir_path=CONFIG.path_to_chunks_dir)
 
 
-def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, microsecond_correction=0) -> list:
+def create_datetime_array(start_datetime: datetime, 
+                          time_seconds: np.ndarray, 
+                          microsecond_correction: int = 0) -> list:
     # Validate input types      
     if not isinstance(start_datetime, datetime):
         raise TypeError("start_datetime must be a datetime object")
@@ -68,15 +76,6 @@ def build_datetime_array(start_datetime: datetime, time_seconds: np.ndarray, mic
         return [start_datetime + timedelta(seconds=ts + microsecond_correction*10**-6) for ts in time_seconds]
     except ValueError:
         raise ValueError("time_seconds must only contain numeric values")
-
-
-def transform_time_format(input_string: str, original_format: str, transformed_format: str) -> str:
-    try:
-        # Directly parse and return the formatted datetime string
-        return datetime.strptime(input_string, original_format).strftime(transformed_format)
-    except ValueError as e:
-        raise ValueError(f"Error parsing '{input_string}' with format '{original_format}': {e}")
-    
 
 
 def seconds_of_day(dt: datetime) -> float:
@@ -102,16 +101,14 @@ def find_closest_index(val: datetime, ar: np.ndarray, enforce_strict_bounds=Fals
         raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
 
     if val > np.nanmax(ar):
-        error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
         else:
             pass
             # warnings.warn(error_message)
     if val < np.nanmin(ar):
-        error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
         else:
             pass
             # warnings.warn(error_message)

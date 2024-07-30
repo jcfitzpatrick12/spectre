@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from host.utils.capture_session import stop
+from host.capture_scripts.capture_session import stop
 
 def main():
     stop()

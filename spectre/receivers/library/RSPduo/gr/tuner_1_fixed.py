@@ -41,11 +41,12 @@ class tuner_1_fixed(gr.top_block):
         bandwidth = capture_config['bandwidth']
         IF_gain = capture_config['IF_gain']
         RF_gain = capture_config['RF_gain']
+        is_sweeping = False
 
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.chunks_dir, tag, chunk_size, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate, is_sweeping)
         self.sdrplay3_rspduo_0 = sdrplay3.rspduo(
             '',
             rspduo_mode="Single Tuner",

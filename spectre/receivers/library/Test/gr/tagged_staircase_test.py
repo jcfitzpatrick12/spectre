@@ -12,7 +12,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import gr
 from gnuradio.filter import firdes
@@ -26,42 +25,40 @@ from gnuradio import spectre
 
 from cfg import CONFIG
 
-class cosine_signal_test_1(gr.top_block):
+class tagged_staircase_test(gr.top_block):
 
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "cosine-signal-test-1", catch_exceptions=True)
+        gr.top_block.__init__(self, "tagged-staircase-test", catch_exceptions=True)
 
         ##################################################
-        # Unpack capture config
+        # Variables
         ##################################################
-        samp_rate = capture_config['samp_rate']
         tag = capture_config['tag']
+        step_increment = capture_config['step_increment']
+        samp_rate = capture_config['samp_rate']
+        min_samples_per_step = capture_config['min_samples_per_step']
+        max_samples_per_step = capture_config['max_samples_per_step']
         chunk_size = capture_config['chunk_size']
-        frequency = capture_config['frequency']
-        amplitude = capture_config['amplitude']
+        is_sweeping = True
 
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate)
-        self.blocks_throttle_0_1 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
-        self.blocks_null_source_1 = blocks.null_source(gr.sizeof_float*1)
-        self.blocks_float_to_complex_1 = blocks.float_to_complex(1)
-        self.analog_sig_source_x_0 = analog.sig_source_f(samp_rate, analog.GR_COS_WAVE, frequency, amplitude, 0, 0)
+        self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, max_samples_per_step, step_increment, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate, is_sweeping)
+        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate, True)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_float_to_complex_1, 0), (self.spectre_batched_file_sink_0, 0))
-        self.connect((self.blocks_null_source_1, 0), (self.blocks_throttle_0_1, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_float_to_complex_1, 0))
-        self.connect((self.blocks_throttle_0_1, 0), (self.blocks_float_to_complex_1, 1))
+        self.connect((self.blocks_throttle_0, 0), (self.spectre_batched_file_sink_0, 0))
+        self.connect((self.spectre_tagged_staircase_0, 0), (self.blocks_throttle_0, 0))
 
 
-def main(capture_config: dict, top_block_cls=cosine_signal_test_1, options=None):
+
+
+def main(capture_config: dict, top_block_cls=tagged_staircase_test, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

@@ -19,16 +19,14 @@ def find_closest_index(val, ar: np.ndarray, enforce_strict_bounds = False) -> in
         raise ValueError("Both 'val' and elements of 'ar' must be valid numeric types.")
     
     if val > np.nanmax(ar):
-        error_message = f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}. Returning index of maximum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
         else:
             pass
             # warnings.warn(error_message)
     if val < np.nanmin(ar):
-        error_message = f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}. Returning index of minimum value."
         if enforce_strict_bounds:
-            raise ValueError(error_message)
+            raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
         else:
             pass
             # warnings.warn(error_message)
@@ -51,7 +49,7 @@ def compute_resolution(array: np.ndarray) -> float:
     
     # if the resolution is not constant across the array, 
     if not np.allclose(resolutions, resolutions[0]):
-        warnings.warn("Resolution is not consistent across all elements.", UserWarning)
+        warnings.warn("Resolution is not consistent across all elements. Returning the median difference.", UserWarning)
 
     return np.nanmedian(resolutions)
 
@@ -132,3 +130,7 @@ def background_subtract(yvals: np.ndarray, background_indices: list | None):
         yvals -= np.nanmean(yvals[background_indices[0]:
                                   background_indices[1]])
     return yvals
+
+
+def check_strictly_increasing(ar: np.ndarray):
+    return np.all(np.diff(ar) > 0)

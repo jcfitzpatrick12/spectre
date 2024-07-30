@@ -10,11 +10,11 @@ if SPECTREPARENTPATH is None:
 
 
 default_time_format = "%Y-%m-%dT%H:%M:%S"
-chunks_dir = os.path.join(SPECTREPARENTPATH, 'chunks')
-path_to_capture_log = os.path.join(SPECTREPARENTPATH, 'host', 'logs','capture.log')
-json_configs_dir = os.path.join(SPECTREPARENTPATH, "cfg", "json_configs")
 
-path_to_capture_scripts = os.path.join(SPECTREPARENTPATH, 'host', 'capture_scripts')
-path_to_start_capture = os.path.join(path_to_capture_scripts, 'start_capture.py')
-path_to_start_watcher = os.path.join(path_to_capture_scripts, 'start_watcher.py')
+path_to_chunks_dir = os.path.join(SPECTREPARENTPATH, 'chunks')
+path_to_capture_log = os.path.join(SPECTREPARENTPATH, 'host', 'logs','capture.log')
+path_to_json_configs_dir = os.path.join(SPECTREPARENTPATH, "cfg", "json_configs")
+path_to_capture_scripts_dir = os.path.join(SPECTREPARENTPATH, 'host', 'capture_scripts')
+path_to_start_capture = os.path.join(path_to_capture_scripts_dir, 'start_capture.py')
+path_to_start_watcher = os.path.join(path_to_capture_scripts_dir, 'start_watcher.py')
 

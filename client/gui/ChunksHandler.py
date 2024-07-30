@@ -6,7 +6,7 @@ from datetime import datetime
 
 from cfg import CONFIG
 from spectre.chunks.Chunks import Chunks
-from spectre.spectrogram import factory
+from spectre.spectrogram import transform
 from spectre.spectrogram.Panels import Panels
 
 class ChunksHandler:
@@ -39,17 +39,17 @@ class ChunksHandler:
         avg_over_int_freq = int(entry_values['avg_over_int_freq'].get())
 
         S = self.chunks.build_spectrogram_from_range(start_time, end_time)
-        S = factory.frequency_chop(S, lower_freq, upper_freq)
-        S = factory.frequency_average(S, avg_over_int_freq)
-        S = factory.time_average(S, avg_over_int_time)
+        S = transform.frequency_chop(S, lower_freq, upper_freq)
+        S = transform.frequency_average(S, avg_over_int_freq)
+        S = transform.time_average(S, avg_over_int_time)
         return S
 
 
     def set_default_spectrogram(self):
-        chunks_list = list(self.chunks.dict.values())
-        for chunk in reversed(chunks_list):
+        chunk_list = self.chunks.get_chunk_list()
+        for chunk in reversed(chunk_list):
             if chunk.fits.exists():
-                self.default_S = chunk.fits.load_spectrogram()
+                self.default_S = chunk.fits.read()
                 return
         raise ValueError(f"No fits files exist for tag {self.tag}")
 

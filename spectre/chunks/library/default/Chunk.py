@@ -7,38 +7,34 @@ from typing import Tuple
 from scipy.signal import ShortTimeFFT, get_window
 import matplotlib.pyplot as plt
 
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.chunks.SPECTREChunk import SPECTREChunk
 from spectre.chunks.chunk_register import register_chunk
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.chunks.library.default.ChunkBin import ChunkBin
-from spectre.chunks.library.default.ChunkFits import ChunkFits
-
+from spectre.chunks.library.default.BinChunk import BinChunk
+from spectre.chunks.library.default.FitsChunk import FitsChunk
+from spectre.chunks.library.default.HdrChunk import HdrChunk
 
 @register_chunk('default')
-class Chunk(BaseChunk):
+class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
-
-        self.bin = ChunkBin(chunk_start_time, tag)
-        self.fits = ChunkFits(chunk_start_time, tag)
+        
+        self.bin = BinChunk(chunk_start_time, tag)
+        self.fits = FitsChunk(chunk_start_time, tag)
+        self.hdr = HdrChunk(chunk_start_time, tag)
 
 
     def build_spectrogram(self) -> Spectrogram:
-        
-        if not self.bin.exists():
-            raise FileNotFoundError(f"Cannot build spectrogram, {self.bin.get_path()} does not exist.")
-        
-        millisecond_correction, IQ_data = self.bin.read()
+        # fetch the raw IQ sample receiver output from the binary file
+        IQ_data = self.bin.read()
+        # and the millisecond correction from the accompanying header file
+        millisecond_correction = self.hdr.read()
+
         # convert the millisecond correction to microseconds
         microsecond_correction = millisecond_correction * 1000
 
-        # load the capture config for the current tag
-        capture_config_handler = CaptureConfigHandler(self.tag)
-        capture_config = capture_config_handler.load_as_dict()
-
         # do the short time fft
-        time_seconds, freq_MHz, dynamic_spectra = self.do_STFFT(IQ_data, capture_config)
+        time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data, self.capture_config)
 
         # convert all arrays to the standard type
         time_seconds = np.array(time_seconds, dtype = 'float64')
@@ -50,27 +46,26 @@ class Chunk(BaseChunk):
                 freq_MHz, 
                 self.tag, 
                 chunk_start_time = self.chunk_start_time, 
-                units="amplitude",
-                microsecond_correction = microsecond_correction)
+                microsecond_correction = microsecond_correction,
+                spectrum_type="amplitude")
 
     
-    def fetch_window(self, capture_config: dict) -> np.ndarray:
+    def __fetch_window(self, capture_config: dict) -> np.ndarray:
         # fetch the window params and get the appropriate window
         window_type = capture_config.get('window_type')
         window_kwargs = capture_config.get('window_kwargs')
         ## note the implementation ignores the keys by necessity, due to the scipy implementation of get_window
         window_params = (window_type, *window_kwargs.values())
         window_size = capture_config.get('window_size')
-        w = get_window(window_params, window_size)
-        return w
+        return get_window(window_params, window_size)
     
 
-    def do_STFFT(self, IQ_data: np.array, capture_config: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def __do_STFFT(self, IQ_data: np.array, capture_config: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         '''
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
         # fetch the window
-        w = self.fetch_window(capture_config)
+        w = self.__fetch_window(capture_config)
         # find the number of samples 
         num_samples = len(IQ_data)
         # fetch the sample rate

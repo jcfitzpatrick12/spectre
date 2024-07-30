@@ -35,7 +35,8 @@ def chunks(
                     year=year, 
                     month=month,
                     day=day)
-    for chunk_start_time, chunk in chunks.dict.items():
+    
+    for chunk_start_time, chunk in chunks.chunk_map.items():
         # Use getattr to dynamically get the attribute based on 'ext'
         attribute = getattr(chunk, ext, None)
         if attribute is None:
@@ -65,10 +66,11 @@ def modes(
         typer.secho(f"{mode}")
     raise typer.Exit()
 
+
 @app.command()
 def fits_configs(
 ) -> None:
-    json_config_files = os.listdir(CONFIG.json_configs_dir)
+    json_config_files = os.listdir(CONFIG.path_to_json_configs_dir)
     for json_config_file in json_config_files:
         if json_config_file.startswith("fits_config"):
             typer.secho(
@@ -80,7 +82,7 @@ def fits_configs(
 @app.command()
 def capture_configs(
 ) -> None:
-    json_config_files = os.listdir(CONFIG.json_configs_dir)
+    json_config_files = os.listdir(CONFIG.path_to_json_configs_dir)
     for json_config_file in json_config_files:
         if json_config_file.startswith("capture_config"):
             typer.secho(
@@ -98,10 +100,10 @@ def tags(
     day: int = typer.Option(None, "--day", "-d", help=""),
     
 ) -> None:
-    chunks_dir = CONFIG.chunks_dir
+    chunks_dir = CONFIG.path_to_chunks_dir
     if (not year is None) or (not month is None) or (not day is None):
         # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        chunks_dir = datetime_helpers.append_date_dir(CONFIG.chunks_dir, 
+        chunks_dir = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
                                                         year=year, 
                                                         month=month, 
                                                         day=day)

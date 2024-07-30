@@ -1,6 +1,11 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
 from spectre.receivers.library.Test.gr import cosine_signal_test_1
+from spectre.receivers.library.Test.gr import tagged_staircase_test
 from spectre.utils import validator_helpers
 
 @register_receiver("Test")
@@ -11,14 +16,16 @@ class Receiver(SPECTREReceiver):
 
     def _set_capture_methods(self) -> None:
         self.capture_methods = {
-            "cosine-signal-test-1": self.__cosine_signal_test_1
+            "cosine-signal-test-1": self.__cosine_signal_test_1,
+            "tagged-staircase-test": self.__tagged_staircase_test
         }
         return
     
 
     def _set_validators(self) -> None:
         self.validators = {
-            "cosine-signal-test-1": self.__cosine_signal_test_1_validator
+            "cosine-signal-test-1": self.__cosine_signal_test_1_validator,
+            "tagged-staircase-test": self.__tagged_staircase_test_validator
         }
         return
     
@@ -26,14 +33,28 @@ class Receiver(SPECTREReceiver):
     def _set_templates(self) -> None:
         self.templates = {
             "cosine-signal-test-1": {
-                'samp_rate': int, # gr (sampling rate)
-                'frequency': float, # gr (frequency of the cosine signal)
-                'amplitude': float, # gr (ampltude of the cosine signal)
-                'chunk_size': int, # gr (size of each batched file) [s]
-                'window_type': str, # post_proc (window type)
-                'window_kwargs': dict, # post_proc (keyword arguments for window function) must be in order as in scipy documentation.
-                'window_size': int, # post_proc (number of samples for window)
-                'STFFT_kwargs': dict, # post_proc (keyword arguments for STFFT)
+                'samp_rate': int, # sample rate for the cosine source
+                'frequency': float, # frequency of the cosine signal
+                'amplitude': float, # ampltude of the cosine signal
+                'chunk_size': int, # size of each batched file [s]
+                'window_type': str, # the window type for the STFFT
+                'window_kwargs': dict, # keyword arguments for scipy get window function. Must be in order as in scipy documentation.
+                'window_size': int, # number of samples for the window
+                'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
+                'chunk_key': str, # tag will map to the chunk with this key
+                'event_handler_key': str, # tag will map to event handler with this key during post processing
+                'integration_time': float # spectrograms will be averaged over a time integration_time
+            },
+            "tagged-staircase-test": {
+                'samp_rate': int, # artifically imposed sample rate
+                'min_samples_per_step': int, # the size of the smallest step (in samples)
+                'max_samples_per_step': int, # the size of the largest step (in samples)
+                'step_increment': int, # the "height" of each step, in terms of the tagged staircase output.
+                'chunk_size': int, # the size of each batched file [s]
+                'window_type': str, # the window type for the STFFT
+                'window_kwargs': dict, # keyword arguments for scipy get window function. Must be in order as in scipy documentation.
+                'window_size': int, # number of samples for the window
+                'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
                 'integration_time': float # spectrograms will be averaged over a time integration_time
@@ -48,18 +69,24 @@ class Receiver(SPECTREReceiver):
         return
     
 
+    def __tagged_staircase_test(self, capture_configs: list) -> None:
+        capture_config = capture_configs[0]
+        tagged_staircase_test.main(capture_config)
+        return
+    
+
     def __cosine_signal_test_1_validator(self, capture_config: dict) -> None:
         # unpack the capture config
-        samp_rate = capture_config.get("samp_rate")
-        frequency = capture_config.get("frequency")
-        amplitude = capture_config.get("amplitude")
-        chunk_size = capture_config.get("chunk_size")
-        window_type = capture_config.get("window_type")
-        window_size = capture_config.get("window_size")
-        STFFT_kwargs = capture_config.get("STFFT_kwargs")
-        chunk_key = capture_config.get("chunk_key")
-        event_handler_key = capture_config.get("event_handler_key")
-        integration_time = capture_config.get("integration_time")
+        samp_rate = capture_config["samp_rate"]
+        frequency = capture_config["frequency"]
+        amplitude = capture_config["amplitude"]
+        chunk_size = capture_config["chunk_size"]
+        window_type = capture_config["window_type"]
+        window_size = capture_config["window_size"]
+        STFFT_kwargs = capture_config["STFFT_kwargs"]
+        chunk_key = capture_config["chunk_key"]
+        event_handler_key = capture_config["event_handler_key"]
+        integration_time = capture_config["integration_time"]
 
         validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
         validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
@@ -87,15 +114,6 @@ class Receiver(SPECTREReceiver):
         # ensuring the window type is rectangular
         if window_type != "boxcar":
             raise ValueError(f"Window type must be \"boxcar\". Received: {window_type}")
-
-        # ensuring that the hop is specified as a keyword argument
-        if set(STFFT_kwargs.keys()) != {"hop"}:
-            raise KeyError(f"Only allowed kwarg is STFFT_kwargs is \"hop\". Received: {STFFT_kwargs.keys()}")
-        
-        # checking that hop is of integer type
-        hop = STFFT_kwargs.get("hop")
-        if type(hop) != int:
-            raise TypeError(f"hop must an integer. Received: {hop}")
         
         # analytical requirement
         # if p is the number of sampled cycles, we can find that p = window_size / a
@@ -109,3 +127,35 @@ class Receiver(SPECTREReceiver):
             raise ValueError(f"amplitude must be strictly positive. Received: {amplitude}")
         return
     
+
+    def __tagged_staircase_test_validator(self, capture_config: dict) -> None:
+        samp_rate = capture_config["samp_rate"]
+        min_samples_per_step = capture_config["min_samples_per_step"]
+        max_samples_per_step = capture_config["max_samples_per_step"]
+        step_increment = capture_config["step_increment"]
+        chunk_size = capture_config["chunk_size"]
+        window_type = capture_config["window_type"]
+        window_kwargs = capture_config["window_kwargs"]
+        window_size = capture_config["window_size"]
+        STFFT_kwargs = capture_config["STFFT_kwargs"]
+        chunk_key = capture_config["chunk_key"]
+        event_handler_key = capture_config["event_handler_key"]
+        integration_time = capture_config["integration_time"]
+
+        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
+        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
+        validator_helpers.validate_integration_time(integration_time, chunk_size)
+        validator_helpers.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
+        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
+        validator_helpers.validate_chunk_key(chunk_key, "sweep")
+        validator_helpers.validate_event_handler_key(event_handler_key, "sweep")
+
+        if min_samples_per_step <= 0:
+            raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")
+        if max_samples_per_step <= 0:
+            raise ValueError(f"max_samples_per_step must be strictly positive. Received: {max_samples_per_step}")
+        if step_increment <= 0:
+            raise ValueError(f"step_increment must be strictly positive. Received: {step_increment}")
+        if min_samples_per_step > max_samples_per_step:
+            raise ValueError(f"min_samples_per_step cannot be greater than max_samples_per_step. Received: {min_samples_per_step} > {max_samples_per_step}")
+        return

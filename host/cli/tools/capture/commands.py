@@ -7,12 +7,11 @@ import os
 from typing import List
 
 from host.cli import __app_name__, __version__
-from host.utils import capture_session 
+from host.capture_scripts import capture_session 
 from host.tests.analytical import do_analytical_test
 from cfg import CONFIG
 
 from spectre.receivers.factory import get_receiver
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.watchdog.Watcher import Watcher
 
 
@@ -57,12 +56,9 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
     
     if run_as_foreground_ps:
 
-        if not os.path.exists(CONFIG.chunks_dir):
-            os.mkdir(CONFIG.chunks_dir)
+        if not os.path.exists(CONFIG.path_to_chunks_dir):
+            os.mkdir(CONFIG.path_to_chunks_dir)
 
-        # load the particular extension to watch from the capture config from the capture config
-        capture_config_handler = CaptureConfigHandler(tag)
-        capture_config = capture_config_handler.load_as_dict()
         watcher = Watcher(tag)
         watcher.start()
 

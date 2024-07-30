@@ -27,12 +27,8 @@ def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
 
 
 def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_status = False) -> None:
-    if not S.shape == analytical_S.shape:
-        raise ValueError(f"Shape mismatch between synthesised spectra: {S.shape}, and analytical spectra: {analytical_S}.")
-    
-    synthesised_dynamic_spectra = S.dynamic_spectra
-    analytical_dynamic_spectra = analytical_S.dynamic_spectra
-    num_time_samples = S.shape[1]
+    if not S.dynamic_spectra.shape == analytical_S.dynamic_spectra.shape:
+        raise ValueError(f"Shape mismatch between synthesised spectra: {S.dynamic_spectra.shape}, and analytical spectra: {analytical_S}.")
     
     is_close = np.isclose(
         S.dynamic_spectra,
@@ -80,18 +76,18 @@ def main(test_tag: str, show_slice_status = False) -> None:
 
     today = datetime.now()
     my_chunks = Chunks(test_tag, year=today.year, month=today.month, day=today.day)
-    chunkf = None
-    for chunk_start_time, chunk in my_chunks.dict.items():
-        if chunk.fits.exists():
-            chunkf = chunk
-            S = chunkf.fits.load_spectrogram()  
-            analytical_S = asf.get_spectrogram(test_mode, S.shape, capture_config)
+    chunk_list = my_chunks.get_chunk_list()
+    current_chunk = None
+    for chunk in chunk_list:
+        current_chunk = chunk
+        if current_chunk.fits.exists():
+            S = chunk.fits.read()  
+            analytical_S = asf.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
-    if chunkf is None:
+    if current_chunk is None:
         raise ValueError(f"No .fits files found with the tag \"{test_tag}\" in {my_chunks.chunks_dir}.")
 
     return
 
-    return
 

@@ -8,7 +8,7 @@ import threading
 
 
 from cfg import CONFIG
-from spectre.watchdog.get_event_handler import get_event_handler_from_tag
+from spectre.watchdog.factory import get_event_handler_from_tag
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
@@ -23,7 +23,7 @@ class Watcher:
         self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
 
     def start(self):
-        self.observer.schedule(self.event_handler, CONFIG.chunks_dir, recursive=True)
+        self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
         self.observer.start()
         print("Watching for new files...")
         try:

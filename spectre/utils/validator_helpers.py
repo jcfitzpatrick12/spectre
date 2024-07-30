@@ -129,6 +129,6 @@ def validate_event_handler_key(event_handler_key: str, expected_event_handler_ke
     return
 
 
-def validate_gain_is_negative(gain: float):
+def validate_gain_is_negative(gain: float) -> None:
     if gain > 0:
         raise ValueError(f"Gain must be non-positive. Received {gain}")

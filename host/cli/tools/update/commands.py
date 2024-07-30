@@ -38,7 +38,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
         capture_config = dict_helpers.update_key_value(capture_config, key, value)
 
     # save the updated capture config
-    receiver.save_capture_config(capture_config, tag, doublecheck_overwrite=False)
+    receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
     typer.secho(f"The capture-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
     raise typer.Exit()
 
