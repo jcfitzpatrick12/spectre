@@ -91,25 +91,7 @@ With the installation verified, you can freely use the suite of `spectre` CLI co
 # spectre-client
 
 ## Introduction
-While we are in development, we have created a placeholder GUI which runs locally using [```tkinter```](https://docs.python.org/3/library/tkinter.html). Please follow the Installation section to get this up and running.
-
-## Installation
-
-**Prerequisites:**  
-We assume you have following the Installation section for ```spectre-host```.
-
-**Set up ```spectre-client```**  
-If not already, change directory into that specified by ```$SPECTREPARENTPATH$``` (where ```spectre``` was cloned):  
-```cd $SPECTREPARENTPATH```  
-Create the Python virtual environment:  
-```python3 -m venv .venv```  
-Activate the virtual environment:  
-```source .venv/bin/activate```  
-Run the set-up using ```pip```:  
-```pip install -e .```  
-And finally, run the GUI:  
-```python3 client/gui/SPECTRECompanion.py --tag [capture tag]```  
-
+While we are in development, we are creating a placeholder GUI which runs locally using [```tkinter```](https://docs.python.org/3/library/tkinter.html). This is being revised and improved following recent rework.
 
 # Contributing
 Once the testing framework is in place, we will be looking for contributors. In the meantime, feel free to contact jcfitzpatrick12@gmail.com if you are interested :)
