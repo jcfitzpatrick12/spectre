@@ -34,7 +34,7 @@ class Chunk(SPECTREChunk):
         microsecond_correction = millisecond_correction * 1000
 
         # do the short time fft
-        time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data, self.capture_config)
+        time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data)
 
         # convert all arrays to the standard type
         time_seconds = np.array(time_seconds, dtype = 'float64')
@@ -50,28 +50,28 @@ class Chunk(SPECTREChunk):
                 spectrum_type="amplitude")
 
     
-    def __fetch_window(self, capture_config: dict) -> np.ndarray:
+    def __fetch_window(self) -> np.ndarray:
         # fetch the window params and get the appropriate window
-        window_type = capture_config.get('window_type')
-        window_kwargs = capture_config.get('window_kwargs')
+        window_type = self.capture_config.get('window_type')
+        window_kwargs = self.capture_config.get('window_kwargs')
         ## note the implementation ignores the keys by necessity, due to the scipy implementation of get_window
         window_params = (window_type, *window_kwargs.values())
-        window_size = capture_config.get('window_size')
+        window_size = self.capture_config.get('window_size')
         return get_window(window_params, window_size)
     
 
-    def __do_STFFT(self, IQ_data: np.array, capture_config: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def __do_STFFT(self, IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         '''
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
         # fetch the window
-        w = self.__fetch_window(capture_config)
+        w = self.__fetch_window(self.capture_config)
         # find the number of samples 
         num_samples = len(IQ_data)
         # fetch the sample rate
-        samp_rate = capture_config.get('samp_rate')
+        samp_rate = self.capture_config.get('samp_rate')
         # fetch the STFFT kwargs
-        STFFT_kwargs = capture_config.get('STFFT_kwargs')
+        STFFT_kwargs = self.capture_config.get('STFFT_kwargs')
 
         # perform the short time FFT (specifying explicately keywords centered)
         SFT = ShortTimeFFT(w, fs=samp_rate, fft_mode='centered', **STFFT_kwargs)
@@ -90,7 +90,7 @@ class Chunk(SPECTREChunk):
         time_seconds = SFT.t(num_samples, p0=0, p1=p1) # seconds
 
         # fetch the center_freq (if not specified, defaults to zero)
-        center_freq = capture_config.get('center_freq', 0)
+        center_freq = self.capture_config.get('center_freq', 0)
         # build the frequency array
         frequency_array = SFT.f + center_freq # Hz
         # convert the frequency array to MHz
