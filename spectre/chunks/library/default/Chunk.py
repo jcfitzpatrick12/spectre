@@ -65,7 +65,7 @@ class Chunk(SPECTREChunk):
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
         # fetch the window
-        w = self.__fetch_window(self.capture_config)
+        w = self.__fetch_window()
         # find the number of samples 
         num_samples = len(IQ_data)
         # fetch the sample rate
