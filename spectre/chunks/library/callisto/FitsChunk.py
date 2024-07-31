@@ -19,19 +19,19 @@ class FitsChunk(ExtChunk):
                 microsecond_correction = self._get_microsecond_correction(primary_hdu)
                 bintable_hdu = self._get_bintable_hdu(hdulist)
                 time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
-                units = self._get_units(primary_hdu)
+                spectrum_type = self._get_spectrum_type(primary_hdu)
 
-                if units == "digits":
+                if spectrum_type == "digits":
                     dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
-                    return Spectrogram(dynamic_spectra, 
+                    return Spectrogram(dynamic_spectra_linearised, 
                            time_seconds, 
                            freq_MHz, 
                            self.tag, 
                            chunk_start_time=self.chunk_start_time, 
-                           units=units,
-                           microsecond_correction=microsecond_correction)
+                           microsecond_correction = microsecond_correction,
+                           spectrum_type = spectrum_type)
                 else:
-                    raise ValueError(f"SPECTRE does not currently support units {units}")
+                    raise ValueError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
                 
         except FileNotFoundError:
             raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
@@ -65,7 +65,7 @@ class FitsChunk(ExtChunk):
         return time_seconds, freq_MHz
 
 
-    def _get_units(self, primary_hdu):
+    def _get_spectrum_type(self, primary_hdu):
         return primary_hdu.header.get('BUNIT', None)
 
 
