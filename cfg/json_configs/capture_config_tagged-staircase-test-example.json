@@ -6,9 +6,9 @@
     "chunk_size": 3,
     "window_type": "boxcar",
     "window_kwargs": {},
-    "window_size": 2048,
+    "window_size": 256,
     "STFFT_kwargs": {
-        "hop": 1024
+        "hop": 256
     },
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
