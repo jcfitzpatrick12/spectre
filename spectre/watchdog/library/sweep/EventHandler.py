@@ -31,12 +31,19 @@ class EventHandler(BaseEventHandler):
         S = transform.time_average(S, average_over_int)
         S.save_to_fits()
         print(f"Processing complete. Removing binary and header chunks with chunk start time: {chunk_start_time}.")
-        # if the previous chunk is defined (and by this point has already been processed)
-        if self.previous_chunk:
-            # delete the now redundant binary and detached header files
+
+        # if the previous chunk has not yet been set, it means we were processing the first chunk
+        # so we don't need to handle the previous chunk
+        if self.previous_chunk is None:
+            # instead, only set it for the next time this method is called
+            self.previous_chunk = chunk
+            
+        # otherwise the previous chunk is defined (and by this point has already been processed)
+        else:
+            # delete the used binary and detached header files
             self.previous_chunk.bin.delete(doublecheck_delete = False)
             self.previous_chunk.hdr.delete(doublecheck_delete = False)
-            # and reassign the current chunk to be used as the previous chunk
+            # and reassign the current chunk to be used as the previous chunk at the next call of this method
             self.previous_chunk = chunk
 
 
