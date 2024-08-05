@@ -150,20 +150,20 @@ class Spectrogram:
         return
 
     def _update_dynamic_spectra_as_dBb(self) -> None:
-        # for ease of computation, create a background spectrum array (bsa) of the same shape as the input dynamic spectra
-        # except each spectrum is identically the background spectrum
-        bsa = np.outer(self.background_spectrum, np.ones(self.dynamic_spectra.shape[1])) 
-        # depending on the spectrum type, we compute the dBb values differently:
+        # Create an artificial spectrogram where each spectrum is identically the background spectrum
+        bsa = self.background_spectrum[:, np.newaxis]
+
+        # Depending on the spectrum type, compute the dBb values differently
         if self.spectrum_type == "amplitude" or self.spectrum_type == "digits":
             dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bsa)
         elif self.spectrum_type == "power":
             dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bsa)
         else:
             raise ValueError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
-        
+
+        # Assign the result to the new attribute
         self.dynamic_spectra_as_dBb = dynamic_spectra_as_dBb
         return
-    
 
     def _check_shapes(self) -> None:
         num_spectrogram_dims = np.ndim(self.dynamic_spectra)
