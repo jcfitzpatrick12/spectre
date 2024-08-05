@@ -80,7 +80,7 @@ class Chunks:
 
     def get_chunk_by_item_index(self, item_index: int) -> BaseChunk:
             num_chunks = len(self.chunk_map) 
-            index = index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
+            index = item_index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
             
             chunk_list = self.get_chunk_list()
             for i, chunk in enumerate(chunk_list):
