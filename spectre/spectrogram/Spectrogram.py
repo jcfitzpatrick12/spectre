@@ -219,7 +219,7 @@ class Spectrogram:
                 time_type: str = "time_seconds", 
                 log_norm: bool = False, 
                 dBb: bool = False, 
-                vmin: int = 1, 
+                vmin: int = -1, 
                 vmax: int = 14):
         # Create a figure
         fig, ax = plt.subplots(1)
