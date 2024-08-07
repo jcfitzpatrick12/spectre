@@ -39,7 +39,7 @@ def get_chunk_path(gz_path: str) -> str:
     chunk_start_time = fits_chunk_name.split('_')[0]
     chunk_parent_path = datetime_helpers.get_chunk_parent_path(chunk_start_time)
     if not os.path.exists(chunk_parent_path):
-        os.mkdir(chunk_parent_path)
+        os.makedirs(chunk_parent_path)
     return os.path.join(chunk_parent_path, fits_chunk_name)
 
 
