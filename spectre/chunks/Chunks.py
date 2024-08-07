@@ -120,9 +120,9 @@ class Chunks:
         raise ValueError(f"No matching chunk found with chunk_start_time {chunk_to_match.chunk_start_time}.")
 
 
-    def build_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
-        start_time = datetime.strptime(start_time, CONFIG.default_time_format)
-        end_time = datetime.strptime(end_time, CONFIG.default_time_format)
+    def build_spectrogram_from_range(self, start_time_str: str, end_time_str: str) -> Spectrogram:
+        start_time = datetime.strptime(start_time_str, CONFIG.default_time_format)
+        end_time = datetime.strptime(end_time_str, CONFIG.default_time_format)
 
         if start_time.day != end_time.day:
             warnings.warn("Warning! Joining spectrograms over more than one day.", RuntimeWarning)
