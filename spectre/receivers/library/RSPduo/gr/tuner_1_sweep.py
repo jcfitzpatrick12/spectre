@@ -123,7 +123,7 @@ class sweep_test(gr.top_block):
 
 
 
-def main(top_block_cls=sweep_test, options=None):
+def main(capture_config: dict, top_block_cls=sweep_test, options=None):
     tb = top_block_cls()
 
     def sig_handler(sig=None, frame=None):
