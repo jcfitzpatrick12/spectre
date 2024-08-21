@@ -75,7 +75,7 @@ class tuner_1_sweep(gr.top_block):
         self.sdrplay3_rspduo_0.set_dab_notch_filter(False)
         self.sdrplay3_rspduo_0.set_am_notch_filter(False)
         self.sdrplay3_rspduo_0.set_biasT(False)
-        self.sdrplay3_rspduo_0.set_stream_tags(False)
+        self.sdrplay3_rspduo_0.set_stream_tags(True)
         self.sdrplay3_rspduo_0.set_debug_mode(False)
         self.sdrplay3_rspduo_0.set_sample_sequence_gaps_check(False)
         self.sdrplay3_rspduo_0.set_show_gain_changes(False)
@@ -84,7 +84,7 @@ class tuner_1_sweep(gr.top_block):
         ##################################################
         # Connections
         ##################################################
-        # self.msg_connect((self.spectre_sweep_driver_0, 'freq'), (self.sdrplay3_rspduo_0, 'freq'))
+        self.msg_connect((self.spectre_sweep_driver_0, 'freq'), (self.sdrplay3_rspduo_0, 'freq'))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_batched_file_sink_0, 0))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_sweep_driver_0, 0))
 
