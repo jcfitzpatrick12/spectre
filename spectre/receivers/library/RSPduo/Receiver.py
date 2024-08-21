@@ -59,7 +59,15 @@ class Receiver(SPECTREReceiver):
         # RSPduo specific validations in single tuner mode
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
-        validator_helpers.closed_confine_center_freq(capture_config['center_freq'], center_freq_lower_bound, center_freq_upper_bound)
+        center_freq = capture_config['center_freq']
+        min_freq = capture_config['min_freq']
+        max_freq = capture_config['max_freq']
+        if center_freq:
+            validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if min_freq:
+            validator_helpers.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if max_freq:
+            validator_helpers.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
 
         samp_rate_lower_bound = 200e3 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]
