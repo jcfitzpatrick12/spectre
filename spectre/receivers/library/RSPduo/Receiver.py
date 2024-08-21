@@ -28,7 +28,7 @@ class Receiver(SPECTREReceiver):
     def _set_templates(self) -> None:
         self.templates = {
             "tuner-1-fixed": self._get_default_template("fixed"),
-            "tuner-1-sweep": self.__get_default_template("sweep"),
+            "tuner-1-sweep": self._get_default_template("sweep"),
         }
 
 
