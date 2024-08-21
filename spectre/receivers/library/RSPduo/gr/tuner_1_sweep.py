@@ -25,7 +25,7 @@ from gnuradio import spectre
 class sweep_test(gr.top_block):
 
     def __init__(self):
-        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
+        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=False)
 
         ##################################################
         # Variables
