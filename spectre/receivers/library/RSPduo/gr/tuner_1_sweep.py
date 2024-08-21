@@ -35,12 +35,11 @@ class tuner_1_sweep(gr.top_block):
         bandwidth = capture_config['bandwidth']
         IF_gain = capture_config['IF_gain']
         RF_gain = capture_config['RF_gain']
-        is_sweeping = True
         min_freq = capture_config['min_freq']
         max_freq = capture_config['max_freq']
         samples_per_step = capture_config['samples_per_step']
         freq_step = capture_config['freq_step']
-        start_freq = start_freq = min_freq + samp_rate/2
+        start_freq = min_freq + samp_rate/2
 
         ##################################################
         # Blocks
@@ -86,7 +85,7 @@ class tuner_1_sweep(gr.top_block):
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.spectre_sweep_driver_0, 'freq'), (self.sdrplay3_rspduo_0, 'freq'))
+        # self.msg_connect((self.spectre_sweep_driver_0, 'freq'), (self.sdrplay3_rspduo_0, 'freq'))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_batched_file_sink_0, 0))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_sweep_driver_0, 0))
 
