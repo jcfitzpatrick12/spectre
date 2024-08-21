@@ -50,7 +50,7 @@ class tuner_1_sweep(gr.top_block):
                                                                      tag, 
                                                                      chunk_size, 
                                                                      samp_rate, 
-                                                                     False, 
+                                                                     True, 
                                                                      'freq', 
                                                                      start_freq)
         self.sdrplay3_rspduo_0 = sdrplay3.rspduo(
