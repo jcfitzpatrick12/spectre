@@ -45,7 +45,14 @@ class tagged_staircase_test(gr.top_block):
         # Blocks
         ##################################################
         self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, max_samples_per_step, step_increment, samp_rate)
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate, is_sweeping)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir,
+                                                                     tag, 
+                                                                     chunk_size, 
+                                                                     samp_rate, 
+                                                                     is_sweeping,
+                                                                     'rx_freq',
+                                                                     0
+                                                                     )
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate, True)
 
 
