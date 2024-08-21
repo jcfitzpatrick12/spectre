@@ -24,7 +24,7 @@ from cfg import CONFIG
 
 class tuner_1_sweep(gr.top_block):
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "tuner_1_sweep", catch_exceptions=True)
+        gr.top_block.__init__(self, "tuner_1_sweep", catch_exceptions=False)
 
         ##################################################
         # Variables
