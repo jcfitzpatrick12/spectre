@@ -50,7 +50,7 @@ class tuner_1_sweep(gr.top_block):
                                                                      tag, 
                                                                      chunk_size, 
                                                                      samp_rate, 
-                                                                     is_sweeping, 
+                                                                     False, 
                                                                      'freq', 
                                                                      start_freq)
         self.sdrplay3_rspduo_0 = sdrplay3.rspduo(
@@ -92,8 +92,6 @@ class tuner_1_sweep(gr.top_block):
 
 
 def main(capture_config: dict, top_block_cls=tuner_1_sweep, options=None):
-
-    print("here")
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):
