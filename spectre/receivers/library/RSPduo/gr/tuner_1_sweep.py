@@ -39,7 +39,7 @@ class sweep_test(gr.top_block):
         # Blocks
         ##################################################
         self.spectre_sweep_driver_0 = spectre.sweep_driver(90000000, 95000000, 1000000, 1000000, 100000, 'freq')
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, 'sweep-test', 5, 1000000, True, 'freq', 90000000)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, 'sweep-test', 5, 1000000, True, 'freq', 90500000)
         self.sdrplay3_rspduo_0 = sdrplay3.rspduo(
             '',
             rspduo_mode="Single Tuner",
