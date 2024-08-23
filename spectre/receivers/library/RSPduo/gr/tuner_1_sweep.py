@@ -42,6 +42,7 @@ class tuner_1_sweep(gr.top_block):
         RF_gain = capture_config['RF_gain']
         chunk_size = capture_config['chunk_size']
         start_freq = min_freq + samp_rate/2
+        tag = capture_config['tag']
 
 
         ##################################################
@@ -54,7 +55,7 @@ class tuner_1_sweep(gr.top_block):
                                                            samples_per_step,
                                                            'freq')
         self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, 
-                                                                     'sweep-test', 
+                                                                     tag, 
                                                                      chunk_size, 
                                                                      samp_rate, 
                                                                      True, 
