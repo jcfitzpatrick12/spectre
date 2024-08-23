@@ -96,7 +96,6 @@ class tuner_1_sweep(gr.top_block):
         # Connections
         ##################################################
         self.msg_connect((self.spectre_sweep_driver_0, 'freq'), (self.sdrplay3_rspduo_0, 'freq'))
-        self.connect((self.sdrplay3_rspduo_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_batched_file_sink_0, 0))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.spectre_sweep_driver_0, 0))
 
