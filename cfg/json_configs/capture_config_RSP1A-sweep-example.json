@@ -5,7 +5,7 @@
     "freq_step": 8000000.0,
     "bandwidth": 8000000.0,
     "samp_rate": 8000000,
-    "IF_gain": -30,
+    "IF_gain": -40,
     "RF_gain": 0,
     "chunk_size": 4,
     "integration_time": 0.0,
