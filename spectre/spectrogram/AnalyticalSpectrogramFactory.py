@@ -9,7 +9,7 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 class AnalyticalSpectrogramFactory:
     def __init__(self,):
         self.builder_methods = {
-            "cosine-signal-test-1": self.cosine_signal_test_1
+            "cosine-signal-1": self.cosine_signal_1
         }
         self.test_modes = list(self.builder_methods.keys())
 
@@ -20,7 +20,7 @@ class AnalyticalSpectrogramFactory:
         S = builder_method(shape, capture_config)
         return S
     
-    def cosine_signal_test_1(self, 
+    def cosine_signal_1(self, 
                             shape: tuple,
                             capture_config: dict
                              ):

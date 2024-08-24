@@ -26,10 +26,10 @@ from gnuradio import spectre
 
 from cfg import CONFIG
 
-class cosine_signal_test_1(gr.top_block):
+class cosine_signal_1(gr.top_block):
 
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "cosine-signal-test-1", catch_exceptions=True)
+        gr.top_block.__init__(self, "cosine-signal-1", catch_exceptions=True)
 
         ##################################################
         # Unpack capture config
@@ -61,7 +61,7 @@ class cosine_signal_test_1(gr.top_block):
         self.connect((self.blocks_throttle_0_1, 0), (self.blocks_float_to_complex_1, 1))
 
 
-def main(capture_config: dict, top_block_cls=cosine_signal_test_1, options=None):
+def main(capture_config: dict, top_block_cls=cosine_signal_1, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

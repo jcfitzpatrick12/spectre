@@ -25,10 +25,10 @@ from gnuradio import spectre
 
 from cfg import CONFIG
 
-class tagged_staircase_test(gr.top_block):
+class tagged_staircase(gr.top_block):
 
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "tagged-staircase-test", catch_exceptions=True)
+        gr.top_block.__init__(self, "tagged-staircase", catch_exceptions=True)
 
         ##################################################
         # Variables
@@ -65,7 +65,7 @@ class tagged_staircase_test(gr.top_block):
 
 
 
-def main(capture_config: dict, top_block_cls=tagged_staircase_test, options=None):
+def main(capture_config: dict, top_block_cls=tagged_staircase, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

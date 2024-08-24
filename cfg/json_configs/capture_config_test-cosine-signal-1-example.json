@@ -13,6 +13,6 @@
     "event_handler_key": "default",
     "chunk_key": "default",
     "receiver": "Test",
-    "mode": "cosine-signal-test-1",
-    "tag": "cosine-signal-test-1-example"
+    "mode": "cosine-signal-1",
+    "tag": "cosine-signal-1-example"
 }
