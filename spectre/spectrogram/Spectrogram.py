@@ -150,20 +150,20 @@ class Spectrogram:
         return
 
     def _update_dynamic_spectra_as_dBb(self) -> None:
-        # for ease of computation, create a background spectrum array (bsa) of the same shape as the input dynamic spectra
-        # except each spectrum is identically the background spectrum
-        bsa = np.outer(self.background_spectrum, np.ones(self.dynamic_spectra.shape[1])) 
-        # depending on the spectrum type, we compute the dBb values differently:
+        # Create an artificial spectrogram where each spectrum is identically the background spectrum
+        bsa = self.background_spectrum[:, np.newaxis]
+
+        # Depending on the spectrum type, compute the dBb values differently
         if self.spectrum_type == "amplitude" or self.spectrum_type == "digits":
             dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bsa)
         elif self.spectrum_type == "power":
             dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bsa)
         else:
             raise ValueError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
-        
+
+        # Assign the result to the new attribute
         self.dynamic_spectra_as_dBb = dynamic_spectra_as_dBb
         return
-    
 
     def _check_shapes(self) -> None:
         num_spectrogram_dims = np.ndim(self.dynamic_spectra)
@@ -215,44 +215,54 @@ class Spectrogram:
         return I
     
 
-    def quick_plot(self,
-                   time_type: str = "time_seconds",
-                   log_norm: bool = False):
-        # create a figure
+    def quick_plot(self, 
+                time_type: str = "time_seconds", 
+                log_norm: bool = False, 
+                dBb: bool = False, 
+                vmin: int = -1, 
+                vmax: int = 14):
+        # Create a figure
         fig, ax = plt.subplots(1)
 
+        # Set up the time axis
         if time_type == "time_seconds":
             times = self.time_seconds
-            ax.set_xlabel(f'Time [s]', size=15)
-        # If the chunk start time is specified, plot with datetimes
+            ax.set_xlabel('Time [s]', size=15)
         elif time_type == "datetimes":
             if self.chunk_start_time is None:
-                raise ValueError(f"Cannot plot with time type \"datetimes\" if chunk start time is not set.")
+                raise ValueError('Cannot plot with time type "datetimes" if chunk start time is not set.')
             times = self.datetimes
-            ax.set_xlabel(f'Time [UTC]', size=15)
+            ax.set_xlabel('Time [UTC]', size=15)
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         else:
-            raise ValueError(f"Unexpected time type. Expected \"time_seconds\" or \"datetimes\", but received {time_type}.")
+            raise ValueError(f'Unexpected time type. Expected "time_seconds" or "datetimes", but received {time_type}.')
 
-        if log_norm:
-            norm = LogNorm(vmin=np.min(self.dynamic_spectra[self.dynamic_spectra > 0]), vmax=np.max(self.dynamic_spectra))
-        else:
-            norm = None
+        if log_norm and dBb:
+            raise ValueError(f"Please specify either log_norm or dBb. Both is not supported.")
+        
+        # Select the appropriate data and normalization
+        ds = self.dynamic_spectra_as_dBb if dBb else self.dynamic_spectra
+        norm = LogNorm(vmin=np.min(ds[ds > 0]), vmax=np.max(ds)) if log_norm else None
 
-        # Assign the x and y labels with specified font size
+        # Assign the y label
         ax.set_ylabel('Frequency [MHz]', size=15)
-        # Format the x and y tick labels with specified font size
+
+        # Format the x and y tick labels
         ax.tick_params(axis='x', labelsize=15)
         ax.tick_params(axis='y', labelsize=15)
 
+        # Plot the dynamic spectra
         pcolor_plot = ax.pcolormesh(times, 
                                     self.freq_MHz, 
-                                    self.dynamic_spectra, 
-                                    norm=norm,
+                                    ds, 
+                                    vmin=vmin if dBb else None, 
+                                    vmax=vmax if dBb else None, 
+                                    norm=norm, 
                                     cmap="gnuplot2")
 
+        # Display the plot
         plt.show()
-        return
+
 
 
     def slice_at_time(self, 

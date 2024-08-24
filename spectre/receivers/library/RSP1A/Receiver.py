@@ -1,6 +1,6 @@
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
-from spectre.receivers.library.RSP1A.gr import fixed
+from spectre.receivers.library.RSP1A.gr import fixed, sweep
 from spectre.utils import validator_helpers
 
 @register_receiver("RSP1A")
@@ -11,22 +11,26 @@ class Receiver(SPECTREReceiver):
 
     def _set_capture_methods(self) -> None:
         self.capture_methods = {
-            "fixed": self.__fixed
+            "fixed": self.__fixed,
+            "sweep": self.__sweep
         }
         return
     
 
     def _set_validators(self) -> None:
         self.validators = {
-            "fixed": self.__fixed_validator
+            "fixed": self.__fixed_validator,
+            "sweep": self.__sweep_validator
         }
         return
     
 
     def _set_templates(self) -> None:
         default_fixed_template = self._get_default_template("fixed")
+        default_sweep_template = self._get_default_template("sweep")
         self.templates = {
-            "fixed": default_fixed_template
+            "fixed": default_fixed_template,
+            "sweep": default_sweep_template
         }
 
 
@@ -35,17 +39,37 @@ class Receiver(SPECTREReceiver):
         fixed.main(capture_config)
         return
     
+    
+    def __sweep(self, capture_configs: list) -> None:
+        capture_config = capture_configs[0]
+        sweep.main(capture_config)
+        return
+    
 
     def __fixed_validator(self, capture_config: dict) -> None:
         self._default_fixed_validator(capture_config)
         self.__RSP1A_validator(capture_config)
+
+
+    def __sweep_validator(self, capture_config: dict) -> None:
+        self._default_sweep_validator(capture_config)
+        self.__RSP1A_validator(capture_config)
+        return
 
     
     def __RSP1A_validator(self, capture_config: dict) -> None:
         # RSP1A specific validations
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
-        validator_helpers.closed_confine_center_freq(capture_config['center_freq'], center_freq_lower_bound, center_freq_upper_bound)
+        center_freq = capture_config.get("center_freq")
+        min_freq = capture_config.get("min_freq")
+        max_freq = capture_config.get("max_freq")
+        if center_freq:
+            validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if min_freq:
+            validator_helpers.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if max_freq:
+            validator_helpers.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
 
         samp_rate_lower_bound = 200e3 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]

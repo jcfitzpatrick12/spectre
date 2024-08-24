@@ -18,8 +18,8 @@ class HdrChunk(ExtChunk):
             center_frequencies = self._get_center_frequencies(hdr_contents)
             num_samples = self._get_num_samples(hdr_contents)
             self._validate_frequencies_and_samples(center_frequencies, num_samples)
-            return millisecond_correction, center_frequencies, num_samples
-
+            return millisecond_correction, (center_frequencies, num_samples)
+        
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Error fetching IQ data, received {e}.")
 

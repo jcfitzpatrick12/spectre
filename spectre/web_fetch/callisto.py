@@ -2,43 +2,68 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from datetime import datetime
 import os
 import subprocess
 import shutil
+import gzip
+from datetime import datetime
+from pathlib import Path
 
-from spectre.utils import callisto_helpers
 from cfg import CONFIG, callisto_stations
+from spectre.utils import datetime_helpers
 
 temp_dir = os.path.join(os.environ['SPECTREPARENTPATH'], "tmp")
 
-def copy_to_chunks():
-    # Iterate through all files in the specified directory
+def get_chunk_name(station: str, date: str, time: str, instrument_code: str) -> str:
+    dt = datetime.strptime(f"{date}T{time}", '%Y%m%dT%H%M%S')
+    formatted_time = dt.strftime(CONFIG.default_time_format)
+    return f"{formatted_time}_callisto-{station.lower()}-{instrument_code}.fits"
+
+
+def get_chunk_components(gz_path: str):
+    file_name = os.path.basename(gz_path)
+    if not file_name.endswith(".fit.gz"):
+        raise ValueError(f"Unexpected file extension in {file_name}. Expected .fit.gz")
+    
+    file_base_name = file_name.rstrip(".fit.gz")
+    parts = file_base_name.split('_')
+    if len(parts) != 4:
+        raise ValueError("Filename does not conform to the expected format of [station]_[date]_[time]_[instrument_code]")
+    
+    return parts
+
+
+def get_chunk_path(gz_path: str) -> str:
+    station, date, time, instrument_code = get_chunk_components(gz_path)
+    fits_chunk_name = get_chunk_name(station, date, time, instrument_code)
+    chunk_start_time = fits_chunk_name.split('_')[0]
+    chunk_parent_path = datetime_helpers.get_chunk_parent_path(chunk_start_time)
+    if not os.path.exists(chunk_parent_path):
+        os.makedirs(chunk_parent_path)
+    return os.path.join(chunk_parent_path, fits_chunk_name)
+
+
+def unzip_file_to_chunks(gz_path: str):
+    fits_path = get_chunk_path(gz_path)
+    with gzip.open(gz_path, 'rb') as f_in, open(fits_path, 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+
+
+def unzip_to_chunks():
     for entry in os.scandir(temp_dir):
         if entry.is_file() and entry.name.endswith('.gz'):
-            gz_path = entry.path
-            # Define a new output path for the uncompressed file
-            callisto_helpers.unzip_to_chunks_dir(gz_path) # unzip 
-            os.remove(gz_path)
-            
+            unzip_file_to_chunks(entry.path)
+            os.remove(entry.path)
 
-# fetches all .fits.gz files and saves them inside fpath for a particular date and callisto station
-def wget_callisto_station(instrument_code: str, year: int, month: int, day: int):
 
-    temp_datetime = datetime(year=year, month=month, day=day)
-    formatted_year = temp_datetime.strftime("%Y")
-    formatted_month = temp_datetime.strftime("%m")
-    formatted_day = temp_datetime.strftime("%d")
-
-    base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{formatted_year}/{formatted_month}/{formatted_day}/"
-
-    # wget -r -l1 -H -t1 -nd -N -np -e robots=off -A 'GLASGOW*.fit.gz' http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/2024/05/20/
+def download_callisto_data(instrument_code: str, year: int, month: int, day: int):
+    date_str = f"{year:04d}/{month:02d}/{day:02d}"
+    base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{date_str}/"
     command = [
-        'wget', '-r', '-l1', '-nd', '-np', 
-        '-R', '.tmp', # reject all .tmp file 
-        '-A', f'{instrument_code}*.fit.gz', # download all .fit.gz for the appropriate station
-        '-P', f'{temp_dir}', # download the files into the temp directory
-        f"{base_url}" 
+        'wget', '-r', '-l1', '-nd', '-np', '-R', '.tmp',
+        '-A', f'{instrument_code}*.fit.gz',
+        '-P', temp_dir,
+        base_url
     ]
 
     try:
@@ -46,35 +71,13 @@ def wget_callisto_station(instrument_code: str, year: int, month: int, day: int)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
 
-
-def fetch_chunks(instrument_code: str, 
-                 year=None, 
-                 month=None, 
-                 day=None):
-    
+def fetch_chunks(instrument_code: str, year: int, month: int, day: int):
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
-    found_code_match = False
-    for callisto_instrument_code in callisto_stations.instrument_codes:
-        if instrument_code in callisto_instrument_code:
-            found_code_match = True
-            break
-    if not found_code_match:
+    if instrument_code not in callisto_stations.instrument_codes:
         raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {callisto_stations.instrument_codes}")
 
-    if not year:
-        raise ValueError("Year, month and day must all be specified.")
-    # Validate the combinations of year, month, and day
-    if day and not month:
-        raise ValueError("Day specified without month.")
-    if (month or day) and not year:
-        raise ValueError("Month or day specified without year.")
-    if day and not (year and month):
-        raise ValueError("Day specified without both year and month.")
-    
-    wget_callisto_station(instrument_code, year, month, day)
-    copy_to_chunks()
-
+    download_callisto_data(instrument_code, year, month, day)
+    unzip_to_chunks()
     shutil.rmtree(temp_dir)
-    return

@@ -4,8 +4,8 @@
 
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
-from spectre.receivers.library.Test.gr import cosine_signal_test_1
-from spectre.receivers.library.Test.gr import tagged_staircase_test
+from spectre.receivers.library.Test.gr import cosine_signal_1
+from spectre.receivers.library.Test.gr import tagged_staircase
 from spectre.utils import validator_helpers
 
 @register_receiver("Test")
@@ -16,23 +16,23 @@ class Receiver(SPECTREReceiver):
 
     def _set_capture_methods(self) -> None:
         self.capture_methods = {
-            "cosine-signal-test-1": self.__cosine_signal_test_1,
-            "tagged-staircase-test": self.__tagged_staircase_test
+            "cosine-signal-1": self.__cosine_signal_1,
+            "tagged-staircase": self.__tagged_staircase
         }
         return
     
 
     def _set_validators(self) -> None:
         self.validators = {
-            "cosine-signal-test-1": self.__cosine_signal_test_1_validator,
-            "tagged-staircase-test": self.__tagged_staircase_test_validator
+            "cosine-signal-1": self.__cosine_signal_1_validator,
+            "tagged-staircase": self.__tagged_staircase_validator
         }
         return
     
 
     def _set_templates(self) -> None:
         self.templates = {
-            "cosine-signal-test-1": {
+            "cosine-signal-1": {
                 'samp_rate': int, # sample rate for the cosine source
                 'frequency': float, # frequency of the cosine signal
                 'amplitude': float, # ampltude of the cosine signal
@@ -45,7 +45,7 @@ class Receiver(SPECTREReceiver):
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
                 'integration_time': float # spectrograms will be averaged over a time integration_time
             },
-            "tagged-staircase-test": {
+            "tagged-staircase": {
                 'samp_rate': int, # artifically imposed sample rate
                 'min_samples_per_step': int, # the size of the smallest step (in samples)
                 'max_samples_per_step': int, # the size of the largest step (in samples)
@@ -63,19 +63,19 @@ class Receiver(SPECTREReceiver):
         return
 
 
-    def __cosine_signal_test_1(self, capture_configs: list) -> None:
+    def __cosine_signal_1(self, capture_configs: list) -> None:
         capture_config = capture_configs[0]
-        cosine_signal_test_1.main(capture_config)
+        cosine_signal_1.main(capture_config)
         return
     
 
-    def __tagged_staircase_test(self, capture_configs: list) -> None:
+    def __tagged_staircase(self, capture_configs: list) -> None:
         capture_config = capture_configs[0]
-        tagged_staircase_test.main(capture_config)
+        tagged_staircase.main(capture_config)
         return
     
 
-    def __cosine_signal_test_1_validator(self, capture_config: dict) -> None:
+    def __cosine_signal_1_validator(self, capture_config: dict) -> None:
         # unpack the capture config
         samp_rate = capture_config["samp_rate"]
         frequency = capture_config["frequency"]
@@ -128,7 +128,7 @@ class Receiver(SPECTREReceiver):
         return
     
 
-    def __tagged_staircase_test_validator(self, capture_config: dict) -> None:
+    def __tagged_staircase_validator(self, capture_config: dict) -> None:
         samp_rate = capture_config["samp_rate"]
         min_samples_per_step = capture_config["min_samples_per_step"]
         max_samples_per_step = capture_config["max_samples_per_step"]

@@ -76,9 +76,8 @@ def main(test_tag: str, show_slice_status = False) -> None:
 
     today = datetime.now()
     my_chunks = Chunks(test_tag, year=today.year, month=today.month, day=today.day)
-    chunk_list = my_chunks.get_chunk_list()
     current_chunk = None
-    for chunk in chunk_list:
+    for chunk in my_chunks:
         current_chunk = chunk
         if current_chunk.fits.exists():
             S = chunk.fits.read()  

@@ -30,8 +30,23 @@ class SPECTREReceiver(BaseReceiver):
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
             },
-            "sweeping": {
-                # tbd
+            "sweep": {
+                "min_freq": float, # minimum defined frequency for the sweep
+                "max_freq": float, # maximum defined frequency for the sweep
+                "samples_per_step": int, # the number of samples in each step in one sweep
+                "freq_step": float, # the increment in center_frequency between steps
+                "bandwidth": float, # bandwidth for the receiver
+                "samp_rate": int, # sample rate for the receiver
+                "IF_gain": int, # intermediate frequency gain for the receiver
+                "RF_gain": int, # radio frequency gain for the receiver
+                'chunk_size': int, #  Size of each batched file [s]
+                'integration_time': float, # time over which to average spectra in postprocessing
+                'window_type': str, # window type for STFFT
+                'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
+                'window_size': int, # number of samples in STFFT window
+                'STFFT_kwargs': dict, # keyword arguments for the scipy STFFT class
+                'chunk_key': str, # tag will map to the chunk with this key
+                'event_handler_key': str, # tag will map to event handler with this key during post processing
             }
         }
         return
@@ -42,6 +57,11 @@ class SPECTREReceiver(BaseReceiver):
         if default_template is None:
             raise KeyError(f"No default template found with key {default_template_key}")
         return default_template
+    
+
+    # ! TO BE IMPLEMENTED ! # 
+    def _default_sweep_validator(self, capture_config: dict) -> None:
+        return
     
 
     def _default_fixed_validator(self, capture_config: dict) -> None:

@@ -5,8 +5,8 @@
 
 exp_internal 1
 
-exec chmod +x ./SDRplay_RSP_API-Linux-3.14.0.run
-spawn ./SDRplay_RSP_API-Linux-3.14.0.run
+exec chmod +x ./SDRplay_RSP_API-Linux-3.15.2.run
+spawn ./SDRplay_RSP_API-Linux-3.15.2.run
 
 expect {
 	-regex "identification in applications such as lsusb?" {

@@ -1,6 +1,6 @@
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
-from spectre.receivers.library.RSPduo.gr import tuner_1_fixed
+from spectre.receivers.library.RSPduo.gr import tuner_1_fixed, tuner_1_sweep
 from spectre.utils import validator_helpers
 
 @register_receiver("RSPduo")
@@ -11,22 +11,24 @@ class Receiver(SPECTREReceiver):
 
     def _set_capture_methods(self) -> None:
         self.capture_methods = {
-            "tuner-1-fixed": self.__tuner_1_fixed
+            "tuner-1-fixed": self.__tuner_1_fixed,
+            "tuner-1-sweep": self.__tuner_1_sweep
         }
         return
     
 
     def _set_validators(self) -> None:
         self.validators = {
-            "tuner-1-fixed": self.__tuner_1_fixed_validator
+            "tuner-1-fixed": self.__tuner_1_fixed_validator,
+            "tuner-1-sweep": self.__tuner_1_sweep_validator
         }
         return
     
 
     def _set_templates(self) -> None:
-        default_fixed_template = self._get_default_template("fixed")
         self.templates = {
-            "tuner-1-fixed": default_fixed_template
+            "tuner-1-fixed": self._get_default_template("fixed"),
+            "tuner-1-sweep": self._get_default_template("sweep"),
         }
 
 
@@ -36,8 +38,19 @@ class Receiver(SPECTREReceiver):
         return
     
 
+    def __tuner_1_sweep(self, capture_configs: list) -> None:
+        capture_config = capture_configs[0]
+        tuner_1_sweep.main(capture_config)
+        return
+    
+
     def __tuner_1_fixed_validator(self, capture_config: dict) -> None:
         self._default_fixed_validator(capture_config)
+        self.__RSPduo_validator(capture_config)
+        return
+    
+    def __tuner_1_sweep_validator(self, capture_config: dict) -> None:
+        self._default_sweep_validator(capture_config)
         self.__RSPduo_validator(capture_config)
         return
     
@@ -46,7 +59,15 @@ class Receiver(SPECTREReceiver):
         # RSPduo specific validations in single tuner mode
         center_freq_lower_bound = 1e3 # [Hz]
         center_freq_upper_bound = 2e9 # [Hz]
-        validator_helpers.closed_confine_center_freq(capture_config['center_freq'], center_freq_lower_bound, center_freq_upper_bound)
+        center_freq = capture_config.get("center_freq")
+        min_freq = capture_config.get("min_freq")
+        max_freq = capture_config.get("max_freq")
+        if center_freq:
+            validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if min_freq:
+            validator_helpers.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
+        if max_freq:
+            validator_helpers.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
 
         samp_rate_lower_bound = 200e3 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]

@@ -16,9 +16,6 @@ fi
 
 # Run the Docker container (no GUI support)
 sudo docker run --name spectre-host-gui-container -it --rm \
-    -v $SPECTREPARENTPATH/cfg:/home/spectre/cfg \
-    -v $SPECTREPARENTPATH/host/logs:/home/spectre/host/logs \
-    -v $SPECTREPARENTPATH/chunks:/home/spectre/chunks \
     -v /dev/shm:/dev/shm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \

@@ -25,10 +25,10 @@ from gnuradio import spectre
 
 from cfg import CONFIG
 
-class tagged_staircase_test(gr.top_block):
+class tagged_staircase(gr.top_block):
 
     def __init__(self, capture_config: dict):
-        gr.top_block.__init__(self, "tagged-staircase-test", catch_exceptions=True)
+        gr.top_block.__init__(self, "tagged-staircase", catch_exceptions=True)
 
         ##################################################
         # Variables
@@ -45,7 +45,14 @@ class tagged_staircase_test(gr.top_block):
         # Blocks
         ##################################################
         self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, max_samples_per_step, step_increment, samp_rate)
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate, is_sweeping)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir,
+                                                                     tag, 
+                                                                     chunk_size, 
+                                                                     samp_rate, 
+                                                                     is_sweeping,
+                                                                     'rx_freq',
+                                                                     0
+                                                                     )
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate, True)
 
 
@@ -58,7 +65,7 @@ class tagged_staircase_test(gr.top_block):
 
 
 
-def main(capture_config: dict, top_block_cls=tagged_staircase_test, options=None):
+def main(capture_config: dict, top_block_cls=tagged_staircase, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):
