@@ -11,7 +11,6 @@ FROM ubuntu:22.04
 
 # stop interactive dialogue (only for the duration of the build)
 ARG DEBIAN_FRONTEND=noninteractive
-
 #Set SPECTREHOST as the parent directory of the package
 ENV SPECTREPARENTPATH /home/spectre
 #add spectre to the python path so we can import modules properly
@@ -23,7 +22,7 @@ ENV PYTHONPATH "${SPECTREPARENTPATH}:${PYTHONPATH}"
 # -------------------------------------------------- # 
 
 # Install the required packages for the installation
-# versions are most recent as of 13th of March 2024
+# versions are most recent as of 24th August 2024
 RUN apt-get update -y && \
     apt-get install -y sudo \
     bash=5.1-6ubuntu1.1 \
