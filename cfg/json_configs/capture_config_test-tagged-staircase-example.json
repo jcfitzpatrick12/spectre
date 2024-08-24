@@ -15,5 +15,5 @@
     "integration_time": 0.0,
     "receiver": "Test",
     "mode": "tagged-staircase",
-    "tag": "tagged-staircase-example"
+    "tag": "test-tagged-staircase-example"
 }

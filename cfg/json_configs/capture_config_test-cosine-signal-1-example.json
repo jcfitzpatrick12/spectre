@@ -14,5 +14,5 @@
     "chunk_key": "default",
     "receiver": "Test",
     "mode": "cosine-signal-1",
-    "tag": "cosine-signal-1-example"
+    "tag": "test-cosine-signal-1-example"
 }
