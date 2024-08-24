@@ -1,9 +1,9 @@
 {
     "event_handler_key": "default",
-    "chunk_size": 5,
+    "chunk_size": 3,
     "samp_rate": 600000,
     "integration_time": 0.01,
-    "window_size": 2048,
+    "window_size": 512,
     "chunk_key": "default",
     "center_freq": 95800000.0,
     "RF_gain": 0,
@@ -13,7 +13,7 @@
     "window_kwargs": {
     },
     "STFFT_kwargs": {
-        "hop": 1024
+        "hop": 256
     },
     "receiver": "RSP1A",
     "mode": "fixed",
