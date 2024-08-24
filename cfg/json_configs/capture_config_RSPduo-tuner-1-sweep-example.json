@@ -1,7 +1,7 @@
 {
-    "min_freq": 120000000.0,
-    "max_freq": 160000000.0,
-    "samples_per_step": 300000,
+    "min_freq": 80000000.0,
+    "max_freq": 120000000.0,
+    "samples_per_step": 400000,
     "freq_step": 8000000.0,
     "bandwidth": 8000000.0,
     "samp_rate": 8000000,
