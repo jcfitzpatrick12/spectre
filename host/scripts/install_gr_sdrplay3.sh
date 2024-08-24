@@ -10,7 +10,7 @@ cd gr-sdrplay3
 # Checkout a specific branch
 git checkout message-passing
 # Checkout a specific commit within the branch
-git checkout bde185c2afc15da37bc1810ba60f6899020eeafc
+# git checkout <commit hash>
 # Build the OOT module
 mkdir build && cd build && cmake .. && make
 # Install the module

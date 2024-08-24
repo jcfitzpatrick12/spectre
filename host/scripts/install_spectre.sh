@@ -9,9 +9,8 @@ git clone https://github.com/jcfitzpatrick12/spectre.git
 cd spectre
 # Checkout a specific branch
 git checkout sweep-logic
-# Checkout a specific commit within the branch
-git checkout 0a4414cc5fcf91ab55039e519ff4398cf182399e
-
+# # Checkout a specific commit within the branch
+# git checkout <commit hash>
 # install the requirements for spectre-host
 cd host/
 pip install -r requirements.txt

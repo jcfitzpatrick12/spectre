@@ -10,7 +10,7 @@ cd gr-spectre
 # Checkout a specific branch
 git checkout sweep-logic
 # Checkout a specific commit within the branch
-git checkout 0a4414cc5fcf91ab55039e519ff4398cf182399e
+# git checkout <commit hash>
 # Build the OOT module
 mkdir build && cd build && cmake .. && make
 # Install the module
