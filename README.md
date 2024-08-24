@@ -30,6 +30,7 @@ Current supported receivers include:
 The framework is in place to integrate the following receivers, this is planned for the near future:
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
 - AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO, RTLSDR (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
+- USRP SDRs
 
 ## Supported Operating Systems and Platforms
 This project is tested to be compatible with the following operating systems and architectures:
@@ -50,12 +51,12 @@ Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubunt
 
 **Install the RSP API on your host machine**  
 First, download the RSP API from SDRPlay on your host machine by running (in your desired directory):  
-```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.14.0.run```  
+```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run```  
   
 Alternatively, you can manually download it [directly from the SDRPlay website](https://www.sdrplay.com/api/).  
   
 Run the API installation:  
-```chmod +x ./SDRplay_RSP_API-Linux-3.14.0.run && ./SDRplay_RSP_API-Linux-3.14.0.run```  
+```chmod +x ./SDRplay_RSP_API-Linux-3.15.2.run && ./SDRplay_RSP_API-Linux-3.15.2.run```  
   
 With the installation successful, start the sdrplay API service:  
 ```sudo systemctl start sdrplay```
