@@ -30,9 +30,9 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
             self.wait_until_stable(event.src_path)
             try:
                 self.process(event.src_path)
-            except Exception as e:
-                print(f"Error processing file {event.src_path}: {e}")
+            except Exception:
                 self.watcher.stop()  # Signal the watcher to stop on error
+                raise
 
 
     def wait_until_stable(self, file_path: str):
