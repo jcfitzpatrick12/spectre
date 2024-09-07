@@ -12,7 +12,7 @@ from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 from spectre.receivers.factory import get_receiver
 from spectre.utils import file_helpers
-from host.capture_scripts.capture_session import update_process_status
+from host.capture_scripts.capture_session import update_subprocess_statuses
 
 app = typer.Typer()
 
@@ -30,7 +30,7 @@ def process_log(
     Print the process log or the log for a specific subprocess if PID is provided.
     """
     # Update the statuses of subprocesses before printing
-    update_process_status()
+    update_process_statuses()
 
     if pid:
         # Print the log for the specific subprocess by PID
