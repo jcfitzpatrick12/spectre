@@ -30,7 +30,7 @@ def process_log(
     Print the process log or the log for a specific subprocess if PID is provided.
     """
     # Update the statuses of subprocesses before printing
-    update_subprocess_statuses()
+    update_process_status()
 
     if pid:
         # Print the log for the specific subprocess by PID
