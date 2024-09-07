@@ -12,16 +12,13 @@ class HdrChunk(ExtChunk):
         super().__init__(chunk_start_time, tag, "hdr")
 
     def read(self) -> Tuple[int, np.ndarray, np.ndarray]:
-        try:
-            hdr_contents = self._read_file_contents()
-            millisecond_correction = self._get_millisecond_correction(hdr_contents)
-            center_frequencies = self._get_center_frequencies(hdr_contents)
-            num_samples = self._get_num_samples(hdr_contents)
-            self._validate_frequencies_and_samples(center_frequencies, num_samples)
-            return millisecond_correction, (center_frequencies, num_samples)
+        hdr_contents = self._read_file_contents()
+        millisecond_correction = self._get_millisecond_correction(hdr_contents)
+        center_frequencies = self._get_center_frequencies(hdr_contents)
+        num_samples = self._get_num_samples(hdr_contents)
+        self._validate_frequencies_and_samples(center_frequencies, num_samples)
+        return millisecond_correction, (center_frequencies, num_samples)
         
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"Error fetching IQ data, received {e}.")
 
 
     def _read_file_contents(self) -> np.ndarray:
