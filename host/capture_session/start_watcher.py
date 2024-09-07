@@ -29,9 +29,13 @@ if __name__ == "__main__":
             os.mkdir(CONFIG.path_to_chunks_dir)
             logger.info(f"Created chunks directory at {CONFIG.path_to_chunks_dir}")
 
-        # Start the watcher
+        # create an instane of the watcher
         watcher = Watcher(tag)
+        logger.info(f"Watcher successfully instantiated with tag: {tag}")
+
+        # and start watching
         watcher.start()
+        logger.info(f"Watcher is now watching ...")
 
     except Exception as e:
         # Log any unexpected errors

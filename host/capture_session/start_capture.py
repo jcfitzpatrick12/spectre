@@ -26,18 +26,18 @@ def main():
         tags = args.tags
 
         # Log the input arguments
-        logger.info(f"Starting capture session with receiver: {receiver_name}, mode: {mode}, tags: {tags}")
+        logger.info(f"Starting capture with the receiver {receiver_name} in mode {mode} with tags {tags}.")
 
         # Get receiver and start capture
         receiver = get_receiver(receiver_name, mode=mode)
-        logger.info(f"Receiver {receiver_name} initialized with mode {mode}")
+        logger.info(f"Receiver {receiver_name} successfully instantiated in mode {mode}.")
 
         receiver.start_capture(tags)
-        logger.info(f"Capture started with tags: {tags}")
+        logger.info(f"Capture started with tags {tags}")
 
     except Exception as e:
         # Log any unexpected errors
-        logger.error(f"Exception occurred during capture session: {str(e)}", exc_info=True)
+        logger.error(f"An exception occurred during capture: {str(e)}", exc_info=True)
 
 if __name__ == "__main__":
     main()
