@@ -77,11 +77,13 @@ def is_process_running(pid: int) -> bool:
         return False  # Process is not running
     return True  # Process is running
 
+
 # Function to update the statuses of subprocesses
 def update_subprocess_statuses() -> None:
     """
     Iterates through the subprocesses in the tracking file, checks their status using os.kill(),
     and updates the status if any subprocess has stopped or failed.
+    Skips updating processes that are already marked as 'failed'.
     """
     subprocesses = read_from_log_file(CONFIG.path_to_processes_log)
 
@@ -93,14 +95,21 @@ def update_subprocess_statuses() -> None:
         pid = int(pid_str)
         logger = configure_subprocess_logging(pid)
 
+        # Skip updating if the status is 'failed'
+        if status == 'failed':
+            logger.info(f"Subprocess with PID {pid} has already failed. Skipping update.")
+            continue
+
+        # Check if the process is still running
         if is_process_running(pid):
             logger.info(f"Subprocess with PID {pid} is still running.")
         else:
-            # The process does not exist anymore
+            # Update the status to 'stopped' if the process has stopped
             update_process_status(pid, 'stopped')
             logger.info(f"Subprocess with PID {pid} has stopped or no longer exists.")
 
     typer.secho("Subprocess statuses have been updated.", fg=typer.colors.GREEN)
+
 
 def start(command: List[str]) -> None:
     """
@@ -121,7 +130,7 @@ def start(command: List[str]) -> None:
     # Check if the process has exited early using poll()
     if process.poll() is not None:  # The process has exited early
         # Handle early failure
-        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Run \"spectre print capture-log\" for more details.", fg=typer.colors.RED)
+        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Run \"spectre print process-log\" for more details.", fg=typer.colors.RED)
         update_process_status(process.pid, 'failed')
         raise typer.Exit(1)
 
