@@ -3,43 +3,31 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from watchdog.observers import Observer
-import time
-import threading
-
-
+from watchdog.events import FileSystemEventHandler
 from cfg import CONFIG
 from spectre.watchdog.factory import get_event_handler_from_tag
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
     def __init__(self, tag: str):
         self.observer = Observer()
-        self.tag = tag
-
-        # Event handler based on tag
         EventHandler = get_event_handler_from_tag(tag)
-        self.event_handler = EventHandler(self, tag)
-
-        self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
+        self.event_handler = EventHandler(self, tag)  # Initialize with the appropriate handler
 
     def start(self):
-
         try:
+            # Schedule the observer with the event handler
             self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
             self.observer.start()
             print("Watching for new files...")
-            while not self.stop_event.is_set():
-                time.sleep(1)
+
+            # Observer runs asynchronously, just wait for it to complete or fail
+            self.observer.join()  # This will block until the observer is stopped
         except Exception as e:
-            # Propagate the error upwards to the caller
-            raise e  # This will propagate the error to where watcher.start() is called
+            # Propagate the error upwards
+            print(f"Error occurred in watcher: {e}")
+            raise e
         finally:
-            # Ensure the observer is properly stopped even in the case of an error
+            # Ensure the observer is properly stopped in the event of an error
             self.observer.stop()
             self.observer.join()
-            print("Observer Stopped")
-
-    def stop(self):
-        self.stop_event.set()  # Signal to stop the observer
-
-
+            print("Observer stopped.")

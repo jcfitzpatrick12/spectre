@@ -7,12 +7,12 @@ import os
 import logging
 from spectre.watchdog.Watcher import Watcher
 from cfg import CONFIG
-from host.capture_scripts.capture_session import configure_subprocess_logging  
+from host.capture_scripts.capture_session import configure_subprocess_logging
 
 if __name__ == "__main__":
     # Set up argument parser
     parser = ArgumentParser()
-    parser.add_argument("--tag", required=True, type=str, help="")
+    parser.add_argument("--tag", required=True, type=str, help="Tag for the file handler")
     args = parser.parse_args()
     tag = args.tag
 
