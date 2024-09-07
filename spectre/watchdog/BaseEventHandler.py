@@ -4,19 +4,22 @@
 
 import os
 import time
+import queue
 from watchdog.events import FileSystemEventHandler
 from abc import ABC, abstractmethod
+
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
+
 class BaseEventHandler(ABC, FileSystemEventHandler):
-    def __init__(self, watcher, tag: str, extension: str):
-        self.watcher = watcher  # Reference to the watcher
+    def __init__(self, tag: str, exception_queue: queue.Queue, extension: str):
         self.tag = tag
         self.Chunk = get_chunk_from_tag(tag)
         capture_config_handler = CaptureConfigHandler(tag)
         self.capture_config = capture_config_handler.load_as_dict()
         self.extension = extension
+        self.exception_queue = exception_queue  # Queue to propagate exceptions
 
     @abstractmethod
     def process(self, file_path: str) -> None:
@@ -30,7 +33,8 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 self.process(event.src_path)
             except Exception as e:
                 print(f"Error processing file {event.src_path}: {e}")
-                self.watcher.exception_queue.put(e)  # Put the exception in the queue
+                # Capture the exception and propagate it through the queue
+                self.exception_queue.put(e)
 
     def wait_until_stable(self, file_path: str):
         print(f"Waiting until {file_path} is stable.")
@@ -44,6 +48,6 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 time.sleep(0.5)
             except OSError as e:
                 print(f"Error accessing file {file_path}: {e}")
-                self.watcher.exception_queue.put(e)  # Put the exception in the queue
+                self.exception_queue.put(e)  # Capture the exception and propagate it
                 raise e
         print(f"File {file_path} is stable and ready for processing.")
