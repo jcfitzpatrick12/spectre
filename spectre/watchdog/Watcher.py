@@ -23,11 +23,11 @@ class Watcher:
         self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
 
     def start(self):
-        self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
-        self.observer.start()
-        print("Watching for new files...")
 
         try:
+            self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
+            self.observer.start()
+            print("Watching for new files...")
             while not self.stop_event.is_set():
                 time.sleep(1)
         except Exception as e:
