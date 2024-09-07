@@ -107,6 +107,7 @@ def stop() -> None:
         return
 
     for pid, status in subprocesses.items():
+        logger = configure_subprocess_logging(int(pid))
         if status == 'running':
             try:
                 os.kill(int(pid), signal.SIGTERM)
@@ -119,7 +120,6 @@ def stop() -> None:
                 except ProcessLookupError:
                     # Process is terminated
                     update_process_status(pid, 'stopped')
-                    logger = configure_subprocess_logging(int(pid))
                     logger.info(f"Subprocess with PID {pid} has been terminated.")
                 else:
                     # Forcefully kill if still alive
