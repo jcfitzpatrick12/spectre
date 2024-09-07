@@ -80,6 +80,9 @@ def start(command: List[str]) -> None:
 
         typer.secho("Subprocess started. Checking status...", fg=typer.colors.BLUE)
 
+        # Give the subprocess time to warm-up
+        time.sleep(1)
+
         # Capture both stdout and stderr even in case of success
         stdout_output, stderr_output = process.communicate()
 
