@@ -85,7 +85,7 @@ def start(command: List[str]) -> None:
             stderr_output = process.communicate()[1].decode('utf-8')  # Capture stderr
             logger.error(f"Subprocess with PID {process.pid} failed. Stderr: {stderr_output}")
             update_process_status(process.pid, 'failed')
-            typer.secho(f"Subprocess with PID {process.pid} failed. Use 'spectre capture process-log' to see error details.", fg=typer.colors.RED)
+            typer.secho(f"Subprocess with PID {process.pid} failed. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
             raise typer.Exit(1)
 
         typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
