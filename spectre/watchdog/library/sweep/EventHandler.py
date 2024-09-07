@@ -14,7 +14,7 @@ from spectre.watchdog.event_handler_register import register_event_handler
 @register_event_handler("sweep")
 class EventHandler(BaseEventHandler):
     def __init__(self, watcher, tag: str):
-        super().__init__(watcher, tag, "bin")
+        super().__init__(watcher, tag, "hdr")
 
         # initialise an attribute which will store the previous chunk
         # this is required in order to avoid data dropping constructing swept spectrograms
