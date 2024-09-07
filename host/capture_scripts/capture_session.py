@@ -98,8 +98,6 @@ def start(command: List[str]) -> None:
         
         # Log the exception properly
         log_process(process.pid, str(e))
-
-        typer.secho(f"An exception occurred in subprocess with PID {process.pid}. Use 'spectre capture process-log' to see error details.", fg=typer.colors.RED)
         raise typer.Exit(1)
 
 # Stop running subprocesses and update their statuses
