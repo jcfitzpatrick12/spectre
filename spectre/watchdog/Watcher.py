@@ -26,16 +26,22 @@ class Watcher:
         self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
         self.observer.start()
         print("Watching for new files...")
+
         try:
             while not self.stop_event.is_set():  # Check if the stop event is set
                 time.sleep(1)
-        except KeyboardInterrupt:
-            print("Watcher manually interrupted.")
+
+        except Exception as e:
+            # Log the error here for extra visibility
+            print(f"Error in Watcher: {str(e)}")
+            # Raise the exception so it gets propagated to the caller
+            raise
+
         finally:
             self.observer.stop()
             self.observer.join()
             print("Observer Stopped")
 
-
     def stop(self):
         self.stop_event.set()  # External method to stop the observer
+
