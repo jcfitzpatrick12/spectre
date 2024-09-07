@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from argparse import ArgumentParser
-import os
 
-from host.capture_scripts import capture_session
 from spectre.receivers.factory import get_receiver
 
 def main():
@@ -20,12 +18,8 @@ def main():
     mode = args.mode
     tags = args.tags
 
-    try:
-        receiver = get_receiver(receiver_name, mode = mode)
-        receiver.start_capture(tags)
-
-    except Exception as e:
-        capture_session.log_subprocess(os.getpid(), str(e))
+    receiver = get_receiver(receiver_name, mode = mode)
+    receiver.start_capture(tags)
 
 if __name__ == "__main__":
     main()
