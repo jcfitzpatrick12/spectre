@@ -11,8 +11,6 @@ import logging
 from logging import FileHandler, Formatter
 import typer
 from typing import List
-import sys
-
 from cfg import CONFIG
 
 # Helper functions for reading/writing to log files
@@ -57,17 +55,10 @@ def configure_subprocess_logging(pid: int) -> logging.Logger:
 
     # Avoid adding multiple handlers by checking if already set
     if not logger.handlers:
-
         file_handler = FileHandler(log_file)
-        file_handler.setLevel(logging.INFO)
-        logger.addHandler(file_handler)
-
-        stream_handler = logging.StreamHandler(sys.stdout)
-        stream_handler.setLevel(logging.INFO)
-        logger.addHandler(stream_handler)
-
         formatter = Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     return logger
 
@@ -77,21 +68,14 @@ def start(command: List[str]) -> None:
     Starts a subprocess and logs its execution in the tracking file and its own log file.
     """
     try:
-        # Start the subprocess
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
-        
+        logger = configure_subprocess_logging(process.pid)
         # Log the subprocess as running in the process tracking file
         log_process(process.pid, 'running')
-
-        # Configure and log subprocess-specific logging
-        logger = configure_subprocess_logging(process.pid)
         logger.info(f"Subprocess with PID {process.pid} started with command: {' '.join(command)}")
-
         typer.secho("Subprocess started. Checking status...", fg=typer.colors.BLUE)
-
         # Give the subprocess time to warm-up and potentially fail early
         time.sleep(1)
-
         # Check if the subprocess has failed right after starting
         if process.poll() is not None:  # Non-blocking check if the process has exited
             # Capture both stdout and stderr if it failed
