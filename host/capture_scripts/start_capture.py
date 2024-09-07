@@ -3,29 +3,41 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from argparse import ArgumentParser
-
+import os
+import logging
 from spectre.receivers.factory import get_receiver
+from host.capture_scripts.capture_session import configure_subprocess_logging  # Import logging config
 
 def main():
-    parser = ArgumentParser()
-    parser.add_argument("--receiver", type=str, help="")
-    parser.add_argument("--mode", type=str, help="")
-    parser.add_argument("--tags", "--tag", type=str, nargs="+", help="")
+    # Configure logging for this subprocess (using its PID)
+    pid = os.getpid()
+    logger = configure_subprocess_logging(pid)  # Set up logging for the subprocess
+    
+    try:
+        parser = ArgumentParser()
+        parser.add_argument("--receiver", type=str, help="")
+        parser.add_argument("--mode", type=str, help="")
+        parser.add_argument("--tags", "--tag", type=str, nargs="+", help="")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    receiver_name = args.receiver
-    mode = args.mode
-    tags = args.tags
+        receiver_name = args.receiver
+        mode = args.mode
+        tags = args.tags
 
-    receiver = get_receiver(receiver_name, mode = mode)
-    receiver.start_capture(tags)
+        # Log the input arguments
+        logger.info(f"Starting capture session with receiver: {receiver_name}, mode: {mode}, tags: {tags}")
+
+        # Get receiver and start capture
+        receiver = get_receiver(receiver_name, mode=mode)
+        logger.info(f"Receiver {receiver_name} initialized with mode {mode}")
+
+        receiver.start_capture(tags)
+        logger.info(f"Capture started with tags: {tags}")
+
+    except Exception as e:
+        # Log any unexpected errors
+        logger.error(f"Exception occurred during capture session: {str(e)}", exc_info=True)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
