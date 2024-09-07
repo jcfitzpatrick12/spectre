@@ -43,7 +43,7 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
         for tag in tags:
             subprocess_command += [tag]
 
-        capture_session.start(subprocess_command)
+        processes.start(subprocess_command)
         raise typer.Exit()
 
 @app.command()
