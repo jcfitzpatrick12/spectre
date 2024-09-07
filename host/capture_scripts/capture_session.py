@@ -61,7 +61,6 @@ def configure_subprocess_logging(pid: int) -> logging.Logger:
     subprocess_loggers[pid] = logger
     return logger
 
-# Start a subprocess and handle logging and process tracking
 def start(command: List[str]) -> None:
     """
     Starts a subprocess and logs its execution in the tracking file and its own log file.
@@ -86,17 +85,21 @@ def start(command: List[str]) -> None:
             stderr_output = process.communicate()[1].decode('utf-8')  # Capture stderr
             logger.error(f"Subprocess with PID {process.pid} failed. Stderr: {stderr_output}")
             update_process_status(process.pid, 'failed')
-            typer.secho(f"Subprocess with PID {process.pid} failed. Check the log for details.", fg=typer.colors.RED)
+            typer.secho(f"Subprocess with PID {process.pid} failed. Use 'spectre capture process-log' to see error details.", fg=typer.colors.RED)
             raise typer.Exit(1)
-        else:
-            typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
-            logger.info(f"Subprocess with PID {process.pid} started successfully.")
+
+        typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
+        logger.info(f"Subprocess with PID {process.pid} started successfully.")
 
     except Exception as e:
         logger = configure_subprocess_logging(process.pid)
         logger.error(f"Exception occurred in subprocess with PID {process.pid}: {str(e)}", exc_info=True)
         update_process_status(process.pid, 'failed')
-        typer.secho(f"Subprocess failed with an exception. Check the log for details.", fg=typer.colors.RED)
+        
+        # Log the exception properly
+        log_process(process.pid, str(e))
+
+        typer.secho(f"An exception occurred in subprocess with PID {process.pid}. Use 'spectre capture process-log' to see error details.", fg=typer.colors.RED)
         raise typer.Exit(1)
 
 # Stop running subprocesses and update their statuses
