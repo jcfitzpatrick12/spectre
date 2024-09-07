@@ -2,40 +2,47 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import queue
 from watchdog.observers import Observer
-import time
-import threading
-
-
 from cfg import CONFIG
 from spectre.watchdog.factory import get_event_handler_from_tag
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 
 class Watcher:
     def __init__(self, tag: str):
         self.observer = Observer()
-        self.tag = tag
-
+        self.exception_queue = queue.Queue()  # A thread-safe queue for exceptions
         EventHandler = get_event_handler_from_tag(tag)
-        # create an instance of the event handler
-        self.event_handler = EventHandler(self, tag)
-
-        self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
+        self.event_handler = EventHandler(tag, self.exception_queue)
 
     def start(self):
-        self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
-        self.observer.start()
-        print("Watching for new files...")
         try:
-            while not self.stop_event.is_set():  # Check if the stop event is set
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("Watcher manually interrupted.")
+            # Schedule the observer with the event handler
+            self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
+            self.observer.start()
+            print("Watcher started, observing directory...")
+
+            # Monitor the observer and check for exceptions in the queue
+            while True:
+                try:
+                    # Block and wait for exceptions with a 1-second timeout
+                    exc = self.exception_queue.get(block=True, timeout=1)
+                    print("Exception captured in background thread.")
+                    raise exc  # Propagate the exception to the main thread
+                except queue.Empty:
+                    # No exceptions in queue, continue checking
+                    pass
+
+                # Stop if the observer thread stops running
+                if not self.observer.is_alive():
+                    print("Observer has stopped unexpectedly.")
+                    break
+        except Exception as e:
+            print(f"Error occurred in Watcher: {e}")
+            raise e
         finally:
+            # Ensure the observer is properly stopped
             self.observer.stop()
             self.observer.join()
-            print("Observer Stopped")
+            print("Watcher stopped.")
 
 
-    def stop(self):
-        self.stop_event.set()  # External method to stop the observer

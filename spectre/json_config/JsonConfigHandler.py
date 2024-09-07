@@ -36,13 +36,13 @@ class JsonConfigHandler:
 
     def load_as_dict(self) -> dict:
         file_path = self.get_path()
-        json_as_dict = json_helpers.load_json_as_dict(file_path)
-        return json_as_dict
+        return json_helpers.load_json_as_dict(file_path)
     
 
     def save_dict_as_json(self, d: dict, doublecheck_overwrite = True) -> None:
         file_path = self.get_path()
         json_helpers.save_dict_as_json(d, file_path, doublecheck_overwrite=doublecheck_overwrite)
+        return
     
 
     def update_key_value(self, key: Any, value: Any, doublecheck_overwrite = False) -> None:
@@ -60,4 +60,5 @@ class JsonConfigHandler:
         else:
             file_helpers.doublecheck_delete(self.get_path())
             os.remove(self.get_path())
+        return
             
