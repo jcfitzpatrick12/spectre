@@ -121,7 +121,6 @@ def start(command: List[str]) -> None:
 
     typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
 
-# Function to stop all running subprocesses
 def stop() -> None:
     """Stops all running subprocesses listed in the process tracking file."""
     subprocesses = read_from_log_file(CONFIG.path_to_processes_log)
@@ -136,17 +135,24 @@ def stop() -> None:
 
         if status == 'running':
             try:
-                os.kill(pid, signal.SIGTERM)
-                typer.secho(f"Subprocess with PID {pid} terminated.", fg=typer.colors.GREEN)
+                os.kill(pid, signal.SIGTERM)  # Send SIGTERM to terminate gracefully
+                typer.secho(f"Subprocess with PID {pid} termination initiated.", fg=typer.colors.GREEN)
+
+                # Wait for 1 seconds to give the process time to terminate
                 time.sleep(1)
+
                 if not is_process_running(pid):
+                    # Process terminated normally
                     update_process_log(pid, 'stopped')
                     logger.info(f"Subprocess with PID {pid} has been stopped.")
                 else:
+                    # If still running, forcefully terminate with SIGKILL
                     os.kill(pid, signal.SIGKILL)
                     typer.secho(f"Subprocess with PID {pid} was forcefully terminated.", fg=typer.colors.YELLOW)
                     update_process_log(pid, 'killed')
+
             except ProcessLookupError:
+                # If the process is already gone
                 typer.secho(f"Failed to terminate subprocess with PID {pid}. It may have already exited.", fg=typer.colors.RED)
 
     typer.secho("All subprocesses have been addressed, and the log file has been cleared.", fg=typer.colors.GREEN)
