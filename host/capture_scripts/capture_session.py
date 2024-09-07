@@ -105,6 +105,7 @@ def update_subprocess_statuses() -> None:
 def start(command: List[str]) -> None:
     """
     Starts a subprocess and logs its execution in the tracking file and its own log file.
+    Detects and logs if the subprocess fails within the first second.
     """
     try:
         # Start the subprocess
@@ -114,26 +115,29 @@ def start(command: List[str]) -> None:
         # Log the subprocess as running in the process tracking file
         log_process(process.pid, 'running')
         logger.info(f"Subprocess with PID {process.pid} started with command: {' '.join(command)}")
-        typer.secho("Subprocess started. Checking status...", fg=typer.colors.BLUE)
+        typer.secho(f"Subprocess with PID {process.pid} started. Checking status...", fg=typer.colors.BLUE)
 
-        # Give the subprocess a moment to initialize
+        # Give the subprocess a short time to initialize
         time.sleep(1)
 
-        # Check if the subprocess has exited early using poll()
-        if process.poll() is not None:  # Non-blocking check if the process has exited
-            # The process has exited early, capture stdout and stderr
+        # Check if the subprocess has exited within the first second using poll()
+        return_code = process.poll()  # Non-blocking check if the process has exited
+
+        if return_code is not None:  # The process has exited early
+            # The process has exited, capture stdout and stderr
             stdout_output, stderr_output = process.communicate()
-            if process.returncode != 0:  # Check for non-zero exit codes (indicates failure)
-                logger.error(f"Subprocess with PID {process.pid} failed. Stderr: {stderr_output.decode('utf-8')}")
+
+            # Log and print appropriate error messages based on return code
+            if return_code != 0:  # Non-zero return code indicates failure
+                logger.error(f"Subprocess with PID {process.pid} failed. Return code: {return_code}. Stderr: {stderr_output.decode('utf-8')}")
                 update_process_status(process.pid, 'failed')
-                typer.secho(f"Subprocess with PID {process.pid} failed. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
+                typer.secho(f"Subprocess with PID {process.pid} failed. Check logs for details.", fg=typer.colors.RED)
             else:
-                # If the process exited successfully (rare but possible within 1 second)
-                logger.info(f"Subprocess with PID {process.pid} completed successfully.")
+                logger.info(f"Subprocess with PID {process.pid} completed successfully within the first second.")
                 update_process_status(process.pid, 'stopped')
             return
 
-        # If it's still running after the initial check, mark it as successfully started
+        # If still running, mark as successfully started
         typer.secho(f"Subprocess with PID {process.pid} started successfully and is running.", fg=typer.colors.GREEN)
         logger.info(f"Subprocess with PID {process.pid} started successfully and is running.")
 
@@ -142,6 +146,7 @@ def start(command: List[str]) -> None:
         logger.error(f"Exception occurred in subprocess with PID {process.pid}: {str(e)}", exc_info=True)
         update_process_status(process.pid, 'failed')
         typer.secho(f"An exception occurred in subprocess with PID {process.pid}. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
+
 # Function to stop all running subprocesses
 def stop() -> None:
     """
