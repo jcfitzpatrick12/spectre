@@ -16,8 +16,8 @@ class Watcher:
         self.observer = Observer()
         self.tag = tag
 
+        # Event handler based on tag
         EventHandler = get_event_handler_from_tag(tag)
-        # create an instance of the event handler
         self.event_handler = EventHandler(self, tag)
 
         self.stop_event = threading.Event()  # Event to signal an error and stop the watcher
@@ -28,14 +28,18 @@ class Watcher:
         print("Watching for new files...")
 
         try:
-            while not self.stop_event.is_set():  # Check if the stop event is set
+            while not self.stop_event.is_set():
                 time.sleep(1)
-
         except Exception as e:
-            # Raise the exception so it gets propagated to the caller
-            raise
-
+            # Propagate the error upwards to the caller
+            raise e  # This will propagate the error to where watcher.start() is called
+        finally:
+            # Ensure the observer is properly stopped even in the case of an error
+            self.observer.stop()
+            self.observer.join()
+            print("Observer Stopped")
 
     def stop(self):
-        self.stop_event.set()  # External method to stop the observer
+        self.stop_event.set()  # Signal to stop the observer
+
 
