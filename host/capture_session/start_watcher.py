@@ -7,7 +7,7 @@ import os
 import logging
 from spectre.watchdog.Watcher import Watcher
 from cfg import CONFIG
-from host.capture_scripts.capture_session import configure_subprocess_logging
+from host.capture_session.processes import configure_subprocess_logging
 
 if __name__ == "__main__":
     # Set up argument parser
@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     try:
         # Log that the process has started
-        logger.info(f"Starting Watcher with tag: {tag}")
+        logger.info(f"Starting watcher with tag: {tag}")
 
         # Check if the chunks directory exists, and create if not
         if not os.path.exists(CONFIG.path_to_chunks_dir):

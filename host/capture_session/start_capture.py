@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 import os
 import logging
 from spectre.receivers.factory import get_receiver
-from host.capture_scripts.capture_session import configure_subprocess_logging  # Import logging config
+from host.capture_session.processes import configure_subprocess_logging  # Import logging config
 
 def main():
     # Configure logging for this subprocess (using its PID)
