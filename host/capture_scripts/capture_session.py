@@ -11,6 +11,8 @@ import logging
 from logging import FileHandler, Formatter
 import typer
 from typing import List
+import sys
+
 from cfg import CONFIG
 
 # Helper functions for reading/writing to log files
@@ -55,10 +57,17 @@ def configure_subprocess_logging(pid: int) -> logging.Logger:
 
     # Avoid adding multiple handlers by checking if already set
     if not logger.handlers:
+
         file_handler = FileHandler(log_file)
+        file_handler.setLevel(logging.INFO)
+        logger.addHandler(file_handler)
+
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setLevel(logging.INFO)
+        logger.addHandler(stream_handler)
+
         formatter = Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
 
     return logger
 
