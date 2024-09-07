@@ -7,7 +7,7 @@ import os
 from typing import List
 
 from host.cli import __app_name__, __version__
-from host.capture_scripts import capture_session 
+from host.capture_session import processes
 from host.tests.analytical import do_analytical_test
 from cfg import CONFIG
 
@@ -68,14 +68,14 @@ def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the 
             'python3', f'{CONFIG.path_to_start_watcher}',
             '--tag', tag,
         ]
-        capture_session.start(subprocess_command)
+        processes.start(subprocess_command)
         raise typer.Exit()
 
 
 @app.command()
 def stop(
 ) -> None:
-    capture_session.stop()
+    processes.stop()
     raise typer.Exit()
 
 
