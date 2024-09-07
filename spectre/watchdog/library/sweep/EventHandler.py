@@ -22,24 +22,10 @@ class EventHandler(BaseEventHandler):
         self.previous_chunk = None # at instantiation, there is no previous chunk
 
     def process(self, file_path: str):
-        # try and build the spectrogram
-        try:
-            self._build_spectrogram(file_path)
-        # if some sort of error occurs, ignore, and just set the previous chunk
-        except Exception as e:
-
-            self.previous_chunk = self._get_chunk(file_path)
-            return
-    
-    def _get_chunk(self, file_path: str):
+        print(f"Processing {file_path}")
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
-        return self.Chunk(chunk_start_time, self.tag)
-
-
-    def _build_spectrogram(self, file_path: str):
-        print(f"Processing {file_path}")
-        chunk = self._get_chunk(file_path)
+        chunk = self.Chunk(chunk_start_time, self.tag)
         S = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
