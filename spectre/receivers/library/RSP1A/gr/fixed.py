@@ -91,7 +91,7 @@ def main(capture_config: dict, top_block_cls=fixed, options=None):
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)
 
-    tb.start()
+    tb.start(512)
 
     tb.wait()
 
