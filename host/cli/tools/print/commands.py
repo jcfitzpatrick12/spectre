@@ -22,8 +22,12 @@ def cron_log() -> None:
 
 
 @app.command()
-def process_log() -> None:
-    pid: int = typer.Option(None, "--pid", help="Print the process log, or if specified the specific logs for some subprocess"),
+def process_log(
+    pid: int = typer.Option(None, "--pid", help="Print the process log, or if specified the specific logs for some subprocess")
+    ) -> None:
+    """
+    Print the process log or the log for a specific subprocess if PID is provided.
+    """
     if pid:
         file_helpers.cat(os.path.join(CONFIG.path_to_logs, f"subprocess_{pid}.log"))
     else:
