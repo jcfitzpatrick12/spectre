@@ -80,27 +80,26 @@ def start(command: List[str]) -> None:
 
         typer.secho("Subprocess started. Checking status...", fg=typer.colors.BLUE)
 
-        # Give the subprocess time to warm-up
+        # Give the subprocess time to warm-up and potentially fail early
         time.sleep(1)
 
-        # Capture both stdout and stderr even in case of success
-        stdout_output, stderr_output = process.communicate()
-
-        # Check if the subprocess has exited with non-zero status
-        if process.returncode != 0:
+        # Check if the subprocess has failed right after starting
+        if process.poll() is not None:  # Non-blocking check if the process has exited
+            # Capture both stdout and stderr if it failed
+            stdout_output, stderr_output = process.communicate()
             logger.error(f"Subprocess with PID {process.pid} failed. Stderr: {stderr_output.decode('utf-8')}")
             update_process_status(process.pid, 'failed')
             typer.secho(f"Subprocess with PID {process.pid} failed. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
             return
 
-        typer.secho(f"Subprocess with PID {process.pid} started successfully.", fg=typer.colors.GREEN)
-        logger.info(f"Subprocess with PID {process.pid} started successfully.")
+        # If it's still running after the initial check, mark it as successfully started
+        typer.secho(f"Subprocess with PID {process.pid} started successfully and is running.", fg=typer.colors.GREEN)
+        logger.info(f"Subprocess with PID {process.pid} started successfully and is running.")
 
     except Exception as e:
         logger = configure_subprocess_logging(process.pid)
         logger.error(f"Exception occurred in subprocess with PID {process.pid}: {str(e)}", exc_info=True)
         update_process_status(process.pid, 'failed')
-
         typer.secho(f"An exception occurred in subprocess with PID {process.pid}. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
 
 
