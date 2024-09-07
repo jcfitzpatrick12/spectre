@@ -32,15 +32,9 @@ class Watcher:
                 time.sleep(1)
 
         except Exception as e:
-            # Log the error here for extra visibility
-            print(f"Error in Watcher: {str(e)}")
             # Raise the exception so it gets propagated to the caller
             raise
 
-        finally:
-            self.observer.stop()
-            self.observer.join()
-            print("Observer Stopped")
 
     def stop(self):
         self.stop_event.set()  # External method to stop the observer

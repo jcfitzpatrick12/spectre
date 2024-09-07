@@ -28,11 +28,8 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith(self.extension):
             self.wait_until_stable(event.src_path)
-            try:
-                self.process(event.src_path)
-            except Exception:
-                self.watcher.stop()  # Signal the watcher to stop on error
-                raise
+            self.process(event.src_path)
+
 
 
     def wait_until_stable(self, file_path: str):
