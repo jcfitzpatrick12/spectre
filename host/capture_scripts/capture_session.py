@@ -59,10 +59,15 @@ def is_process_running(pid: int) -> bool:
     except OSError:
         return False
 
-# Function to update the statuses of subprocesses
+
 def update_subprocess_statuses() -> None:
-    """Checks and updates the status of all subprocesses, skipping those marked as 'failed'."""
+    """
+    Iterates through the subprocesses in the tracking file, checks their status using os.kill(),
+    and updates the status if any subprocess has stopped or failed.
+    Skips updating processes that are already marked as 'failed'.
+    """
     subprocesses = read_from_log_file(CONFIG.path_to_processes_log)
+
     if not subprocesses:
         typer.secho("No subprocesses found to update.", fg=typer.colors.YELLOW)
         return
@@ -71,17 +76,34 @@ def update_subprocess_statuses() -> None:
         pid = int(pid_str)
         logger = configure_subprocess_logging(pid)
 
+        # Skip if already marked as failed
         if status == 'failed':
             logger.info(f"Subprocess with PID {pid} has already failed. Skipping update.")
             continue
 
+        # Check if the process is still running
         if is_process_running(pid):
             logger.info(f"Subprocess with PID {pid} is still running.")
-        else:
+            continue
+
+        # Process has stopped, check its exit status
+        try:
+            pid, status_code = os.waitpid(pid, os.WNOHANG)
+            exit_code = os.WEXITSTATUS(status_code)
+
+            if exit_code == 0:
+                update_process_log(pid, 'stopped')
+                logger.info(f"Subprocess with PID {pid} exited successfully.")
+            else:
+                update_process_log(pid, 'failed')
+                logger.error(f"Subprocess with PID {pid} failed with exit code {exit_code}.")
+        except ChildProcessError:
+            # Process is already reaped by the system, mark it as stopped
             update_process_log(pid, 'stopped')
-            logger.info(f"Subprocess with PID {pid} has stopped or no longer exists.")
+            logger.info(f"Subprocess with PID {pid} has already been reaped by the system.")
 
     typer.secho("Subprocess statuses have been updated.", fg=typer.colors.GREEN)
+
 
 # Function to start a subprocess and track its status
 def start(command: List[str]) -> None:
