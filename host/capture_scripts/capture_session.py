@@ -130,12 +130,6 @@ def start(command: List[str]) -> None:
     log_process(process.pid, 'running')  # Update log to show process is still running
 
 
-    except Exception as e:
-        logger = configure_subprocess_logging(process.pid)
-        logger.error(f"Exception occurred in subprocess with PID {process.pid}: {str(e)}", exc_info=True)
-        update_process_status(process.pid, 'failed')
-        typer.secho(f"An exception occurred in subprocess with PID {process.pid}. Use 'spectre print process-log' to see error details.", fg=typer.colors.RED)
-
 # Function to stop all running subprocesses
 def stop() -> None:
     """
