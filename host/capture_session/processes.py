@@ -89,8 +89,6 @@ def update_subprocess_statuses() -> None:
         # Update process status based on whether it's running or stopped
         update_status_for_pid(pid, logger)
 
-    typer.secho("Subprocess statuses have been updated.", fg=typer.colors.GREEN)
-
 
 def update_status_for_pid(pid: int, logger) -> None:
     """
