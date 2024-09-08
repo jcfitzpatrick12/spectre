@@ -71,6 +71,8 @@ def start_session(receiver_name: str,
     
     start_watcher(tags)
     start_capture(receiver_name, mode, tags)
+
+    typer.secho("Periodically checking subprocess statuses ...")
     # Polling loop to check for stopped processes
     while True:
         time.sleep(5)  # Sleep to reduce CPU usage
