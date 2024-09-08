@@ -82,9 +82,6 @@ def start_session(receiver_name: str,
         if any_process_not_running():
             typer.secho("A subprocess has exited unexpectedly.", fg=typer.colors.RED)
             
-            # Stop all subprocesses
-            stop()
-
             if force_restart:
                 typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
                 start_session(receiver_name, mode, tags, force_restart)
@@ -92,5 +89,7 @@ def start_session(receiver_name: str,
             else:
                 typer.secho("Stopping session as processes are not running.", fg = typer.colors.YELLOW)
                 break
-
+    
+    # Stop all subprocesses
+    stop()
     typer.secho("Session stopped.", fg = typer.colors.GREEN)
