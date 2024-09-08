@@ -7,7 +7,13 @@ import typer
 from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.Watcher import Watcher
-from host.capture_session import processes
+from host.capture_session.processes import (
+    update_process_log,
+    start,
+    any_process_not_running,
+    update_subprocess_statuses,
+    stop
+)
 
 
 def start_capture(receiver_name: str,
@@ -32,7 +38,7 @@ def start_capture(receiver_name: str,
         for tag in tags:
             subprocess_command += [tag]
 
-        processes.start(subprocess_command)
+        start(subprocess_command)
     return
 
 
@@ -54,7 +60,7 @@ def start_watcher(tags: List[str],
                 'python3', f'{CONFIG.path_to_start_watcher}',
                 '--tag', tag,
             ]
-            processes.start(subprocess_command)
+            start(subprocess_command)
     return
 
 
@@ -70,14 +76,14 @@ def start_session(receiver_name: str,
         time.sleep(5)  # Sleep to reduce CPU usage
 
         # Update the status of all subprocesses
-        processes.update_subprocess_statuses()
+        update_subprocess_statuses()
 
         # If any subprocess is not running, restart or exit depending on the flag
-        if processes.any_process_not_running():
+        if any_process_not_running():
             typer.secho("A subprocess has exited unexpectedly.", fg=typer.colors.RED)
             
             # Stop all subprocesses
-            processes.stop()
+            stop()
 
             if force_restart:
                 typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
