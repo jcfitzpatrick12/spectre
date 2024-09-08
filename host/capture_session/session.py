@@ -85,6 +85,7 @@ def start_session(receiver_name: str,
             if force_restart:
                 typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
                 stop()
+                time.sleep(5)
                 start_session(receiver_name, mode, tags, force_restart = force_restart)
                 return  # Exit the current loop and function, new session will take over
             else:
