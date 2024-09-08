@@ -23,7 +23,7 @@ app = typer.Typer()
 def start_session(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name"),
                   mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode for capture"),
                   tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),
-                  force_restart: bool = typer.Option(False, "--force_restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session..")
+                  force_restart: bool = typer.Option(False, "--force-restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session..")
                  ) -> None:
 
     session.start_session(receiver_name,
