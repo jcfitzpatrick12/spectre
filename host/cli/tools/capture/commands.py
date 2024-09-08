@@ -13,63 +13,45 @@ from cfg import CONFIG
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.Watcher import Watcher
+from host.capture_session import session
 
 
 app = typer.Typer()
 
+
+@app.command()
+def start_session(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name"),
+                  mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode for capture"),
+                  tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),
+                  force_restart: bool = typer.Option(False, "--force_restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session..")
+                 ) -> None:
+
+    session.start_session(receiver_name,
+                          mode,
+                          tags,
+                          force_restart)
+    return
+
+
 @app.command()
 def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name"),
           mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode for capture"),
-          tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),
+          tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture."),
           run_as_foreground_ps: bool = typer.Option(False, "--in-foreground", help="Specify whether to run as a foreground process."),
 ) -> None:
-
-    if not os.path.exists(CONFIG.path_to_start_capture):
-        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_capture}.")
-    
-    if run_as_foreground_ps:
-        receiver = get_receiver(receiver_name, mode = mode)
-        receiver.start_capture(tags)
-
-    else:
-        # build the command to start the capture session
-        subprocess_command = [
-            'python3', f'{CONFIG.path_to_start_capture}',
-            '--receiver', receiver_name,
-            '--mode', mode
-        ]
-
-        subprocess_command += ['--tag']
-        for tag in tags:
-            subprocess_command += [tag]
-
-        processes.start(subprocess_command)
-        raise typer.Exit()
+    session.start_capture(receiver_name,
+                          mode,
+                          tags,
+                          run_as_foreground_ps)
+    raise typer.Exit()
 
 @app.command()
-def start_watcher(tag: str = typer.Option(..., "--tag", "-t", help="Tag for the capture session",),
+def start_watcher(tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),,
                   run_as_foreground_ps: bool = typer.Option(False, "--in-foreground", help="Specify whether to run as a foreground process."),
 ) -> None:
-    
-    if not os.path.exists(CONFIG.path_to_start_watcher):
-        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_watcher}.")
-    
-    if run_as_foreground_ps:
-
-        if not os.path.exists(CONFIG.path_to_chunks_dir):
-            os.mkdir(CONFIG.path_to_chunks_dir)
-
-        watcher = Watcher(tag)
-        watcher.start()
-
-    else:
-        # build the command to start the capture session
-        subprocess_command = [
-            'python3', f'{CONFIG.path_to_start_watcher}',
-            '--tag', tag,
-        ]
-        processes.start(subprocess_command)
-        raise typer.Exit()
+    session.start_watcher(tags,
+                          run_as_foreground_ps)
+    raise typer.Exit()
 
 
 @app.command()

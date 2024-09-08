@@ -142,3 +142,12 @@ def stop() -> None:
     typer.secho("All subprocesses have been forcefully terminated.", fg=typer.colors.GREEN)
     write_to_process_log({})  # Clear the log after termination
 
+
+# Check if any subprocess is not running
+def any_process_not_running() -> bool:
+    process_log = read_process_log()
+    for _, status in process_log.items():
+        if status != 'running':
+            return True
+    return False
+

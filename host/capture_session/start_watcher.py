@@ -4,7 +4,6 @@
 
 from argparse import ArgumentParser
 import os
-import logging
 from spectre.watchdog.Watcher import Watcher
 from cfg import CONFIG
 from host.capture_session.processes import configure_subprocess_logging
