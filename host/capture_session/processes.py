@@ -77,27 +77,34 @@ def update_subprocess_statuses() -> None:
     typer.secho("Subprocess statuses have been updated.", fg=typer.colors.GREEN)
 
 
-def update_status_for_pid(pid: int, logger) -> None:    
-    # Check if the process is still running
-    if is_process_running(pid):
-        logger.info(f"The subprocess with PID {pid} is still running.")
-        return
-
-    # Process has stopped, check its exit status
+def update_status_for_pid(pid: int, logger) -> None:
     try:
-        pid, wait_result = os.waitpid(pid, os.WNOHANG)
-        exit_code = os.WEXITSTATUS(wait_result)
+        # Check if the process is still running
+        if is_process_running(pid):
+            logger.info(f"The subprocess with PID {pid} is still running.")
+            return
 
-        if exit_code == 0: # exit is success
-            update_process_log(pid, 'stopped')
-            logger.info(f"Subprocess with PID {pid} exited successfully.")
-        else: # exit code is not a success
-            update_process_log(pid, 'failed')
-            logger.error(f"Subprocess with PID {pid} failed with exit code {exit_code}.")
+        # Process has stopped, check its exit status
+        pid, wait_result = os.waitpid(pid, os.WNOHANG)
+
+        # If the process has stopped, retrieve the exit code
+        if wait_result:
+            exit_code = os.WEXITSTATUS(wait_result)
+
+            if exit_code == 0:  # exit is success
+                update_process_log(pid, 'stopped')
+                logger.info(f"Subprocess with PID {pid} exited successfully.")
+            else:  # exit code indicates failure
+                update_process_log(pid, 'failed')
+                logger.error(f"Subprocess with PID {pid} failed with exit code {exit_code}.")
+        else:
+            logger.info(f"Subprocess with PID {pid} has already been reaped by the system.")
+
     except ChildProcessError:
         # Process is already reaped by the system, mark it as reaped
         update_process_log(pid, 'stopped')
         logger.info(f"Subprocess with PID {pid} has already been reaped by the system.")
+
 
 
 
