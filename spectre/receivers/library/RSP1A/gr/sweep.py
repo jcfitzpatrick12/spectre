@@ -64,12 +64,12 @@ class sweep(gr.top_block):
                 channels_size=1
             ),
         )
-        self.sdrplay3_rsp1a_0.set_sample_rate(samp_rate, True)
-        self.sdrplay3_rsp1a_0.set_center_freq(start_freq, True)
+        self.sdrplay3_rsp1a_0.set_sample_rate(samp_rate, False)
+        self.sdrplay3_rsp1a_0.set_center_freq(start_freq, False)
         self.sdrplay3_rsp1a_0.set_bandwidth(bandwidth)
         self.sdrplay3_rsp1a_0.set_gain_mode(False)
-        self.sdrplay3_rsp1a_0.set_gain(IF_gain, 'IF', True)
-        self.sdrplay3_rsp1a_0.set_gain(RF_gain, 'RF', True)
+        self.sdrplay3_rsp1a_0.set_gain(IF_gain, 'IF', False)
+        self.sdrplay3_rsp1a_0.set_gain(RF_gain, 'RF', False)
         self.sdrplay3_rsp1a_0.set_freq_corr(0)
         self.sdrplay3_rsp1a_0.set_dc_offset_mode(False)
         self.sdrplay3_rsp1a_0.set_iq_balance_mode(False)
@@ -113,7 +113,7 @@ def main(capture_config: dict, top_block_cls=sweep, options=None):
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)
 
-    tb.start(256)
+    tb.start(512)
 
     tb.wait()
 
