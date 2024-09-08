@@ -74,17 +74,16 @@ def start_session(receiver_name: str,
     # Polling loop to check for stopped processes
     while True:
         time.sleep(5)  # Sleep to reduce CPU usage
-
         # Update the status of all subprocesses
         update_subprocess_statuses()
-
         # If any subprocess is not running, restart or exit depending on the flag
         if any_process_not_running():
             typer.secho("A subprocess has exited unexpectedly.", fg=typer.colors.RED)
             
             if force_restart:
                 typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
-                start_session(receiver_name, mode, tags, force_restart)
+                stop()
+                start_session(receiver_name, mode, tags, force_restart = force_restart)
                 return  # Exit the current loop and function, new session will take over
             else:
                 typer.secho("Stopping session as processes are not running.", fg = typer.colors.YELLOW)

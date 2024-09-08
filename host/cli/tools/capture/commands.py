@@ -29,7 +29,7 @@ def start_session(receiver_name: str = typer.Option(..., "--receiver", "-r", hel
     session.start_session(receiver_name,
                           mode,
                           tags,
-                          force_restart)
+                          force_restart = force_restart)
     return
 
 
