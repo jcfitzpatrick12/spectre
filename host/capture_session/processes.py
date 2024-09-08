@@ -1,7 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
-# This file is part of SPECTRE
-# SPDX-License-Identifier: GPL-3.0-or-later
-
+import psutil
 import subprocess
 import json
 import os
@@ -16,6 +13,10 @@ from cfg import CONFIG
 
 
 def read_process_log() -> dict:
+    """
+    Reads the process log from a JSON file.
+    Returns an empty dictionary if the file is not found.
+    """
     try:
         with open(CONFIG.path_to_processes_log, 'r') as file:
             return json.load(file)
@@ -24,39 +25,53 @@ def read_process_log() -> dict:
 
 
 def write_to_process_log(data: dict) -> None:
+    """
+    Writes the provided data dictionary to the process log.
+    """
     with open(CONFIG.path_to_processes_log, 'w') as file:
         json.dump(data, file)
 
 
-# Function to log and update subprocess statuses in the tracking file
 def update_process_log(pid: int, status: str) -> None:
+    """
+    Updates the process log with the current status of the process.
+    """
     subprocesses = read_process_log()
     subprocesses[str(pid)] = status
     write_to_process_log(subprocesses)
 
 
-# Function to configure logging for each subprocess
 def configure_subprocess_logging(pid: int) -> logging.Logger:
+    """
+    Configures and returns a logger for subprocesses based on the PID.
+    """
     log_file = os.path.join(CONFIG.path_to_logs, f"subprocess_{pid}.log")
     logger = logging.getLogger(f"subprocess_{pid}")
+    
     if not logger.handlers:  # Avoid adding multiple handlers
         file_handler = FileHandler(log_file)
         file_handler.setFormatter(Formatter('%(asctime)s:%(levelname)s:%(message)s'))
         logger.setLevel(logging.INFO)
         logger.addHandler(file_handler)
+    
     return logger
 
+
 def is_process_running(pid: int) -> bool:
-    # checks if a process with the given PID is still running using os.kill with signal 0
+    """
+    Checks if a process with the given PID is still running using psutil.
+    """
     try:
-        os.kill(pid, 0)
-        return True
-    except OSError:
+        process = psutil.Process(pid)
+        return process.is_running() and process.status() != psutil.STATUS_ZOMBIE
+    except psutil.NoSuchProcess:
         return False
 
 
 def update_subprocess_statuses() -> None:
-    # Read subprocesses from the log file
+    """
+    Updates the status of all subprocesses by reading the log file and checking their current status.
+    """
     subprocesses = read_process_log()
 
     if not subprocesses:
@@ -78,47 +93,33 @@ def update_subprocess_statuses() -> None:
 
 
 def update_status_for_pid(pid: int, logger) -> None:
-    try:
-        # Check if the process is still running
-        if is_process_running(pid):
-            logger.info(f"The subprocess with PID {pid} is still running.")
-            return
-
-        # Process has stopped, check its exit status
-        pid, wait_result = os.waitpid(pid, os.WNOHANG)
-
-        # If the process has stopped, retrieve the exit code
-        if wait_result:
-            exit_code = os.WEXITSTATUS(wait_result)
-
-            if exit_code == 0:  # exit is success
-                update_process_log(pid, 'stopped')
-                logger.info(f"Subprocess with PID {pid} exited successfully.")
-            else:  # exit code indicates failure
-                update_process_log(pid, 'failed')
-                logger.error(f"Subprocess with PID {pid} failed with exit code {exit_code}.")
-        else:
-            logger.info(f"Subprocess with PID {pid} has already been reaped by the system.")
-
-    except ChildProcessError:
-        # Process is already reaped by the system, mark it as reaped
+    """
+    Updates the status for a subprocess based on whether it's running or stopped using psutil.
+    """
+    if is_process_running(pid):
+        logger.info(f"The subprocess with PID {pid} is still running.")
+    else:
+        # Mark the process as stopped in the log
         update_process_log(pid, 'stopped')
-        logger.info(f"Subprocess with PID {pid} has already been reaped by the system.")
+        logger.info(f"Subprocess with PID {pid} has stopped.")
 
 
-
-
-# Function to start a subprocess and track its status
 def start(command: List[str]) -> None:
-    # execute the command as a subprocess
+    """
+    Starts a subprocess with the provided command, tracks its status, and logs the result.
+    """
+    # Start the command as a subprocess
     process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
     update_process_log(process.pid, 'running')
     typer.secho(f"Subprocess with PID {process.pid} started. Checking status...", fg=typer.colors.BLUE)
-    # give the subprocess time to boot up
+
+    # Give the subprocess time to boot up
     time.sleep(1)
 
-    if process.poll() is not None:
-        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. Use \"spectre print process-log --pid <pid>\" to find out more.", fg=typer.colors.RED)
+    # Check if the subprocess has already exited
+    if not is_process_running(process.pid):
+        typer.secho(f"Subprocess with PID {process.pid} failed shortly after starting. "
+                    f"Use \"spectre print process-log --pid <pid>\" to find out more.", fg=typer.colors.RED)
         update_process_log(process.pid, 'failed')
         raise typer.Exit(1)
 
@@ -126,6 +127,9 @@ def start(command: List[str]) -> None:
 
 
 def stop() -> None:
+    """
+    Stops all running subprocesses by sending a kill signal and updating their status.
+    """
     subprocesses = read_process_log()
 
     if not subprocesses:
@@ -138,7 +142,8 @@ def stop() -> None:
 
         if status == 'running':
             try:
-                os.kill(pid, signal.SIGKILL)  # Immediately forcefully terminate the process
+                # Forcefully terminate the process
+                os.kill(pid, signal.SIGKILL)
                 typer.secho(f"Subprocess with PID {pid} has been terminated.", fg=typer.colors.GREEN)
                 logger.info(f"Subprocess with PID {pid} has been terminated.")
                 update_process_log(pid, 'killed')
@@ -146,15 +151,17 @@ def stop() -> None:
             except ProcessLookupError:
                 typer.secho(f"Subprocess with PID {pid} was not found. It may have already exited.", fg=typer.colors.RED)
 
+    # Clear the log after termination
+    write_to_process_log({})
     typer.secho("All subprocesses have been forcefully terminated.", fg=typer.colors.GREEN)
-    write_to_process_log({})  # Clear the log after termination
 
 
-# Check if any subprocess is not running
 def any_process_not_running() -> bool:
+    """
+    Checks if any subprocess is not running by reading the process log and evaluating their statuses.
+    """
     process_log = read_process_log()
     for _, status in process_log.items():
         if status != 'running':
             return True
     return False
-
