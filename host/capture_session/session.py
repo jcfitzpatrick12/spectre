@@ -62,9 +62,9 @@ def start_session(receiver_name: str,
                   mode: str,
                   tags: List[str],
                   force_restart: bool = False) -> None:
-    start_capture(receiver_name, mode, tags)
+    
     start_watcher(tags)
-
+    start_capture(receiver_name, mode, tags)
     # Polling loop to check for stopped processes
     while True:
         time.sleep(5)  # Sleep to reduce CPU usage
