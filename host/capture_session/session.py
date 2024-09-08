@@ -2,6 +2,7 @@ from typing import List
 import time
 import logging
 import os
+import typer
 
 from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
@@ -43,7 +44,6 @@ def start_watcher(tags: List[str],
     if run_as_foreground_ps:
         if not os.path.exists(CONFIG.path_to_chunks_dir):
             os.mkdir(CONFIG.path_to_chunks_dir)
-
         for tag in tags:
             watcher = Watcher(tag)
             watcher.start()
@@ -74,17 +74,17 @@ def start_session(receiver_name: str,
 
         # If any subprocess is not running, restart or exit depending on the flag
         if processes.any_process_not_running():
-            logging.error("One or more subprocesses are not running.")
+            typer.secho("A subprocess has exited unexpectedly.", fg=typer.colors.RED)
             
             # Stop all subprocesses
             processes.stop()
 
             if force_restart:
-                logging.info("Restarting session due to stopped process.")
+                typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
                 start_session(receiver_name, mode, tags, force_restart)
                 return  # Exit the current loop and function, new session will take over
             else:
-                logging.info("Stopping session as processes are not running.")
+                typer.secho("Stopping session as processes are not running.", fg = typer.colors.YELLOW)
                 break
 
-    logging.info("Session stopped.")
+    typer.secho("Session stopped.", fg = typer.colors.GREEN)
