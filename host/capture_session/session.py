@@ -2,6 +2,7 @@ from typing import List
 import time
 import os
 import multiprocessing
+import typer
 
 from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
@@ -60,12 +61,25 @@ def _monitor_processes(processes: List[multiprocessing.Process],
         time.sleep(5)  # Poll every 5 seconds
 
 def _terminate_processes(processes: List[multiprocessing.Process]) -> None:
-    """Gracefully terminate all running processes."""
     for p in processes:
         if p.is_alive():
             p.terminate()
             p.join()
 
+def _start_process(target_func, args: tuple, process_name: str) -> multiprocessing.Process:
+    typer.secho(f"Starting {process_name} process ...", fg=typer.colors.BLUE)
+    process = multiprocessing.Process(target=target_func, args=args, name=process_name, daemon=True)
+    process.start()
+
+    # Give the process a second to "boot up"
+    time.sleep(1)
+
+    if process.is_alive():
+        typer.secho(f"{process_name.capitalize()} process booted up successfully", fg=typer.colors.GREEN)
+    else:
+        print(f"{process_name.capitalize()} process failed to start.")
+        process.terminate()  # Terminate if it failed to start
+    return process
 
 def start_session(receiver_name: str,
                   mode: str,
@@ -75,38 +89,32 @@ def start_session(receiver_name: str,
                   minutes: int = 0,
                   hours: int = 0) -> None:
 
-    with open(os.devnull, 'w') as devnull:
-        # Calculate total runtime in seconds
-        total_runtime = _calculate_total_runtime(seconds, minutes, hours)
-        
-        # Create processes with stdout/stderr redirection
-        watcher_process = multiprocessing.Process(target=start_watcher, 
-                                                args=(tags,), 
-                                                name="Watcher", 
-                                                stdout=devnull, 
-                                                stderr=devnull)
-        capture_process = multiprocessing.Process(target=start_capture, 
-                                                args=(receiver_name, mode, tags), 
-                                                name="Capture",
-                                                stdout=devnull,
-                                                stderr=devnull)
+    # Calculate total runtime in seconds
+    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
-        # Check for boot-up success within the first second
-        time.sleep(1)  # Allow processes to "boot up"
-        
-        if not watcher_process.is_alive():
-            print("Watcher process failed to start. Terminating session.")
-            _terminate_processes([watcher_process, capture_process])
-            return
+    # Start watcher process using the helper function
+    watcher_process = _start_process(target_func=start_watcher, 
+                                     args=(tags,), 
+                                     process_name="watcher")
 
-        if not capture_process.is_alive():
-            print("Capture process failed to start. Terminating session.")
-            _terminate_processes([watcher_process, capture_process])
-            return
+    # If the watcher process failed to start, terminate and return
+    if not watcher_process.is_alive():
+        _terminate_processes([watcher_process])
+        return
 
-        # Monitor both processes
-        try:
-            _monitor_processes([watcher_process, capture_process], total_runtime, force_restart, receiver_name, mode, tags)
-        except KeyboardInterrupt:
-            print("Keyboard Interrupt detected. Terminating all processes.")
-            _terminate_processes([watcher_process, capture_process])
+    # Start capture process using the helper function
+    capture_process = _start_process(target_func=start_capture, 
+                                     args=(receiver_name, mode, tags), 
+                                     process_name="capture")
+
+    # If the capture process failed to start, terminate both processes and return
+    if not capture_process.is_alive():
+        _terminate_processes([watcher_process, capture_process])
+        return
+
+    # Monitor both processes
+    try:
+        _monitor_processes([watcher_process, capture_process], total_runtime, force_restart, receiver_name, mode, tags)
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt detected. Terminating all processes.")
+        _terminate_processes([watcher_process, capture_process])
