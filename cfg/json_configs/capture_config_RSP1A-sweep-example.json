@@ -5,15 +5,15 @@
     "freq_step": 8000000.0,
     "bandwidth": 8000000.0,
     "samp_rate": 8000000,
-    "IF_gain": -40,
+    "IF_gain": -20,
     "RF_gain": 0,
-    "chunk_size": 4,
+    "chunk_size": 3,
     "integration_time": 0.0,
     "window_type": "blackman",
     "window_kwargs": {},
-    "window_size": 2048,
+    "window_size": 1024,
     "STFFT_kwargs": {
-        "hop": 1024
+        "hop": 512
     },
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
