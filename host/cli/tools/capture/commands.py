@@ -7,13 +7,9 @@ import os
 from typing import List
 
 from host.cli import __app_name__, __version__
-from host.capture_session import processes
 from host.tests.analytical import do_analytical_test
-from cfg import CONFIG
-
-from spectre.receivers.factory import get_receiver
-from spectre.watchdog.Watcher import Watcher
 from host.capture_session import session
+from cfg import CONFIG
 
 
 app = typer.Typer()
