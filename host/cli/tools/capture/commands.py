@@ -46,7 +46,9 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
     session.start_capture(receiver_name,
                           mode,
                           tags,
-                          run_as_foreground_ps = run_as_foreground_ps)
+                          seconds = seconds,
+                          minutes = minutes,
+                          hours = hours)
     raise typer.Exit()
 
 
