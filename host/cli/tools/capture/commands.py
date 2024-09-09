@@ -39,21 +39,15 @@ def start_session(receiver_name: str = typer.Option(..., "--receiver", "-r", hel
 def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name"),
           mode: str = typer.Option(..., "--mode", "-m", help="Specify the mode for capture"),
           tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture."),
-          run_as_foreground_ps: bool = typer.Option(False, "--in-foreground", help="Specify whether to run as a foreground process."),
+          seconds: int = typer.Option(0, "--seconds", help="Seconds component of the session duration."),
+          minutes: int = typer.Option(0, "--minutes", help="Minutes component of the session duration."),
+          hours: int = typer.Option(0, "--hours", help="Hours component of the session duration.")
 ) -> None:
     session.start_capture(receiver_name,
                           mode,
                           tags,
                           run_as_foreground_ps = run_as_foreground_ps)
     raise typer.Exit()
-
-@app.command()
-def start_watcher(tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),
-                  run_as_foreground_ps: bool = typer.Option(False, "--in-foreground", help="Specify whether to run as a foreground process."),
-) -> None:
-    session.start_watcher(tags)
-    raise typer.Exit()
-
 
 
 @app.command()
