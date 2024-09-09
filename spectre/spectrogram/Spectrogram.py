@@ -192,8 +192,7 @@ class Spectrogram:
         try:
             fits_config_handler = FitsConfigHandler(self.tag)
             fits_config = fits_config_handler.load_as_dict()
-        except (FileNotFoundError, IOError) as e:
-            warnings.warn(f"fits_config for tag {self.tag} unable to be loaded, defaulting to empty dictionary. Received error {e}")
+        except FileNotFoundError:
             fits_config = {}
         chunk_parent_path = datetime_helpers.get_chunk_parent_path(self.chunk_start_time) 
         file_path = os.path.join(chunk_parent_path, f"{self.chunk_start_time}_{self.tag}.fits")

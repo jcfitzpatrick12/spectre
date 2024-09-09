@@ -105,13 +105,11 @@ def find_closest_index(val: datetime, ar: np.ndarray, enforce_strict_bounds=Fals
             raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
         else:
             pass
-            # warnings.warn(error_message)
     if val < np.nanmin(ar):
         if enforce_strict_bounds:
             raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
         else:
             pass
-            # warnings.warn(error_message)
 
     # Calculate absolute differences in nanoseconds and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))

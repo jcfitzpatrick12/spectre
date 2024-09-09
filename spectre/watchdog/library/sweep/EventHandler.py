@@ -53,7 +53,6 @@ class EventHandler(BaseEventHandler):
         time_res_seconds = S.time_res_seconds
 
         if requested_integration_time <= S.time_res_seconds:
-            warnings.warn(f'Requested integration time is lower than the time resolution of the spectrogram. No averaging taking place.')
             return 1
         
         return floor(requested_integration_time/time_res_seconds)
