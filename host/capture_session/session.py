@@ -40,7 +40,8 @@ def start_process(target_func, args: tuple, process_name: str) -> multiprocessin
 
 # Shared monitoring logic for any set of processes
 def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: float) -> None:
-    typer.secho("Polling process statuses ...", fg = typer.colors.BLUE)
+    message = "Monitoring process ..." if len(processes) == 1 else "Monitoring processes ..."
+    typer.secho(message, fg = typer.colors.BLUE)
     start_time = time.time()
     try:
         while True:
