@@ -17,7 +17,6 @@ class EventHandler(BaseEventHandler):
         super().__init__(watcher, tag, "bin")
 
     def process(self, file_path: str):
-        print(f"Processing {file_path}")
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
         chunk = self.Chunk(chunk_start_time, self.tag)
@@ -25,7 +24,6 @@ class EventHandler(BaseEventHandler):
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
         S.save_to_fits()
-        print(f"Processing complete. Removing binary and header chunks with chunk start time: {chunk_start_time}.")
         chunk.bin.delete(doublecheck_delete = False)
         chunk.hdr.delete(doublecheck_delete = False)
 

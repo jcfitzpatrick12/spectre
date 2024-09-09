@@ -64,7 +64,6 @@ class Chunks:
                 # then from the file name split the chunk start time from the tag
                 chunk_start_time, tag = file_name.split("_", 1)
             except ValueError as e:
-                print(f"Error while splitting {file_name} at \"_\". Received {e}")
             # if the tag is equal to the user-defined tag, we will add that chunk to the chunk map
             if tag == self.tag:
                 chunk_map[chunk_start_time] = self.Chunk(chunk_start_time, tag)
