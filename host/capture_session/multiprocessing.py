@@ -38,11 +38,17 @@ def start_process(target_func, args: tuple, process_name: str) -> multiprocessin
     return process
 
 
+def _restart_process(process_name: str, target_func, args: tuple) -> multiprocessing.Process:
+    typer.secho(f"Restarting {process_name} process ...", fg=typer.colors.YELLOW)
+    return start_process(target_func, args, process_name)
+
+
 # Shared monitoring logic for any set of processes
-def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: float) -> None:
+def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: float, force_restart: bool) -> None:
     message = "Monitoring process ..." if len(processes) == 1 else "Monitoring processes ..."
-    typer.secho(message, fg = typer.colors.BLUE)
+    typer.secho(message, fg=typer.colors.BLUE)
     start_time = time.time()
+
     try:
         while True:
             elapsed_time = time.time() - start_time
@@ -54,11 +60,16 @@ def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: 
                 return
 
             # Monitor each process
-            for p in processes:
+            for i, p in enumerate(processes):
                 if not p.is_alive():
                     typer.secho(f"Process {p.name} unexpectedly exited.", fg=typer.colors.RED)
-                    _terminate_processes(processes)
-                    return
+                    
+                    if force_restart:
+                        typer.secho(f"Force restarting process {p.name}...", fg=typer.colors.YELLOW)
+                        processes[i] = _restart_process(p.name, p._target, p._args)
+                    else:
+                        _terminate_processes(processes)
+                        return
 
             time.sleep(5)  # Poll every 5 seconds
     except KeyboardInterrupt:
@@ -68,7 +79,7 @@ def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: 
 
 # Separate functions for each operation mode
 def start_capture(receiver_name: str, mode: str, tags: List[str], 
-                  seconds: int = 0, minutes: int = 0, hours: int = 0) -> None:
+                  seconds: int = 0, minutes: int = 0, hours: int = 0, force_restart: bool = False) -> None:
     # Calculate total runtime in seconds
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
@@ -76,7 +87,7 @@ def start_capture(receiver_name: str, mode: str, tags: List[str],
     capture_process = start_process(target_func=_start_capture, args=(receiver_name, mode, tags), process_name="capture")
 
     # Monitor the capture process
-    _monitor_processes([capture_process], total_runtime)
+    _monitor_processes([capture_process], total_runtime, force_restart)
 
 
 def start_session(receiver_name: str, mode: str, tags: List[str], 
@@ -93,7 +104,7 @@ def start_session(receiver_name: str, mode: str, tags: List[str],
         return
 
     # Monitor both processes
-    _monitor_processes([watcher_process, capture_process], total_runtime)
+    _monitor_processes([watcher_process, capture_process], total_runtime, force_restart)
 
 
 # Functions that can be mapped to CLI commands
