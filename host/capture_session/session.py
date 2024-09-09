@@ -1,97 +1,91 @@
 from typing import List
 import time
-import logging
 import os
-import typer
+import multiprocessing
 
 from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.Watcher import Watcher
-from host.capture_session.processes import (
-    update_process_log,
-    start,
-    any_process_not_running,
-    update_subprocess_statuses,
-    stop
-)
 
-
-def start_capture(receiver_name: str,
-                  mode: str,
-                  tags: List[str],
-                  run_as_foreground_ps: bool = False) -> None:
-    if not os.path.exists(CONFIG.path_to_start_capture):
-        raise FileNotFoundError(f"Could not find capture script: {CONFIG.path_to_start_capture}.")
-    
-    if run_as_foreground_ps:
-        receiver = get_receiver(receiver_name, mode=mode)
-        receiver.start_capture(tags)
-    else:
-        # Build the command to start the capture session
-        subprocess_command = [
-            'python3', f'{CONFIG.path_to_start_capture}',
-            '--receiver', receiver_name,
-            '--mode', mode
-        ]
-
-        subprocess_command += ['--tag']
-        for tag in tags:
-            subprocess_command += [tag]
-
-        start(subprocess_command)
+def start_capture(receiver_name: str, 
+                  mode: str, 
+                  tags: List[str]) -> None:
+    receiver = get_receiver(receiver_name, mode=mode)
+    receiver.start_capture(tags)
     return
 
-
-def start_watcher(tags: List[str],
-                  run_as_foreground_ps: bool = False) -> None:
-    if not os.path.exists(CONFIG.path_to_start_watcher):
-        raise FileNotFoundError(f"Could not find watcher script: {CONFIG.path_to_start_watcher}.")
-    
-    if run_as_foreground_ps:
-        if not os.path.exists(CONFIG.path_to_chunks_dir):
-            os.mkdir(CONFIG.path_to_chunks_dir)
-        for tag in tags:
-            watcher = Watcher(tag)
-            watcher.start()
-    else:
-        for tag in tags:
-            # Build the command to start the watcher
-            subprocess_command = [
-                'python3', f'{CONFIG.path_to_start_watcher}',
-                '--tag', tag,
-            ]
-            start(subprocess_command)
+def start_watcher(tags: List[str]) -> None:
+    if not os.path.exists(CONFIG.path_to_chunks_dir):
+        os.mkdir(CONFIG.path_to_chunks_dir)
+    for tag in tags:
+        watcher = Watcher(tag)
+        watcher.start()
     return
+
+def _calculate_total_runtime(seconds: int = 0,
+                            minutes: int = 0, 
+                            hours: int = 0) -> float:
+    return seconds + (minutes * 60) + (hours * 3600)
+
+def _monitor_processes(processes: List[multiprocessing.Process], 
+                      total_runtime: float, 
+                      force_restart: bool, 
+                      receiver_name: str, 
+                      mode: str, 
+                      tags: List[str]) -> None:
+    start_time = time.time()
+    
+    while True:
+        elapsed_time = time.time() - start_time
+
+        # Terminate processes when total runtime is reached
+        if elapsed_time >= total_runtime:
+            print("Session duration reached. Terminating all processes.")
+            _terminate_processes(processes)
+            return
+
+        # Check if any process has stopped
+        for p in processes:
+            if not p.is_alive():
+                if force_restart:
+                    print(f"Process {p.name} stopped. Restarting session...")
+                    _terminate_processes(processes)
+                    start_session(receiver_name, mode, tags, force_restart=force_restart)
+                    return
+                else:
+                    print(f"Process {p.name} stopped. Terminating session.")
+                    _terminate_processes(processes)
+                    return
+
+        time.sleep(5)  # Poll every 5 seconds
+
+def _terminate_processes(processes: List[multiprocessing.Process]) -> None:
+    """Gracefully terminate all running processes."""
+    for p in processes:
+        if p.is_alive():
+            p.terminate()
+            p.join()
 
 
 def start_session(receiver_name: str,
                   mode: str,
                   tags: List[str],
-                  force_restart: bool = False) -> None:
-    
-    start_watcher(tags)
-    start_capture(receiver_name, mode, tags)
+                  force_restart: bool = False,
+                  seconds: int = 0,
+                  minutes: int = 0,
+                  hours: int = 0) -> None:    
+    # Calculate total runtime in seconds
+    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
-    typer.secho("Periodically checking subprocess statuses ...")
-    # Polling loop to check for stopped processes
-    while True:
-        time.sleep(5)  # Sleep to reduce CPU usage
-        # Update the status of all subprocesses
-        update_subprocess_statuses()
-        # If any subprocess is not running, restart or exit depending on the flag
-        if any_process_not_running():
-            typer.secho("A subprocess has exited unexpectedly.", fg=typer.colors.RED)
-            
-            if force_restart:
-                typer.secho("Restarting session due to stopped process.", fg = typer.colors.YELLOW)
-                stop()
-                time.sleep(5)
-                start_session(receiver_name, mode, tags, force_restart = force_restart)
-                return  # Exit the current loop and function, new session will take over
-            else:
-                typer.secho("Stopping session as processes are not running.", fg = typer.colors.YELLOW)
-                break
-    
-    # Stop all subprocesses
-    stop()
-    typer.secho("Session stopped.", fg = typer.colors.GREEN)
+    # Create and start the processes
+    watcher_process = multiprocessing.Process(target=start_watcher, args=(tags,), name="Watcher")
+    capture_process = multiprocessing.Process(target=start_capture, args=(receiver_name, mode, tags), name="Capture")
+    watcher_process.start()
+    capture_process.start()
+
+    # Monitor both processes
+    try:
+        _monitor_processes([watcher_process, capture_process], total_runtime, force_restart, receiver_name, mode, tags)
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt detected. Terminating all processes.")
+        _terminate_processes([watcher_process, capture_process])

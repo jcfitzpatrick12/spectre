@@ -49,16 +49,9 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
 def start_watcher(tags: List[str] = typer.Option(..., "--tag", "-t", help="Specify the tags for the capture session."),
                   run_as_foreground_ps: bool = typer.Option(False, "--in-foreground", help="Specify whether to run as a foreground process."),
 ) -> None:
-    session.start_watcher(tags,
-                          run_as_foreground_ps = run_as_foreground_ps)
+    session.start_watcher(tags)
     raise typer.Exit()
 
-
-@app.command()
-def stop(
-) -> None:
-    processes.stop()
-    raise typer.Exit()
 
 
 @app.command()
