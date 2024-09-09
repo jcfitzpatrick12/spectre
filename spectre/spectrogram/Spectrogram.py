@@ -153,13 +153,15 @@ class Spectrogram:
         # Create an artificial spectrogram where each spectrum is identically the background spectrum
         bsa = self.background_spectrum[:, np.newaxis]
 
-        # Depending on the spectrum type, compute the dBb values differently
-        if self.spectrum_type == "amplitude" or self.spectrum_type == "digits":
-            dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bsa)
-        elif self.spectrum_type == "power":
-            dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bsa)
-        else:
-            raise ValueError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
+        # Suppress divide by zero and invalid value warnings for this block of code
+        with np.errstate(divide='ignore', invalid='ignore'):
+            # Depending on the spectrum type, compute the dBb values differently
+            if self.spectrum_type == "amplitude" or self.spectrum_type == "digits":
+                dynamic_spectra_as_dBb = 10 * np.log10(self.dynamic_spectra / bsa)
+            elif self.spectrum_type == "power":
+                dynamic_spectra_as_dBb = 20 * np.log10(self.dynamic_spectra / bsa)
+            else:
+                raise ValueError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
 
         # Assign the result to the new attribute
         self.dynamic_spectra_as_dBb = dynamic_spectra_as_dBb
