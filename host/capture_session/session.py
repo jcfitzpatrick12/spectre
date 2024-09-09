@@ -73,15 +73,31 @@ def start_session(receiver_name: str,
                   force_restart: bool = False,
                   seconds: int = 0,
                   minutes: int = 0,
-                  hours: int = 0) -> None:    
+                  hours: int = 0) -> None:
+
     # Calculate total runtime in seconds
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
     # Create and start the processes
     watcher_process = multiprocessing.Process(target=start_watcher, args=(tags,), name="Watcher")
     capture_process = multiprocessing.Process(target=start_capture, args=(receiver_name, mode, tags), name="Capture")
+    
+    # Start processes
     watcher_process.start()
     capture_process.start()
+
+    # Check for boot-up success within the first second
+    time.sleep(1)  # Allow processes to "boot up"
+    
+    if not watcher_process.is_alive():
+        print("Watcher process failed to start. Terminating session.")
+        _terminate_processes([watcher_process, capture_process])
+        return
+
+    if not capture_process.is_alive():
+        print("Capture process failed to start. Terminating session.")
+        _terminate_processes([watcher_process, capture_process])
+        return
 
     # Monitor both processes
     try:
