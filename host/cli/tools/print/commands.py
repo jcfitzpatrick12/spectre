@@ -12,7 +12,6 @@ from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 from spectre.receivers.factory import get_receiver
 from spectre.utils import file_helpers
-from host.capture_session.processes import update_subprocess_statuses
 
 app = typer.Typer()
 
