@@ -38,15 +38,8 @@ def start_process(target_func, args: tuple, process_name: str) -> multiprocessin
     return process
 
 
-def _restart_process(process_name: str, target_func, args: tuple) -> multiprocessing.Process:
-    typer.secho(f"Restarting {process_name} process ...", fg=typer.colors.YELLOW)
-    return start_process(target_func, args, process_name)
-
-
-# Shared monitoring logic for any set of processes
-def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: float, force_restart: bool) -> None:
-    message = "Monitoring process ..." if len(processes) == 1 else "Monitoring processes ..."
-    typer.secho(message, fg=typer.colors.BLUE)
+def _monitor_processes(process_infos: List[tuple], total_runtime: float, force_restart: bool) -> None:
+    typer.secho("Monitoring processes ...", fg=typer.colors.BLUE)
     start_time = time.time()
 
     try:
@@ -56,25 +49,26 @@ def _monitor_processes(processes: List[multiprocessing.Process], total_runtime: 
             # Terminate when the total runtime is reached
             if elapsed_time >= total_runtime:
                 typer.secho("Session duration reached.", fg=typer.colors.GREEN)
-                _terminate_processes(processes)
+                _terminate_processes([p[0] for p in process_infos])
                 return
 
             # Monitor each process
-            for i, p in enumerate(processes):
-                if not p.is_alive():
-                    typer.secho(f"Process {p.name} unexpectedly exited.", fg=typer.colors.RED)
-                    
+            for i, (process, target_func, args) in enumerate(process_infos):
+                if not process.is_alive():
+                    typer.secho(f"Process {process.name} unexpectedly exited.", fg=typer.colors.RED)
+
                     if force_restart:
-                        typer.secho(f"Force restarting process {p.name}...", fg=typer.colors.YELLOW)
-                        processes[i] = _restart_process(p.name, p._target, p._args)
+                        typer.secho(f"Force restarting process {process.name}...", fg=typer.colors.YELLOW)
+                        new_process = start_process(target_func, args, process.name)
+                        process_infos[i] = (new_process, target_func, args)
                     else:
-                        _terminate_processes(processes)
+                        _terminate_processes([p[0] for p in process_infos])
                         return
 
             time.sleep(5)  # Poll every 5 seconds
     except KeyboardInterrupt:
         typer.secho("Keyboard Interrupt detected. Terminating processes.", fg=typer.colors.RED)
-        _terminate_processes(processes)
+        _terminate_processes([p[0] for p in process_infos])
 
 
 # Separate functions for each operation mode
@@ -87,7 +81,7 @@ def start_capture(receiver_name: str, mode: str, tags: List[str],
     capture_process = start_process(target_func=_start_capture, args=(receiver_name, mode, tags), process_name="capture")
 
     # Monitor the capture process
-    _monitor_processes([capture_process], total_runtime, force_restart)
+    _monitor_processes([(capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
 
 
 def start_session(receiver_name: str, mode: str, tags: List[str], 
@@ -104,7 +98,8 @@ def start_session(receiver_name: str, mode: str, tags: List[str],
         return
 
     # Monitor both processes
-    _monitor_processes([watcher_process, capture_process], total_runtime, force_restart)
+    _monitor_processes([(watcher_process, _start_watcher, (tags,)), 
+                        (capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
 
 
 # Functions that can be mapped to CLI commands
