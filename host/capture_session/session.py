@@ -75,33 +75,38 @@ def start_session(receiver_name: str,
                   minutes: int = 0,
                   hours: int = 0) -> None:
 
-    # Calculate total runtime in seconds
-    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
+    with open(os.devnull, 'w') as devnull:
+        # Calculate total runtime in seconds
+        total_runtime = _calculate_total_runtime(seconds, minutes, hours)
+        
+        # Create processes with stdout/stderr redirection
+        watcher_process = multiprocessing.Process(target=start_watcher, 
+                                                args=(tags,), 
+                                                name="Watcher", 
+                                                stdout=devnull, 
+                                                stderr=devnull)
+        capture_process = multiprocessing.Process(target=start_capture, 
+                                                args=(receiver_name, mode, tags), 
+                                                name="Capture",
+                                                stdout=devnull,
+                                                stderr=devnull)
 
-    # Create and start the processes
-    watcher_process = multiprocessing.Process(target=start_watcher, args=(tags,), name="Watcher")
-    capture_process = multiprocessing.Process(target=start_capture, args=(receiver_name, mode, tags), name="Capture")
-    
-    # Start processes
-    watcher_process.start()
-    capture_process.start()
+        # Check for boot-up success within the first second
+        time.sleep(1)  # Allow processes to "boot up"
+        
+        if not watcher_process.is_alive():
+            print("Watcher process failed to start. Terminating session.")
+            _terminate_processes([watcher_process, capture_process])
+            return
 
-    # Check for boot-up success within the first second
-    time.sleep(1)  # Allow processes to "boot up"
-    
-    if not watcher_process.is_alive():
-        print("Watcher process failed to start. Terminating session.")
-        _terminate_processes([watcher_process, capture_process])
-        return
+        if not capture_process.is_alive():
+            print("Capture process failed to start. Terminating session.")
+            _terminate_processes([watcher_process, capture_process])
+            return
 
-    if not capture_process.is_alive():
-        print("Capture process failed to start. Terminating session.")
-        _terminate_processes([watcher_process, capture_process])
-        return
-
-    # Monitor both processes
-    try:
-        _monitor_processes([watcher_process, capture_process], total_runtime, force_restart, receiver_name, mode, tags)
-    except KeyboardInterrupt:
-        print("Keyboard Interrupt detected. Terminating all processes.")
-        _terminate_processes([watcher_process, capture_process])
+        # Monitor both processes
+        try:
+            _monitor_processes([watcher_process, capture_process], total_runtime, force_restart, receiver_name, mode, tags)
+        except KeyboardInterrupt:
+            print("Keyboard Interrupt detected. Terminating all processes.")
+            _terminate_processes([watcher_process, capture_process])
