@@ -19,14 +19,12 @@ class Watcher:
             # Schedule the observer with the event handler
             self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
             self.observer.start()
-            print("Watcher started, observing directory...")
 
             # Monitor the observer and check for exceptions in the queue
             while True:
                 try:
                     # Block and wait for exceptions with a 1-second timeout
                     exc = self.exception_queue.get(block=True, timeout=1)
-                    print("Exception captured in background thread.")
                     raise exc  # Propagate the exception to the main thread
                 except queue.Empty:
                     # No exceptions in queue, continue checking
@@ -34,15 +32,12 @@ class Watcher:
 
                 # Stop if the observer thread stops running
                 if not self.observer.is_alive():
-                    print("Observer has stopped unexpectedly.")
                     break
         except Exception as e:
-            print(f"Error occurred in Watcher: {e}")
             raise e
         finally:
             # Ensure the observer is properly stopped
             self.observer.stop()
             self.observer.join()
-            print("Watcher stopped.")
 
 

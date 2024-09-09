@@ -173,7 +173,7 @@ class Spectrogram:
 
         if return_time_type == "datetimes":
             if self.chunk_start_time is None:
-                print(f"The \"datetimes\" time type requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
+                warnings.warn(f"The \"datetimes\" time type requires that chunk_start_time is set. Currently, chunk_start_time={self.chunk_start_time}.")
             times = self.datetimes
 
         elif return_time_type == "time_seconds":

@@ -23,13 +23,11 @@ def find_closest_index(val, ar: np.ndarray, enforce_strict_bounds = False) -> in
             raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
         else:
             pass
-            # warnings.warn(error_message)
     if val < np.nanmin(ar):
         if enforce_strict_bounds:
             raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
         else:
             pass
-            # warnings.warn(error_message)
     
     # Compute absolute differences and find the index of the minimum
     closest_index = np.argmin(np.abs(ar - val))
@@ -46,10 +44,6 @@ def compute_resolution(array: np.ndarray) -> float:
     
     # Calculate differences between consecutive elements.
     resolutions = np.diff(array)
-    
-    # if the resolution is not constant across the array, 
-    if not np.allclose(resolutions, resolutions[0]):
-        warnings.warn("Resolution is not consistent across all elements. Returning the median difference.", UserWarning)
 
     return np.nanmedian(resolutions)
 
@@ -124,7 +118,6 @@ def normalise_peak_intensity(yvals: np.ndarray):
 
 def background_subtract(yvals: np.ndarray, background_indices: list | None):
     if background_indices is None:
-        warnings.warn(f"No background interval set. Subtracting total mean.")
         yvals -= np.nanmean(yvals)
     else:
         yvals -= np.nanmean(yvals[background_indices[0]:
