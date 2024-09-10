@@ -10,7 +10,5 @@ export PYTHONPATH="${SPECTREPARENTPATH}:${PYTHONPATH}"
 # ensure that spectre is recognised as a command in the cron environment
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-spectre capture start-watcher -t sol
-spectre capture start --receiver RSPduo --mode tuner-1-fixed --tag sol
-sleep 36000s
-spectre capture stop
+spectre capture session --receiver RSP1A --mode sweep --tag RSP1A-sweep-example --hours 8 --force-restart
+
