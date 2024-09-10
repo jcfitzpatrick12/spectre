@@ -62,7 +62,7 @@ def _monitor_processes(process_infos: List[tuple], total_runtime: float, force_r
                         _terminate_processes([p[0] for p in process_infos])
                         return
 
-            time.sleep(5)  # Poll every 5 seconds
+            time.sleep(1)  # Poll every 1 second
 
         typer.secho("Session duration reached.", fg=typer.colors.GREEN)
         _terminate_processes([p[0] for p in process_infos])

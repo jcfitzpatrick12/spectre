@@ -43,7 +43,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 if current_size == size:
                     break  # File is stable when the size hasn't changed
                 size = current_size
-                time.sleep(1)
+                time.sleep(0.5)
             except OSError as e:
                 self.exception_queue.put(e)  # Capture the exception and propagate it
                 raise e
