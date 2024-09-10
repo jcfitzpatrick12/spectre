@@ -24,7 +24,7 @@ class Watcher:
             while True:
                 try:
                     # Block and wait for exceptions with a 1-second timeout
-                    exc = self.exception_queue.get(block=True, timeout=1)
+                    exc = self.exception_queue.get(block=True, timeout=0.5)
                     raise exc  # Propagate the exception to the main thread
                 except queue.Empty:
                     # No exceptions in queue, continue checking
