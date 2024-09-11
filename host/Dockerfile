@@ -12,9 +12,9 @@ FROM ubuntu:22.04
 # stop interactive dialogue (only for the duration of the build)
 ARG DEBIAN_FRONTEND=noninteractive
 #Set SPECTREHOST as the parent directory of the package
-ENV SPECTREPARENTPATH /home/spectre
+ENV SPECTRE_PARENT_PATH /home/spectre
 #add spectre to the python path so we can import modules properly
-ENV PYTHONPATH "${SPECTREPARENTPATH}:${PYTHONPATH}"
+ENV PYTHONPATH "${SPECTRE_PARENT_PATH}:${PYTHONPATH}"
 
 
 # -------------------------------------------------- # 
