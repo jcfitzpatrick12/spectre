@@ -14,6 +14,7 @@ from matplotlib.colors import LogNorm
 from spectre.utils import datetime_helpers, array_helpers, fits_helpers
 from spectre.utils import fits_helpers
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
+
 from cfg import (
     DEFAULT_TIME_FORMAT
 )

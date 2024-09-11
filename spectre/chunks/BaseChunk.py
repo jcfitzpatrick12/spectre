@@ -5,10 +5,11 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+from spectre.utils import datetime_helpers
+
 from cfg import (
     DEFAULT_TIME_FORMAT
 )
-from spectre.utils import datetime_helpers
 
 class BaseChunk:
     def __init__(self, chunk_start_time: str, tag: str):

@@ -6,6 +6,7 @@ import queue
 from watchdog.observers import Observer
 
 from spectre.watchdog.factory import get_event_handler_from_tag
+
 from cfg import (
     CHUNKS_DIR_PATH
 )

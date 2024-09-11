@@ -4,12 +4,12 @@ import multiprocessing
 from typing import List
 import typer
 
-from cfg import (
-    CHUNKS_DIR_PATH
-)
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.Watcher import Watcher
 
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:

@@ -6,16 +6,17 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import (
-    CHUNKS_DIR_PATH,
-    JSON_CONFIGS_DIR_PATH,
-    INSTRUMENT_CODES
-)
 
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.chunks.Chunks import Chunks
+
+from cfg import (
+    CHUNKS_DIR_PATH,
+    JSON_CONFIGS_DIR_PATH,
+    INSTRUMENT_CODES
+)
 
 app = typer.Typer()
 

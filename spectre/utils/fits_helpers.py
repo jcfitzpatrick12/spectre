@@ -8,8 +8,6 @@ from datetime import datetime
 
 from spectre.utils import datetime_helpers
 
-
-
 # Function to create a FITS file with the specified structure
 def save_spectrogram(S, fits_config: dict, path_to_fits: str):
 

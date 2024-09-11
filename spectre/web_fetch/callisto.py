@@ -16,7 +16,7 @@ from cfg import (
     INSTRUMENT_CODES
 )
 
-temp_dir = os.path.join(os.environ['SPECTREPARENTPATH'], "tmp")
+temp_dir = os.path.join(os.environ['SPECTRE_PARENT_PATH'], "tmp")
 
 def get_chunk_name(station: str, date: str, time: str, instrument_code: str) -> str:
     dt = datetime.strptime(f"{date}T{time}", '%Y%m%dT%H%M%S')
