@@ -77,7 +77,7 @@ class Spectrogram:
 
     def set_chunk_start_time(self, chunk_start_time: str):
         self.chunk_start_time = chunk_start_time
-        self.chunk_start_datetime = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
+        self.chunk_start_datetime = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
         self.datetimes = datetime_helpers.build_datetime_array(self.chunk_start_datetime, 
                                                                 self.time_seconds,
                                                                 microsecond_correction = self.microsecond_correction)
@@ -249,8 +249,8 @@ class Spectrogram:
         
 
         if start_background_type == str:
-            start_background = datetime.strptime(start_background, CONFIG.default_time_format)
-            end_background = datetime.strptime(end_background, CONFIG.default_time_format)
+            start_background = datetime.strptime(start_background, DEFAULT_TIME_FORMAT)
+            end_background = datetime.strptime(end_background, DEFAULT_TIME_FORMAT)
             return [datetime_helpers.find_closest_index(start_background, self.datetimes, enforce_strict_bounds = True),
                     datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds = True)]
 

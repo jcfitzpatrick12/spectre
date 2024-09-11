@@ -6,7 +6,6 @@ import typer
 from typing import List
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler
 

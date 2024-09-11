@@ -10,7 +10,10 @@ from typing import Tuple
 
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.utils import dir_helpers, datetime_helpers
-from cfg import CONFIG
+from cfg import (
+    CHUNKS_DIR_PATH,
+    DEFAULT_TIME_FORMAT
+)
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
@@ -24,10 +27,10 @@ class Chunks:
         
         # if a specific date is specified via kwargs, set the attribute
         # for chunks dir with the date dir appended.
-        self.chunks_dir = CONFIG.path_to_chunks_dir
+        self.chunks_dir = CHUNKS_DIR_PATH
         if (not year is None) or (not month is None) or (not day is None):
             # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
+            self.chunks_dir = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
                                                                year=year, 
                                                                month=month, 
                                                                day=day)
@@ -88,9 +91,9 @@ class Chunks:
 
     def find_nearest_chunk(self, requested_chunk_start_time: str):
         try:
-            requested_chunk_start_time = datetime.strptime(requested_chunk_start_time, CONFIG.default_time_format)
+            requested_chunk_start_time = datetime.strptime(requested_chunk_start_time, DEFAULT_TIME_FORMAT)
         except ValueError as e:
-            raise ValueError(f"Invalid date format for current chunk. Expected {CONFIG.default_time_format}, but got {requested_chunk_start_time}.")
+            raise ValueError(f"Invalid date format for current chunk. Expected {DEFAULT_TIME_FORMAT}, but got {requested_chunk_start_time}.")
         
         closest_chunk = None
         min_time_diff = None
@@ -114,8 +117,8 @@ class Chunks:
     
 
     def build_spectrogram_from_range(self, requested_start_str: str, requested_end_str: str) -> Spectrogram:
-        requested_start_datetime = datetime.strptime(requested_start_str, CONFIG.default_time_format)
-        requested_end_datetime = datetime.strptime(requested_end_str, CONFIG.default_time_format)
+        requested_start_datetime = datetime.strptime(requested_start_str, DEFAULT_TIME_FORMAT)
+        requested_end_datetime = datetime.strptime(requested_end_str, DEFAULT_TIME_FORMAT)
 
 
         if requested_start_datetime.day != requested_end_datetime.day:

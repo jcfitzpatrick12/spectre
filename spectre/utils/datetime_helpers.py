@@ -7,7 +7,10 @@ import os
 import numpy as np
 import warnings
 
-from cfg import CONFIG
+from cfg import (
+    DEFAULT_TIME_FORMAT,
+    CHUNKS_DIR_PATH
+)
     
 
 # Given a parent directory, appends the year, month, and day as a date directory
@@ -55,12 +58,12 @@ def get_date_dir(dt: datetime, base_dir_path: str = None) -> str:
 def get_chunk_parent_path(chunk_start_time: str) -> str:
     # Parse the datetime string to a datetime object
     try:
-        dt = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
+        dt = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
     except ValueError as e:
         raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
     
     # Use the get_date_dir function to get the parent path
-    return get_date_dir(dt, base_dir_path=CONFIG.path_to_chunks_dir)
+    return get_date_dir(dt, base_dir_path=CHUNKS_DIR_PATH)
 
 
 def create_datetime_array(start_datetime: datetime, 

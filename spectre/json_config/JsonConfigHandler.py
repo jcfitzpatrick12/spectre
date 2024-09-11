@@ -5,7 +5,9 @@
 from typing import Any
 import os
 
-from cfg import CONFIG
+from cfg import (
+    JSON_CONFIGS_DIR_PATH
+)
 from spectre.utils import json_helpers, file_helpers, dict_helpers
 
 class JsonConfigHandler:
@@ -13,7 +15,7 @@ class JsonConfigHandler:
         self.set_tag(tag)
         self.config_type = config_type
         self.file_name = f"{config_type}_config_{tag}.json"
-        self.parent_path = CONFIG.path_to_json_configs_dir
+        self.parent_path = JSON_CONFIGS_DIR_PATH
     
 
     def set_tag(self, tag):
@@ -51,7 +53,7 @@ class JsonConfigHandler:
             dict_helpers.update_key_value(json_config_dict, key, value)
             self.save_dict_as_json(json_config_dict, doublecheck_overwrite=doublecheck_overwrite)
         except (IOError, PermissionError) as e:
-            raise RuntimeError(f"Failed to update {self.name} at '{CONFIG.path_to_json_configs_dir}': {e}") from e
+            raise RuntimeError(f"Failed to update {self.name} at '{JSON_CONFIGS_DIR_PATH}': {e}") from e
 
 
     def delete_self(self) -> None:

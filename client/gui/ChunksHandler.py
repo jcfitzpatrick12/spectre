@@ -4,7 +4,9 @@
 
 from datetime import datetime
 
-from cfg import CONFIG
+from cfg import (
+    DEFAULT_TIME_FORMAT
+)
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram import transform
 from spectre.spectrogram.Panels import Panels
@@ -16,7 +18,7 @@ class ChunksHandler:
 
     def set_attrs(self, tag, start_time=None):
         if start_time:
-            start_datetime = datetime.strptime(start_time, CONFIG.default_time_format)
+            start_datetime = datetime.strptime(start_time, DEFAULT_TIME_FORMAT)
             year = start_datetime.year
             month = start_datetime.month
             day = start_datetime.day
@@ -57,8 +59,8 @@ class ChunksHandler:
     def get_field_defaults(self):
         return {
             'tag': self.tag,
-            'start_time': self.default_S.datetimes[0].strftime(CONFIG.default_time_format),
-            'end_time': self.default_S.datetimes[-1].strftime(CONFIG.default_time_format),
+            'start_time': self.default_S.datetimes[0].strftime(DEFAULT_TIME_FORMAT),
+            'end_time': self.default_S.datetimes[-1].strftime(DEFAULT_TIME_FORMAT),
             'lower_freq': round(self.default_S.freq_MHz[0], 2),
             'upper_freq': round(self.default_S.freq_MHz[-1], 2),
             'avg_over_int_time': 1,

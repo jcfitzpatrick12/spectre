@@ -9,7 +9,6 @@ from typing import Any
 
 from spectre.utils import datetime_helpers, file_helpers
 from spectre.chunks.BaseChunk import BaseChunk
-from cfg import CONFIG
 
 class ExtChunk(ABC, BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str, ext: str):

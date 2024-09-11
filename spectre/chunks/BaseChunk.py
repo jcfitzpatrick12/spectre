@@ -5,7 +5,9 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from cfg import CONFIG
+from cfg import (
+    DEFAULT_TIME_FORMAT
+)
 from spectre.utils import datetime_helpers
 
 class BaseChunk:
@@ -14,9 +16,9 @@ class BaseChunk:
         self.tag = tag
         
         try:
-            self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, CONFIG.default_time_format)
+            self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_TIME_FORMAT)
         except ValueError as e:
             raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
         
         self.parent_path = datetime_helpers.get_chunk_parent_path(self.chunk_start_time)
-        self.chunk_start_datetime = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
+        self.chunk_start_datetime = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)

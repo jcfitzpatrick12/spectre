@@ -23,7 +23,9 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
-from cfg import CONFIG
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 class tagged_staircase(gr.top_block):
 
@@ -45,7 +47,7 @@ class tagged_staircase(gr.top_block):
         # Blocks
         ##################################################
         self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, max_samples_per_step, step_increment, samp_rate)
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir,
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CHUNKS_DIR_PATH,
                                                                      tag, 
                                                                      chunk_size, 
                                                                      samp_rate, 

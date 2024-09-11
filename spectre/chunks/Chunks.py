@@ -13,7 +13,9 @@ from spectre.chunks.BaseChunk import BaseChunk
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
-from cfg import CONFIG
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 class Chunks:
     def __init__(self, 
@@ -24,10 +26,10 @@ class Chunks:
         self.tag = tag
         
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
-        self.chunks_dir = CONFIG.path_to_chunks_dir
+        self.chunks_dir = CHUNKS_DIR_PATH
         # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
         if (year is not None) or (month is not None) or (day is not None):
-            self.chunks_dir = datetime_helpers.append_date_dir(CONFIG.path_to_chunks_dir, 
+            self.chunks_dir = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
                                                                year=year, 
                                                                month=month, 
                                                                day=day)
@@ -123,8 +125,8 @@ class Chunks:
 
 
     def build_spectrogram_from_range(self, start_time_str: str, end_time_str: str) -> Spectrogram:
-        start_time = datetime.strptime(start_time_str, CONFIG.default_time_format)
-        end_time = datetime.strptime(end_time_str, CONFIG.default_time_format)
+        start_time = datetime.strptime(start_time_str, DEFAULT_TIME_FORMAT)
+        end_time = datetime.strptime(end_time_str, DEFAULT_TIME_FORMAT)
 
         if start_time.day != end_time.day:
             warnings.warn("Warning! Joining spectrograms over more than one day.", RuntimeWarning)

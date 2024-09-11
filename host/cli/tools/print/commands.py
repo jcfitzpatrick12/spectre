@@ -6,7 +6,6 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
 
 from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
 from spectre.json_config.FitsConfigHandler import FitsConfigHandler

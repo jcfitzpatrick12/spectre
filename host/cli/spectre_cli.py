@@ -6,8 +6,6 @@ import typer
 from typing import Optional
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
-
 
 from host.cli.tools.create.commands import app as create_app
 from host.cli.tools.list.commands import app as list_app

@@ -3,7 +3,9 @@ from typing import Tuple, Optional
 from scipy.signal import ShortTimeFFT, get_window
 from datetime import datetime, timedelta
 
-from cfg import CONFIG
+from cfg import (
+    DEFAULT_TIME_FORMAT
+)
 from spectre.chunks.SPECTREChunk import SPECTREChunk
 from spectre.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
@@ -140,7 +142,7 @@ class Chunk(SPECTREChunk):
         # subtract this from the (millisecond corrected) chunk start time for the current chunk
         corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds=millisecond_correction) - timedelta(seconds=elapsed_seconds)
         # return the chunk_start_time (i.e. formatted as a string, truncated to second precision), along with the millisecond correction in order to recover full accuracy
-        return datetime.strftime(corrected_datetime, CONFIG.default_time_format), corrected_datetime.microsecond / 1000
+        return datetime.strftime(corrected_datetime, DEFAULT_TIME_FORMAT), corrected_datetime.microsecond / 1000
 
 
     def _do_STFFT(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
