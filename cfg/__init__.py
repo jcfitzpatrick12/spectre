@@ -4,12 +4,12 @@
 
 import os
 
-SPECTRE_PARENT_DIR_PATH = os.environ.get("SPECTRE_PARENT_PATH")
+SPECTRE_PARENT_DIR_PATH = os.environ.get("SPECTRE_DIR_PATH")
 if SPECTRE_PARENT_DIR_PATH is None:
-    raise ValueError("The environment variable SPECTRE_PARENT_PATH has not been set.")
+    raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set.")
 
 CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR", os.path.join(SPECTRE_PARENT_DIR_PATH, 'chunks'))
-LOGS_DIR_PATH = os.path.join(SPECTRE_PARENT_DIR_PATH, 'host', 'logs')
+LOGS_DIR_PATH = os.path.join(SPECTRE_PARENT_DIR_PATH, 'logs')
 JSON_CONFIGS_DIR_PATH = os.path.join(SPECTRE_PARENT_DIR_PATH, "cfg", "json_configs")
 
 DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"

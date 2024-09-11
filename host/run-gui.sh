@@ -6,12 +6,12 @@
 # Enable xhost for the local machine only, safer than 'xhost +'
 xhost local:
 
-# Set SPECTRE_PARENT_PATH to the parent directory of this script
-export SPECTRE_PARENT_PATH=$(dirname "$(dirname "$(realpath "$0")")")
+# Set SPECTRE_DIR_PATH to the parent directory of this script
+export SPECTRE_DIR_PATH=$(dirname "$(dirname "$(realpath "$0")")")
 
-# Check if the directory $SPECTRE_PARENT_PATH/chunks exists; if not, create it
-if [ ! -d "$SPECTRE_PARENT_PATH/chunks" ]; then
-    mkdir -p "$SPECTRE_PARENT_PATH/chunks"
+# Check if the directory $SPECTRE_DIR_PATH/chunks exists; if not, create it
+if [ ! -d "$SPECTRE_DIR_PATH/chunks" ]; then
+    mkdir -p "$SPECTRE_DIR_PATH/chunks"
 fi
 
 # Run the Docker container (no GUI support)
