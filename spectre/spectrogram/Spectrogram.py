@@ -5,8 +5,7 @@
 import numpy as np
 import os
 from datetime import datetime
-from typing import Tuple
-import warnings
+from typing import Tuple, Any
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.colors import LogNorm
@@ -22,9 +21,9 @@ from cfg import (
 
 class Spectrogram:
     def __init__(self, 
-                 dynamic_spectra: np.ndarray, # holds the spectrogram data
-                 time_seconds: np.ndarray, # holds the time stamp [s] for each spectrum
-                 freq_MHz: np.ndarray,  # physical frequencies [MHz] for each spectral component
+                 dynamic_spectra: np.ndarray[np.float64, np.float64], # holds the spectrogram data
+                 time_seconds: np.ndarray[np.float64], # holds the time stamp [s] for each spectrum
+                 freq_MHz: np.ndarray[np.float64],  # physical frequencies [MHz] for each spectral component
                  tag: str,  # the tag associated with that spectrogram
                  chunk_start_time: str = None, # (optional) the datetime (as a string) assigned to the first spectrum in the spectrogram (floored second precision)
                  microsecond_correction: int = 0, # (optional) a correction to the chunk start time
@@ -33,23 +32,23 @@ class Spectrogram:
                  background_interval: list = None): # (optional) specify an interval over which to compute the background spectrum
 
         # set the mandatory attributes
-        self.dynamic_spectra = dynamic_spectra
-        self.time_seconds = time_seconds
-        self.freq_MHz = freq_MHz
-        self.tag = tag
+        self.dynamic_spectra: np.ndarray[np.float64, np.float64] = dynamic_spectra
+        self.time_seconds: np.ndarray[np.float64] = time_seconds
+        self.freq_MHz: np.ndarray[np.float64] = freq_MHz
+        self.tag: str = tag
         # set all dependent attributes initially to None to ensure a defined state for the class
-        self.time_res_seconds = None
-        self.freq_res_MHz = None
-        self.spectrum_type = None
-        self.chunk_start_time = None
-        self.microsecond_correction = None
-        self.chunk_start_datetime = None
-        self.datetimes = None
-        self.corrected_start_datetime = None
-        self.background_spectrum = None
-        self.background_interval = None
-        self.background_indices = None
-        self.dynamic_spectra_as_dBb = None
+        self.time_res_seconds: float = None
+        self.freq_res_MHz: float = None
+        self.spectrum_type: str = None
+        self.chunk_start_time: str = None
+        self.microsecond_correction: int = None
+        self.chunk_start_datetime: datetime = None
+        self.datetimes: list[datetime] = None
+        self.corrected_start_datetime: datetime = None
+        self.background_spectrum: np.ndarray[float] = None
+        self.background_interval: list[Any] = None
+        self.background_indices: list[int] = None
+        self.dynamic_spectra_as_dBb: np.ndarray[float, float] = None
 
         # directly compute the array resolutions
         self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
