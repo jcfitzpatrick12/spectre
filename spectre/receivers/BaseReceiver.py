@@ -112,7 +112,7 @@ class BaseReceiver(ABC):
 
     def load_capture_config(self, tag: str) -> dict:
         capture_config_handler = CaptureConfigHandler(tag)
-        capture_config = capture_config_handler.load_as_dict()
+        capture_config = capture_config_handler.read()
 
         if capture_config['receiver'] != self.receiver_name:
             raise ValueError(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.receiver_name}', got '{capture_config['receiver']}'.")

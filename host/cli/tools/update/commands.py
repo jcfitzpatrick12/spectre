@@ -19,7 +19,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     
     # extract the current capture config saved (which will be type cast!)
     capture_config_handler = CaptureConfigHandler(tag)
-    capture_config = capture_config_handler.load_as_dict()
+    capture_config = capture_config_handler.read()
 
     # find the receiver and the mode of the capture config
     receiver_name = capture_config.get("receiver")
@@ -49,7 +49,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
-    fits_config = fits_config_handler.load_as_dict()
+    fits_config = fits_config_handler.read()
     template = fits_config_handler.get_template()
 
     params_as_string_dict = dict_helpers.params_list_to_string_valued_dict(params)

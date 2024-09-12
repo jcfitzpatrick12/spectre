@@ -17,7 +17,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         self.tag = tag
         self.Chunk = get_chunk_from_tag(tag)
         capture_config_handler = CaptureConfigHandler(tag)
-        self.capture_config = capture_config_handler.load_as_dict()
+        self.capture_config = capture_config_handler.read()
         self.extension = extension
         self.exception_queue = exception_queue  # Queue to propagate exceptions
 

@@ -87,7 +87,7 @@ def capture_config_template(
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
-    config_dict = fits_config_handler.load_as_dict()
+    config_dict = fits_config_handler.read()
     for key, value in config_dict.items():
         typer.secho(
             f"{key}: {value}"
@@ -98,7 +98,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
     capture_config_handler = CaptureConfigHandler(tag)
-    config_dict = capture_config_handler.load_as_dict()
+    config_dict = capture_config_handler.read()
     for key, value in config_dict.items():
         typer.secho(
             f"{key}: {value}"

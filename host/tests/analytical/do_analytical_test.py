@@ -57,7 +57,7 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_s
 def main(test_tag: str, show_slice_status = False) -> None:
     # load the capture config corresponding to the input test tag
     capture_config_handler = CaptureConfigHandler(test_tag)
-    capture_config = capture_config_handler.load_as_dict()
+    capture_config = capture_config_handler.read()
     
     # first check the receiver specified in the capture config is a Test receiver
     receiver_name = capture_config['receiver']
