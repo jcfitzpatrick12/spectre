@@ -5,11 +5,11 @@
 import numpy as np
 from typing import Tuple
 
-from spectre.chunks.ExtChunk import ExtChunk
+from spectre.chunks.BaseChunk import BaseChunk
 
-class HdrChunk(ExtChunk):
+class HdrChunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, "hdr")
+        super().__init__(chunk_start_time, tag, extension="hdr")
 
 
     def read(self) -> int:
@@ -23,7 +23,7 @@ class HdrChunk(ExtChunk):
 
     def _read_file_contents(self) -> np.ndarray:
         # Reads the contents of the .hdr file into a NumPy array 
-        with open(self.get_path(), "rb") as fh:
+        with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
 
 

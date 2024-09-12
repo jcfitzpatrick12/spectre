@@ -6,17 +6,17 @@ from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
 from astropy.io.fits.hdu.hdulist import HDUList
 
-from spectre.chunks.ExtChunk import ExtChunk
+from spectre.chunks.BaseChunk import BaseChunk
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.utils import datetime_helpers
 
-class FitsChunk(ExtChunk):
-    def __init__(self, chunk_start_time, tag: str):
-        super().__init__(chunk_start_time, tag, "fits")
+class FitsChunk(BaseChunk):
+    def __init__(self, chunk_start_time: str, tag: str):
+        super().__init__(chunk_start_time, tag, extension="fits")
 
     def read(self) -> Spectrogram:
         try:
-            with fits.open(self.get_path(), mode='readonly') as hdulist:
+            with fits.open(self.file_path, mode='readonly') as hdulist:
                 primary_hdu = self._get_primary_hdu(hdulist)
                 dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
                 spectrum_type = self._get_spectrum_type(primary_hdu)
@@ -31,7 +31,7 @@ class FitsChunk(ExtChunk):
                                    microsecond_correction=microsecond_correction,
                                    spectrum_type = spectrum_type)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
+            raise FileNotFoundError(f"Could not load spectrogram, {self.file_path} not found.")
         except Exception as e:
             raise RuntimeError(f"An error occurred while reading the FITS file: {e}")
 
@@ -67,11 +67,11 @@ class FitsChunk(ExtChunk):
 
     def get_datetimes(self) -> np.ndarray:
         try:
-            with fits.open(self.get_path(), mode='readonly') as hdulist:
+            with fits.open(self.file_path, mode='readonly') as hdulist:
                 bintable_data = hdulist[1].data
                 time_seconds = bintable_data['TIME'][0]
                 return datetime_helpers.create_datetime_array(self.chunk_start_datetime, time_seconds)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Could not load spectrogram, {self.get_path()} not found.")
+            raise FileNotFoundError(f"Could not load spectrogram, {self.file_path} not found.")
         except Exception as e:
             raise RuntimeError(f"An error occurred while retrieving datetime array: {e}")
