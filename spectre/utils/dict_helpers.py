@@ -16,6 +16,7 @@ def unpack(param: str) -> tuple:
 def params_list_to_string_valued_dict(params: list) -> dict:
     return {k: v for k, v in (unpack(param) for param in params)}
 
+
 def convert_types(string_valued_dict: dict, template: dict) -> dict:
     type_converted_dict = {}
     for key, string_value in string_valued_dict.items():          
@@ -100,10 +101,3 @@ def inject_dict(input_dict: dict, overwrite_dict: dict):
         input_dict[key] = value
     return input_dict
 
-
-def update_key_value(input_dict: dict, key: Any, value: Any) -> dict:
-    valid_keys = list(input_dict.keys())
-    if not key in valid_keys:
-        raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
-    input_dict[key] = value
-    return input_dict
