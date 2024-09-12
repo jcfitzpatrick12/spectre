@@ -47,22 +47,17 @@ def append_date_dir(base_dir_path: str,
 def get_date_dir(dt: datetime, base_dir_path: str = None) -> str:
     # Format the datetime object to the desired string format
     date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
-    
+
     # Prepend base_dir_path if specified
     if base_dir_path:
         return os.path.join(base_dir_path, date_dir)
-    return date_dir
+    else:
+        return date_dir
 
 
 # Based on an input chunk_start_time, returns the parent path for that chunk
 def get_chunk_parent_path(chunk_start_time: str) -> str:
-    # Parse the datetime string to a datetime object
-    try:
-        dt = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
-    except ValueError as e:
-        raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
-    
-    # Use the get_date_dir function to get the parent path
+    dt = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
     return get_date_dir(dt, base_dir_path=CHUNKS_DIR_PATH)
 
 
