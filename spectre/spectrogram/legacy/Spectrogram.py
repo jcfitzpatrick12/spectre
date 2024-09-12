@@ -14,7 +14,7 @@ from spectre.utils import fits_helpers
 from cfg import CONFIG
 from spectre.spectrogram.PanelStack import PanelStack
 from spectre.spectrogram.ComparisonStack import ComparisonStack
-from spectre.json_config.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.FitsConfigHandler import FitsConfigHandler
 
 
 class Spectrogram:

@@ -8,7 +8,7 @@ from typing import List
 from host.cli import __app_name__, __version__
 
 from spectre.receivers.factory import get_receiver
-from spectre.json_config.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.FitsConfigHandler import FitsConfigHandler
 
 
 app = typer.Typer()

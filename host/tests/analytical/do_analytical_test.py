@@ -6,7 +6,7 @@ from datetime import datetime
 import numpy as np
 import typer
 
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.CaptureConfigHandler import CaptureConfigHandler
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
 from spectre.spectrogram.Spectrogram import Spectrogram
