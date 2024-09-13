@@ -200,7 +200,7 @@ class Spectrogram:
         chunk_parent_path = datetime_helpers.get_chunk_parent_path(self.chunk_start_time) 
         file_name = f"{self.chunk_start_time}_{self.tag}.fits"
         write_path = os.path.join(chunk_parent_path, file_name)
-        _save_spectrogram(self, fits_config, write_path)
+        _save_spectrogram(write_path, self, fits_config)
         return
     
 
