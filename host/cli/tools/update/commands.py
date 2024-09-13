@@ -6,8 +6,8 @@ import typer
 from typing import List
 
 from spectre.receivers.factory import get_receiver
-from spectre.file_handlers.CaptureConfigHandler import CaptureConfigHandler
-from spectre.file_handlers.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 from spectre.utils import dict_helpers 
 
 app = typer.Typer()
