@@ -10,34 +10,8 @@ from host.cli import __app_name__, __version__
 from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 from spectre.receivers.factory import get_receiver
-from spectre.utils import file_helpers
 
 app = typer.Typer()
-
-@app.command()
-def cron_log() -> None:
-    file_helpers.cat("/var/log/daily_capture.log")
-    raise typer.Exit()
-
-
-@app.command()
-def process_log(
-    pid: int = typer.Option(None, "--pid", help="Print the process log, or if specified, the specific logs for a subprocess")
-) -> None:
-    # """
-    # Print the process log or the log for a specific subprocess if PID is provided.
-    # """
-    # # Update the statuses of subprocesses before printing
-
-    # if pid:
-    #     # Print the log for the specific subprocess by PID
-    #     file_helpers.cat(os.path.join(CONFIG.path_to_logs, f"subprocess_{pid}.log"))
-    # else:
-    #     # Print the general process tracking log
-    #     file_helpers.cat(CONFIG.path_to_processes_log)
-
-    raise typer.Exit()
-
 
 @app.command()
 def fits_config_template(
