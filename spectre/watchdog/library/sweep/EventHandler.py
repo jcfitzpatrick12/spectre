@@ -28,7 +28,7 @@ class EventHandler(BaseEventHandler):
         S = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
-        S.save_to_fits()
+        S.save()
 
         # if the previous chunk has not yet been set, it means we were processing the first chunk
         # so we don't need to handle the previous chunk

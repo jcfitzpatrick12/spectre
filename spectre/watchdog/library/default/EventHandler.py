@@ -23,7 +23,7 @@ class EventHandler(BaseEventHandler):
         S = chunk.build_spectrogram()
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
-        S.save_to_fits()
+        S.save()
         chunk.bin.delete(doublecheck_delete = False)
         chunk.hdr.delete(doublecheck_delete = False)
 
