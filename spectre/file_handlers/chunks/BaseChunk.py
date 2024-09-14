@@ -5,9 +5,11 @@
 from datetime import datetime
 
 from spectre.utils import datetime_helpers
-from spectre.file_handlers.BaseFileHandler import BaseFileHandler
+from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 
-from cfg import DEFAULT_TIME_FORMAT
+from cfg import (
+    DEFAULT_TIME_FORMAT
+)
 
 
 class BaseChunk:
@@ -21,11 +23,12 @@ class BaseChunk:
         self.chunk_name = f"{self.chunk_start_time}_{self.tag}"
 
 
-    def add_file(self, extension: str, chunk_instance: BaseFileHandler):
-        self.chunk_files[extension] = chunk_instance
+    def add_file(self, extension: str, chunk_file: ChunkFile) -> None:
+        self.chunk_files[extension] = chunk_file
+        return
 
 
-    def get_file(self, extension: str) -> BaseFileHandler:
+    def get_file(self, extension: str) -> ChunkFile:
         if extension not in self.chunk_files:
             raise ValueError(f"No file registered with extension '{extension}'")
         return self.chunk_files[extension]
@@ -36,7 +39,7 @@ class BaseChunk:
         if chunk_file.exists():
             return chunk_file.read()
         else:
-            raise FileNotFoundError(f"Chunk file with extension '{extension}' not found on disk")
+            raise FileNotFoundError(f"{chunk_file.file_path} was not found.")
 
 
     def delete_file(self, extension: str, doublecheck_delete: bool = True):
@@ -44,7 +47,7 @@ class BaseChunk:
         if chunk_file.exists():
             chunk_file.delete(doublecheck_delete=doublecheck_delete)
         else:
-            raise FileNotFoundError(f"Chunk file with extension '{extension}' not found on disk")
+            raise FileNotFoundError(f"{chunk_file.file_path} was not found.")
 
 
     def file_exists(self, extension: str) -> bool:

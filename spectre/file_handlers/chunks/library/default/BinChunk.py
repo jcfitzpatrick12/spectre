@@ -4,11 +4,11 @@
 
 import numpy as np
 
-from spectre.chunks.ChunkFile import ChunkFile
+from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 
 class BinChunk(ChunkFile):
-    def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, "bin")
+    def __init__(self, chunk_parent_path: str, chunk_name: str):
+        super().__init__(chunk_parent_path, chunk_name, "bin")
 
     def read(self) -> np.ndarray:
         try:

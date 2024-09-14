@@ -4,7 +4,7 @@
 
 from abc import abstractmethod
 
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.file_handlers.chunks.BaseChunk import BaseChunk
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 

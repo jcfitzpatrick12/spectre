@@ -7,21 +7,21 @@ from typing import Tuple
 from scipy.signal import ShortTimeFFT, get_window
 import matplotlib.pyplot as plt
 
-from spectre.chunks.SPECTREChunk import SPECTREChunk
-from spectre.chunks.chunk_register import register_chunk
+from spectre.file_handlers.chunks.SPECTREChunk import SPECTREChunk
+from spectre.file_handlers.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.chunks.library.default.BinChunk import BinChunk
-from spectre.chunks.library.default.FitsChunk import FitsChunk
-from spectre.chunks.library.default.HdrChunk import HdrChunk
+from spectre.file_handlers.chunks.library.default.BinChunk import BinChunk
+from spectre.file_handlers.chunks.library.default.FitsChunk import FitsChunk
+from spectre.file_handlers.chunks.library.default.HdrChunk import HdrChunk
 
 @register_chunk('default')
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
         
-        self.add_file(BinChunk(chunk_start_time, tag))
-        self.add_file(FitsChunk(chunk_start_time, tag))
-        self.add_file(HdrChunk(chunk_start_time, tag))
+        self.add_file(BinChunk(self.chunk_parent_path, self.chunk_name))
+        self.add_file(FitsChunk(self.chunk_parent_path, self.chunk_name))
+        self.add_file(HdrChunk(self.chunk_parent_path, self.chunk_name))
 
 
     def build_spectrogram(self) -> Spectrogram:

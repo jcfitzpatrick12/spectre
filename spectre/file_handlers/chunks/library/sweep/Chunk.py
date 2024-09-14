@@ -6,21 +6,21 @@ from datetime import datetime, timedelta
 from cfg import (
     DEFAULT_TIME_FORMAT
 )
-from spectre.chunks.SPECTREChunk import SPECTREChunk
-from spectre.chunks.chunk_register import register_chunk
+from spectre.file_handlers.chunks.SPECTREChunk import SPECTREChunk
+from spectre.file_handlers.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.chunks.library.sweep.HdrChunk import HdrChunk
-from spectre.chunks.library.default.BinChunk import BinChunk
-from spectre.chunks.library.default.FitsChunk import FitsChunk
+from spectre.file_handlers.chunks.library.sweep.HdrChunk import HdrChunk
+from spectre.file_handlers.chunks.library.default.BinChunk import BinChunk
+from spectre.file_handlers.chunks.library.default.FitsChunk import FitsChunk
 
 @register_chunk('sweep')
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time, tag):
         super().__init__(chunk_start_time, tag)
 
-        self.add_file(BinChunk(chunk_start_time, tag))
-        self.add_file(FitsChunk(chunk_start_time, tag))
-        self.add_file(HdrChunk(chunk_start_time, tag))
+        self.add_file(BinChunk(self.chunk_parent_path, self.chunk_name))
+        self.add_file(FitsChunk(self.chunk_parent_path, self.chunk_name))
+        self.add_file(HdrChunk(self.chunk_parent_path, self.chunk_name))
 
         # intialise attributes which are used by build_spectrogram and its helper methods 
         self.window: Optional[np.ndarray] = None
