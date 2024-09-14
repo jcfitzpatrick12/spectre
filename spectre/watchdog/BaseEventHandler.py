@@ -8,7 +8,7 @@ import queue
 from watchdog.events import FileSystemEventHandler
 from abc import ABC, abstractmethod
 
-from spectre.chunks.factory import get_chunk_from_tag
+from spectre.file_handlers.chunks.factory import get_chunk_from_tag
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 
 
