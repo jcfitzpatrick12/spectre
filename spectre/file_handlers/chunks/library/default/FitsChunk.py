@@ -11,8 +11,8 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.utils import datetime_helpers
 
 class FitsChunk(ChunkFile):
-    def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, "fits")
+    def __init__(self, chunk_parent_path: str, chunk_name: str):
+        super().__init__(chunk_parent_path, chunk_name, "fits")
 
     def read(self) -> Spectrogram:
         try:

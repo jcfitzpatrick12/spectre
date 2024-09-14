@@ -5,11 +5,11 @@
 import numpy as np
 from typing import Tuple
 
-from spectre.chunks.ChunkFile import ChunkFile
+from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 
 class HdrChunk(ChunkFile):
-    def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, "hdr")
+    def __init__(self, chunk_parent_path: str, chunk_name: str):
+        super().__init__(chunk_parent_path, chunk_name, "hdr")
 
     def read(self) -> Tuple[int, np.ndarray, np.ndarray]:
         hdr_contents = self._read_file_contents()

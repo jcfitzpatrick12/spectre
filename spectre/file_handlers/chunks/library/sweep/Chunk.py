@@ -86,7 +86,7 @@ class Chunk(SPECTREChunk):
         # read the entirety of the raw IQ data from the previous chunk
         prev_sweep_IQ_data = previous_chunk.read_file("bin")
         # read the sweep metadata from the header of the previous chunk
-        _, (prev_center_freqs, prev_num_samples) = previous_chunk.hdr.read()
+        _, (prev_center_freqs, prev_num_samples) = previous_chunk.read_file("hdr")
         # extract the (step) index of the start step of the final sweep
         final_sweep_start_step_index = np.where(prev_center_freqs == np.min(prev_center_freqs))[0][-1]
         # use this to isolate the data corresponding to the final sweep

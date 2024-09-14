@@ -23,8 +23,8 @@ class BaseChunk:
         self.chunk_name = f"{self.chunk_start_time}_{self.tag}"
 
 
-    def add_file(self, extension: str, chunk_file: ChunkFile) -> None:
-        self.chunk_files[extension] = chunk_file
+    def add_file(self, chunk_file: ChunkFile) -> None:
+        self.chunk_files[chunk_file.extension] = chunk_file
         return
 
 
@@ -50,7 +50,7 @@ class BaseChunk:
             raise FileNotFoundError(f"{chunk_file.file_path} was not found.")
 
 
-    def file_exists(self, extension: str) -> bool:
+    def has_file(self, extension: str) -> bool:
         chunk_file = self.chunk_files.get(extension)
         return chunk_file is not None and chunk_file.exists()
 
