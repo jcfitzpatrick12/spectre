@@ -15,7 +15,8 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
 from cfg import (
-    CHUNKS_DIR_PATH
+    CHUNKS_DIR_PATH,
+    DEFAULT_TIME_FORMAT
 )
 
 class Chunks:
