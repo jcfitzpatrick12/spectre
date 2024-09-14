@@ -79,7 +79,7 @@ def main(test_tag: str, show_slice_status = False) -> None:
     current_chunk = None
     for chunk in my_chunks:
         current_chunk = chunk
-        if chunk.get_file("fits"):
+        if chunk.has_file("fits"):
             S = chunk.read_file("fits")  
             analytical_S = asf.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)

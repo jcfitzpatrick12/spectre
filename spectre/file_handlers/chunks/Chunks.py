@@ -8,8 +8,8 @@ import warnings
 from datetime import datetime
 from typing import Tuple, Iterator
 
-from spectre.chunks.factory import get_chunk_from_tag
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.file_handlers.chunks.factory import get_chunk_from_tag
+from spectre.file_handlers.chunks.BaseChunk import BaseChunk
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
@@ -144,7 +144,7 @@ class Chunks:
             lower_bound, upper_bound = chunk_intervals[chunk_start_time]
 
             if lower_bound < end_time and upper_bound > start_time:
-                spectrogram = chunk.fits.read()
+                spectrogram = chunk.read_file("fits")
                 chopped_spectrogram = transform.time_chop(spectrogram, start_time_str, end_time_str)
                 if chopped_spectrogram is None:
                     raise ValueError("Error chopping spectrogram within the specified time range.")
@@ -157,13 +157,12 @@ class Chunks:
         chunk_list = self.get_chunk_list()
         total_chunks = len(chunk_list)
         chunk_intervals = {}
-
         for i, chunk in enumerate(chunk_list):
             if not chunk.has_file("fits"):
                 continue
 
             start_time = chunk.chunk_start_datetime
-            end_time = chunk_list[i + 1].chunk_start_datetime if i < total_chunks - 1 else chunk.fits.get_datetimes()[-1]
+            end_time = chunk_list[i + 1].chunk_start_datetime if (i < total_chunks - 1) else chunk.get_file("fits").get_datetimes()[-1]
 
             chunk_intervals[chunk.chunk_start_time] = (start_time, end_time)
 
