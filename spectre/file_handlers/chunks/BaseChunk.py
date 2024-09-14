@@ -26,6 +26,9 @@ class BaseChunk:
     def add_file(self, chunk_file: ChunkFile) -> None:
         self.chunk_files[chunk_file.extension] = chunk_file
         return
+    
+    def get_extensions(self) -> list[str]:
+        return self.chunk_files.keys()
 
 
     def get_file(self, extension: str) -> ChunkFile:
