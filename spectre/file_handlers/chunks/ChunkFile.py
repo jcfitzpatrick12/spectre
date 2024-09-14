@@ -4,7 +4,6 @@
 
 
 from spectre.file_handlers.BaseFileHandler import BaseFileHandler
-from spectre.utils.datetime_helpers import get_chunk_parent_path
 
 class ChunkFile(BaseFileHandler):
     def __init__(self, chunk_parent_path: str, chunk_name: str, extension: str):
