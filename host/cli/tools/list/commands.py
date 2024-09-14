@@ -10,7 +10,7 @@ from host.cli import __app_name__, __version__
 from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
-from spectre.chunks.Chunks import Chunks
+from spectre.file_handlers.chunks.Chunks import Chunks
 
 from cfg import (
     CHUNKS_DIR_PATH,
@@ -31,7 +31,6 @@ def callisto_instrument_codes(
 @app.command()
 def chunks(
     tag: str = typer.Option(..., "--tag", "-t", help=""),
-    ext: str = typer.Option(..., "--ext", "-e", help=""),
     year: int = typer.Option(None, "--year", "-y", help=""),
     month: int = typer.Option(None, "--month", "-m", help=""),
     day: int = typer.Option(None, "--day", "-d", help=""),
@@ -41,15 +40,12 @@ def chunks(
                     month=month,
                     day=day)
     
-    for chunk_start_time, chunk in chunks.chunk_map.items():
-        # Use getattr to dynamically get the attribute based on 'ext'
-        attribute = getattr(chunk, ext, None)
-        if attribute is None:
-            typer.echo(f"No attribute '{ext}' found on chunk")
-            continue
-        if attribute.exists():
-            print(f"{chunk_start_time}_{tag}.{ext}")
+    for chunk in chunks:
+        for extension in chunk.get_extensions():
+            if chunk.has_file(extension):
+                print(chunk.chunk_name)
     typer.Exit()
+
 
 @app.command()
 def receivers(
