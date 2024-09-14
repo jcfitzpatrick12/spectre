@@ -42,23 +42,12 @@ def append_date_dir(base_dir_path: str,
     return date_dir
 
 
-# Returns a directory of the form %Y/%m/%d based on a datetime, 
-# prepending a base path if specified
-def get_date_dir(dt: datetime, base_dir_path: str = None) -> str:
-    # Format the datetime object to the desired string format
-    date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
-
-    # Prepend base_dir_path if specified
-    if base_dir_path:
-        return os.path.join(base_dir_path, date_dir)
-    else:
-        return date_dir
-
-
 # Based on an input chunk_start_time, returns the parent path for that chunk
 def get_chunk_parent_path(chunk_start_time: str) -> str:
     dt = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
-    return get_date_dir(dt, base_dir_path=CHUNKS_DIR_PATH)
+    # Format the datetime object to the desired string format
+    date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
+    return os.path.join(CHUNKS_DIR_PATH, date_dir)
 
 
 def create_datetime_array(start_datetime: datetime, 

@@ -5,11 +5,11 @@
 import numpy as np
 from typing import Tuple
 
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.chunks.ChunkFile import ChunkFile
 
-class HdrChunk(BaseChunk):
+class HdrChunk(ChunkFile):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, extension="hdr")
+        super().__init__(chunk_start_time, tag, "hdr")
 
 
     def read(self) -> int:

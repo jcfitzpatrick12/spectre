@@ -17,9 +17,10 @@ from spectre.chunks.library.default.FitsChunk import FitsChunk
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time, tag):
         super().__init__(chunk_start_time, tag)
-        self.bin = BinChunk(chunk_start_time, tag)
-        self.fits = FitsChunk(chunk_start_time, tag)
-        self.hdr = HdrChunk(chunk_start_time, tag)
+
+        self.add_file(BinChunk(chunk_start_time, tag))
+        self.add_file(FitsChunk(chunk_start_time, tag))
+        self.add_file(HdrChunk(chunk_start_time, tag))
 
         # intialise attributes which are used by build_spectrogram and its helper methods 
         self.window: Optional[np.ndarray] = None
@@ -39,9 +40,9 @@ class Chunk(SPECTREChunk):
 
     def build_spectrogram(self, previous_chunk: Optional[SPECTREChunk] = None) -> Spectrogram:
         # read the (raw) swept IQ data
-        self.sweep_IQ_data = self.bin.read()
+        self.sweep_IQ_data = self.read_file("bin")
         # read the millisecond correction and sweep metadata
-        millisecond_correction, self.sweep_metadata = self.hdr.read()
+        millisecond_correction, self.sweep_metadata = self.read_file("hdr")
 
         # if the previous chunk is specified, it is indicating we need to reconstruct the initial sweep
         if previous_chunk:
@@ -83,7 +84,7 @@ class Chunk(SPECTREChunk):
 
     def _get_final_sweep_previous_chunk(self, previous_chunk: SPECTREChunk) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         # read the entirety of the raw IQ data from the previous chunk
-        prev_sweep_IQ_data = previous_chunk.bin.read()
+        prev_sweep_IQ_data = previous_chunk.read_file("bin")
         # read the sweep metadata from the header of the previous chunk
         _, (prev_center_freqs, prev_num_samples) = previous_chunk.hdr.read()
         # extract the (step) index of the start step of the final sweep

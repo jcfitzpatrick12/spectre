@@ -12,8 +12,7 @@ class Chunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
         
-        self.fits = FitsChunk(chunk_start_time, tag)
-
+        self.add_file(FitsChunk(chunk_start_time, tag))
 
 
 

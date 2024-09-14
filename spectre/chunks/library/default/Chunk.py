@@ -19,16 +19,16 @@ class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
         
-        self.bin = BinChunk(chunk_start_time, tag)
-        self.fits = FitsChunk(chunk_start_time, tag)
-        self.hdr = HdrChunk(chunk_start_time, tag)
+        self.add_file(BinChunk(chunk_start_time, tag))
+        self.add_file(FitsChunk(chunk_start_time, tag))
+        self.add_file(HdrChunk(chunk_start_time, tag))
 
 
     def build_spectrogram(self) -> Spectrogram:
         # fetch the raw IQ sample receiver output from the binary file
-        IQ_data = self.bin.read()
+        IQ_data = self.read_file("bin")
         # and the millisecond correction from the accompanying header file
-        millisecond_correction = self.hdr.read()
+        millisecond_correction = self.read_file("hdr")
 
         # convert the millisecond correction to microseconds
         microsecond_correction = millisecond_correction * 1000

@@ -15,7 +15,8 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
 from cfg import (
-    CHUNKS_DIR_PATH
+    CHUNKS_DIR_PATH,
+    DEFAULT_TIME_FORMAT
 )
 
 class Chunks:
@@ -137,7 +138,7 @@ class Chunks:
         spectrograms = []
 
         for chunk_start_time, chunk in self.chunk_map.items():
-            if chunk.chunk_start_datetime.day != target_day or not chunk.fits.exists():
+            if chunk.chunk_start_datetime.day != target_day or not chunk.has_file("fits"):
                 continue
 
             lower_bound, upper_bound = chunk_intervals[chunk_start_time]
@@ -158,7 +159,7 @@ class Chunks:
         chunk_intervals = {}
 
         for i, chunk in enumerate(chunk_list):
-            if not chunk.fits.exists():
+            if not chunk.has_file("fits"):
                 continue
 
             start_time = chunk.chunk_start_datetime

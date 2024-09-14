@@ -24,8 +24,8 @@ class EventHandler(BaseEventHandler):
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
         S.save()
-        chunk.bin.delete(doublecheck_delete = False)
-        chunk.hdr.delete(doublecheck_delete = False)
+        chunk.delete_file("bin", doublecheck_delete = False)
+        chunk.delete_file("hdr", doublecheck_delete = False)
 
 
     def get_average_over_int(self, S: Spectrogram) -> int:

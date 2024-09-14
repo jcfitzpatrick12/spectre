@@ -6,13 +6,13 @@ from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
 from astropy.io.fits.hdu.hdulist import HDUList
 
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.chunks.ChunkFile import ChunkFile
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.utils import datetime_helpers
 
-class FitsChunk(BaseChunk):
+class FitsChunk(ChunkFile):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, extension="fits")
+        super().__init__(chunk_start_time, tag, "fits")
 
     def read(self) -> Spectrogram:
         try:

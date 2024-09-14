@@ -3,13 +3,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import numpy as np
-from typing import Tuple
 
-from spectre.chunks.BaseChunk import BaseChunk
+from spectre.chunks.ChunkFile import ChunkFile
 
-class BinChunk(BaseChunk):
+class BinChunk(ChunkFile):
     def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag, extension="bin")
+        super().__init__(chunk_start_time, tag, "bin")
 
     def read(self) -> np.ndarray:
         try:
