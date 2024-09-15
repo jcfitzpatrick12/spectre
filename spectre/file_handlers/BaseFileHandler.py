@@ -11,17 +11,12 @@ class BaseFileHandler(ABC):
                  parent_path: str, 
                  base_file_name: str, 
                  extension: str = None,
-                 override_extension: str = None,
-                 read_on_instantiation: bool = False):
+                 override_extension: str = None):
         self.parent_path = parent_path
         self.file_name = base_file_name
         self.extension = extension if (override_extension is None) else override_extension
         self.file_name = base_file_name if (self.extension is None) else f"{base_file_name}.{extension}"
         self.file_path = os.path.join(self.parent_path, self.file_name)
-
-        self.data: Any = None
-        if read_on_instantiation:
-            self.data = self.read()
         
         
 
