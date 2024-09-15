@@ -60,7 +60,7 @@ def frequency_chop(input_S: Spectrogram,
 def time_chop(input_S: Spectrogram, 
               start_time: str, 
               end_time: str, 
-              time_format = DEFAULT_TIME_FORMAT) -> Spectrogram | None:
+              time_format: str = DEFAULT_TIME_FORMAT) -> Spectrogram | None:
     
 
     # spectre does not currently support time chop for non-datetime assigned spectrograms
@@ -75,7 +75,7 @@ def time_chop(input_S: Spectrogram,
     is_entirely_below_time_range = (start_datetime < input_S.datetimes[0] and end_datetime < input_S.datetimes[0])
     is_entirely_above_time_range = (start_datetime > input_S.datetimes[-1] and end_datetime > input_S.datetimes[-1])
     if is_entirely_below_time_range or is_entirely_above_time_range:
-        return None
+        raise ValueError("Requested time interval is out of range for the input spectrogram.")
     
     start_index = datetime_helpers.find_closest_index(start_datetime, input_S.datetimes)
     end_index = datetime_helpers.find_closest_index(end_datetime, input_S.datetimes)
