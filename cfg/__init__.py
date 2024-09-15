@@ -12,10 +12,10 @@ CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR", os.path.join(SPECTRE_PARE
 os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
 
 LOGS_DIR_PATH = os.path.join(SPECTRE_PARENT_DIR_PATH, 'logs')
-os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
+os.makedirs(LOGS_DIR_PATH, exist_ok=True)
 
 JSON_CONFIGS_DIR_PATH = os.path.join(SPECTRE_PARENT_DIR_PATH, "cfg", "json_configs")
-os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
+os.makedirs(JSON_CONFIGS_DIR_PATH, exist_ok=True)
 
 DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
