@@ -43,7 +43,8 @@ def chunks(
     for chunk in chunks:
         for extension in chunk.get_extensions():
             if chunk.has_file(extension):
-                print(chunk.chunk_name)
+                chunk_file = chunk.get_file(extension)
+                print(chunk_file.file_name)
                 continue
     typer.Exit()
 
