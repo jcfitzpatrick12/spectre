@@ -126,44 +126,80 @@ class Chunks:
         raise ValueError(f"No matching chunk found with chunk_start_time {chunk_to_match.chunk_start_time}.")
 
 
-    def build_spectrogram_from_range(self, start_time_str: str, end_time_str: str) -> Spectrogram:
-        start_time = datetime.strptime(start_time_str, DEFAULT_TIME_FORMAT)
-        end_time = datetime.strptime(end_time_str, DEFAULT_TIME_FORMAT)
+    def build_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
+        # Convert input strings to datetime objects
+        start_datetime = datetime.strptime(start_time, DEFAULT_TIME_FORMAT)
+        end_datetime = datetime.strptime(end_time, DEFAULT_TIME_FORMAT)
 
-        if start_time.day != end_time.day:
-            warnings.warn("Warning! Joining spectrograms over more than one day.", RuntimeWarning)
+        if start_datetime.day != end_datetime.day:
+            warnings.warn("Joining spectrograms across multiple days.", RuntimeWarning)
 
-        target_day = start_time.day
+        # Retrieve upper-bound intervals for all chunks
         chunk_intervals = self.get_upper_bound_chunk_intervals()
+
+        # List to store spectrograms to join
         spectrograms = []
 
+        # Iterate through each chunk's start time and spectrogram data
         for chunk_start_time, chunk in self.chunk_map.items():
-            if chunk.chunk_start_datetime.day != target_day or not chunk.has_file("fits"):
-                continue
-
-            lower_bound, upper_bound = chunk_intervals[chunk_start_time]
-
-            if lower_bound < end_time and upper_bound > start_time:
-                spectrogram = chunk.read_file("fits")
-                chopped_spectrogram = transform.time_chop(spectrogram, start_time_str, end_time_str)
-                if chopped_spectrogram is None:
-                    raise ValueError("Error chopping spectrogram within the specified time range.")
-                spectrograms.append(chopped_spectrogram)
-
-        return transform.join_spectrograms(spectrograms)
-
-
-    def get_upper_bound_chunk_intervals(self) -> dict[str, Tuple[datetime, datetime]]:
-        chunk_list = self.get_chunk_list()
-        total_chunks = len(chunk_list)
-        chunk_intervals = {}
-        for i, chunk in enumerate(chunk_list):
+            # Skip chunks without the correct file or if the day doesn't match
             if not chunk.has_file("fits"):
                 continue
 
-            start_time = chunk.chunk_start_datetime
-            end_time = chunk_list[i + 1].chunk_start_datetime if (i < total_chunks - 1) else chunk.get_file("fits").get_datetimes()[-1]
+            # Get the time bounds for this chunk
+            lower_bound, upper_bound = chunk_intervals.get(chunk_start_time, (None, None))
+            
+            # Ensure both lower and upper bounds are valid
+            if lower_bound is None or upper_bound is None:
+                continue
+            
+            # Check if the chunk time range overlaps the requested time range
+            if lower_bound < end_datetime and upper_bound > start_datetime:
+                # Read the spectrogram for this chunk
+                spectrogram = chunk.read_file("fits")
+                
+                # Chop the spectrogram to fit within the requested time range
+                chopped_spectrogram = transform.time_chop(spectrogram, start_time, end_time)
+                
+                # Add the chopped spectrogram to the list
+                spectrograms.append(chopped_spectrogram)
 
+        # Join all the collected spectrograms into a single spectrogram
+        if spectrograms:
+            return transform.join_spectrograms(spectrograms)
+        else:
+            raise ValueError("No spectrogram data found for the given time range.")
+
+
+
+    def get_upper_bound_chunk_intervals(self) -> dict[str, Tuple[datetime, datetime]]:
+        # Retrieve the list of chunks
+        chunk_list = self.get_chunk_list()
+        total_chunks = len(chunk_list)
+        chunk_intervals = {}
+
+        for i, chunk in enumerate(chunk_list):
+            # Skip chunks without the required FITS file
+            if not chunk.has_file("fits"):
+                continue
+
+            # Determine the start time of the current chunk
+            start_time = chunk.chunk_start_datetime
+
+            # Determine the end time based on the next chunk's start time or calculate the last chunk's end time
+            if i < total_chunks - 1:
+                # End time is the start time of the next chunk
+                end_time = chunk_list[i + 1].chunk_start_datetime
+            else:
+                # For the last chunk, attempt to retrieve the exact end time from its own data
+                end_times = chunk.get_file("fits").get_datetimes()
+                if end_times:
+                    end_time = end_times[-1]  # Use the last available time as the upper bound
+                else:
+                    # Use a fallback value if end times are unavailable
+                    end_time = start_time + timedelta(hours=1)  # Adjust this as per data expectations
+
+            # Store the start and end times for this chunk
             chunk_intervals[chunk.chunk_start_time] = (start_time, end_time)
 
         return chunk_intervals
