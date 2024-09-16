@@ -44,6 +44,7 @@ def chunks(
         for extension in chunk.get_extensions():
             if chunk.has_file(extension):
                 print(chunk.chunk_name)
+                continue
     typer.Exit()
 
 
