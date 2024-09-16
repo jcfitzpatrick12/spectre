@@ -8,8 +8,8 @@ import queue
 from watchdog.events import FileSystemEventHandler
 from abc import ABC, abstractmethod
 
-from spectre.chunks.factory import get_chunk_from_tag
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.chunks.factory import get_chunk_from_tag
+from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 
 
 class BaseEventHandler(ABC, FileSystemEventHandler):
@@ -17,7 +17,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         self.tag = tag
         self.Chunk = get_chunk_from_tag(tag)
         capture_config_handler = CaptureConfigHandler(tag)
-        self.capture_config = capture_config_handler.load_as_dict()
+        self.capture_config = capture_config_handler.read()
         self.extension = extension
         self.exception_queue = exception_queue  # Queue to propagate exceptions
 

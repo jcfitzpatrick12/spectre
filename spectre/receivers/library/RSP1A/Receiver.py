@@ -1,7 +1,7 @@
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
 from spectre.receivers.library.RSP1A.gr import fixed, sweep
-from spectre.utils import validator_helpers
+from spectre.receivers import validators
 
 @register_receiver("RSP1A")
 class Receiver(SPECTREReceiver):
@@ -65,28 +65,28 @@ class Receiver(SPECTREReceiver):
         min_freq = capture_config.get("min_freq")
         max_freq = capture_config.get("max_freq")
         if center_freq:
-            validator_helpers.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
+            validators.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
         if min_freq:
-            validator_helpers.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
+            validators.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
         if max_freq:
-            validator_helpers.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
+            validators.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
 
         samp_rate_lower_bound = 200e3 # [Hz]
         samp_rate_upper_bound = 10e6 # [Hz]
-        validator_helpers.closed_confine_samp_rate(capture_config['samp_rate'], samp_rate_lower_bound, samp_rate_upper_bound)
+        validators.closed_confine_samp_rate(capture_config['samp_rate'], samp_rate_lower_bound, samp_rate_upper_bound)
 
         bandwidth_lower_bound = 200e3 # [Hz]
         bandwidth_upper_bound = 8e6 # [Hz]
-        validator_helpers.closed_confine_bandwidth(capture_config['bandwidth'], bandwidth_lower_bound, bandwidth_upper_bound)
+        validators.closed_confine_bandwidth(capture_config['bandwidth'], bandwidth_lower_bound, bandwidth_upper_bound)
 
         ## make a function in validator helper BOUND IF_GAIN
         IF_gain_upper_bound = -20 # [dB]
-        validator_helpers.closed_upper_bound_IF_gain(capture_config['IF_gain'], IF_gain_upper_bound)
+        validators.closed_upper_bound_IF_gain(capture_config['IF_gain'], IF_gain_upper_bound)
         
         
         ## make a function in validator helpers BOUND RF_GAIN
         RF_gain_upper_bound = 0 # [dB]
-        validator_helpers.closed_upper_bound_RF_gain(capture_config['RF_gain'], RF_gain_upper_bound)
+        validators.closed_upper_bound_RF_gain(capture_config['RF_gain'], RF_gain_upper_bound)
         return
 
     

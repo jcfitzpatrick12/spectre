@@ -24,7 +24,9 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
-from cfg import CONFIG
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 class cosine_signal_1(gr.top_block):
 
@@ -43,7 +45,7 @@ class cosine_signal_1(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CONFIG.path_to_chunks_dir, tag, chunk_size, samp_rate)
+        self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CHUNKS_DIR_PATH, tag, chunk_size, samp_rate)
         self.blocks_throttle_0_1 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
         self.blocks_null_source_1 = blocks.null_source(gr.sizeof_float*1)

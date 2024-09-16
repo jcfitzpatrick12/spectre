@@ -6,11 +6,10 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
 
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-from spectre.json_config.FitsConfigHandler import FitsConfigHandler
-from spectre.chunks.Chunks import Chunks
+from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.chunks.Chunks import Chunks
 
 app = typer.Typer()
 
@@ -28,18 +27,13 @@ def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
                 day=day)
     
     for chunk in chunks:
-        # Use getattr to dynamically get the attribute based on 'ext'
-        chunk_ext = getattr(chunk, ext, None)
-        if chunk_ext is None:
-            typer.echo(f"No attribute '{ext}' found on chunk")
-            continue
         if suppress_doublecheck:
             doublecheck_delete = False
         else:
             doublecheck_delete = True
-        if chunk_ext.exists():
-            chunk_ext.delete(doublecheck_delete=doublecheck_delete)
-            typer.secho(f"File deleted: {chunk_ext.get_path()}.", fg=typer.colors.YELLOW)
+        if chunk.has_file(ext):
+            chunk.delete_file(ext, doublecheck_delete=doublecheck_delete)
+            typer.secho(f"File deleted: {chunk.get_file(ext).file_path}.", fg=typer.colors.YELLOW)
     
     typer.Exit()
 

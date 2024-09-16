@@ -28,7 +28,7 @@ class EventHandler(BaseEventHandler):
         S = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
         average_over_int = self.get_average_over_int(S)
         S = transform.time_average(S, average_over_int)
-        S.save_to_fits()
+        S.save()
 
         # if the previous chunk has not yet been set, it means we were processing the first chunk
         # so we don't need to handle the previous chunk
@@ -39,8 +39,8 @@ class EventHandler(BaseEventHandler):
         # otherwise the previous chunk is defined (and by this point has already been processed)
         else:
             # delete the used binary and detached header files
-            self.previous_chunk.bin.delete(doublecheck_delete = False)
-            self.previous_chunk.hdr.delete(doublecheck_delete = False)
+            self.previous_chunk.delete_file("bin", doublecheck_delete = False)
+            self.previous_chunk.delete_file("hdr", doublecheck_delete = False)
             # and reassign the current chunk to be used as the previous chunk at the next call of this method
             self.previous_chunk = chunk
 

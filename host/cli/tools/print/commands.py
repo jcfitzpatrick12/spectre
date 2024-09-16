@@ -6,39 +6,12 @@ import typer
 import os
 
 from host.cli import __app_name__, __version__
-from cfg import CONFIG
 
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-from spectre.json_config.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 from spectre.receivers.factory import get_receiver
-from spectre.utils import file_helpers
 
 app = typer.Typer()
-
-@app.command()
-def cron_log() -> None:
-    file_helpers.cat("/var/log/daily_capture.log")
-    raise typer.Exit()
-
-
-@app.command()
-def process_log(
-    pid: int = typer.Option(None, "--pid", help="Print the process log, or if specified, the specific logs for a subprocess")
-) -> None:
-    # """
-    # Print the process log or the log for a specific subprocess if PID is provided.
-    # """
-    # # Update the statuses of subprocesses before printing
-
-    # if pid:
-    #     # Print the log for the specific subprocess by PID
-    #     file_helpers.cat(os.path.join(CONFIG.path_to_logs, f"subprocess_{pid}.log"))
-    # else:
-    #     # Print the general process tracking log
-    #     file_helpers.cat(CONFIG.path_to_processes_log)
-
-    raise typer.Exit()
-
 
 @app.command()
 def fits_config_template(
@@ -88,7 +61,7 @@ def capture_config_template(
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
-    config_dict = fits_config_handler.load_as_dict()
+    config_dict = fits_config_handler.read()
     for key, value in config_dict.items():
         typer.secho(
             f"{key}: {value}"
@@ -99,7 +72,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
     capture_config_handler = CaptureConfigHandler(tag)
-    config_dict = capture_config_handler.load_as_dict()
+    config_dict = capture_config_handler.read()
     for key, value in config_dict.items():
         typer.secho(
             f"{key}: {value}"

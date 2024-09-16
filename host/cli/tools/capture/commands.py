@@ -12,7 +12,6 @@ from host.capture_session.multiprocessing import (
     start_capture,
     start_session
 )
-from cfg import CONFIG
 
 
 app = typer.Typer()

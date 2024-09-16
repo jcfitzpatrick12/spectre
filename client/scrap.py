@@ -1,17 +1,31 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 from spectre.chunks.Chunks import Chunks
 from spectre.spectrogram.transform import (
     join_spectrograms,
-    frequency_chop
+    frequency_chop,
+    time_average,
 )
 
-chunks = Chunks("RSP1A-sweeper", year=2024, month=9, day=7)
+chunks = Chunks("RSP1A-fixed-example", year=2024, month=9, day=11)
 
-# start_time = "2024-09-07T14:46:00"
-# end_time =  "2024-09-07T14:47:00"
-# S = chunks.build_spectrogram_from_range(start_time, end_time)
+for chunk in chunks:
+    if chunk.fits.exists():
+        S = chunk.fits.read()
+        S.quick_plot(log_norm=True)
 
-spectrograms = [chunk.fits.read() for chunk in chunks if chunk.fits.exists()]
-S = join_spectrograms(spectrograms)
-S.quick_plot(dBb=True)
-print(S.time_res_seconds)
+# spectrograms = [chunk.fits.read() for chunk in chunks if chunk.fits.exists()]
+# S = join_spectrograms(spectrograms)
+# print(f"Time resolution {S.time_res_seconds} [s]")
+# print(f"Frequency resolution {S.freq_res_MHz*1e3} [kHz]")
+# print(f"Frequency range {S.freq_MHz[-1] - S.freq_MHz[0]} [MHz]")
+# S.quick_plot(log_norm=True)
+
+
+
+
+
+
+
         

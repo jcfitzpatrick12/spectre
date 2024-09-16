@@ -4,10 +4,12 @@ import multiprocessing
 from typing import List
 import typer
 
-from cfg import CONFIG
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.Watcher import Watcher
 
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
@@ -99,7 +101,7 @@ def _start_capture(receiver_name: str, mode: str, tags: List[str]) -> None:
 
 
 def _start_watcher(tags: List[str]) -> None:
-    os.makedirs(CONFIG.path_to_chunks_dir, exist_ok=True)
+    os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
     for tag in tags:
         watcher = Watcher(tag)
         watcher.start()

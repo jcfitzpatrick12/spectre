@@ -4,8 +4,12 @@
 
 import queue
 from watchdog.observers import Observer
-from cfg import CONFIG
+
 from spectre.watchdog.factory import get_event_handler_from_tag
+
+from cfg import (
+    CHUNKS_DIR_PATH
+)
 
 class Watcher:
     def __init__(self, tag: str):
@@ -17,7 +21,7 @@ class Watcher:
     def start(self):
         try:
             # Schedule the observer with the event handler
-            self.observer.schedule(self.event_handler, CONFIG.path_to_chunks_dir, recursive=True)
+            self.observer.schedule(self.event_handler, CHUNKS_DIR_PATH, recursive=True)
             self.observer.start()
 
             # Monitor the observer and check for exceptions in the queue

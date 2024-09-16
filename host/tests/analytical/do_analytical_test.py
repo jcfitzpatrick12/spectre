@@ -6,8 +6,8 @@ from datetime import datetime
 import numpy as np
 import typer
 
-from spectre.json_config.CaptureConfigHandler import CaptureConfigHandler
-from spectre.chunks.Chunks import Chunks
+from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.chunks.Chunks import Chunks
 from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.receivers.factory import get_receiver
@@ -57,7 +57,7 @@ def compare_spectrograms(S: Spectrogram, analytical_S: Spectrogram, show_slice_s
 def main(test_tag: str, show_slice_status = False) -> None:
     # load the capture config corresponding to the input test tag
     capture_config_handler = CaptureConfigHandler(test_tag)
-    capture_config = capture_config_handler.load_as_dict()
+    capture_config = capture_config_handler.read()
     
     # first check the receiver specified in the capture config is a Test receiver
     receiver_name = capture_config['receiver']
@@ -79,8 +79,8 @@ def main(test_tag: str, show_slice_status = False) -> None:
     current_chunk = None
     for chunk in my_chunks:
         current_chunk = chunk
-        if current_chunk.fits.exists():
-            S = chunk.fits.read()  
+        if chunk.has_file("fits"):
+            S = chunk.read_file("fits")  
             analytical_S = asf.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 

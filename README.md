@@ -68,12 +68,12 @@ Clone the repository (in your desired directory):
 Navigate to the ```spectre``` directory:   
 ```cd spectre```
 
-Set the ```SPECTREPARENTPATH``` environment variable:  
-```echo "export SPECTREPARENTPATH=$(pwd)" >> ~/.bashrc```  
+Set the ```SPECTRE_DIR_PATH``` environment variable:  
+```echo "export SPECTRE_DIR_PATH=$(pwd)" >> ~/.bashrc```  
 
 **Set up ```spectre-host```**  
 Please open a new shell and navigate to the ```host``` directory via:   
-```cd $SPECTREPARENTPATH/host```
+```cd $SPECTRE_DIR_PATH/host```
 
 Build the Docker image:  
 ```sudo docker build -t spectre-host .```

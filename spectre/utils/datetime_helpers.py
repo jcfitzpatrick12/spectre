@@ -7,7 +7,10 @@ import os
 import numpy as np
 import warnings
 
-from cfg import CONFIG
+from cfg import (
+    DEFAULT_TIME_FORMAT,
+    CHUNKS_DIR_PATH
+)
     
 
 # Given a parent directory, appends the year, month, and day as a date directory
@@ -39,28 +42,12 @@ def append_date_dir(base_dir_path: str,
     return date_dir
 
 
-# Returns a directory of the form %Y/%m/%d based on a datetime, 
-# prepending a base path if specified
-def get_date_dir(dt: datetime, base_dir_path: str = None) -> str:
-    # Format the datetime object to the desired string format
-    date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
-    
-    # Prepend base_dir_path if specified
-    if base_dir_path:
-        return os.path.join(base_dir_path, date_dir)
-    return date_dir
-
-
 # Based on an input chunk_start_time, returns the parent path for that chunk
 def get_chunk_parent_path(chunk_start_time: str) -> str:
-    # Parse the datetime string to a datetime object
-    try:
-        dt = datetime.strptime(chunk_start_time, CONFIG.default_time_format)
-    except ValueError as e:
-        raise ValueError(f"Could not parse {chunk_start_time}, received {e}.")
-    
-    # Use the get_date_dir function to get the parent path
-    return get_date_dir(dt, base_dir_path=CONFIG.path_to_chunks_dir)
+    dt = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
+    # Format the datetime object to the desired string format
+    date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
+    return os.path.join(CHUNKS_DIR_PATH, date_dir)
 
 
 def create_datetime_array(start_datetime: datetime, 

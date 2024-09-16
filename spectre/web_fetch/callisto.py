@@ -9,14 +9,18 @@ import gzip
 from datetime import datetime
 from pathlib import Path
 
-from cfg import CONFIG, callisto_stations
 from spectre.utils import datetime_helpers
 
-temp_dir = os.path.join(os.environ['SPECTREPARENTPATH'], "tmp")
+from cfg import (
+    DEFAULT_TIME_FORMAT,
+    INSTRUMENT_CODES
+)
+
+temp_dir = os.path.join(os.environ['SPECTRE_DIR_PATH'], "tmp")
 
 def get_chunk_name(station: str, date: str, time: str, instrument_code: str) -> str:
     dt = datetime.strptime(f"{date}T{time}", '%Y%m%dT%H%M%S')
-    formatted_time = dt.strftime(CONFIG.default_time_format)
+    formatted_time = dt.strftime(DEFAULT_TIME_FORMAT)
     return f"{formatted_time}_callisto-{station.lower()}-{instrument_code}.fits"
 
 
@@ -75,8 +79,8 @@ def fetch_chunks(instrument_code: str, year: int, month: int, day: int):
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
-    if instrument_code not in callisto_stations.instrument_codes:
-        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {callisto_stations.instrument_codes}")
+    if instrument_code not in INSTRUMENT_CODES:
+        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {INSTRUMENT_CODES}")
 
     download_callisto_data(instrument_code, year, month, day)
     unzip_to_chunks()

@@ -6,7 +6,7 @@ from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.SPECTREReceiver import SPECTREReceiver
 from spectre.receivers.library.Test.gr import cosine_signal_1
 from spectre.receivers.library.Test.gr import tagged_staircase
-from spectre.utils import validator_helpers
+from spectre.receivers import validators
 
 @register_receiver("Test")
 class Receiver(SPECTREReceiver):
@@ -88,17 +88,17 @@ class Receiver(SPECTREReceiver):
         event_handler_key = capture_config["event_handler_key"]
         integration_time = capture_config["integration_time"]
 
-        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
-        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
-        validator_helpers.validate_integration_time(integration_time, chunk_size) 
-        validator_helpers.validate_window(window_type, 
+        validators.validate_samp_rate_strictly_positive(samp_rate)
+        validators.validate_chunk_size_strictly_positive(chunk_size)
+        validators.validate_integration_time(integration_time, chunk_size) 
+        validators.validate_window(window_type, 
                                           {}, 
                                           window_size,
                                           chunk_size,
                                           samp_rate)
-        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
-        validator_helpers.validate_chunk_key(chunk_key, "default")
-        validator_helpers.validate_event_handler_key(event_handler_key, "default")
+        validators.validate_STFFT_kwargs(STFFT_kwargs)
+        validators.validate_chunk_key(chunk_key, "default")
+        validators.validate_event_handler_key(event_handler_key, "default")
 
         if integration_time != 0:
             raise ValueError(f"Integration time must be zero. Received: {integration_time}")
@@ -142,13 +142,13 @@ class Receiver(SPECTREReceiver):
         event_handler_key = capture_config["event_handler_key"]
         integration_time = capture_config["integration_time"]
 
-        validator_helpers.validate_samp_rate_strictly_positive(samp_rate)
-        validator_helpers.validate_chunk_size_strictly_positive(chunk_size)
-        validator_helpers.validate_integration_time(integration_time, chunk_size)
-        validator_helpers.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
-        validator_helpers.validate_STFFT_kwargs(STFFT_kwargs)
-        validator_helpers.validate_chunk_key(chunk_key, "sweep")
-        validator_helpers.validate_event_handler_key(event_handler_key, "sweep")
+        validators.validate_samp_rate_strictly_positive(samp_rate)
+        validators.validate_chunk_size_strictly_positive(chunk_size)
+        validators.validate_integration_time(integration_time, chunk_size)
+        validators.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
+        validators.validate_STFFT_kwargs(STFFT_kwargs)
+        validators.validate_chunk_key(chunk_key, "sweep")
+        validators.validate_event_handler_key(event_handler_key, "sweep")
 
         if min_samples_per_step <= 0:
             raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")
