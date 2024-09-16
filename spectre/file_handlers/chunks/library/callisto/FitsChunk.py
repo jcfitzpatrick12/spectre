@@ -27,9 +27,9 @@ class FitsChunk(ChunkFile):
 
                 if spectrum_type == "digits":
                     dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
-                    return Spectrogram(dynamic_spectra_linearised, 
+                    return Spectrogram(dynamic_spectra_linearised[::-1, :], # reverse the spectra along the frequency axis
                            time_seconds, 
-                           freq_MHz, 
+                           freq_MHz[::-1], # sort the frequencies in ascending order
                            self.tag, 
                            chunk_start_time=self.chunk_start_time, 
                            microsecond_correction = microsecond_correction,
