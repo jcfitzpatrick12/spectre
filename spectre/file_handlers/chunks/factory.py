@@ -26,5 +26,8 @@ def get_chunk_from_tag(tag: str) -> BaseChunk:
     else:
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
-        chunk_key = capture_config.get('chunk_key', None)
+        chunk_key = capture_config.get('chunk_key')
+
+    if chunk_key is None:
+        raise ValueError(f"Chunk key could not be found for tag {tag}")
     return get_chunk(chunk_key)
