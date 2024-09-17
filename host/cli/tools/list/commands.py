@@ -112,7 +112,8 @@ def tags(
                                                         month=month, 
                                                         day=day)
     chunk_files = [f for f in listdir(chunks_dir) if isfile(join(chunks_dir, f))]
-    
+    print(chunk_files)
+    exit()
     if tag_type not in [None, "native", "callisto"]:
         raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")
 
