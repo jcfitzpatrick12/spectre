@@ -74,35 +74,6 @@ def seconds_of_day(dt: datetime) -> float:
     return (dt - start_of_day).total_seconds()
 
 
-def find_closest_index(val: datetime, ar: np.ndarray, enforce_strict_bounds=False) -> int:
-    # Convert Python datetime to numpy datetime64 if necessary
-    if isinstance(val, datetime):
-        val = np.datetime64(val)
-    if isinstance(ar, (list, tuple, np.ndarray)):
-        ar = np.array(ar, dtype='datetime64[ns]')  # Convert list or tuple to numpy array of datetime64
-    elif isinstance(ar, np.ndarray) and not np.issubdtype(ar.dtype, np.datetime64):
-        ar = ar.astype('datetime64[ns]')  # Convert existing numpy array elements to datetime64
-    
-    # Validate data types
-    if not np.issubdtype(ar.dtype, np.datetime64) or not isinstance(val, np.datetime64):
-        raise TypeError("Both 'val' and elements of 'ar' must be datetime64 compatible types.")
-
-    if val > np.nanmax(ar):
-        if enforce_strict_bounds:
-            raise ValueError(f"Value {val} is strictly larger than the maximum of the array {np.nanmax(ar)}.")
-        else:
-            pass
-    if val < np.nanmin(ar):
-        if enforce_strict_bounds:
-            raise ValueError(f"Value {val} is strictly less than the minimum of the array {np.nanmin(ar)}.")
-        else:
-            pass
-
-    # Calculate absolute differences in nanoseconds and find the index of the minimum
-    closest_index = np.argmin(np.abs(ar - val))
-    return closest_index
-
-
 def seconds_elapsed(datetimes: np.ndarray) -> np.ndarray:
     if not isinstance(datetimes, np.ndarray):
         raise TypeError(f"Input must be of type list. Received type {type(datetimes).__name__} instead.")

@@ -13,6 +13,12 @@ import os
 
 
 from spectre.utils import datetime_helpers, array_helpers
+from spectre.spectrogram.arrays_operations import (
+    find_closest_index,
+    normalise_peak_intensity,
+    compute_resolution,
+    subtract_background,
+)
 from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 
 from cfg import (
@@ -52,8 +58,8 @@ class Spectrogram:
         self.dynamic_spectra_as_dBb: np.ndarray[float, float] = None
 
         # directly compute the array resolutions
-        self.time_res_seconds = array_helpers.compute_resolution(time_seconds)
-        self.freq_res_MHz = array_helpers.compute_resolution(freq_MHz)
+        self.time_res_seconds = compute_resolution(time_seconds)
+        self.freq_res_MHz = compute_resolution(freq_MHz)
 
         # set the spectrum type based on constructor input
         self.spectrum_type = spectrum_type
@@ -140,12 +146,12 @@ class Spectrogram:
             if background_type is str:
                 start_background = datetime.strptime(start_background, DEFAULT_TIME_FORMAT)
                 end_background = datetime.strptime(end_background, DEFAULT_TIME_FORMAT)
-            self.background_indices = [datetime_helpers.find_closest_index(start_background, self.datetimes, enforce_strict_bounds=False),
-                                       datetime_helpers.find_closest_index(end_background, self.datetimes, enforce_strict_bounds=False)]
+            self.background_indices = [find_closest_index(start_background, self.datetimes, enforce_strict_bounds=False),
+                                       find_closest_index(end_background, self.datetimes, enforce_strict_bounds=False)]
 
         elif background_type in [int, float]:
-            self.background_indices = [array_helpers.find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=False),
-                                       array_helpers.find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=False)]
+            self.background_indices = [find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=False),
+                                       find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=False)]
 
         else:
             raise TypeError(f"Unrecognized background interval type! Received {background_type}.")
@@ -205,16 +211,16 @@ class Spectrogram:
     
 
     def integrate_over_frequency(self, 
-                                 background_subtract: bool = False, 
+                                 correct_background: bool = False, 
                                  peak_normalise: bool = False):
             
         freq_Hz = self.freq_MHz * 1e-6  # Convert MHz to Hz
         I = np.nansum(self.dynamic_spectra * freq_Hz[:, np.newaxis], axis=0) # integrate over frequency
 
-        if background_subtract:
-            I = array_helpers.background_subtract(I, self.background_indices)
+        if correct_background:
+            I = subtract_background(I, self.background_indices)
         if peak_normalise:
-            I = array_helpers.normalise_peak_intensity(I)
+            I = normalise_peak_intensity(I)
         return I
     
 
@@ -284,10 +290,10 @@ class Spectrogram:
         if isinstance(at_time, datetime):
             if self.chunk_start_time is None:
                 raise ValueError(f"With at_time specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}.")
-            index_of_slice = datetime_helpers.find_closest_index(at_time, self.datetimes, enforce_strict_bounds = False)
+            index_of_slice = find_closest_index(at_time, self.datetimes, enforce_strict_bounds = False)
             time_of_slice = self.datetimes[index_of_slice]  
         elif isinstance(at_time, float) or isinstance(at_time, int):
-            index_of_slice = array_helpers.find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
+            index_of_slice = find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
             time_of_slice = self.time_seconds[index_of_slice]       
         else:
             raise TypeError(f"Unexpected time type. Received {type(at_time)} expected one of str, datetime, float or int.")
@@ -304,7 +310,7 @@ class Spectrogram:
         frequency_slice = ds[:, index_of_slice].copy() # make a copy so to preserve the spectrum on transformations of the slice
 
         if peak_normalise and time_of_slice != "dBb":
-            frequency_slice = array_helpers.normalise_peak_intensity(frequency_slice)
+            frequency_slice = normalise_peak_intensity(frequency_slice)
         
         return (time_of_slice, self.freq_MHz, frequency_slice)
 
@@ -313,13 +319,13 @@ class Spectrogram:
                            at_frequency: float,
                            slice_type="raw",
                            peak_normalise = False,
-                           background_subtract = False,
+                           correct_background = False,
                            return_time_type: str = "datetimes") -> Tuple[float, np.array, np.array]:
         
         # it is important to note that the "at frequency" specified by the user likely does not correspond
         # exactly to one of the physical frequencies assigned to each spectral component. So, we compute the nearest achievable,
         # and return it from the function as output too.
-        index_of_slice = array_helpers.find_closest_index(at_frequency, self.freq_MHz, enforce_strict_bounds = False)
+        index_of_slice = find_closest_index(at_frequency, self.freq_MHz, enforce_strict_bounds = False)
         frequency_of_slice = self.freq_MHz[index_of_slice]
 
         if return_time_type == "datetimes":
@@ -343,29 +349,20 @@ class Spectrogram:
         
         time_slice = ds[index_of_slice,:].copy() # make a copy so to preserve the spectrum on transformations of the slice
 
-        if background_subtract and self.slice_type != "dBb":
-            time_slice = array_helpers.background_subtract(slice, self.background_indices)
+        if correct_background and self.slice_type != "dBb":
+            time_slice = subtract_background(time_slice, self.background_indices)
             
         if peak_normalise and self.slice_type != "dBb":
-            time_slice = array_helpers.normalise_peak_intensity(slice)
+            time_slice = subtract_background(time_slice)
 
         return (frequency_of_slice, times, time_slice)
-
-    
-    # TO BE REVISED # 
-    # def stack_panels(self, fig: Figure, panel_types = ["raw"], **kwargs) -> None:        
-    #     return
-
-
-    # def compare_with(self, fig: Figure, callisto_S, **kwargs):
-    #     return
 
 
 
 # Function to create a FITS file with the specified structure
 def _save_spectrogram(write_path: str, 
                       spectrogram: Spectrogram, 
-                      fits_config: dict):
+                      fits_config: dict) -> None:
     if spectrogram.chunk_start_time is None:
         raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}.")
     
