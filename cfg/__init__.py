@@ -74,3 +74,24 @@ INSTRUMENT_CODES = [
     "URUGUAY",
     "USA-BOSTON",
 ]
+
+def get_chunks_dir_path(year: int = None, 
+                        month: int = None, 
+                        day: int = None):
+    # Validate the input for proper year, month, and day relationships
+    if day and not (year and month):
+        raise ValueError("A day requires both a month and a year.")
+    if month and not year:
+        raise ValueError("A month requires a year.")
+    
+    # Create the list of date components, skipping None values
+    date_dir_components = []
+    if year:
+        date_dir_components.append(f"{year:04}")
+    if month:
+        date_dir_components.append(f"{month:02}")
+    if day:
+        date_dir_components.append(f"{day:02}")
+    
+    # Combine base directory with the date components
+    return os.path.join(CHUNKS_DIR_PATH, *date_dir_components)

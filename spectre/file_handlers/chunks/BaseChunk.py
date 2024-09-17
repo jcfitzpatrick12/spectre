@@ -10,6 +10,7 @@ from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 from cfg import (
     DEFAULT_TIME_FORMAT
 )
+from cfg import get_chunks_dir_path
 
 
 class BaseChunk:
@@ -17,9 +18,11 @@ class BaseChunk:
         self.chunk_start_time = chunk_start_time
         self.tag = tag
         self.chunk_files = {}
-        self.chunk_start_datetime: datetime = datetime.strptime(self.chunk_start_time, 
-                                                                DEFAULT_TIME_FORMAT)
-        self.chunk_parent_path = datetime_helpers.get_chunk_parent_path(chunk_start_time)
+        self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, 
+                                                      DEFAULT_TIME_FORMAT)
+        self.chunk_parent_path = get_chunks_dir_path(year = self.chunk_start_datetime.year,
+                                                     month = self.chunk_start_datetime.month,
+                                                     day = self.chunk_start_datetime.day)
         self.chunk_name = f"{self.chunk_start_time}_{self.tag}"
 
 

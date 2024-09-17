@@ -16,9 +16,9 @@ from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
 from cfg import (
-    CHUNKS_DIR_PATH,
     DEFAULT_TIME_FORMAT
 )
+from cfg import get_chunks_dir_path
 
 class Chunks:
     def __init__(self, 
@@ -29,13 +29,7 @@ class Chunks:
         self.tag = tag
         
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
-        self.chunks_dir_path = CHUNKS_DIR_PATH
-        # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        if (year is not None) or (month is not None) or (day is not None):
-            self.chunks_dir_path = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
-                                                                    year=year, 
-                                                                    month=month, 
-                                                                    day=day)
+        self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
         # extract the appropriate chunk class based on the input tag
         self.Chunk = get_chunk_from_tag(tag)

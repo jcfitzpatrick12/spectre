@@ -4,7 +4,7 @@
 
 import numpy as np
 from astropy.io import fits
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Tuple, Any
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -24,6 +24,7 @@ from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 from cfg import (
     DEFAULT_TIME_FORMAT
 )
+from cfg import get_chunks_dir_path
 
 
 class Spectrogram:
@@ -83,9 +84,7 @@ class Spectrogram:
         self.chunk_start_time = chunk_start_time
         self.microsecond_correction = microsecond_correction
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_TIME_FORMAT)
-        self.datetimes = datetime_helpers.create_datetime_array(self.chunk_start_datetime, 
-                                                                self.time_seconds,
-                                                                microsecond_correction = microsecond_correction)
+        self.datetimes = [self.chunk_start_datetime + timedelta(seconds=(t + microsecond_correction*(10**-6))) for t in self.time_seconds]
         self.corrected_start_datetime = self.datetimes[0]
         return
 
@@ -203,7 +202,9 @@ class Spectrogram:
         fits_config_handler = FitsConfigHandler(self.tag)
         fits_config = fits_config_handler.read() if fits_config_handler.exists() else {}
     
-        chunk_parent_path = datetime_helpers.get_chunk_parent_path(self.chunk_start_time) 
+        chunk_parent_path = get_chunks_dir_path(year = self.chunk_start_datetime.year,
+                                                month = self.chunk_start_datetime.month,
+                                                day = self.chunk_start_datetime.day)
         file_name = f"{self.chunk_start_time}_{self.tag}.fits"
         write_path = os.path.join(chunk_parent_path, file_name)
         _save_spectrogram(write_path, self, fits_config)
@@ -358,6 +359,9 @@ class Spectrogram:
         return (frequency_of_slice, times, time_slice)
 
 
+def _seconds_of_day(dt: datetime) -> float:
+    start_of_day = datetime(dt.year, dt.month, dt.day)
+    return (dt - start_of_day).total_seconds()
 
 # Function to create a FITS file with the specified structure
 def _save_spectrogram(write_path: str, 
@@ -416,7 +420,7 @@ def _save_spectrogram(write_path: str,
     primary_hdu.header.set('DATAMIN', np.nanmin(spectrogram.dynamic_spectra), 'minimum element in image')
     primary_hdu.header.set('DATAMAX', np.nanmax(spectrogram.dynamic_spectra), 'maximum element in image')
 
-    primary_hdu.header.set('CRVAL1', f'{datetime_helpers.seconds_of_day(start_datetime)}', 'value on axis 1 at reference pixel [sec of day]')
+    primary_hdu.header.set('CRVAL1', f'{_seconds_of_day(start_datetime)}', 'value on axis 1 at reference pixel [sec of day]')
     primary_hdu.header.set('CRPIX1', 0, 'reference pixel of axis 1')
     primary_hdu.header.set('CTYPE1', 'TIME [UT]', 'title of axis 1')
     primary_hdu.header.set('CDELT1', spectrogram.time_res_seconds, 'step between first and second element in x-axis')

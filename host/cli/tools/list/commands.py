@@ -8,16 +8,15 @@ from os.path import splitext
 
 from host.cli import __app_name__, __version__
 
-from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.file_handlers.chunks.Chunks import Chunks
 
 from cfg import (
-    CHUNKS_DIR_PATH,
     JSON_CONFIGS_DIR_PATH,
     INSTRUMENT_CODES
 )
+from cfg import get_chunks_dir_path
 
 app = typer.Typer()
 
@@ -104,14 +103,7 @@ def tags(
     day: int = typer.Option(None, "--day", "-d", help=""),
     
 ) -> None:
-    chunks_dir_path = CHUNKS_DIR_PATH
-    if (not year is None) or (not month is None) or (not day is None):
-        # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        chunks_dir_path = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
-                                                        year=year, 
-                                                        month=month, 
-                                                        day=day)
-        
+    chunks_dir_path = get_chunks_dir_path(year, month, day)
     chunk_files = [f for (_, _, files) in walk(chunks_dir_path) for f in files]
 
     if tag_type not in [None, "native", "callisto"]:

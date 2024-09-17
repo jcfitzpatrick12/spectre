@@ -233,6 +233,13 @@ def frequency_average(input_S: Spectrogram,
                        )
 
 
+def _seconds_elapsed(datetimes: np.ndarray) -> np.ndarray:
+    # Extract the first datetime to use as the reference point
+    base_time = datetimes[0]
+    # Calculate elapsed time in seconds for each datetime in the list
+    elapsed_seconds = [(dt - base_time).total_seconds() for dt in datetimes]
+    # Convert the list of seconds to a NumPy array of type float64
+    return np.array(elapsed_seconds, dtype=np.float64)
 
 # we assume that the spectrogram list is ORDERED chronologically
 # we assume there is no time overlap in any of the spectrograms in the list
@@ -274,7 +281,7 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
         transformed_dynamic_spectra[:, start_index:end_index] = S.dynamic_spectra
         start_index = end_index
 
-    transformed_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
+    transformed_time_seconds = _seconds_elapsed(conc_datetimes)
     # check the transformed time seconds are strictly increasing
     strictly_increasing = np.all(np.diff(transformed_time_seconds) > 0)
     if not strictly_increasing:
