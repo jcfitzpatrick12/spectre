@@ -5,7 +5,7 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from spectre.utils import array_helpers, datetime_helpers
+from spectre.utils import datetime_helpers
 from spectre.spectrogram.arrays_operations import (
     find_closest_index
 )
