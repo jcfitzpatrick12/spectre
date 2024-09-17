@@ -24,13 +24,15 @@
 ## Supported Receivers
 
 Current supported receivers include:
-- RSP1A
-- RSPduo
+- [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)
+- [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)
 
 The framework is in place to integrate the following receivers, this is planned for the near future:
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
 - AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO, RTLSDR (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
 - USRP SDRs
+
+**Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with SPECTRE as they are not compatible with the official SDRPlay API**. 
 
 ## Supported Operating Systems and Platforms
 This project is tested to be compatible with the following operating systems and architectures:
