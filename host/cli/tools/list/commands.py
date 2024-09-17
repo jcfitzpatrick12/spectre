@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-import os
+from os import listdir
+from os.path import isfile, join, splitext
 
 from host.cli import __app_name__, __version__
 
@@ -73,7 +74,7 @@ def modes(
 @app.command()
 def fits_configs(
 ) -> None:
-    json_config_files = os.listdir(JSON_CONFIGS_DIR_PATH)
+    json_config_files = listdir(JSON_CONFIGS_DIR_PATH)
     for json_config_file in json_config_files:
         if json_config_file.startswith("fits_config"):
             typer.secho(
@@ -85,7 +86,7 @@ def fits_configs(
 @app.command()
 def capture_configs(
 ) -> None:
-    json_config_files = os.listdir(JSON_CONFIGS_DIR_PATH)
+    json_config_files = listdir(JSON_CONFIGS_DIR_PATH)
     for json_config_file in json_config_files:
         if json_config_file.startswith("capture_config"):
             typer.secho(
@@ -110,20 +111,20 @@ def tags(
                                                         year=year, 
                                                         month=month, 
                                                         day=day)
-    all_files = dir_helpers.list_all_files(chunks_dir)
+    chunk_files = [f for f in listdir(chunks_dir) if isfile(join(chunks_dir, f))]
     
     if tag_type not in [None, "native", "callisto"]:
         raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")
 
     tags = set()
-    for file in all_files:
-        file_name, _ = os.path.splitext(file)
-        tag = file_name.split("_")[-1]
+    for chunk_file in chunk_files:
+        chunk_base_name, _ = splitext(chunk_file)
+        tag = chunk_base_name.split("_")[1]
         if tag_type == "callisto" and "callisto" in tag:
             tags.add(tag)
         elif tag_type == "native" and "callisto" not in tag:
             tags.add(tag)
-        elif tag_type is None:
+        else:
             tags.add(tag)
 
     if len(tags) == 0:
