@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-from os import listdir
-from os.path import isfile, join, splitext
+from os import listdir, walk
+from os.path import splitext
 
 from host.cli import __app_name__, __version__
 
@@ -111,9 +111,8 @@ def tags(
                                                         year=year, 
                                                         month=month, 
                                                         day=day)
-    chunk_files = [f for f in listdir(chunks_dir) if isfile(join(chunks_dir, f))]
-    print(chunk_files)
-    exit()
+    chunk_files = [f for (_, _, files) in walk(CHUNKS_DIR_PATH) for f in files]
+    
     if tag_type not in [None, "native", "callisto"]:
         raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")
 
