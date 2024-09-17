@@ -12,7 +12,7 @@ from matplotlib.colors import LogNorm
 import os
 
 
-from spectre.utils import datetime_helpers, array_helpers
+from spectre.utils import datetime_helpers
 from spectre.spectrogram.arrays_operations import (
     find_closest_index,
     normalise_peak_intensity,
