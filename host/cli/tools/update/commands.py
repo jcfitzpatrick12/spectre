@@ -28,8 +28,6 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     receiver = get_receiver(receiver_name, mode)
     # fetch the corresponding template so we can type cast the params list
     template = receiver.get_template()
-    print(params)
-    exit()
     # convert the params to update (passed in via --param arguments) into a string valued dict
     d = capture_config_handler.type_cast_params(params, template, ignore_keys=['receiver', 'mode', 'tag'])
     # update the key values as per the params dict
