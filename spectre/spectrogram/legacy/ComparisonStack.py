@@ -9,7 +9,6 @@ from datetime import datetime
 import matplotlib.dates as mdates
 
 from spectre.spectrogram.Panels import Panels
-from spectre.utils import dict_helpers
  
 
 class ComparisonStack:      

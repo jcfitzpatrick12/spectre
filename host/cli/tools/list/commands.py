@@ -3,20 +3,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-import os
+from os import listdir, walk
+from os.path import splitext
 
 from host.cli import __app_name__, __version__
 
-from spectre.utils import dir_helpers, datetime_helpers
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.file_handlers.chunks.Chunks import Chunks
 
 from cfg import (
-    CHUNKS_DIR_PATH,
     JSON_CONFIGS_DIR_PATH,
     INSTRUMENT_CODES
 )
+from cfg import get_chunks_dir_path
 
 app = typer.Typer()
 
@@ -73,7 +73,7 @@ def modes(
 @app.command()
 def fits_configs(
 ) -> None:
-    json_config_files = os.listdir(JSON_CONFIGS_DIR_PATH)
+    json_config_files = listdir(JSON_CONFIGS_DIR_PATH)
     for json_config_file in json_config_files:
         if json_config_file.startswith("fits_config"):
             typer.secho(
@@ -85,7 +85,7 @@ def fits_configs(
 @app.command()
 def capture_configs(
 ) -> None:
-    json_config_files = os.listdir(JSON_CONFIGS_DIR_PATH)
+    json_config_files = listdir(JSON_CONFIGS_DIR_PATH)
     for json_config_file in json_config_files:
         if json_config_file.startswith("capture_config"):
             typer.secho(
@@ -103,27 +103,21 @@ def tags(
     day: int = typer.Option(None, "--day", "-d", help=""),
     
 ) -> None:
-    chunks_dir = CHUNKS_DIR_PATH
-    if (not year is None) or (not month is None) or (not day is None):
-        # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        chunks_dir = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
-                                                        year=year, 
-                                                        month=month, 
-                                                        day=day)
-    all_files = dir_helpers.list_all_files(chunks_dir)
-    
+    chunks_dir_path = get_chunks_dir_path(year, month, day)
+    chunk_files = [f for (_, _, files) in walk(chunks_dir_path) for f in files]
+
     if tag_type not in [None, "native", "callisto"]:
         raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")
 
     tags = set()
-    for file in all_files:
-        file_name, _ = os.path.splitext(file)
-        tag = file_name.split("_")[-1]
+    for chunk_file in chunk_files:
+        chunk_base_name, _ = splitext(chunk_file)
+        tag = chunk_base_name.split("_")[1]
         if tag_type == "callisto" and "callisto" in tag:
             tags.add(tag)
         elif tag_type == "native" and "callisto" not in tag:
             tags.add(tag)
-        elif tag_type is None:
+        else:
             tags.add(tag)
 
     if len(tags) == 0:

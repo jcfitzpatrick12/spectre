@@ -5,12 +5,61 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from spectre.utils import array_helpers, datetime_helpers
+from spectre.spectrogram.arrays_operations import (
+    find_closest_index
+)
 from spectre.spectrogram.Spectrogram import Spectrogram
 from cfg import (
     DEFAULT_TIME_FORMAT
 )
 
+
+def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
+
+    # Check if average_over is an integer
+    if type(average_over) != int:
+        raise TypeError(f"average_over must be an integer. Got {type(average_over)}.")
+
+    # Get the size of the specified axis which we will average over
+    axis_size = array.shape[axis]
+    # Check if average_over is within the valid range
+    if not 1 <= average_over <= axis_size:
+        raise ValueError(f"average_over must be between 1 and the length of the axis ({axis_size}).")
+    
+    max_axis_index = len(np.shape(array)) - 1
+    if axis > max_axis_index: # zero indexing on specifying axis, so minus one
+        raise ValueError(f"Requested axis is out of range of array dimensions. Axis: {axis}, max axis index: {max_axis_index}")
+
+    # find the number of elements in the requested axis
+    num_elements = array.shape[axis]
+
+    # find the number of "full blocks" to average over
+    num_full_blocks = num_elements // average_over
+    # if num_elements is not exactly divisible by average_over, we will have some elements left over
+    # these remaining elements will be padded with nans to become another full block
+    remainder = num_elements % average_over
+    
+    # if there exists a remainder, pad the last block
+    if remainder != 0:
+        # initialise an array to hold the padding shape
+        padding_shape = [(0, 0)] * array.ndim
+        # pad after the last column in the requested axis
+        padding_shape[axis] = (0, average_over - remainder)
+        # pad with nan values (so to not contribute towards the mean computation)
+        array = np.pad(array, padding_shape, mode='constant', constant_values=np.nan)
+    
+    # initalise a list to hold the new shape
+    new_shape = list(array.shape)
+    # update the shape on the requested access (to the number of blocks we will average over)
+    new_shape[axis] = num_full_blocks + (1 if remainder else 0)
+    # insert a new dimension, with the size of each block
+    new_shape.insert(axis + 1, average_over)
+    # and reshape the array to sort the array into the relevant blocks.
+    reshaped_array = array.reshape(new_shape)
+    # average over the newly created axis, essentially averaging over the blocks.
+    averaged_array = np.nanmean(reshaped_array, axis=axis + 1)
+    # return the averaged array
+    return averaged_array
 
 def frequency_chop(input_S: Spectrogram, 
                    start_freq_MHz: float | int, 
@@ -23,8 +72,8 @@ def frequency_chop(input_S: Spectrogram,
         return None
     
     #find the index of the nearest matching frequency bins in the spectrogram
-    start_index = array_helpers.find_closest_index(start_freq_MHz, input_S.freq_MHz)
-    end_index = array_helpers.find_closest_index(end_freq_MHz, input_S.freq_MHz)
+    start_index = find_closest_index(start_freq_MHz, input_S.freq_MHz)
+    end_index = find_closest_index(end_freq_MHz, input_S.freq_MHz)
     
     # enforce distinct start and end indices
     if start_index == end_index:
@@ -77,8 +126,8 @@ def time_chop(input_S: Spectrogram,
     if is_entirely_below_time_range or is_entirely_above_time_range:
         raise ValueError("Requested time interval is out of range for the input spectrogram.")
     
-    start_index = datetime_helpers.find_closest_index(start_datetime, input_S.datetimes)
-    end_index = datetime_helpers.find_closest_index(end_datetime, input_S.datetimes)
+    start_index = find_closest_index(start_datetime, input_S.datetimes)
+    end_index = find_closest_index(end_datetime, input_S.datetimes)
     
     if start_index == end_index:
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
@@ -125,9 +174,9 @@ def time_average(input_S: Spectrogram,
         return input_S
 
     # average the dynamic spectra array
-    transformed_dynamic_spectra = array_helpers.average_array(input_S.dynamic_spectra, average_over, axis=1)
+    transformed_dynamic_spectra = _average_array(input_S.dynamic_spectra, average_over, axis=1)
     # average the time seconds array s.t. the ith averaged spectrum is assigned the 
-    transformed_time_seconds = array_helpers.average_array(input_S.time_seconds, average_over)
+    transformed_time_seconds = _average_array(input_S.time_seconds, average_over)
 
     # We need to assign timestamps to the averaged spectrums in the spectrograms. The natural way to do this
     # is to assign the i'th averaged spectrogram to the i'th averaged time stamp. From this,
@@ -167,9 +216,9 @@ def frequency_average(input_S: Spectrogram,
     # We need to assign physical frequencies to the averaged spectrums in the spectrograms.
     # is to assign the i'th averaged spectral component to the i'th averaged frequency.
     # average the dynamic spectra array
-    transformed_dynamic_spectra = array_helpers.average_array(input_S.dynamic_spectra, average_over, axis=0)
-    transformed_freq_MHz = array_helpers.average_array(input_S.freq_MHz, average_over)
-    transformed_background_spectrum = array_helpers.average_array(input_S.background_spectrum, average_over)
+    transformed_dynamic_spectra = _average_array(input_S.dynamic_spectra, average_over, axis=0)
+    transformed_freq_MHz = _average_array(input_S.freq_MHz, average_over)
+    transformed_background_spectrum = _average_array(input_S.background_spectrum, average_over)
 
     return Spectrogram(transformed_dynamic_spectra, 
                        input_S.time_seconds, 
@@ -183,6 +232,13 @@ def frequency_average(input_S: Spectrogram,
                        )
 
 
+def _seconds_elapsed(datetimes: np.ndarray) -> np.ndarray:
+    # Extract the first datetime to use as the reference point
+    base_time = datetimes[0]
+    # Calculate elapsed time in seconds for each datetime in the list
+    elapsed_seconds = [(dt - base_time).total_seconds() for dt in datetimes]
+    # Convert the list of seconds to a NumPy array of type float64
+    return np.array(elapsed_seconds, dtype=np.float64)
 
 # we assume that the spectrogram list is ORDERED chronologically
 # we assume there is no time overlap in any of the spectrograms in the list
@@ -224,9 +280,12 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
         transformed_dynamic_spectra[:, start_index:end_index] = S.dynamic_spectra
         start_index = end_index
 
-    transformed_time_seconds = datetime_helpers.seconds_elapsed(conc_datetimes)
-    # check the transformed time seconds are strictly increasing
-    array_helpers.check_strictly_increasing(transformed_time_seconds)
+    transformed_time_seconds = _seconds_elapsed(conc_datetimes)
+    
+    # # check the transformed time seconds are strictly increasing
+    # strictly_increasing = np.all(np.diff(transformed_time_seconds) > 0)
+    # if not strictly_increasing:
+    #     raise ValueError(f"The transformed time values are not strictly increasing. Ensure that the time data is well ordered.")
 
     # compute the microsecond correction
     transformed_microsecond_correction = conc_datetimes[0].microsecond

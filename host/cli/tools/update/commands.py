@@ -8,7 +8,6 @@ from typing import List
 from spectre.receivers.factory import get_receiver
 from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
-from spectre.utils import dict_helpers 
 
 app = typer.Typer()
 
@@ -30,14 +29,12 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     # fetch the corresponding template so we can type cast the params list
     template = receiver.get_template()
     # convert the params to update (passed in via --param arguments) into a string valued dict
-    params_as_string_dict = dict_helpers.params_list_to_string_valued_dict(params)
-    # type cast this dict via the template
-    params_as_dict = dict_helpers.convert_types(params_as_string_dict, template)
-
-    # update the capture config
-    for key, value in params_as_dict.items():
-        capture_config = dict_helpers.update_key_value(capture_config, key, value)
-
+    d = capture_config_handler.type_cast_params(params, 
+                                                template, 
+                                                validate_against_template=False, # don't validate against the template
+                                                ignore_keys=['receiver', 'mode', 'tag'])
+    # update the key values as per the params dict
+    capture_config.update(d)
     # save the updated capture config
     receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
     typer.secho(f"The capture-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
@@ -51,13 +48,11 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     fits_config_handler = FitsConfigHandler(tag)
     fits_config = fits_config_handler.read()
     template = fits_config_handler.get_template()
-
-    params_as_string_dict = dict_helpers.params_list_to_string_valued_dict(params)
-
-    params_as_dict = dict_helpers.convert_types(params_as_string_dict, template)
-    for key, value in params_as_string_dict.items():
-        fits_config = dict_helpers.update_key_value(fits_config, key, value)
-    
-    fits_config_handler.save_dict_as_json(fits_config, doublecheck_overwrite=False)
+    d = fits_config_handler.type_cast_params(params,
+                                             template,
+                                             validate_against_template=False)
+    fits_config.update(d)
+    fits_config_handler.validate_against_template(fits_config, template)
+    fits_config_handler.save(fits_config, doublecheck_overwrite=False)
     typer.secho(f"The fits-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
     raise typer.Exit()

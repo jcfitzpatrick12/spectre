@@ -1,6 +1,6 @@
 from astropy.io import fits
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Tuple
 from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
@@ -8,7 +8,6 @@ from astropy.io.fits.hdu.hdulist import HDUList
 
 from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.utils import datetime_helpers
 
 class FitsChunk(ChunkFile):
     def __init__(self, chunk_parent_path: str, chunk_name: str):
@@ -85,7 +84,7 @@ class FitsChunk(ChunkFile):
             with fits.open(self.file_path, mode='readonly') as hdulist:
                 bintable_data = hdulist[1].data
                 time_seconds = bintable_data['TIME'][0]
-                return datetime_helpers.create_datetime_array(self.chunk_start_datetime, time_seconds)
+                return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
         except FileNotFoundError:
             raise FileNotFoundError(f"Could not load spectrogram, {self.file_path} not found.")
         except Exception as e:

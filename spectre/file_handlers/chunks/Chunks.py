@@ -3,21 +3,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import OrderedDict
-import os
+from os import walk
+from os.path import splitext
 import warnings
 from datetime import datetime
 from typing import Tuple, Iterator
 
 from spectre.file_handlers.chunks.factory import get_chunk_from_tag
 from spectre.file_handlers.chunks.BaseChunk import BaseChunk
-from spectre.utils import dir_helpers, datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
 from cfg import (
-    CHUNKS_DIR_PATH,
     DEFAULT_TIME_FORMAT
 )
+from cfg import get_chunks_dir_path
 
 class Chunks:
     def __init__(self, 
@@ -28,13 +28,7 @@ class Chunks:
         self.tag = tag
         
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
-        self.chunks_dir = CHUNKS_DIR_PATH
-        # if the user specifies any of the date kwargs, call that method to append to the parent chunks directory
-        if (year is not None) or (month is not None) or (day is not None):
-            self.chunks_dir = datetime_helpers.append_date_dir(CHUNKS_DIR_PATH, 
-                                                               year=year, 
-                                                               month=month, 
-                                                               day=day)
+        self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
         # extract the appropriate chunk class based on the input tag
         self.Chunk = get_chunk_from_tag(tag)
@@ -50,10 +44,10 @@ class Chunks:
         # chunk map is an ordered dictionary, with each chunk ordered chronologically based on the chunk start time
         chunk_map = OrderedDict()
         # each file within chunks will be an extension instance of a chunk
-        ext_chunk_files = dir_helpers.list_all_files(self.chunks_dir)
+        chunk_files = [f for (_, _, files) in walk(self.chunks_dir_path) for f in files]
         
         # if there are no files at all
-        if len(ext_chunk_files) == 0:
+        if len(chunk_files) == 0:
             warnings.warn("No chunks found, setting chunk map with empty dictionary.")
             # set with an empty dictionary
             self.chunk_map = chunk_map
@@ -61,9 +55,9 @@ class Chunks:
             return
         
         # for each chunk extension file
-        for ext_chunk_file in ext_chunk_files:
+        for ext_chunk_file in chunk_files:
             # split the extension from the file name
-            file_name, _ = os.path.splitext(ext_chunk_file)
+            file_name, _ = splitext(ext_chunk_file)
             try:
                 # then from the file name split the chunk start time from the tag
                 chunk_start_time, tag = file_name.split("_", 1)
@@ -108,7 +102,7 @@ class Chunks:
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
         chunk = self.chunk_map.get(chunk_start_time)
         if chunk is None:
-            raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir}")
+            raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
         return chunk
 
     # get chunk by the index

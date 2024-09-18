@@ -8,6 +8,7 @@ class CaptureConfigHandler(SPECTREConfigHandler):
     def __init__(self, tag: str, **kwargs):
         super().__init__(tag, "capture", **kwargs)
     
+    
 
 
     

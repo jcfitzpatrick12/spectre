@@ -9,12 +9,11 @@ import gzip
 from datetime import datetime
 from pathlib import Path
 
-from spectre.utils import datetime_helpers
-
 from cfg import (
     DEFAULT_TIME_FORMAT,
     INSTRUMENT_CODES
 )
+from cfg import get_chunks_dir_path
 
 temp_dir = os.path.join(os.environ['SPECTRE_DIR_PATH'], "tmp")
 
@@ -41,7 +40,10 @@ def get_chunk_path(gz_path: str) -> str:
     station, date, time, instrument_code = get_chunk_components(gz_path)
     fits_chunk_name = get_chunk_name(station, date, time, instrument_code)
     chunk_start_time = fits_chunk_name.split('_')[0]
-    chunk_parent_path = datetime_helpers.get_chunk_parent_path(chunk_start_time)
+    chunk_start_datetime = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
+    chunk_parent_path = get_chunks_dir_path(year = chunk_start_datetime.year,
+                                            month = chunk_start_datetime.month,
+                                            day = chunk_start_datetime.day)
     if not os.path.exists(chunk_parent_path):
         os.makedirs(chunk_parent_path)
     return os.path.join(chunk_parent_path, fits_chunk_name)
