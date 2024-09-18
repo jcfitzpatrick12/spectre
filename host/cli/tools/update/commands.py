@@ -45,13 +45,14 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
 ) -> None:
-    ...
-    # fits_config_handler = FitsConfigHandler(tag)
-    # fits_config = fits_config_handler.read()
-    # template = fits_config_handler.get_template()
-    # params_as_string_dict = dict_helpers.params_list_to_string_valued_dict(params)
-    # params_as_dict = dict_helpers.convert_types(params_as_string_dict, template)
-    # fits_config.update(params_as_dict)
-    # fits_config_handler.save(fits_config, doublecheck_overwrite=False)
-    # typer.secho(f"The fits-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
-    # raise typer.Exit()
+    fits_config_handler = FitsConfigHandler(tag)
+    fits_config = fits_config_handler.read()
+    template = fits_config_handler.get_template()
+    d = fits_config_handler.type_cast_params(params,
+                                             template,
+                                             validate_against_template=False)
+    fits_config.update(d)
+    fits_config_handler.validate_against_template(fits_config, template)
+    fits_config_handler.save(fits_config, doublecheck_overwrite=False)
+    typer.secho(f"The fits-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
+    raise typer.Exit()
