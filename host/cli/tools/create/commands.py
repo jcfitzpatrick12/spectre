@@ -31,7 +31,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
 ) -> None:
     
     receiver = get_receiver(receiver_name, mode = mode)
-    receiver.save_params_as_capture_config(params, tag)
+    receiver.save_params_as_capture_config(tag, params)
     typer.secho(f"The capture-config for tag \"{tag}\" has been created.", fg=typer.colors.GREEN)
     raise typer.Exit()
 
