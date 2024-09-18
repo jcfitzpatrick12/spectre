@@ -96,7 +96,7 @@ class BaseReceiver(ABC):
         capture_config_handler = CaptureConfigHandler(tag)
         template = self.get_template()
         capture_config = capture_config_handler.type_cast_params(params, template) # type cast the params list according to the active template
-        self.save_capture_config(capture_config, doublecheck_overwrite=doublecheck_overwrite)
+        self.save_capture_config(tag, capture_config, doublecheck_overwrite=doublecheck_overwrite)
 
 
     def save_capture_config(self, tag: str, capture_config: dict, doublecheck_overwrite: bool = True) -> None:
