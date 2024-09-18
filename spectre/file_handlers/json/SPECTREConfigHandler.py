@@ -25,7 +25,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
     def _params_list_to_string_valued_dict(self, params: list) -> dict[str, str]:
-        def _unpack(self, param: str) -> tuple:
+        def _unpack(param: str) -> tuple:
             if not param or '=' not in param or param.startswith('=') or param.endswith('='):
                 raise ValueError(f'Invalid format: "{param}". Expected "KEY=VALUE".')
             return tuple(map(str.strip, param.split('=', 1)))
@@ -33,9 +33,9 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
     def _convert_types(self, d: dict[str, str], template: dict) -> dict[str, Any]:
-        def _convert_to_dict(self, v: str) -> dict:
+        def _convert_to_dict(v: str) -> dict:
             return ast.literal_eval(v)
-        def _convert_to_bool(self, v: str) -> bool:
+        def _convert_to_bool(v: str) -> bool:
             v = v.lower()
             if v in ('true', '1', 't', 'y', 'yes'):
                 return True
