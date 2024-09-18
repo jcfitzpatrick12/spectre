@@ -6,7 +6,7 @@ from collections import OrderedDict
 from os import walk
 from os.path import splitext
 import warnings
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Tuple, Iterator
 
 from spectre.file_handlers.chunks.factory import get_chunk_from_tag
@@ -55,14 +55,11 @@ class Chunks:
             return
         
         # for each chunk extension file
-        for ext_chunk_file in chunk_files:
+        for chunk_file in chunk_files:
             # split the extension from the file name
-            file_name, _ = splitext(ext_chunk_file)
-            try:
-                # then from the file name split the chunk start time from the tag
-                chunk_start_time, tag = file_name.split("_", 1)
-            except ValueError as e:
-                raise ValueError(f"Error while splitting {file_name} at \"_\". Received {e}")
+            file_name, _ = splitext(chunk_file)
+            # then from the file name split the chunk start time from the tag
+            chunk_start_time, tag = file_name.split("_", 1)
             # if the tag is equal to the user-defined tag, we will add that chunk to the chunk map
             if tag == self.tag:
                 chunk_map[chunk_start_time] = self.Chunk(chunk_start_time, tag)
@@ -75,6 +72,7 @@ class Chunks:
         self._set_chunk_map()
         return
     
+
     # enable iterative chunks
     def __iter__(self) -> Iterator[BaseChunk]:
         self._current_index = 0
@@ -91,12 +89,14 @@ class Chunks:
             raise StopIteration
 
     # getter for the list of chunk start times (already sorted chronologically)
-    def get_chunk_start_time_list(self) -> list:
+    def get_chunk_start_time_list(self) -> list[str]:
         return list(self.chunk_map.keys()) 
 
+
     # getter for the list of chunks (already sorted chronologically)
-    def get_chunk_list(self) -> list:
+    def get_chunk_list(self) -> list[BaseChunk]:
         return list(self.chunk_map.values())
+
 
     # get chunk by the chunk start time
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
@@ -104,6 +104,7 @@ class Chunks:
         if chunk is None:
             raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
         return chunk
+
 
     # get chunk by the index
     def get_chunk_by_index(self, item_index: int) -> BaseChunk:
@@ -129,7 +130,7 @@ class Chunks:
             warnings.warn("Joining spectrograms across multiple days.", RuntimeWarning)
 
         # Retrieve upper-bound intervals for all chunks
-        chunk_intervals = self.get_upper_bound_chunk_intervals()
+        chunk_intervals = self._get_upper_bound_chunk_intervals()
 
         # List to store spectrograms to join
         spectrograms = []
@@ -142,10 +143,6 @@ class Chunks:
 
             # Get the time bounds for this chunk
             lower_bound, upper_bound = chunk_intervals.get(chunk_start_time, (None, None))
-            
-            # Ensure both lower and upper bounds are valid
-            if lower_bound is None or upper_bound is None:
-                continue
             
             # Check if the chunk time range overlaps the requested time range
             if lower_bound < end_datetime and upper_bound > start_datetime:
@@ -166,7 +163,7 @@ class Chunks:
 
 
 
-    def get_upper_bound_chunk_intervals(self) -> dict[str, Tuple[datetime, datetime]]:
+    def _get_upper_bound_chunk_intervals(self) -> dict[str, Tuple[datetime, datetime]]:
         # Retrieve the list of chunks
         chunk_list = self.get_chunk_list()
         total_chunks = len(chunk_list)
@@ -186,12 +183,9 @@ class Chunks:
                 end_time = chunk_list[i + 1].chunk_start_datetime
             else:
                 # For the last chunk, attempt to retrieve the exact end time from its own data
-                end_times = chunk.get_file("fits").get_datetimes()
-                if end_times:
-                    end_time = end_times[-1]  # Use the last available time as the upper bound
-                else:
-                    # Use a fallback value if end times are unavailable
-                    end_time = start_time + timedelta(hours=1)  # Adjust this as per data expectations
+                fits_chunk = chunk.get_file("fits")
+                end_times = fits_chunk.get_datetimes()
+                end_time = end_times[-1]  # Use the last available time as the upper bound
 
             # Store the start and end times for this chunk
             chunk_intervals[chunk.chunk_start_time] = (start_time, end_time)
