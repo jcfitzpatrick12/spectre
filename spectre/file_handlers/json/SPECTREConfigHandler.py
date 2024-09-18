@@ -66,10 +66,12 @@ class SPECTREConfigHandler(JsonHandler, ABC):
     def type_cast_params(self, 
                          params: list[str], 
                          template: dict[str, type], 
+                         validate_against_template: bool = False,
                          ignore_keys: list = []) -> dict[str, Any]:
         d = self._params_list_to_string_valued_dict(params)
         d = self._convert_types(d, template)
-        self.validate_against_template(d, template, ignore_keys=ignore_keys)
+        if validate_against_template:
+            self.validate_against_template(d, template, ignore_keys=ignore_keys)
         return d
 
 
