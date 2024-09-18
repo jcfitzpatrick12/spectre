@@ -92,18 +92,16 @@ def frequency_chop(input_S: Spectrogram,
         transformed_background_spectrum = input_S.background_spectrum[start_index:end_index+1]
     
     # return the spectrogram instance
-    return Spectrogram(
-        transformed_dynamic_spectra,
-        input_S.time_seconds,
-        transformed_freq_MHz,
-        input_S.tag,
-        chunk_start_time = input_S.chunk_start_time,
-        microsecond_correction = input_S.microsecond_correction,
-        spectrum_type = input_S.spectrum_type,
-        background_spectrum = transformed_background_spectrum,
-        background_interval = input_S.background_interval
-        
-    )
+    return Spectrogram(transformed_dynamic_spectra,
+                       input_S.time_seconds,
+                       transformed_freq_MHz,
+                       input_S.tag,
+                       chunk_start_time = input_S.chunk_start_time,
+                       microsecond_correction = input_S.microsecond_correction,
+                       spectrum_type = input_S.spectrum_type,
+                       background_spectrum = transformed_background_spectrum,
+                       background_interval = input_S.background_interval
+                       )
 
 
 def time_chop(input_S: Spectrogram, 
