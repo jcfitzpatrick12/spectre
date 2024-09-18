@@ -11,7 +11,6 @@ from typing import Tuple, Iterator
 
 from spectre.file_handlers.chunks.factory import get_chunk_from_tag
 from spectre.file_handlers.chunks.BaseChunk import BaseChunk
-from spectre.utils import datetime_helpers
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 

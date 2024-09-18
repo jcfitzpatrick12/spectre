@@ -8,7 +8,6 @@ from astropy.io.fits.hdu.hdulist import HDUList
 
 from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.utils import datetime_helpers
 
 class FitsChunk(ChunkFile):
     def __init__(self, chunk_parent_path: str, chunk_name: str):

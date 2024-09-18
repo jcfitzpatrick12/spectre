@@ -11,8 +11,6 @@ from matplotlib.axes import Axes
 from datetime import datetime
 from math import ceil
 
-from spectre.utils import array_helpers, datetime_helpers
-from cfg import CONFIG
 
 class Panels:
     def __init__(self, 

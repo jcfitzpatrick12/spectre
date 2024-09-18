@@ -4,10 +4,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from datetime import datetime
 
-from spectre.spectrogram.Panels import Panels
-from spectre.utils import array_helpers
  
 
 class PanelStack(Panels):  

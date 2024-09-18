@@ -4,7 +4,6 @@
 
 from datetime import datetime
 
-from spectre.utils import datetime_helpers
 from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 
 from cfg import (

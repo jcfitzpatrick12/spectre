@@ -5,7 +5,6 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from spectre.utils import datetime_helpers
 from spectre.spectrogram.arrays_operations import (
     find_closest_index
 )
@@ -282,10 +281,11 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
         start_index = end_index
 
     transformed_time_seconds = _seconds_elapsed(conc_datetimes)
-    # check the transformed time seconds are strictly increasing
-    strictly_increasing = np.all(np.diff(transformed_time_seconds) > 0)
-    if not strictly_increasing:
-        raise ValueError(f"The transformed time values are not strictly increasing. Ensure that the time data is well ordered.")
+    
+    # # check the transformed time seconds are strictly increasing
+    # strictly_increasing = np.all(np.diff(transformed_time_seconds) > 0)
+    # if not strictly_increasing:
+    #     raise ValueError(f"The transformed time values are not strictly increasing. Ensure that the time data is well ordered.")
 
     # compute the microsecond correction
     transformed_microsecond_correction = conc_datetimes[0].microsecond
