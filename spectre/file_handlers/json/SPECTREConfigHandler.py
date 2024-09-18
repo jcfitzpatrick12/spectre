@@ -56,7 +56,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 else:
                     converted_dict[k] = dynamic_type(v)
             except ValueError:
-                message = f'Could not convert {k}: Received {v}, expected {dynamic_type}.'
+                message = f'Could not convert value at {k}: Received {v}, expected {dynamic_type.__name__}.'
                 if dynamic_type == dict:
                     message += ' Use syntax {\\"key\\":value}.'
                 raise ValueError(message)
