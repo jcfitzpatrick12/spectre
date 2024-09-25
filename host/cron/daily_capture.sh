@@ -15,5 +15,5 @@ cat /dev/null > /var/spectre/daily_capture.log
 # start the capture session
 spectre capture session --receiver RSP1A --mode sweep --tag RSP1A-sweeper --hours 8 --force-restart
 # deletes all remnant bin and hdr chunk files in all chunks subdirectories
-spectre delete chunks --tag RSP1A-sweeper --extension bin --extension hdr
+spectre delete chunks --tag RSP1A-sweeper --extension bin --extension hdr --suppress-doublecheck
 
