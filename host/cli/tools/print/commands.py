@@ -18,7 +18,7 @@ from cfg import (
 app = typer.Typer()
 
 @app.command()
-def cron_log(
+def daily_capture_log(
 ) -> None:
     daily_capture_log_handler = TextHandler(VAR_SPECTRE_DIR_PATH, 
                                             "daily_capture", 
