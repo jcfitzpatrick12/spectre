@@ -15,7 +15,7 @@ class BaseFileHandler(ABC):
         self.parent_path = parent_path
         self.base_file_name = base_file_name
         self.extension = extension if (override_extension is None) else override_extension
-        self.file_name = base_file_name if (self.extension is None) else f"{base_file_name}.{extension}"
+        self.file_name = base_file_name if (self.extension is None) else f"{base_file_name}.{self.extension}"
         self.file_path = os.path.join(self.parent_path, self.file_name)
         
         

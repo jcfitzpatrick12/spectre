@@ -30,7 +30,7 @@ class HdrChunk(ChunkFile):
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
         # Validates that the header file contains exactly one element 
         if len(hdr_contents) != 1:
-            raise ValueError(f"Only expected one integer in the header, but received header contents: {hdr_contents}")
+            raise ValueError(f"Expected one integer in the header, but received header contents: {hdr_contents}")
         # Extracts and returns the millisecond correction from the file contents 
         millisecond_correction_as_float = float(hdr_contents[0])
         if millisecond_correction_as_float.is_integer():

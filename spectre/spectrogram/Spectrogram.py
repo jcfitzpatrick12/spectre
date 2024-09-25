@@ -47,7 +47,7 @@ class Spectrogram:
         self.time_res_seconds: float = None
         self.freq_res_MHz: float = None
         self.spectrum_type: str = None
-        self.chunk_start_time: str = None
+        self.chunk_start_time: str | None = None
         self.microsecond_correction: int = None
         self.chunk_start_datetime: datetime = None
         self.datetimes: list[datetime] = None
