@@ -15,25 +15,26 @@ app = typer.Typer()
 
 @app.command()
 def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
-           ext: str = typer.Option(..., "--ext", "-e", help=""),
-           year: int = typer.Option(..., "--year", "-y", help=""),
-           month: int = typer.Option(..., "--month", "-m", help=""),
-           day: int = typer.Option(..., "--day", "-d", help=""),
+           extensions: list[str] = typer.Option(..., "--extension", "-e", help=""),
+           year: int = typer.Option(None, "--year", "-y", help=""),
+           month: int = typer.Option(None, "--month", "-m", help=""),
+           day: int = typer.Option(None, "--day", "-d", help=""),
            suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help="")
 ) -> None:
     chunks = Chunks(tag, 
-                year=year, 
-                month=month,
-                day=day)
+                    year=year, 
+                    month=month,
+                    day=day)
     
     for chunk in chunks:
         if suppress_doublecheck:
             doublecheck_delete = False
         else:
             doublecheck_delete = True
-        if chunk.has_file(ext):
-            chunk.delete_file(ext, doublecheck_delete=doublecheck_delete)
-            typer.secho(f"File deleted: {chunk.get_file(ext).file_path}.", fg=typer.colors.YELLOW)
+        for extension in extensions:
+            if chunk.has_file(extension):
+                chunk.delete_file(extension, doublecheck_delete=doublecheck_delete)
+                typer.secho(f"File deleted: {chunk.get_file(extension).file_path}.", fg=typer.colors.YELLOW)
     
     typer.Exit()
 
