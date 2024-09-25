@@ -122,7 +122,7 @@ def time_chop(input_S: Spectrogram,
     is_entirely_below_time_range = (start_datetime < input_S.datetimes[0] and end_datetime < input_S.datetimes[0])
     is_entirely_above_time_range = (start_datetime > input_S.datetimes[-1] and end_datetime > input_S.datetimes[-1])
     if is_entirely_below_time_range or is_entirely_above_time_range:
-        raise ValueError("Requested time interval is out of range for the input spectrogram.")
+        return None
     
     start_index = find_closest_index(start_datetime, input_S.datetimes)
     end_index = find_closest_index(end_datetime, input_S.datetimes)
