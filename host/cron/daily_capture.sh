@@ -10,5 +10,6 @@ export PYTHONPATH="${SPECTRE_DIR_PATH}:${PYTHONPATH}"
 # ensure that spectre is recognised as a command in the cron environment
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-spectre capture session --receiver RSP1A --mode sweep --tag RSP1A-sweep-example --hours 8 --force-restart
+spectre capture session --receiver RSP1A --mode sweep --tag RSP1A-sweeper --hours 8 --force-restart
+spectre delete chunks --tag RSP1A-sweeper --ext bin --ext hdr
 
