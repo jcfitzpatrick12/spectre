@@ -147,7 +147,7 @@ class Chunks:
             # this assumes that the chunks are non-overlapping (reasonable assumption)
             lower_bound = chunk.chunk_start_datetime
             if i < num_fits_chunks:
-                next_chunk = self.get_chunk_by_index(i)
+                next_chunk = self.get_chunk_by_index(i + 1)
                 upper_bound = next_chunk.chunk_start_datetime
             # if there is no "next chunk" then we do have to read the file
             else:
@@ -155,13 +155,15 @@ class Chunks:
                 datetimes = fits_chunk.get_datetimes()
                 upper_bound = datetimes[-1]
 
+            lower_bound_overlaps = (lower_bound <= start_datetime <= upper_bound)
+            upper_bound_overlaps = (lower_bound <= end_datetime <= upper_bound)
             # if the chunk overlaps with the input time range, then read the fits file
-            if lower_bound <= end_datetime and upper_bound >= start_datetime:
+            if lower_bound_overlaps or upper_bound_overlaps:
                 # Read the spectrogram for this chunk
                 spectrogram = chunk.read_file("fits")
 
                 # Chop the spectrogram to fit within the requested time range
-                # spectrogram = transform.time_chop(spectrogram, start_time, end_time)
+                spectrogram = transform.time_chop(spectrogram, start_time, end_time)
                 
                 # if we have a non-empty spectrogram, append it to the list of spectrograms
                 if spectrogram:
