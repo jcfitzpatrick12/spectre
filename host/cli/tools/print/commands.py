@@ -9,9 +9,23 @@ from host.cli import __app_name__, __version__
 
 from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.text.TextHandler import TextHandler
 from spectre.receivers.factory import get_receiver
+from cfg import (
+    VAR_SPECTRE_DIR_PATH
+)
 
 app = typer.Typer()
+
+@app.command()
+def cron_log(
+) -> None:
+    daily_capture_log_handler = TextHandler(VAR_SPECTRE_DIR_PATH, 
+                                            "daily_capture", 
+                                            override_extension="log")
+    daily_capture_log_handler.cat()
+    typer.Exit()
+    
 
 @app.command()
 def fits_config_template(
