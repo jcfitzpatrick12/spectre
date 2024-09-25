@@ -156,7 +156,7 @@ class Chunks:
                 upper_bound = datetimes[-1]
 
             # if the chunk overlaps with the input time range, then read the fits file
-            if start_datetime <= upper_bound or lower_bound <= end_datetime:
+            if start_datetime <= upper_bound and lower_bound <= end_datetime:
                 # Read the spectrogram for this chunk
                 spectrogram = chunk.read_file("fits")
 
