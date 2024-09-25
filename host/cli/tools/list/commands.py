@@ -34,6 +34,7 @@ def chunks(
     year: int = typer.Option(None, "--year", "-y", help=""),
     month: int = typer.Option(None, "--month", "-m", help=""),
     day: int = typer.Option(None, "--day", "-d", help=""),
+    extensions: list[str] = typer.Option([], "--extension", "-e", help="")
 ) -> None:
     chunks = Chunks(tag, 
                     year=year, 
@@ -41,7 +42,12 @@ def chunks(
                     day=day)
     
     for chunk in chunks:
-        for extension in chunk.get_extensions():
+        
+        # if no extensions are specified, look for ALL defined extensions for that chunk
+        if not extensions:
+            extensions = chunk.get_extensions()
+
+        for extension in extensions:
             if chunk.has_file(extension):
                 chunk_file = chunk.get_file(extension)
                 print(chunk_file.file_name)
