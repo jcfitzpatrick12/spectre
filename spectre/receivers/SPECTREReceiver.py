@@ -13,8 +13,6 @@ class SPECTREReceiver(BaseReceiver):
     def __init__(self, receiver_name: str, mode: str = None):
         self.__set_default_templates()
         super().__init__(receiver_name, mode = mode)
-
-        self.api_latency: Optional[float] = None
         return
     
     def __set_default_templates(self) -> None:
@@ -103,8 +101,9 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_num_samples_per_step(samples_per_step, window_size)
 
         # if the api latency is defined, raise a warning if the step interval is of the same order
-        if self.specifications.get("api_latency"):
-            validators.validate_step_interval(samples_per_step, samp_rate, self.api_latency)
+        api_latency = self.specifications.get("api_latency")
+        if api_latency:
+            validators.validate_step_interval(samples_per_step, samp_rate, api_latency)
         return
     
 
