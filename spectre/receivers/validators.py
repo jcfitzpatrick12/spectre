@@ -149,7 +149,7 @@ def validate_num_samples_per_step(samples_per_step: int, window_size: int) -> No
 
 def validate_non_overlapping_steps(freq_step: float, samp_rate: int) -> None:
     if freq_step < samp_rate:
-        raise NotImplementedError(f"SPECTRE does not yet support spectral steps overlapping in frequency. Received frequency step {freq_step/1e6} [MHz] which is less than the sample rate {samp_rate} [samples/second]")
+        raise NotImplementedError(f"SPECTRE does not yet support spectral steps overlapping in frequency. Received frequency step {freq_step/1e6} [MHz] which is less than the sample rate {samp_rate/1e6} [MHz]")
 
 
 def validate_step_interval(samples_per_step: int, 
