@@ -157,4 +157,4 @@ def validate_step_interval(samples_per_step: int,
                            api_latency: float) -> None:
     step_interval = samples_per_step * 1/samp_rate # [s]
     if step_interval < api_latency:
-        warnings.warn(f"The computed step interval is {step_interval} [s] is of the order of empirically derived API latency {api_latency} [ms] you may experience undefined behaviour!")
+        warnings.warn(f"The computed step interval is {step_interval} [s] is of the order of empirically derived API latency {api_latency} [s] you may experience undefined behaviour!")
