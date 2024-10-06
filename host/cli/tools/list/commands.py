@@ -82,7 +82,7 @@ def specifications(
 ) -> None:
     receiver = get_receiver(receiver_name)
     specifications = receiver.get_specifications()
-    for k, v in specifications.items:
+    for k, v in specifications.items():
         typer.secho(f"{k}: {v}")
     raise typer.Exit()
 
