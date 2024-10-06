@@ -115,7 +115,7 @@ def validate_integration_time(integration_time: int, chunk_size: int) -> None:
         raise ValueError(f'Integration time must be non-negative. Received: {integration_time} [s]')
     
     if integration_time > chunk_size:
-        raise ValueError(f'Integration time must be less than or equal to chunk_size.')
+        raise ValueError(f'Integration time must be less than or equal to chunk_size. ')
     return
 
 
@@ -139,7 +139,7 @@ def validate_gain_is_negative(gain: float) -> None:
 def validate_num_steps_per_sweep(min_freq: float, max_freq: float, samp_rate: int, freq_step: float) -> None:
     num_steps_per_sweep = floor((max_freq - min_freq + samp_rate/2) / freq_step)
     if num_steps_per_sweep <= 1:
-        raise ValueError(f"We require more than one step per sweep. Computed {num_steps_per_sweep}.")
+        raise ValueError(f"We strictly greater than one sample per step. Computed: {num_steps_per_sweep}.")
     
 
 def validate_num_samples_per_step(samples_per_step: int, window_size: int) -> None:
