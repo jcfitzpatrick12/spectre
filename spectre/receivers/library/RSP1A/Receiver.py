@@ -1,10 +1,14 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.receiver_register import register_receiver
-from spectre.receivers.SPECTREReceiver import SPECTREReceiver
+from spectre.receivers.SDRPlayReceiver import SDRPlayReceiver
 from spectre.receivers.library.RSP1A.gr import fixed, sweep
 from spectre.receivers import validators
 
 @register_receiver("RSP1A")
-class Receiver(SPECTREReceiver):
+class Receiver(SDRPlayReceiver):
     def __init__(self, receiver_name: str, mode: str = None):
         super().__init__(receiver_name, mode = mode)
 

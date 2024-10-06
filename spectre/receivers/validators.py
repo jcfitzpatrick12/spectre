@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from scipy.signal import get_window
+from math import floor
+import warnings
 
 
 def closed_upper_bound_RF_gain(RF_gain: float, RF_gain_upper_bound: float) -> None:
@@ -80,13 +82,13 @@ def validate_STFFT_kwargs(STFFT_kwargs: dict):
 
 def validate_center_freq_strictly_positive(center_freq: float):
     if center_freq <= 0:
-        raise ValueError(f"Center frequency must be strictly positive. Received: {center_freq}")
+        raise ValueError(f"Center frequency must be strictly positive. Received: {center_freq/1e6} [MHz]")
     return
 
 
 def validate_bandwidth_strictly_positive(bandwidth: float) -> None:
     if bandwidth < 0:
-        raise ValueError(f"Bandwidth must be non-negative. Received: {bandwidth}")
+        raise ValueError(f"Bandwidth must be non-negative. Received: {bandwidth/1e6} [MHz]")
     return
 
 
@@ -98,22 +100,22 @@ def validate_nyquist_criterion(samp_rate: int, bandwidth: float) -> None:
 
 def validate_samp_rate_strictly_positive(samp_rate: int) -> None:
     if samp_rate < 0:
-        raise ValueError(f"samp_rate must be strictly positive. Received: {samp_rate}")
+        raise ValueError(f"Sample rate must be strictly positive. Received: {samp_rate}")
     return
 
 
 def validate_chunk_size_strictly_positive(chunk_size: int) -> None:
     if chunk_size <= 0:
-        raise ValueError(f"chunk_size must be strictly positive. Received: {chunk_size}")
+        raise ValueError(f"Chunk size must be strictly positive. Received: {chunk_size} [s]")
     return
 
 
 def validate_integration_time(integration_time: int, chunk_size: int) -> None:
     if integration_time < 0:
-        raise ValueError(f'integration_time must be non-negative. Received: {integration_time}')
+        raise ValueError(f'Integration time must be non-negative. Received: {integration_time} [s]')
     
     if integration_time > chunk_size:
-        raise ValueError(f'integration_time must be less than or equal to chunk_size.')
+        raise ValueError(f'Integration time must be less than or equal to chunk_size.')
     return
 
 
@@ -131,4 +133,28 @@ def validate_event_handler_key(event_handler_key: str, expected_event_handler_ke
 
 def validate_gain_is_negative(gain: float) -> None:
     if gain > 0:
-        raise ValueError(f"Gain must be non-positive. Received {gain}")
+        raise ValueError(f"Gain must be non-positive. Received {gain} [dB]")
+    
+
+def validate_num_steps_per_sweep(min_freq: float, max_freq: float, samp_rate: int, freq_step: float) -> None:
+    num_steps_per_sweep = floor((max_freq - min_freq + samp_rate/2) / freq_step)
+    if num_steps_per_sweep <= 1:
+        raise ValueError(f"We require more than one step per sweep. Computed {num_steps_per_sweep}.")
+    
+
+def validate_num_samples_per_step(samples_per_step: int, window_size: int) -> None:
+    if window_size >= samples_per_step:
+        raise ValueError(f"Window size must be strictly less than the number of samples per step. Received window size {window_size} [samples], which is more than or equal to the number of samples per step {samples_per_step}.")
+    
+
+def validate_non_overlapping_steps(freq_step: float, samp_rate: int) -> None:
+    if freq_step < samp_rate:
+        raise NotImplementedError(f"SPECTRE does not yet support spectral steps overlapping in frequency. Received frequency step {freq_step/1e6} [MHz] which is less than the sample rate {samp_rate} [samples/second]")
+
+
+def validate_step_interval(samples_per_step: int, 
+                           samp_rate: int, 
+                           api_latency: float) -> None:
+    step_interval = samples_per_step * 1/samp_rate # [s]
+    if step_interval < api_latency:
+        warnings.warn(f"The computed step interval is {step_interval} [s] is of the order of empirically derived API latency {api_latency} [ms] you may experience undefined behaviour!")
