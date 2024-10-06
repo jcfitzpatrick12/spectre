@@ -8,7 +8,7 @@ SPECTRE_DIR_PATH = os.environ.get("SPECTRE_DIR_PATH")
 if SPECTRE_DIR_PATH is None:
     raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set.")
 
-CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR", os.path.join(SPECTRE_DIR_PATH, 'chunks'))
+CHUNKS_DIR_PATH = os.environ.get("CHUNKS_DIR_PATH", os.path.join(SPECTRE_DIR_PATH, 'chunks'))
 os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
 
 LOGS_DIR_PATH = os.path.join(SPECTRE_DIR_PATH, 'logs')
