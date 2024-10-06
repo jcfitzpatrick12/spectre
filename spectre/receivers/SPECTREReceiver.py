@@ -100,6 +100,7 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_gain_is_negative(IF_gain)
         validators.validate_gain_is_negative(RF_gain)
         validators.validate_num_steps_per_sweep(min_freq, max_freq, samp_rate, freq_step)
+        validators.validate_non_overlapping_steps(freq_step, samp_rate)
         validators.validate_num_samples_per_step(samples_per_step, window_size)
 
         # if the api latency is defined, validate the step interval against it
