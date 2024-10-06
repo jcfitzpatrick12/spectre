@@ -43,4 +43,4 @@ class SDRPlayReceiver(SPECTREReceiver):
                                               self.get_specification("IF_gain_upper_bound"))
         
         validators.closed_upper_bound_RF_gain(capture_config['RF_gain'], 
-                                              self.get_specification("IF_gain_upper_bound"))
+                                              self.get_specification("RF_gain_upper_bound"))
