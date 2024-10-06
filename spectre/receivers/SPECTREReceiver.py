@@ -63,7 +63,6 @@ class SPECTREReceiver(BaseReceiver):
         return default_template
     
 
-    # ! TO BE IMPLEMENTED ! # 
     def _default_sweep_validator(self, capture_config: dict) -> None:
         min_freq = capture_config["min_freq"]
         max_freq = capture_config["max_freq"]
@@ -103,8 +102,8 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_non_overlapping_steps(freq_step, samp_rate)
         validators.validate_num_samples_per_step(samples_per_step, window_size)
 
-        # if the api latency is defined, validate the step interval against it
-        if self.api_latency:
+        # if the api latency is defined, raise a warning if the step interval is of the same order
+        if self.specifications.get("api_latency"):
             validators.validate_step_interval(samples_per_step, samp_rate, self.api_latency)
         return
     

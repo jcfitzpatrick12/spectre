@@ -58,9 +58,13 @@ class Receiver(SPECTREReceiver):
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
                 'integration_time': float # spectrograms will be averaged over a time integration_time
-            },
+            }
         }
         return
+    
+    def _set_specifications(self) -> None:
+        self.specifications = {
+        } 
 
 
     def __cosine_signal_1(self, capture_configs: list) -> None:
