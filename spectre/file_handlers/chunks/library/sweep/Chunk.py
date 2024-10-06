@@ -44,9 +44,6 @@ class Chunk(SPECTREChunk):
         # read the millisecond correction and sweep metadata
         millisecond_correction, self.sweep_metadata = self.read_file("hdr")
 
-        # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
-        self._validate_center_frequencies_ordering()
-
         # if the previous chunk is specified, it is indicating we need to reconstruct the initial sweep
         if previous_chunk:
             self._reconstruct_initial_sweep(previous_chunk)
@@ -59,6 +56,10 @@ class Chunk(SPECTREChunk):
 
         # unpack the sweep metadata attributes explictly 
         (self.center_frequencies, self.num_samples) = self.sweep_metadata
+
+        # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
+        self._validate_center_frequencies_ordering()
+
         # convert the millisecond correction to a microsecond correction
         microsecond_correction = millisecond_correction * 1e3
         # and (essentially) perform the STFFT on the IQ samples
