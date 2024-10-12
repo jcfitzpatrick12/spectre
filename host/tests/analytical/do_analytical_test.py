@@ -61,14 +61,14 @@ def main(test_tag: str, show_slice_status = False) -> None:
     
     # first check the receiver specified in the capture config is a Test receiver
     receiver_name = capture_config['receiver']
-    if receiver_name != "Test":
+    if receiver_name != "test":
         raise ValueError(f"To do analytical verifications, the receiver in the specified capture config must be \"Test\". Received: {receiver_name}")
     
     # check that the user specified mode is that specified in the capture config
     test_mode = capture_config['mode']    
     
     # check the mode is a defined mode for the Test receiver
-    test_receiver = get_receiver("Test")
+    test_receiver = get_receiver("test")
     if test_mode not in test_receiver.valid_modes:
         raise ValueError(f"{test_mode} is not a valid mode. Expected one of {test_receiver.valid_modes}.")
     
