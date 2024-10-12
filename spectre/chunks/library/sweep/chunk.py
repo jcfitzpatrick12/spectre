@@ -11,7 +11,7 @@ from spectre.chunks.base import (
     ChunkFile
 )
 from spectre.chunks.chunk_register import register_chunk
-from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.chunks.library.default.chunk import (
     BinChunk,
     FitsChunk

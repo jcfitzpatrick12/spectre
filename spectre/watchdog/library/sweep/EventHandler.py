@@ -7,8 +7,8 @@ import warnings
 from math import floor
 
 from spectre.watchdog.BaseEventHandler import BaseEventHandler
-from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.spectrogram import transform
+from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.spectrograms import transform
 from spectre.watchdog.event_handler_register import register_event_handler
 
 @register_event_handler("sweep")

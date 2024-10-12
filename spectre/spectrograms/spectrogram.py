@@ -12,7 +12,7 @@ from matplotlib.colors import LogNorm
 import os
 
 
-from spectre.spectrogram.array_operations import (
+from spectre.spectrograms.array_operations import (
     find_closest_index,
     normalise_peak_intensity,
     compute_resolution,

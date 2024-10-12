@@ -11,8 +11,8 @@ from typing import Iterator
 
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.chunks.base import BaseChunk
-from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.spectrogram import transform
+from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.spectrograms import transform
 
 from spectre.cfg import (
     DEFAULT_TIME_FORMAT,

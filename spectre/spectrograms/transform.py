@@ -5,10 +5,10 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from spectre.spectrogram.array_operations import (
+from spectre.spectrograms.array_operations import (
     find_closest_index
 )
-from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )

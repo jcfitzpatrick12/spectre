@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from datetime import datetime
 import matplotlib.dates as mdates
 
-from spectre.spectrogram.Panels import Panels
+from spectre.spectrograms.Panels import Panels
  
 
 class ComparisonStack:      

@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import numpy as np
+from spectre.spectrograms.spectrogram import Spectrogram
 
-from spectre.spectrogram.Spectrogram import Spectrogram
-
-class AnalyticalSpectrogramFactory:
+class AnalyticalFactory:
     def __init__(self,):
         self.builder_methods = {
             "cosine-signal-1": self.cosine_signal_1

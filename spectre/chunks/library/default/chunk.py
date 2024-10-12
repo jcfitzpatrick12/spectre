@@ -18,7 +18,7 @@ from spectre.chunks.base import (
     ChunkFile
 )
 from spectre.chunks.chunk_register import register_chunk
-from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.spectrograms.spectrogram import Spectrogram
 
 @register_chunk('default')
 class Chunk(SPECTREChunk):
