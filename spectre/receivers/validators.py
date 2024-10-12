@@ -7,31 +7,39 @@ from math import floor
 import warnings
 
 
-def closed_upper_bound_RF_gain(RF_gain: float, RF_gain_upper_bound: float) -> None:
+def closed_upper_bound_RF_gain(RF_gain: float, 
+                               RF_gain_upper_bound: float) -> None:
     if not (RF_gain <= RF_gain_upper_bound):
         raise ValueError(f"RF_gain must be strictly less than or equal to {RF_gain_upper_bound} [dB]. Got {RF_gain} [dB]")
     return
 
 
-def closed_upper_bound_IF_gain(IF_gain: float, IF_gain_upper_bound: float) -> None:
+def closed_upper_bound_IF_gain(IF_gain: float, 
+                               IF_gain_upper_bound: float) -> None:
     if not (IF_gain <= IF_gain_upper_bound):
         raise ValueError(f"IF_gain must be strictly less than or equal to {IF_gain_upper_bound} [dB]. Got {IF_gain} [dB]")
     return
 
 
-def closed_confine_center_freq(center_freq: float, center_freq_lower_bound: float, center_freq_upper_bound: float) -> None:
+def closed_confine_center_freq(center_freq: float, 
+                               center_freq_lower_bound: float, 
+                               center_freq_upper_bound: float) -> None:
     if not (center_freq_lower_bound <= center_freq <= center_freq_upper_bound):
         raise ValueError(f"center_freq must be between {center_freq_lower_bound*1e-3} [kHz] and {center_freq_upper_bound*1e-9} [GHz]. Received {center_freq*1e-6} [MHz]")
     return
 
 
-def closed_confine_samp_rate(samp_rate: int, samp_rate_lower_bound: int, samp_rate_upper_bound: int) -> None:
+def closed_confine_samp_rate(samp_rate: int, 
+                             samp_rate_lower_bound: int, 
+                             samp_rate_upper_bound: int) -> None:
     if not (samp_rate_lower_bound <= samp_rate <= samp_rate_upper_bound):
         raise ValueError(f"samp_rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz].")
     return
 
 
-def closed_confine_bandwidth(bandwidth: float, bandwidth_lower_bound: float, bandwidth_upper_bound: float) -> None:
+def closed_confine_bandwidth(bandwidth: float, 
+                             bandwidth_lower_bound: float, 
+                             bandwidth_upper_bound: float) -> None:
     if not (bandwidth_lower_bound <= bandwidth <= bandwidth_upper_bound):
         raise ValueError(f"bandwidth must be between {bandwidth_lower_bound*1e-3} [kHz] and {bandwidth_upper_bound*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
     return
@@ -42,10 +50,10 @@ def is_power_of_two(n):
 
 
 def validate_window(window_type: str, 
-                        window_kwargs: dict, 
-                        window_size: int,
-                        chunk_size: int,
-                        samp_rate: float) -> None:
+                    window_kwargs: dict, 
+                    window_size: int,
+                    chunk_size: int,
+                    samp_rate: float) -> None:
     
     if not is_power_of_two(window_size):
         raise ValueError(f"window_size must be some power of two. Received: {window_size}")
@@ -55,7 +63,8 @@ def validate_window(window_type: str,
         raise ValueError(f"Windowing interval must be strictly less than the chunk size.")
     
     try:
-        window_params = (window_type, *window_kwargs.values())
+        window_params = (window_type, 
+                         *window_kwargs.values())
         w = get_window(window_params, window_size)
     except:
         raise
@@ -92,7 +101,8 @@ def validate_bandwidth_strictly_positive(bandwidth: float) -> None:
     return
 
 
-def validate_nyquist_criterion(samp_rate: int, bandwidth: float) -> None:
+def validate_nyquist_criterion(samp_rate: int, 
+                               bandwidth: float) -> None:
     if samp_rate < bandwidth:
         raise ValueError(f"Sample rate must be greater than or equal to the bandwidth.")
     return
@@ -110,7 +120,8 @@ def validate_chunk_size_strictly_positive(chunk_size: int) -> None:
     return
 
 
-def validate_integration_time(integration_time: int, chunk_size: int) -> None:
+def validate_integration_time(integration_time: int, 
+                              chunk_size: int) -> None:
     if integration_time < 0:
         raise ValueError(f'Integration time must be non-negative. Received: {integration_time} [s]')
     
@@ -119,13 +130,15 @@ def validate_integration_time(integration_time: int, chunk_size: int) -> None:
     return
 
 
-def validate_chunk_key(chunk_key: str, expected_chunk_key: str) -> None:
+def validate_chunk_key(chunk_key: str, 
+                       expected_chunk_key: str) -> None:
     if chunk_key != expected_chunk_key:
         raise ValueError(f"Expected \"{expected_chunk_key}\" for the chunk_key, received: {chunk_key}")
     return
 
 
-def validate_event_handler_key(event_handler_key: str, expected_event_handler_key: str) -> None:
+def validate_event_handler_key(event_handler_key: str, 
+                               expected_event_handler_key: str) -> None:
     if event_handler_key != expected_event_handler_key:
         raise ValueError(f"Expected \"{expected_event_handler_key}\" for the event_handler_key, received: {event_handler_key}")
     return
@@ -136,18 +149,47 @@ def validate_gain_is_negative(gain: float) -> None:
         raise ValueError(f"Gain must be non-positive. Received {gain} [dB]")
     
 
-def validate_num_steps_per_sweep(min_freq: float, max_freq: float, samp_rate: int, freq_step: float) -> None:
-    num_steps_per_sweep = floor((max_freq - min_freq + samp_rate/2) / freq_step)
-    if num_steps_per_sweep <= 1:
-        raise ValueError(f"We strictly greater than one sample per step. Computed: {num_steps_per_sweep}.")
-    
+def _compute_num_steps_per_sweep(min_freq: float, 
+                                 max_freq: float,
+                                 samp_rate: int,
+                                 freq_step: float) -> int:
+    return floor((max_freq - min_freq + samp_rate/2) / freq_step)
 
-def validate_num_samples_per_step(samples_per_step: int, window_size: int) -> None:
+def validate_num_steps_per_sweep(min_freq: float, 
+                                 max_freq: float, 
+                                 samp_rate: int, 
+                                 freq_step: float) -> None:
+    num_steps_per_sweep = _compute_num_steps_per_sweep(min_freq, 
+                                                       max_freq, 
+                                                       samp_rate, 
+                                                       freq_step)
+    if num_steps_per_sweep <= 1:
+        raise ValueError(f"We strictly greater than one sample per step. Computed: {num_steps_per_sweep}")
+    
+def validate_sweep_interval(min_freq: float, 
+                           max_freq: float, 
+                           samp_rate: int, 
+                           freq_step: float,
+                           samples_per_step: int,
+                           chunk_size: float) -> None: 
+    num_steps_per_sweep = _compute_num_steps_per_sweep(min_freq, 
+                                                       max_freq, 
+                                                       samp_rate, 
+                                                       freq_step)
+    num_samples_per_sweep = num_steps_per_sweep * samples_per_step
+    sweep_interval = num_samples_per_sweep * 1/samp_rate
+    if sweep_interval < chunk_size:
+        raise ValueError(f"Sweep interval must be greater than the chunk size. Computed sweep interval: {sweep_interval} [s] is less than the given chunk size {chunk_size} [s]")
+
+
+def validate_num_samples_per_step(samples_per_step: int, 
+                                  window_size: int) -> None:
     if window_size >= samples_per_step:
         raise ValueError(f"Window size must be strictly less than the number of samples per step. Received window size {window_size} [samples], which is more than or equal to the number of samples per step {samples_per_step}.")
     
 
-def validate_non_overlapping_steps(freq_step: float, samp_rate: int) -> None:
+def validate_non_overlapping_steps(freq_step: float, 
+                                   samp_rate: int) -> None:
     if freq_step < samp_rate:
         raise NotImplementedError(f"SPECTRE does not yet support spectral steps overlapping in frequency. Received frequency step {freq_step/1e6} [MHz] which is less than the sample rate {samp_rate/1e6} [MHz]")
 

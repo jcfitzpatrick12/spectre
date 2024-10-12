@@ -83,9 +83,11 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_center_freq_strictly_positive(max_freq)
         validators.validate_samp_rate_strictly_positive(samp_rate)
         validators.validate_bandwidth_strictly_positive(bandwidth)
-        validators.validate_nyquist_criterion(samp_rate, bandwidth)
+        validators.validate_nyquist_criterion(samp_rate, 
+                                              bandwidth)
         validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_integration_time(integration_time, chunk_size) 
+        validators.validate_integration_time(integration_time, 
+                                             chunk_size) 
         validators.validate_window(window_type, 
                                    window_kwargs, 
                                    window_size,
@@ -96,14 +98,27 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_event_handler_key(event_handler_key, "sweep")
         validators.validate_gain_is_negative(IF_gain)
         validators.validate_gain_is_negative(RF_gain)
-        validators.validate_num_steps_per_sweep(min_freq, max_freq, samp_rate, freq_step)
-        validators.validate_non_overlapping_steps(freq_step, samp_rate)
-        validators.validate_num_samples_per_step(samples_per_step, window_size)
+        validators.validate_num_steps_per_sweep(min_freq, 
+                                                max_freq, 
+                                                samp_rate, 
+                                                freq_step)
+        validators.validate_sweep_interval(min_freq, 
+                                           max_freq, 
+                                           samp_rate, 
+                                           freq_step,
+                                           samples_per_step,
+                                           chunk_size)
+        validators.validate_non_overlapping_steps(freq_step, 
+                                                  samp_rate)
+        validators.validate_num_samples_per_step(samples_per_step, 
+                                                 window_size)
 
         # if the api latency is defined, raise a warning if the step interval is of the same order
         api_latency = self.specifications.get("api_latency")
         if api_latency:
-            validators.validate_step_interval(samples_per_step, samp_rate, api_latency)
+            validators.validate_step_interval(samples_per_step, 
+                                              samp_rate, 
+                                              api_latency)
         return
     
 
