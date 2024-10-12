@@ -84,9 +84,10 @@ def fetch_chunks(instrument_code: str | None,
                  year: int | None, 
                  month: int | None, 
                  day: int | None):
-    
-    if (year is None) and (month is None) and (day is None):
-        raise ValueError(f"At least one of the year, month and day should be specified.")
+
+
+    if (year is None) or (month is None) or (day is None):
+        raise ValueError(f"All of year, month and day should be specified.")
     
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
