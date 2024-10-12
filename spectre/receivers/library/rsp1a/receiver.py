@@ -74,36 +74,3 @@ class Receiver(SDRPlayReceiver):
         self._default_sweep_validator(capture_config)
         self._sdrplay_validator(capture_config)
         return
-    
-
-    
-    def __RSP1A_validator(self, capture_config: dict) -> None:
-        # RSP1A specific validations
-        center_freq_lower_bound = 1e3 # [Hz]
-        center_freq_upper_bound = 2e9 # [Hz]
-        center_freq = capture_config.get("center_freq")
-        min_freq = capture_config.get("min_freq")
-        max_freq = capture_config.get("max_freq")
-        if center_freq:
-            validators.closed_confine_center_freq(center_freq, center_freq_lower_bound, center_freq_upper_bound)
-        if min_freq:
-            validators.closed_confine_center_freq(min_freq, center_freq_lower_bound, center_freq_upper_bound)
-        if max_freq:
-            validators.closed_confine_center_freq(max_freq, center_freq_lower_bound, center_freq_upper_bound)
-
-        samp_rate_lower_bound = 200e3 # [Hz]
-        samp_rate_upper_bound = 10e6 # [Hz]
-        validators.closed_confine_samp_rate(capture_config['samp_rate'], samp_rate_lower_bound, samp_rate_upper_bound)
-
-        bandwidth_lower_bound = 200e3 # [Hz]
-        bandwidth_upper_bound = 8e6 # [Hz]
-        validators.closed_confine_bandwidth(capture_config['bandwidth'], bandwidth_lower_bound, bandwidth_upper_bound)
-
-        IF_gain_upper_bound = -20 # [dB]
-        validators.closed_upper_bound_IF_gain(capture_config['IF_gain'], IF_gain_upper_bound)
-        
-        RF_gain_upper_bound = 0 # [dB]
-        validators.closed_upper_bound_RF_gain(capture_config['RF_gain'], RF_gain_upper_bound)
-        return
-
-    
