@@ -177,13 +177,13 @@ class SPECTREReceiver(BaseReceiver):
     def __set_default_templates(self) -> None:
         self.default_templates = {
             "fixed": {
-                "center_freq": float, # center frequency for the receiver
-                "bandwidth": float, # bandwidth for the receiver
-                "samp_rate": int, # sample rate for the receiver
-                "IF_gain": int, # intermediate frequency gain for the receiver
-                "RF_gain": int, # radio frequency gain for the receiver
-                'chunk_size': int, #  Size of each batched file [s]
-                'integration_time': float, # time over which to average spectra in postprocessing
+                "center_freq": float, # [Hz]
+                "bandwidth": float, # [Hz]
+                "samp_rate": int, # [Hz]
+                "IF_gain": int, # [dB]
+                "RF_gain": int, # [dB]
+                'chunk_size': int, #  [s]
+                'integration_time': float, # [s]
                 'window_type': str, # window type for STFFT
                 'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
                 'window_size': int, # number of samples in STFFT window
@@ -192,16 +192,16 @@ class SPECTREReceiver(BaseReceiver):
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
             },
             "sweep": {
-                "min_freq": float, # minimum defined frequency for the sweep
-                "max_freq": float, # maximum defined frequency for the sweep
-                "samples_per_step": int, # the number of samples in each step in one sweep
-                "freq_step": float, # the increment in center_frequency between steps
-                "bandwidth": float, # bandwidth for the receiver
-                "samp_rate": int, # sample rate for the receiver
-                "IF_gain": int, # intermediate frequency gain for the receiver
-                "RF_gain": int, # radio frequency gain for the receiver
-                'chunk_size': int, #  Size of each batched file [s]
-                'integration_time': float, # time over which to average spectra in postprocessing
+                "min_freq": float, # [Hz]
+                "max_freq": float, # [Hz]
+                "samples_per_step": int, 
+                "freq_step": float, # [Hz]
+                "bandwidth": float, # [Hz]
+                "samp_rate": int, # [Hz]
+                "IF_gain": int, # [dB]
+                "RF_gain": int, # [dB]
+                'chunk_size': int, #  [s]
+                'integration_time': float, # [s]
                 'window_type': str, # window type for STFFT
                 'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
                 'window_size': int, # number of samples in STFFT window
