@@ -37,9 +37,9 @@ class Chunk(SPECTREChunk):
         time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data)
 
         # convert all arrays to the standard type
-        time_seconds = np.array(time_seconds, dtype = 'float64')
-        freq_MHz = np.array(freq_MHz, dtype = 'float64')
-        dynamic_spectra = np.array(dynamic_spectra, dtype = 'float64')
+        time_seconds = np.array(time_seconds, dtype = 'float32')
+        freq_MHz = np.array(freq_MHz, dtype = 'float32')
+        dynamic_spectra = np.array(dynamic_spectra, dtype = 'float32')
 
         return Spectrogram(dynamic_spectra, 
                 time_seconds, 

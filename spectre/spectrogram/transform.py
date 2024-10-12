@@ -235,8 +235,8 @@ def _seconds_elapsed(datetimes: np.ndarray) -> np.ndarray:
     base_time = datetimes[0]
     # Calculate elapsed time in seconds for each datetime in the list
     elapsed_seconds = [(dt - base_time).total_seconds() for dt in datetimes]
-    # Convert the list of seconds to a NumPy array of type float64
-    return np.array(elapsed_seconds, dtype=np.float64)
+    # Convert the list of seconds to a NumPy array of type float32
+    return np.array(elapsed_seconds, dtype=np.float32)
 
 # we assume that the spectrogram list is ORDERED chronologically
 # we assume there is no time overlap in any of the spectrograms in the list
