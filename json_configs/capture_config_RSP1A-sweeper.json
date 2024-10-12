@@ -17,7 +17,7 @@
     },
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
-    "receiver": "RSP1A",
+    "receiver": "rsp1a",
     "mode": "sweep",
     "tag": "RSP1A-sweeper"
 }

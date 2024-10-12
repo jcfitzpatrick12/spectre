@@ -7,7 +7,7 @@ from spectre.receivers.base import SDRPlayReceiver
 from spectre.receivers.library.rsp1a.gr import fixed, sweep
 from spectre.receivers import validators
 
-@register_receiver("RSP1A")
+@register_receiver("rsp1a")
 class Receiver(SDRPlayReceiver):
     def __init__(self, receiver_name: str, mode: str = None):
         super().__init__(receiver_name, mode = mode)
