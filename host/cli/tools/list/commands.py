@@ -114,7 +114,6 @@ def capture_configs(
 
 @app.command()
 def tags(
-    tag_type: str = typer.Option(None, "--tag-type", help=""),
     year: int = typer.Option(None, "--year", "-y", help=""),
     month: int = typer.Option(None, "--month", "-m", help=""),
     day: int = typer.Option(None, "--day", "-d", help=""),
@@ -122,21 +121,11 @@ def tags(
 ) -> None:
     chunks_dir_path = get_chunks_dir_path(year, month, day)
     chunk_files = [f for (_, _, files) in walk(chunks_dir_path) for f in files]
-
-    if tag_type not in [None, "native", "callisto"]:
-        raise ValueError("Expected argument for --tag-type to be 'native' or 'callisto'.")
-
     tags = set()
     for chunk_file in chunk_files:
         chunk_base_name, _ = splitext(chunk_file)
         tag = chunk_base_name.split("_")[1]
-        if tag_type == "callisto" and "callisto" in tag:
-            tags.add(tag)
-        elif tag_type == "native" and "callisto" not in tag:
-            tags.add(tag)
-        else:
-            tags.add(tag)
-
+        tags.add(tag)
     if len(tags) == 0:
         typer.secho("No tags found.")
     else:
