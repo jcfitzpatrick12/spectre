@@ -7,24 +7,14 @@ import os
 
 from host.cli import __app_name__, __version__
 
-from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
-from spectre.file_handlers.text.TextHandler import TextHandler
-from spectre.receivers.factory import get_receiver
-from spectre.cfg import (
-    VAR_SPECTRE_DIR_PATH
+from spectre.file_handlers.json.handlers import (
+    FitsConfigHandler,
+    CaptureConfigHandler
 )
+from spectre.file_handlers.text.handlers import TextHandler
+from spectre.receivers.factory import get_receiver
 
 app = typer.Typer()
-
-@app.command()
-def daily_capture_log(
-) -> None:
-    daily_capture_log_handler = TextHandler(VAR_SPECTRE_DIR_PATH, 
-                                            "daily_capture", 
-                                            override_extension="log")
-    daily_capture_log_handler.cat()
-    typer.Exit()
     
 
 @app.command()

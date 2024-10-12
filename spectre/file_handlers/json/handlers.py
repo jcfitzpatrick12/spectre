@@ -2,12 +2,49 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import ast
+import json
 from typing import Any
-from abc import ABC, abstractmethod
+from abc import ABC
+import ast
 
-from spectre.cfg import JSON_CONFIGS_DIR_PATH
-from spectre.file_handlers.json.JsonHandler import JsonHandler
+from spectre.file_handlers.base import BaseFileHandler
+from spectre.cfg import (
+    JSON_CONFIGS_DIR_PATH
+)
+
+class JsonHandler(BaseFileHandler):
+    def __init__(self, parent_path: str, base_file_name: str, **kwargs):
+        super().__init__(parent_path, base_file_name, extension = "json", **kwargs)
+        return 
+    
+    
+    def read(self) -> dict:
+        with open(self.file_path, 'r') as f:
+            return json.load(f)
+        
+
+    def save(self, d: dict, doublecheck_overwrite: bool = True) -> None:
+        self.make_parent_path()
+
+        if self.exists() and doublecheck_overwrite:
+            self.doublecheck_overwrite()
+        
+        with open(self.file_path, 'w') as file:
+            json.dump(d, file, indent=4)
+
+
+    def update_key_value(self, 
+                         key: str, 
+                         value: Any, 
+                         doublecheck_overwrite: bool = True) -> None:
+        d = self.read() 
+        valid_keys = list(d.keys())
+        if not key in valid_keys:
+            raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
+        d[key] = value
+        self.save(d, doublecheck_overwrite=doublecheck_overwrite)
+        return
+    
 
 class SPECTREConfigHandler(JsonHandler, ABC):
     def __init__(self, tag: str, config_type: str, **kwargs):
@@ -109,3 +146,45 @@ class SPECTREConfigHandler(JsonHandler, ABC):
             if not isinstance(v, expected_type):
                 raise TypeError(f'Expected {expected_type} for "{k}", but got {type(v)}.')
 
+
+class FitsConfigHandler(SPECTREConfigHandler):
+    def __init__(self, tag: str, **kwargs):
+        super().__init__(tag, "fits", **kwargs)
+
+    @classmethod
+    def get_template(cls) -> dict:
+        return {
+            "ORIGIN": str,
+            "TELESCOP": str,
+            "INSTRUME": str,
+            "OBJECT": str,
+            "OBS_LAT": float,
+            "OBS_LONG": float,
+            "OBS_ALT": float
+        }
+
+
+    def template_to_command(self, tag: str, as_string = False) -> str:
+        command_as_list = ["spectre", "create", "fits-config", "-t", tag]
+        template = self.get_template()
+        for key, value in template.items():
+            command_as_list += ["-p"]
+            command_as_list += [f"{key}={value.__name__}"]
+        if as_string:
+            return " ".join(command_as_list)
+        else:
+            return command_as_list
+        
+
+    def save_params_as_fits_config(self, 
+                                   params: list[str], 
+                                   doublecheck_overwrite: bool = True
+                                   ) -> None:
+        d = self.type_cast_params(params, self.get_template())
+        self.save(d, doublecheck_overwrite=doublecheck_overwrite)
+        return
+    
+    
+class CaptureConfigHandler(SPECTREConfigHandler):
+    def __init__(self, tag: str, **kwargs):
+        super().__init__(tag, "capture", **kwargs)

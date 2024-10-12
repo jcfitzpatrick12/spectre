@@ -6,7 +6,7 @@ from abc import abstractmethod
 
 from spectre.file_handlers.chunks.BaseChunk import BaseChunk
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.json.handlers import CaptureConfigHandler
 
 class SPECTREChunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str, **kwargs):

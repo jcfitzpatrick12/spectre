@@ -18,7 +18,7 @@ from spectre.spectrogram.array_operations import (
     compute_resolution,
     subtract_background,
 )
-from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
+from spectre.file_handlers.json.handlers import FitsConfigHandler
 
 from spectre.cfg import (
     DEFAULT_TIME_FORMAT

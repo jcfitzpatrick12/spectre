@@ -5,7 +5,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable, Any
 
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.json.handlers import CaptureConfigHandler
 
 
 class BaseReceiver(ABC):

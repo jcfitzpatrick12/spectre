@@ -9,7 +9,7 @@ import spectre.file_handlers.chunks.library
 # after we decorate all chunks, we can import the chunk_key -> chunk maps
 from spectre.file_handlers.chunks.chunk_register import chunk_map
 from spectre.file_handlers.chunks.BaseChunk import BaseChunk
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
+from spectre.file_handlers.json.handlers import CaptureConfigHandler
 
 def get_chunk(chunk_key: str) -> BaseChunk:
     chunk = chunk_map.get(chunk_key)
