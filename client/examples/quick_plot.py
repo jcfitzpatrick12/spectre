@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from spectre.chunks import Chunks
+from spectre.spectrograms.transform import frequency_chop
 from spectre.cfg import DEFAULT_TIME_FORMAT
 
 def main(tag: str, 
@@ -15,6 +16,7 @@ def main(tag: str,
     spectrogram = chunks.get_spectrogram_from_range(start_time, end_time)
     print(f"Frequency resolution {spectrogram.freq_res_MHz * 1e6} [Hz]")
     print(f"Time resolution: {spectrogram.time_res_seconds} [s]")
+    print(f"Frequency range: {spectrogram.freq_MHz[-1] - spectrogram.freq_MHz[0]} [MHz]")
     spectrogram.quick_plot(time_type = "datetimes", log_norm=True)
 
 if __name__ == "__main__":
