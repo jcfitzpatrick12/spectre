@@ -24,7 +24,7 @@ def session(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Spe
             seconds: int = typer.Option(0, "--seconds", help="Seconds component of the session duration."),
             minutes: int = typer.Option(0, "--minutes", help="Minutes component of the session duration."),
             hours: int = typer.Option(0, "--hours", help="Hours component of the session duration."),
-            force_restart: bool = typer.Option(False, "--force-restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session..")
+            force_restart: bool = typer.Option(False, "--force-restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session.")
             ) -> None:
     
     if seconds == 0 and minutes == 0 and hours == 0:
