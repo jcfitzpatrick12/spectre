@@ -1,4 +1,4 @@
-from spectre.file_handlers.BaseFileHandler import BaseFileHandler
+from spectre.file_handlers.base import BaseFileHandler
 
 class TextHandler(BaseFileHandler):
     def __init__(self, parent_path: str, base_file_name: str, **kwargs):

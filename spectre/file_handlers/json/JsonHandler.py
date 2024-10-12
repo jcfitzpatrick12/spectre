@@ -5,7 +5,7 @@
 import json
 from typing import Any
 
-from spectre.file_handlers.BaseFileHandler import BaseFileHandler
+from spectre.file_handlers.base import BaseFileHandler
 
 class JsonHandler(BaseFileHandler):
     def __init__(self, parent_path: str, base_file_name: str, **kwargs):
