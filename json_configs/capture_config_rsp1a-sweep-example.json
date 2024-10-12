@@ -9,6 +9,7 @@
     "RF_gain": 0,
     "chunk_size": 3,
     "time_resolution": 0.0,
+    "frequency_resolution": 50000.0,
     "window_type": "blackman",
     "window_kwargs": {},
     "window_size": 1024,

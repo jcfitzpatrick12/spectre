@@ -13,6 +13,7 @@
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
     "time_resolution": 0.0,
+    "frequency_resolution": 0.0,
     "receiver": "test",
     "mode": "tagged-staircase",
     "tag": "test-tagged-staircase-example"

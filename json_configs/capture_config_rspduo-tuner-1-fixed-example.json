@@ -3,6 +3,7 @@
     "chunk_size": 5,
     "samp_rate": 600000,
     "time_resolution": 0.01,
+    "frequency_resolution": 6000.0,
     "window_size": 2048,
     "chunk_key": "default",
     "center_freq": 95800000.0,

@@ -2,6 +2,7 @@
     "amplitude": 2.0,
     "frequency": 32000.0,
     "time_resolution": 0.0,
+    "frequency_resolution": 0.0,
     "samp_rate": 128000,
     "chunk_size": 2,
     "window_type": "boxcar",
