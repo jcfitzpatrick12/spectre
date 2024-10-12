@@ -9,11 +9,11 @@ import gzip
 from datetime import datetime
 from pathlib import Path
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT,
     INSTRUMENT_CODES
 )
-from cfg import get_chunks_dir_path
+from spectre.cfg import get_chunks_dir_path
 
 temp_dir = os.path.join(os.environ['SPECTRE_DIR_PATH'], "tmp")
 

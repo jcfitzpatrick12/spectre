@@ -22,7 +22,7 @@ from gnuradio import eng_notation
 from gnuradio import sdrplay3
 from gnuradio import spectre
 
-from cfg import (
+from spectre.cfg import (
     CHUNKS_DIR_PATH
 )
 

@@ -14,10 +14,10 @@ from spectre.file_handlers.chunks.BaseChunk import BaseChunk
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
-from cfg import get_chunks_dir_path
+from spectre.cfg import get_chunks_dir_path
 
 class Chunks:
     def __init__(self, 

@@ -6,10 +6,10 @@ from datetime import datetime
 
 from spectre.file_handlers.chunks.ChunkFile import ChunkFile
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
-from cfg import get_chunks_dir_path
+from spectre.cfg import get_chunks_dir_path
 
 
 class BaseChunk:

@@ -11,7 +11,7 @@ from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 from spectre.file_handlers.text.TextHandler import TextHandler
 from spectre.receivers.factory import get_receiver
-from cfg import (
+from spectre.cfg import (
     VAR_SPECTRE_DIR_PATH
 )
 

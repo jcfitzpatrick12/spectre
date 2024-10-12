@@ -3,7 +3,7 @@ from typing import Tuple, Optional
 from scipy.signal import ShortTimeFFT, get_window
 from datetime import datetime, timedelta
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 from spectre.file_handlers.chunks.SPECTREChunk import SPECTREChunk

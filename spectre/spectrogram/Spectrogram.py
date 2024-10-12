@@ -20,10 +20,10 @@ from spectre.spectrogram.array_operations import (
 )
 from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
-from cfg import get_chunks_dir_path
+from spectre.cfg import get_chunks_dir_path
 
 
 class Spectrogram:

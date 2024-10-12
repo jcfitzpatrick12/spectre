@@ -6,7 +6,7 @@ import ast
 from typing import Any
 from abc import ABC, abstractmethod
 
-from cfg import JSON_CONFIGS_DIR_PATH
+from spectre.cfg import JSON_CONFIGS_DIR_PATH
 from spectre.file_handlers.json.JsonHandler import JsonHandler
 
 class SPECTREConfigHandler(JsonHandler, ABC):

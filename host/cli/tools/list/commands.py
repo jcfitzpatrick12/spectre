@@ -12,11 +12,11 @@ from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.file_handlers.chunks.Chunks import Chunks
 
-from cfg import (
+from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH,
     INSTRUMENT_CODES
 )
-from cfg import get_chunks_dir_path
+from spectre.cfg import get_chunks_dir_path
 
 app = typer.Typer()
 

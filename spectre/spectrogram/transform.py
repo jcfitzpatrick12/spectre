@@ -9,7 +9,7 @@ from spectre.spectrogram.array_operations import (
     find_closest_index
 )
 from spectre.spectrogram.Spectrogram import Spectrogram
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 

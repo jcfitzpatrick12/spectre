@@ -24,7 +24,7 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
-from cfg import (
+from spectre.cfg import (
     CHUNKS_DIR_PATH
 )
 

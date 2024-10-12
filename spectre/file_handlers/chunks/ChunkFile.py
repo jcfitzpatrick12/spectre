@@ -5,7 +5,7 @@
 from datetime import datetime
 
 from spectre.file_handlers.BaseFileHandler import BaseFileHandler
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 

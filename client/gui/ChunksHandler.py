@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 from spectre.chunks.Chunks import Chunks
