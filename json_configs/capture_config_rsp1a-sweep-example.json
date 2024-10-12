@@ -20,5 +20,5 @@
     "event_handler_key": "sweep",
     "receiver": "rsp1a",
     "mode": "sweep",
-    "tag": "rsp1-sweep-example"
+    "tag": "rsp1a-sweep-example"
 }
