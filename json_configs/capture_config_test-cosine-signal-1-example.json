@@ -12,7 +12,7 @@
     "window_size": 256,
     "event_handler_key": "default",
     "chunk_key": "default",
-    "receiver": "Test",
+    "receiver": "test",
     "mode": "cosine-signal-1",
     "tag": "test-cosine-signal-1-example"
 }

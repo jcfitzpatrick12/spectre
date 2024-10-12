@@ -17,7 +17,7 @@
     },
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
-    "receiver": "RSPduo",
+    "receiver": "rspduo",
     "mode": "tuner-1-sweep",
-    "tag": "RSPduo-tuner-1-sweep-example"
+    "tag": "rspduo-tuner-1-sweep-example"
 }
