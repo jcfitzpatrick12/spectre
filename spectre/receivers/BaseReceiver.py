@@ -11,11 +11,21 @@ from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
 class BaseReceiver(ABC):
     def __init__(self, name: str, mode: str = None):
         self.name = name
-            
+
+        self.capture_methods: dict[str, Callable] = None
         self._set_capture_methods()
+
+        self.templates: dict[str, dict[str, Any]] = None
         self._set_templates()
+
+        self.validators: dict[str, Callable] = None
         self._set_validators()
+
+        self.valid_modes: list[str] = None
         self._set_valid_modes()
+
+        self.specifications: dict[str, Any] = None
+        self._set_specifications()
 
         if not mode is None:
             self.set_mode(mode)
@@ -34,6 +44,22 @@ class BaseReceiver(ABC):
     @abstractmethod
     def _set_templates(self) -> None:
         pass
+
+
+    @abstractmethod
+    def _set_specifications(self) -> None:
+        pass
+
+
+    def get_specifications(self) -> dict[dict, Any]:
+        return self.specifications
+    
+    
+    def get_specification(self, specification_key: str) -> Any:
+        specification_value = self.specifications.get(specification_key)
+        if specification_value is None:
+            raise ValueError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
+        return specification_value
 
     
     # ensure that all receiver maps define the same modes for the receiver
@@ -85,7 +111,7 @@ class BaseReceiver(ABC):
         return
 
 
-    def start_capture(self, tags: list) -> None:
+    def start_capture(self, tags: list[str]) -> None:
         capture_configs = [self.load_capture_config(tag) for tag in tags]
         capture_method = self.get_capture_method()
         capture_method(capture_configs)

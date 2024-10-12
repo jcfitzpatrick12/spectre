@@ -2,6 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from math import floor
+from typing import Optional
 
 from spectre.receivers.BaseReceiver import BaseReceiver
 from spectre.receivers import validators
@@ -59,8 +61,64 @@ class SPECTREReceiver(BaseReceiver):
         return default_template
     
 
-    # ! TO BE IMPLEMENTED ! # 
     def _default_sweep_validator(self, capture_config: dict) -> None:
+        min_freq = capture_config["min_freq"]
+        max_freq = capture_config["max_freq"]
+        samples_per_step = capture_config["samples_per_step"]
+        freq_step = capture_config["freq_step"]
+        bandwidth = capture_config["bandwidth"]
+        samp_rate = capture_config["samp_rate"]
+        IF_gain = capture_config["IF_gain"]
+        RF_gain = capture_config["RF_gain"]
+        chunk_size = capture_config['chunk_size']
+        integration_time = capture_config['integration_time']
+        window_type = capture_config['window_type']
+        window_kwargs = capture_config['window_kwargs']
+        window_size = capture_config['window_size']
+        STFFT_kwargs = capture_config['STFFT_kwargs']
+        chunk_key = capture_config['chunk_key']
+        event_handler_key = capture_config[ 'event_handler_key']
+
+        validators.validate_center_freq_strictly_positive(min_freq)
+        validators.validate_center_freq_strictly_positive(max_freq)
+        validators.validate_samp_rate_strictly_positive(samp_rate)
+        validators.validate_bandwidth_strictly_positive(bandwidth)
+        validators.validate_nyquist_criterion(samp_rate, 
+                                              bandwidth)
+        validators.validate_chunk_size_strictly_positive(chunk_size)
+        validators.validate_integration_time(integration_time, 
+                                             chunk_size) 
+        validators.validate_window(window_type, 
+                                   window_kwargs, 
+                                   window_size,
+                                   chunk_size,
+                                   samp_rate)
+        validators.validate_STFFT_kwargs(STFFT_kwargs)
+        validators.validate_chunk_key(chunk_key, "sweep")
+        validators.validate_event_handler_key(event_handler_key, "sweep")
+        validators.validate_gain_is_negative(IF_gain)
+        validators.validate_gain_is_negative(RF_gain)
+        validators.validate_num_steps_per_sweep(min_freq, 
+                                                max_freq, 
+                                                samp_rate, 
+                                                freq_step)
+        validators.validate_sweep_interval(min_freq, 
+                                           max_freq, 
+                                           samp_rate, 
+                                           freq_step,
+                                           samples_per_step,
+                                           chunk_size)
+        validators.validate_non_overlapping_steps(freq_step, 
+                                                  samp_rate)
+        validators.validate_num_samples_per_step(samples_per_step, 
+                                                 window_size)
+
+        # if the api latency is defined, raise a warning if the step interval is of the same order
+        api_latency = self.specifications.get("api_latency")
+        if api_latency:
+            validators.validate_step_interval(samples_per_step, 
+                                              samp_rate, 
+                                              api_latency)
         return
     
 

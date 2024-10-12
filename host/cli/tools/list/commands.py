@@ -77,6 +77,17 @@ def modes(
 
 
 @app.command()
+def specifications(
+    receiver_name: str = typer.Option(..., "--receiver", "-r", help="Specify the receiver name")
+) -> None:
+    receiver = get_receiver(receiver_name)
+    specifications = receiver.get_specifications()
+    for k, v in specifications.items():
+        typer.secho(f"{k}: {v}")
+    raise typer.Exit()
+
+
+@app.command()
 def fits_configs(
 ) -> None:
     json_config_files = listdir(JSON_CONFIGS_DIR_PATH)

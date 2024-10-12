@@ -1,10 +1,14 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from spectre.receivers.receiver_register import register_receiver
-from spectre.receivers.SPECTREReceiver import SPECTREReceiver
+from spectre.receivers.SDRPlayReceiver import SDRPlayReceiver
 from spectre.receivers.library.RSP1A.gr import fixed, sweep
 from spectre.receivers import validators
 
 @register_receiver("RSP1A")
-class Receiver(SPECTREReceiver):
+class Receiver(SDRPlayReceiver):
     def __init__(self, receiver_name: str, mode: str = None):
         super().__init__(receiver_name, mode = mode)
 
@@ -34,6 +38,20 @@ class Receiver(SPECTREReceiver):
         }
 
 
+    def _set_specifications(self) -> None:
+        self.specifications = {
+            "center_freq_lower_bound": 1e3, # [Hz]
+            "center_freq_upper_bound": 2e9, # [Hz]
+            "samp_rate_lower_bound": 200e3, # [Hz]
+            "samp_rate_upper_bound": 10e6, # [Hz]
+            "bandwidth_lower_bound": 200e3, # [Hz]
+            "bandwidth_upper_bound": 8e6, # [Hz]
+            "IF_gain_upper_bound": -20, # [dB]
+            "RF_gain_upper_bound": 0, # [dB]
+            "api_latency": 50 * 1e-3 # [s]
+        }
+
+
     def __fixed(self, capture_configs: list) -> None:
         capture_config = capture_configs[0]
         fixed.main(capture_config)
@@ -48,13 +66,15 @@ class Receiver(SPECTREReceiver):
 
     def __fixed_validator(self, capture_config: dict) -> None:
         self._default_fixed_validator(capture_config)
-        self.__RSP1A_validator(capture_config)
-
+        self._sdrplay_validator(capture_config)
+        return
+    
 
     def __sweep_validator(self, capture_config: dict) -> None:
         self._default_sweep_validator(capture_config)
-        self.__RSP1A_validator(capture_config)
+        self._sdrplay_validator(capture_config)
         return
+    
 
     
     def __RSP1A_validator(self, capture_config: dict) -> None:
@@ -79,12 +99,9 @@ class Receiver(SPECTREReceiver):
         bandwidth_upper_bound = 8e6 # [Hz]
         validators.closed_confine_bandwidth(capture_config['bandwidth'], bandwidth_lower_bound, bandwidth_upper_bound)
 
-        ## make a function in validator helper BOUND IF_GAIN
         IF_gain_upper_bound = -20 # [dB]
         validators.closed_upper_bound_IF_gain(capture_config['IF_gain'], IF_gain_upper_bound)
         
-        
-        ## make a function in validator helpers BOUND RF_GAIN
         RF_gain_upper_bound = 0 # [dB]
         validators.closed_upper_bound_RF_gain(capture_config['RF_gain'], RF_gain_upper_bound)
         return
