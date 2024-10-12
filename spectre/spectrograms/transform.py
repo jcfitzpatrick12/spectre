@@ -254,14 +254,14 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
 
     # perform checks on each spectrogram in teh list
     for spectrogram in spectrogram_list:
-        if not np.all(np.equal(S.freq_MHz, reference_spectrogram.freq_MHz)):
+        if not np.all(np.equal(spectrogram.freq_MHz, reference_spectrogram.freq_MHz)):
             raise ValueError(f"All spectrograms must have identical frequency ranges.")
         if spectrogram.tag != reference_spectrogram.tag:
             raise ValueError(f"All tags must be equal for each spectrogram in the input list!")
         if spectrogram.spectrum_type != reference_spectrogram.spectrum_type:
             raise ValueError(f"All units must be equal for each spectrogram in the input list!")
         if spectrogram.chunk_start_time is None:
-            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {S.chunk_start_time}.")
+            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {spectrogram.chunk_start_time}.")
 
 
     # build a list of the time array of each spectrogram in the list
