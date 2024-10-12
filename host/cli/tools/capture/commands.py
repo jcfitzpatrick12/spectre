@@ -26,7 +26,9 @@ def session(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Spe
             hours: int = typer.Option(0, "--hours", help="Hours component of the session duration."),
             force_restart: bool = typer.Option(False, "--force-restart", help="If a subprocess stops, terminate all subprocesses and restart the capture session..")
             ) -> None:
-
+    
+    if seconds == 0 and minutes == 0 and hours == 0:
+        raise ValueError(f"Session duration must be specified.")
     start_session(receiver_name,
                   mode,
                   tags,
@@ -34,7 +36,7 @@ def session(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Spe
                   minutes = minutes,
                   hours = hours,
                   force_restart = force_restart)
-    return
+    raise typer.Exit()
 
 
 @app.command()
@@ -45,6 +47,8 @@ def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help="Speci
           minutes: int = typer.Option(0, "--minutes", help="Minutes component of the session duration."),
           hours: int = typer.Option(0, "--hours", help="Hours component of the session duration.")
 ) -> None:
+    if seconds == 0 and minutes == 0 and hours == 0:
+        raise ValueError(f"Session duration must be specified.")
     start_capture(receiver_name,
                   mode,
                   tags,

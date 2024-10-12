@@ -62,7 +62,10 @@ def unzip_to_chunks():
             os.remove(entry.path)
 
 
-def download_callisto_data(instrument_code: str, year: int, month: int, day: int):
+def download_callisto_data(instrument_code: str, 
+                           year: int, 
+                           month: int, 
+                           day: int):
     date_str = f"{year:04d}/{month:02d}/{day:02d}"
     base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{date_str}/"
     command = [
@@ -77,7 +80,14 @@ def download_callisto_data(instrument_code: str, year: int, month: int, day: int
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
 
-def fetch_chunks(instrument_code: str, year: int, month: int, day: int):
+def fetch_chunks(instrument_code: str | None, 
+                 year: int | None, 
+                 month: int | None, 
+                 day: int | None):
+    
+    if (year is None) and (month is None) and (day is None):
+        raise ValueError(f"At least one of the year, month and day should be specified.")
+    
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
