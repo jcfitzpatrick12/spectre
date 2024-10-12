@@ -24,7 +24,7 @@ def import_from_receiver(receiver):
         raise NotADirectoryError(f"{gr_path} is not a directory. \"gr\" must be specified as a directory.")
 
     if "receiver.py" not in dir_contents:
-        raise ValueError(f"Could not find Receiver.py in {receiver}")
+        raise ValueError(f"Could not find receiver.py in {receiver}")
 
     full_module_name = f'spectre.receivers.library.{receiver}.receiver'
     importlib.import_module(full_module_name)
