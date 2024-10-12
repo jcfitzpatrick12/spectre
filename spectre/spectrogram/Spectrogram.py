@@ -28,9 +28,9 @@ from cfg import get_chunks_dir_path
 
 class Spectrogram:
     def __init__(self, 
-                 dynamic_spectra: np.ndarray[np.float64, np.float64], # holds the spectrogram data
-                 time_seconds: np.ndarray[np.float64], # holds the time stamp [s] for each spectrum
-                 freq_MHz: np.ndarray[np.float64],  # physical frequencies [MHz] for each spectral component
+                 dynamic_spectra: np.ndarray[np.float32, np.float32], # holds the spectrogram data
+                 time_seconds: np.ndarray[np.float32], # holds the time stamp [s] for each spectrum
+                 freq_MHz: np.ndarray[np.float32],  # physical frequencies [MHz] for each spectral component
                  tag: str,  # the tag associated with that spectrogram
                  chunk_start_time: str = None, # (optional) the datetime (as a string) assigned to the first spectrum in the spectrogram (floored second precision)
                  microsecond_correction: int = 0, # (optional) a correction to the chunk start time
@@ -39,9 +39,9 @@ class Spectrogram:
                  background_interval: list = None): # (optional) specify an interval over which to compute the background spectrum
 
         # set the mandatory attributes
-        self.dynamic_spectra: np.ndarray[np.float64, np.float64] = dynamic_spectra
-        self.time_seconds: np.ndarray[np.float64] = time_seconds
-        self.freq_MHz: np.ndarray[np.float64] = freq_MHz
+        self.dynamic_spectra: np.ndarray[np.float32, np.float32] = dynamic_spectra
+        self.time_seconds: np.ndarray[np.float32] = time_seconds
+        self.freq_MHz: np.ndarray[np.float32] = freq_MHz
         self.tag: str = tag
         # set all dependent attributes initially to None to ensure a defined state for the class
         self.time_res_seconds: float = None
@@ -370,7 +370,7 @@ def _save_spectrogram(write_path: str,
         raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}.")
     
     # Primary HDU with data
-    primary_data = spectrogram.dynamic_spectra.astype(dtype=np.float64) 
+    primary_data = spectrogram.dynamic_spectra.astype(dtype=np.float32) 
     primary_hdu = fits.PrimaryHDU(primary_data)
 
     primary_hdu.header.set('SIMPLE', True, 'file does conform to FITS standard')
@@ -437,8 +437,8 @@ def _save_spectrogram(write_path: str,
 
 
     # Wrap arrays in an additional dimension to mimic the e-CALLISTO storage
-    time_array_wrapped = np.array([spectrogram.time_seconds.astype(np.float64)])
-    freqs_MHz_wrapped = np.array([spectrogram.freq_MHz.astype(np.float64)])
+    time_array_wrapped = np.array([spectrogram.time_seconds.astype(np.float32)])
+    freqs_MHz_wrapped = np.array([spectrogram.freq_MHz.astype(np.float32)])
     
     # Binary Table HDU (extension)
     col1 = fits.Column(name='TIME', format='PD', array=time_array_wrapped)

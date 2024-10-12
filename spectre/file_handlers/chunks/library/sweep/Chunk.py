@@ -66,9 +66,9 @@ class Chunk(SPECTREChunk):
         time_seconds, freq_MHz, dynamic_spectra = self._do_STFFT()
 
         return Spectrogram(
-            dynamic_spectra=np.array(dynamic_spectra, dtype='float64'),
-            time_seconds=np.array(time_seconds, dtype='float64'),
-            freq_MHz=np.array(freq_MHz, dtype='float64'),
+            dynamic_spectra=np.array(dynamic_spectra, dtype='float32'),
+            time_seconds=np.array(time_seconds, dtype='float32'),
+            freq_MHz=np.array(freq_MHz, dtype='float32'),
             tag=self.tag,
             chunk_start_time=chunk_start_time,
             microsecond_correction=microsecond_correction,
