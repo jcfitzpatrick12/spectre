@@ -184,7 +184,7 @@ def time_average(input_S: Spectrogram,
     
     # define the initial spectrum as the spectrum at time index 0 in the spectrogram
     # then, averaged_t0 is the seconds elapsed between the input intial spectrum and the averaged intial spectrum
-    averaged_t0 = transformed_time_seconds[0]
+    averaged_t0 = float(transformed_time_seconds[0])
     # compute the updated chunk start time and the updated microsecond correction based on averaged_t0
     updated_corrected_start_datetime = input_S.corrected_start_datetime + timedelta(seconds = averaged_t0)
     # then, compute the transformed chunk start time and microsecond correction
