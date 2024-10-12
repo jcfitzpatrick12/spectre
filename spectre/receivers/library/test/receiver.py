@@ -33,31 +33,33 @@ class Receiver(SPECTREReceiver):
     def _set_templates(self) -> None:
         self.templates = {
             "cosine-signal-1": {
-                'samp_rate': int, # sample rate for the cosine source
-                'frequency': float, # frequency of the cosine signal
-                'amplitude': float, # ampltude of the cosine signal
-                'chunk_size': int, # size of each batched file [s]
+                'samp_rate': int, # [Hz]
+                'frequency': float, # [Hz]
+                'amplitude': float, # unitless
+                'chunk_size': int, # [s]
+                'time_resolution': float, # [s]
+                'frequency_resolution': float, # [Hz]
                 'window_type': str, # the window type for the STFFT
                 'window_kwargs': dict, # keyword arguments for scipy get window function. Must be in order as in scipy documentation.
                 'window_size': int, # number of samples for the window
                 'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
                 'chunk_key': str, # tag will map to the chunk with this key
-                'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'time_resolution': float # spectrograms will be averaged over a time time_resolution
+                'event_handler_key': str # tag will map to event handler with this key during post processing
             },
             "tagged-staircase": {
-                'samp_rate': int, # artifically imposed sample rate
+                'samp_rate': int, # [Hz]
                 'min_samples_per_step': int, # the size of the smallest step (in samples)
                 'max_samples_per_step': int, # the size of the largest step (in samples)
                 'step_increment': int, # the "height" of each step, in terms of the tagged staircase output.
-                'chunk_size': int, # the size of each batched file [s]
+                'chunk_size': int, # [s]
+                'time_resolution': float, # [s]
+                'frequency_resolution': float, # [Hz]
                 'window_type': str, # the window type for the STFFT
                 'window_kwargs': dict, # keyword arguments for scipy get window function. Must be in order as in scipy documentation.
                 'window_size': int, # number of samples for the window
                 'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'time_resolution': float # spectrograms will be averaged over a time time_resolution
             }
         }
         return
@@ -91,6 +93,7 @@ class Receiver(SPECTREReceiver):
         chunk_key = capture_config["chunk_key"]
         event_handler_key = capture_config["event_handler_key"]
         time_resolution = capture_config["time_resolution"]
+        frequency_resolution = capture_config["frequency_resolution"]
 
         validators.validate_samp_rate_strictly_positive(samp_rate)
         validators.validate_chunk_size_strictly_positive(chunk_size)
@@ -107,9 +110,12 @@ class Receiver(SPECTREReceiver):
         if time_resolution != 0:
             raise ValueError(f"Time resolution must be zero. Received: {time_resolution}")
         
+        if frequency_resolution != 0:
+            raise ValueError(f"Frequency resolution must be zero. Received {frequency_resolution}")
+        
         # check that the sample rate is an integer multiple of the underlying signal frequency
         if samp_rate % frequency != 0:
-            raise ValueError("samp_rate must be some integer multiple of frequency.")
+            raise ValueError("samp_rate must be some integer multiple of frequency")
 
         a = samp_rate/frequency
         if a < 2:
