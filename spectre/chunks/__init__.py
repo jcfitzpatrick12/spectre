@@ -9,11 +9,12 @@ import warnings
 from datetime import datetime
 from typing import Iterator
 
+# dynamically import all chunks
+import spectre.chunks.library
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.chunks.base import BaseChunk
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms import transform
-
 from spectre.cfg import (
     DEFAULT_TIME_FORMAT,
     get_chunks_dir_path
