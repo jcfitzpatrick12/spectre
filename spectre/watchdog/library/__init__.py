@@ -19,10 +19,10 @@ def import_event_handler(event_handler_key: str):
     dir_contents = [d for d in os.listdir(event_handler_path) if not d == "__pycache__"]
 
 
-    if "EventHandler.py" not in dir_contents:
+    if "event_handler.py" not in dir_contents:
         return
     
-    full_module_name = f'spectre.watchdog.library.{event_handler_key}.EventHandler'
+    full_module_name = f'spectre.watchdog.library.{event_handler_key}.event_handler'
 
     importlib.import_module(full_module_name)
 

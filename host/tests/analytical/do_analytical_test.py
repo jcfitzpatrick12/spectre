@@ -6,10 +6,10 @@ from datetime import datetime
 import numpy as np
 import typer
 
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
-from spectre.file_handlers.chunks.Chunks import Chunks
-from spectre.spectrogram.AnalyticalSpectrogramFactory import AnalyticalSpectrogramFactory
-from spectre.spectrogram.Spectrogram import Spectrogram
+from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.chunks import Chunks
+from spectre.spectrograms.analytical_factory import AnalyticalFactory
+from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.receivers.factory import get_receiver
 
 def print_slice_status(S: Spectrogram, is_close: np.array) -> None:
@@ -61,18 +61,18 @@ def main(test_tag: str, show_slice_status = False) -> None:
     
     # first check the receiver specified in the capture config is a Test receiver
     receiver_name = capture_config['receiver']
-    if receiver_name != "Test":
+    if receiver_name != "test":
         raise ValueError(f"To do analytical verifications, the receiver in the specified capture config must be \"Test\". Received: {receiver_name}")
     
     # check that the user specified mode is that specified in the capture config
     test_mode = capture_config['mode']    
     
     # check the mode is a defined mode for the Test receiver
-    test_receiver = get_receiver("Test")
+    test_receiver = get_receiver("test")
     if test_mode not in test_receiver.valid_modes:
         raise ValueError(f"{test_mode} is not a valid mode. Expected one of {test_receiver.valid_modes}.")
     
-    asf = AnalyticalSpectrogramFactory()
+    analytical_factory = AnalyticalFactory()
 
     today = datetime.now()
     my_chunks = Chunks(test_tag, year=today.year, month=today.month, day=today.day)
@@ -81,7 +81,7 @@ def main(test_tag: str, show_slice_status = False) -> None:
         current_chunk = chunk
         if chunk.has_file("fits"):
             S = chunk.read_file("fits")  
-            analytical_S = asf.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
+            analytical_S = analytical_factory.get_spectrogram(test_mode, S.dynamic_spectra.shape, capture_config)
             compare_spectrograms(S, analytical_S, show_slice_status = show_slice_status)
 
     if current_chunk is None:

@@ -13,7 +13,7 @@ fi
 
 # Run the Docker container (no GUI support)
 sudo docker run --name spectre-host-container -it --rm \
-    -v $SPECTRE_DIR_PATH/cfg:/home/spectre/cfg \
+    -v $SPECTRE_DIR_PATH/json_configs:/home/spectre/json_configs \
     -v $SPECTRE_DIR_PATH/host/logs:/home/spectre/host/logs \
     -v $SPECTRE_DIR_PATH/chunks:/home/spectre/chunks \
     -v /dev/shm:/dev/shm \

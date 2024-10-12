@@ -4,12 +4,12 @@
 
 from datetime import datetime
 
-from cfg import (
+from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 from spectre.chunks.Chunks import Chunks
-from spectre.spectrogram import transform
-from spectre.spectrogram.Panels import Panels
+from spectre.spectrograms import transform
+from spectre.spectrograms.Panels import Panels
 
 class ChunksHandler:
     def __init__(self, tag, **kwargs):

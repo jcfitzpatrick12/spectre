@@ -5,7 +5,7 @@ from typing import List
 import typer
 
 from spectre.receivers.factory import get_receiver
-from spectre.watchdog.Watcher import Watcher
+from spectre.watchdog.watcher import Watcher
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:

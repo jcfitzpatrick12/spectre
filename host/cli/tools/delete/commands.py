@@ -7,9 +7,11 @@ import os
 
 from host.cli import __app_name__, __version__
 
-from spectre.file_handlers.json.FitsConfigHandler import FitsConfigHandler
-from spectre.file_handlers.json.CaptureConfigHandler import CaptureConfigHandler
-from spectre.file_handlers.chunks.Chunks import Chunks
+from spectre.file_handlers.json.handlers import (
+    FitsConfigHandler,
+    CaptureConfigHandler
+)
+from spectre.chunks import Chunks
 
 app = typer.Typer()
 
