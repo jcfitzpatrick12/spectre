@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from spectre.receivers.receiver_register import register_receiver
-from spectre.receivers.SPECTREReceiver import SPECTREReceiver
-from spectre.receivers.library.Test.gr import cosine_signal_1
-from spectre.receivers.library.Test.gr import tagged_staircase
+from spectre.receivers.base import SPECTREReceiver
+from spectre.receivers.library.test.gr import cosine_signal_1
+from spectre.receivers.library.test.gr import tagged_staircase
 from spectre.receivers import validators
 
 @register_receiver("Test")

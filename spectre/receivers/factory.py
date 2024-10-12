@@ -7,7 +7,7 @@
 # this import will run the __init__.py within library, which will dynamically import all the receivers
 import spectre.receivers.library
 from spectre.receivers.receiver_register import receivers
-from spectre.receivers.BaseReceiver import BaseReceiver
+from spectre.receivers.base import BaseReceiver
 
 # used to fetch an instance of the receiver class
 def get_receiver(receiver_name: str, mode: str = None) -> BaseReceiver:

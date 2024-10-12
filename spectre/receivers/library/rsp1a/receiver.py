@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from spectre.receivers.receiver_register import register_receiver
-from spectre.receivers.SDRPlayReceiver import SDRPlayReceiver
-from spectre.receivers.library.RSP1A.gr import fixed, sweep
+from spectre.receivers.base import SDRPlayReceiver
+from spectre.receivers.library.rsp1a.gr import fixed, sweep
 from spectre.receivers import validators
 
 @register_receiver("RSP1A")

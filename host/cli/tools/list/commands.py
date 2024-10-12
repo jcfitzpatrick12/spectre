@@ -10,7 +10,7 @@ from host.cli import __app_name__, __version__
 
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
-from spectre.chunks.Chunks import Chunks
+from spectre.chunks import Chunks
 
 from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH,
