@@ -8,7 +8,7 @@
     "IF_gain": -40,
     "RF_gain": 0,
     "chunk_size": 4,
-    "integration_time": 0.0,
+    "time_resolution": 0.0,
     "window_type": "blackman",
     "window_kwargs": {},
     "window_size": 2048,

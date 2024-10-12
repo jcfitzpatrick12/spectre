@@ -2,7 +2,7 @@
     "event_handler_key": "default",
     "chunk_size": 5,
     "samp_rate": 600000,
-    "integration_time": 0.01,
+    "time_resolution": 0.01,
     "window_size": 2048,
     "chunk_key": "default",
     "center_freq": 95800000.0,
