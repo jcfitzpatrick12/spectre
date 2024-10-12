@@ -43,7 +43,7 @@ class Receiver(SPECTREReceiver):
                 'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'integration_time': float # spectrograms will be averaged over a time integration_time
+                'time_resolution': float # spectrograms will be averaged over a time time_resolution
             },
             "tagged-staircase": {
                 'samp_rate': int, # artifically imposed sample rate
@@ -57,7 +57,7 @@ class Receiver(SPECTREReceiver):
                 'STFFT_kwargs': dict, # keyword arguments for scipy STFFT class
                 'chunk_key': str, # tag will map to the chunk with this key
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
-                'integration_time': float # spectrograms will be averaged over a time integration_time
+                'time_resolution': float # spectrograms will be averaged over a time time_resolution
             }
         }
         return
@@ -90,11 +90,11 @@ class Receiver(SPECTREReceiver):
         STFFT_kwargs = capture_config["STFFT_kwargs"]
         chunk_key = capture_config["chunk_key"]
         event_handler_key = capture_config["event_handler_key"]
-        integration_time = capture_config["integration_time"]
+        time_resolution = capture_config["time_resolution"]
 
         validators.validate_samp_rate_strictly_positive(samp_rate)
         validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_integration_time(integration_time, chunk_size) 
+        validators.validate_time_resolution(time_resolution, chunk_size) 
         validators.validate_window(window_type, 
                                           {}, 
                                           window_size,
@@ -104,8 +104,8 @@ class Receiver(SPECTREReceiver):
         validators.validate_chunk_key(chunk_key, "default")
         validators.validate_event_handler_key(event_handler_key, "default")
 
-        if integration_time != 0:
-            raise ValueError(f"Integration time must be zero. Received: {integration_time}")
+        if time_resolution != 0:
+            raise ValueError(f"Time resolution must be zero. Received: {time_resolution}")
         
         # check that the sample rate is an integer multiple of the underlying signal frequency
         if samp_rate % frequency != 0:
@@ -144,11 +144,11 @@ class Receiver(SPECTREReceiver):
         STFFT_kwargs = capture_config["STFFT_kwargs"]
         chunk_key = capture_config["chunk_key"]
         event_handler_key = capture_config["event_handler_key"]
-        integration_time = capture_config["integration_time"]
+        time_resolution = capture_config["time_resolution"]
 
         validators.validate_samp_rate_strictly_positive(samp_rate)
         validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_integration_time(integration_time, chunk_size)
+        validators.validate_time_resolution(time_resolution, chunk_size)
         validators.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
         validators.validate_STFFT_kwargs(STFFT_kwargs)
         validators.validate_chunk_key(chunk_key, "sweep")
