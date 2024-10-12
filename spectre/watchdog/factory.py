@@ -2,10 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# it is important to import the event handler library
-# since the decorators only take effect on import
-# this import will run the __init__.py within library, which will dynamically import all the event handlers
-import spectre.watchdog.library
 from spectre.watchdog.event_handler_register import event_handler_map
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
 

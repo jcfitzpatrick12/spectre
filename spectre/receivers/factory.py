@@ -2,10 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# it is important to import the receivers library
-# since the decorators only take effect on import
-# this import will run the __init__.py within library, which will dynamically import all the receivers
-import spectre.receivers.library
 from spectre.receivers.receiver_register import receivers
 from spectre.receivers.base import BaseReceiver
 
