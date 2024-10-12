@@ -11,7 +11,7 @@ from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
-from spectre.chunks.Chunks import Chunks
+from spectre.chunks import Chunks
 
 app = typer.Typer()
 
