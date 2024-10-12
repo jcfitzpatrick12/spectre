@@ -21,7 +21,7 @@ def import_chunk(chunk_key: str):
     if "chunk.py" not in dir_contents:
         raise FileNotFoundError(f"Chunk directories must contain the file chunk.py - not found in {chunk_path}")
     
-    full_module_name = f'spectre.file_handlers.chunks.library.{chunk_key}.chunk'
+    full_module_name = f'spectre.chunks.library.{chunk_key}.chunk'
     # import the Chunk module for that particular Chunk type
     importlib.import_module(full_module_name)
 

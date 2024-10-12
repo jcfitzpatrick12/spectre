@@ -10,11 +10,11 @@ from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
 from astropy.io.fits.hdu.hdulist import HDUList
 
-from spectre.file_handlers.chunks.base import (
+from spectre.chunks.base import (
     BaseChunk, 
     ChunkFile
 )
-from spectre.file_handlers.chunks.chunk_register import register_chunk
+from spectre.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
 
 

@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
-from spectre.file_handlers.chunks.base import (
+from spectre.chunks.base import (
     SPECTREChunk, 
     ChunkFile
 )
-from spectre.file_handlers.chunks.chunk_register import register_chunk
+from spectre.chunks.chunk_register import register_chunk
 from spectre.spectrogram.Spectrogram import Spectrogram
-from spectre.file_handlers.chunks.library.default.chunk import (
+from spectre.chunks.library.default.chunk import (
     BinChunk,
     FitsChunk
 )

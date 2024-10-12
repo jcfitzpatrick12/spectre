@@ -5,10 +5,10 @@
 # it is important to import the chunks library
 # since the decorators only take effect on import
 # this import will run the __init__.py within library, which will dynamically import all the chunks
-import spectre.file_handlers.chunks.library
+import spectre.chunks.library
 # after we decorate all chunks, we can import the chunk_key -> chunk maps
-from spectre.file_handlers.chunks.chunk_register import chunk_map
-from spectre.file_handlers.chunks.base import BaseChunk
+from spectre.chunks.chunk_register import chunk_map
+from spectre.chunks.base import BaseChunk
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
 
 

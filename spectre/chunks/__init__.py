@@ -9,8 +9,8 @@ import warnings
 from datetime import datetime
 from typing import Iterator
 
-from spectre.file_handlers.chunks.factory import get_chunk_from_tag
-from spectre.file_handlers.chunks.base import BaseChunk
+from spectre.chunks.factory import get_chunk_from_tag
+from spectre.chunks.base import BaseChunk
 from spectre.spectrogram.Spectrogram import Spectrogram
 from spectre.spectrogram import transform
 
