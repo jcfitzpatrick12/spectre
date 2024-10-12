@@ -18,9 +18,8 @@ def import_chunk(chunk_key: str):
     # list all subdirectories
     dir_contents = [d for d in os.listdir(chunk_path) if not d == "__pycache__"]
 
-
-    if "Chunk.py" not in dir_contents:
-        return
+    if "chunk.py" not in dir_contents:
+        raise FileNotFoundError(f"Chunk directories must contain the file chunk.py - not found in {chunk_path}")
     
     full_module_name = f'spectre.file_handlers.chunks.library.{chunk_key}.chunk'
     # import the Chunk module for that particular Chunk type
