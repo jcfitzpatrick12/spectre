@@ -22,7 +22,7 @@ def import_chunk(chunk_key: str):
     if "Chunk.py" not in dir_contents:
         return
     
-    full_module_name = f'spectre.file_handlers.chunks.library.{chunk_key}.Chunk'
+    full_module_name = f'spectre.file_handlers.chunks.library.{chunk_key}.chunk'
     # import the Chunk module for that particular Chunk type
     importlib.import_module(full_module_name)
 
