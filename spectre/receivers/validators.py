@@ -178,8 +178,8 @@ def validate_sweep_interval(min_freq: float,
                                                        freq_step)
     num_samples_per_sweep = num_steps_per_sweep * samples_per_step
     sweep_interval = num_samples_per_sweep * 1/samp_rate
-    if sweep_interval < chunk_size:
-        raise ValueError(f"Sweep interval must be greater than the chunk size. Computed sweep interval: {sweep_interval} [s] is less than the given chunk size {chunk_size} [s]")
+    if sweep_interval > chunk_size:
+        raise ValueError(f"Sweep interval must be less than the chunk size. Computed sweep interval: {sweep_interval} [s] is greater than the given chunk size {chunk_size} [s]")
 
 
 def validate_num_samples_per_step(samples_per_step: int, 
