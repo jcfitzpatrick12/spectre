@@ -9,7 +9,7 @@ setup(name='spectre',
       description='SPECTRE: Process, Explore and Capture Transient Radio Emissions',
       author='Jimmy Fitzpatrick',
       author_email= 'jcfitzpatrick12@gmail.com',
-      packages=['client', 'spectre', 'cfg'],  
+      packages=find_packages(),  
       install_requires=[
         'numpy==1.24.0',
         'scipy==1.12.0',

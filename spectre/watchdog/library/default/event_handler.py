@@ -3,12 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-import warnings
-from math import floor
 
 from spectre.watchdog.base import BaseEventHandler
-from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.spectrograms import transform
 from spectre.watchdog.event_handler_register import register_event_handler
 
 @register_event_handler("default")
@@ -20,22 +16,10 @@ class EventHandler(BaseEventHandler):
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
         chunk = self.Chunk(chunk_start_time, self.tag)
-        S = chunk.build_spectrogram()
-        average_over_int = self.get_average_over_int(S)
-        S = transform.time_average(S, average_over_int)
-        S.save()
+        spectrogram = chunk.build_spectrogram()
+        spectrogram = self.average_in_time(spectrogram)
+        spectrogram = self.average_in_frequency(spectrogram)
+        spectrogram.save()
         chunk.delete_file("bin", doublecheck_delete = False)
         chunk.delete_file("hdr", doublecheck_delete = False)
-
-
-    def get_average_over_int(self, S: Spectrogram) -> int:
-        requested_integration_time = self.capture_config.get('integration_time')
-        if requested_integration_time is None:
-            raise KeyError(f"integration_time has not been specified in the capture config!")
-    
-        time_res_seconds = S.time_res_seconds
-
-        if requested_integration_time <= S.time_res_seconds:
-            return 1
-        
-        return floor(requested_integration_time/time_res_seconds)
+        return

@@ -183,7 +183,8 @@ class SPECTREReceiver(BaseReceiver):
                 "IF_gain": int, # [dB]
                 "RF_gain": int, # [dB]
                 'chunk_size': int, #  [s]
-                'integration_time': float, # [s]
+                'time_resolution': float, # [s]
+                'frequency_resolution': float, # [Hz]
                 'window_type': str, # window type for STFFT
                 'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
                 'window_size': int, # number of samples in STFFT window
@@ -201,7 +202,8 @@ class SPECTREReceiver(BaseReceiver):
                 "IF_gain": int, # [dB]
                 "RF_gain": int, # [dB]
                 'chunk_size': int, #  [s]
-                'integration_time': float, # [s]
+                'time_resolution': float, # [s]
+                'frequency_resolution': float, # [Hz]
                 'window_type': str, # window type for STFFT
                 'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
                 'window_size': int, # number of samples in STFFT window
@@ -230,7 +232,7 @@ class SPECTREReceiver(BaseReceiver):
         IF_gain = capture_config["IF_gain"]
         RF_gain = capture_config["RF_gain"]
         chunk_size = capture_config['chunk_size']
-        integration_time = capture_config['integration_time']
+        time_resolution = capture_config['time_resolution']
         window_type = capture_config['window_type']
         window_kwargs = capture_config['window_kwargs']
         window_size = capture_config['window_size']
@@ -245,7 +247,7 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_nyquist_criterion(samp_rate, 
                                               bandwidth)
         validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_integration_time(integration_time, 
+        validators.validate_time_resolution(time_resolution, 
                                              chunk_size) 
         validators.validate_window(window_type, 
                                    window_kwargs, 
@@ -288,7 +290,7 @@ class SPECTREReceiver(BaseReceiver):
         IF_gain = capture_config['IF_gain']
         RF_gain = capture_config['RF_gain']
         chunk_size = capture_config['chunk_size']
-        integration_time = capture_config['integration_time']
+        time_resolution = capture_config['time_resolution']
         window_type = capture_config['window_type']
         window_kwargs = capture_config['window_kwargs']
         window_size = capture_config['window_size']
@@ -301,7 +303,7 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_bandwidth_strictly_positive(bandwidth)
         validators.validate_nyquist_criterion(samp_rate, bandwidth)
         validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_integration_time(integration_time, chunk_size) 
+        validators.validate_time_resolution(time_resolution, chunk_size) 
         validators.validate_window(window_type, 
                                           window_kwargs, 
                                           window_size,

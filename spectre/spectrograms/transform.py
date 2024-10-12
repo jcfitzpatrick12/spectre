@@ -62,19 +62,19 @@ def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
     return averaged_array
 
 
-def frequency_chop(input_S: Spectrogram, 
+def frequency_chop(input_spectrogram: Spectrogram, 
                    start_freq_MHz: float | int, 
                    end_freq_MHz: float | int) -> Spectrogram:
     
-    is_entirely_below_frequency_range = (start_freq_MHz < input_S.freq_MHz[0] and end_freq_MHz < input_S.freq_MHz[0])
-    is_entirely_above_frequency_range = (start_freq_MHz > input_S.freq_MHz[-1] and end_freq_MHz > input_S.freq_MHz[-1])
+    is_entirely_below_frequency_range = (start_freq_MHz < input_spectrogram.freq_MHz[0] and end_freq_MHz < input_spectrogram.freq_MHz[0])
+    is_entirely_above_frequency_range = (start_freq_MHz > input_spectrogram.freq_MHz[-1] and end_freq_MHz > input_spectrogram.freq_MHz[-1])
     # if the requested frequency range is out of bounds for the spectrogram return None
     if is_entirely_below_frequency_range or is_entirely_above_frequency_range:
         return None
     
     #find the index of the nearest matching frequency bins in the spectrogram
-    start_index = find_closest_index(start_freq_MHz, input_S.freq_MHz)
-    end_index = find_closest_index(end_freq_MHz, input_S.freq_MHz)
+    start_index = find_closest_index(start_freq_MHz, input_spectrogram.freq_MHz)
+    end_index = find_closest_index(end_freq_MHz, input_spectrogram.freq_MHz)
     
     # enforce distinct start and end indices
     if start_index == end_index:
@@ -85,34 +85,34 @@ def frequency_chop(input_S: Spectrogram,
         start_index, end_index = end_index, start_index
     
     # chop the spectrogram accordingly
-    transformed_dynamic_spectra = input_S.dynamic_spectra[start_index:end_index+1, :]
-    transformed_freq_MHz = input_S.freq_MHz[start_index:end_index+1]
+    transformed_dynamic_spectra = input_spectrogram.dynamic_spectra[start_index:end_index+1, :]
+    transformed_freq_MHz = input_spectrogram.freq_MHz[start_index:end_index+1]
 
     # if the background spectrum is specified, chop identically in frequency
-    if not (input_S.background_spectrum is None):
-        transformed_background_spectrum = input_S.background_spectrum[start_index:end_index+1]
+    if not (input_spectrogram.background_spectrum is None):
+        transformed_background_spectrum = input_spectrogram.background_spectrum[start_index:end_index+1]
     
     # return the spectrogram instance
     return Spectrogram(transformed_dynamic_spectra,
-                       input_S.time_seconds,
+                       input_spectrogram.time_seconds,
                        transformed_freq_MHz,
-                       input_S.tag,
-                       chunk_start_time = input_S.chunk_start_time,
-                       microsecond_correction = input_S.microsecond_correction,
-                       spectrum_type = input_S.spectrum_type,
+                       input_spectrogram.tag,
+                       chunk_start_time = input_spectrogram.chunk_start_time,
+                       microsecond_correction = input_spectrogram.microsecond_correction,
+                       spectrum_type = input_spectrogram.spectrum_type,
                        background_spectrum = transformed_background_spectrum,
-                       background_interval = input_S.background_interval
+                       background_interval = input_spectrogram.background_interval
                        )
 
 
-def time_chop(input_S: Spectrogram, 
+def time_chop(input_spectrogram: Spectrogram, 
               start_time: str, 
               end_time: str, 
               time_format: str = DEFAULT_TIME_FORMAT) -> Spectrogram | None:
     
 
     # spectre does not currently support time chop for non-datetime assigned spectrograms
-    if input_S.chunk_start_time is None:
+    if input_spectrogram.chunk_start_time is None:
         raise ValueError(f"Input spectrogram is missing chunk start time. Time chop not yet supported for non-datetime assigned spectrograms.")
     
     # parse the strings as datetimes
@@ -120,13 +120,13 @@ def time_chop(input_S: Spectrogram,
     end_datetime = datetime.strptime(end_time, time_format)
 
     # if the requested time range is out of bounds for the spectrogram return None
-    is_entirely_below_time_range = (start_datetime < input_S.datetimes[0] and end_datetime < input_S.datetimes[0])
-    is_entirely_above_time_range = (start_datetime > input_S.datetimes[-1] and end_datetime > input_S.datetimes[-1])
+    is_entirely_below_time_range = (start_datetime < input_spectrogram.datetimes[0] and end_datetime < input_spectrogram.datetimes[0])
+    is_entirely_above_time_range = (start_datetime > input_spectrogram.datetimes[-1] and end_datetime > input_spectrogram.datetimes[-1])
     if is_entirely_below_time_range or is_entirely_above_time_range:
         return None
     
-    start_index = find_closest_index(start_datetime, input_S.datetimes)
-    end_index = find_closest_index(end_datetime, input_S.datetimes)
+    start_index = find_closest_index(start_datetime, input_spectrogram.datetimes)
+    end_index = find_closest_index(end_datetime, input_spectrogram.datetimes)
     
     if start_index == end_index:
         raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
@@ -135,15 +135,15 @@ def time_chop(input_S: Spectrogram,
         start_index, end_index = end_index, start_index
 
     # chop the spectrogram 
-    transformed_dynamic_spectra = input_S.dynamic_spectra[:, start_index:end_index+1]
+    transformed_dynamic_spectra = input_spectrogram.dynamic_spectra[:, start_index:end_index+1]
 
     # chop the time seconds array
-    transformed_time_seconds = input_S.time_seconds[start_index:end_index+1]
+    transformed_time_seconds = input_spectrogram.time_seconds[start_index:end_index+1]
     #translate the chopped time seconds array to start at zero
     transformed_time_seconds -= transformed_time_seconds[0]
 
     # compute the new start datetime following the time chop
-    transformed_start_datetime = input_S.datetimes[start_index]
+    transformed_start_datetime = input_spectrogram.datetimes[start_index]
     # parse the chunk start time (as string)
     transformed_chunk_start_time = datetime.strftime(transformed_start_datetime, DEFAULT_TIME_FORMAT)
     # and compute the microsecond correction
@@ -151,31 +151,31 @@ def time_chop(input_S: Spectrogram,
 
     return Spectrogram(transformed_dynamic_spectra, 
                        transformed_time_seconds, 
-                       input_S.freq_MHz, 
-                       input_S.tag, 
+                       input_spectrogram.freq_MHz, 
+                       input_spectrogram.tag, 
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = input_S.spectrum_type,
+                       spectrum_type = input_spectrogram.spectrum_type,
                        background_spectrum = None, # reset the background spectrum
                        background_interval = None # reset the background interval
                        )
 
 
-def time_average(input_S: Spectrogram, 
+def time_average(input_spectrogram: Spectrogram, 
                  average_over: int) -> Spectrogram:
     
     # spectre does not currently support averaging of non-datetime assigned spectrograms
-    if input_S.chunk_start_time is None:
+    if input_spectrogram.chunk_start_time is None:
         raise ValueError(f"Input spectrogram is missing chunk start time. Averaging is not yet supported for non-datetime assigned spectrograms.")
     
     # if the user has requested no averaging, just return the same instance unchanged
     if average_over == 1:
-        return input_S
+        return input_spectrogram
 
     # average the dynamic spectra array
-    transformed_dynamic_spectra = _average_array(input_S.dynamic_spectra, average_over, axis=1)
+    transformed_dynamic_spectra = _average_array(input_spectrogram.dynamic_spectra, average_over, axis=1)
     # average the time seconds array s.t. the ith averaged spectrum is assigned the 
-    transformed_time_seconds = _average_array(input_S.time_seconds, average_over)
+    transformed_time_seconds = _average_array(input_spectrogram.time_seconds, average_over)
 
     # We need to assign timestamps to the averaged spectrums in the spectrograms. The natural way to do this
     # is to assign the i'th averaged spectrogram to the i'th averaged time stamp. From this,
@@ -186,7 +186,7 @@ def time_average(input_S: Spectrogram,
     # then, averaged_t0 is the seconds elapsed between the input intial spectrum and the averaged intial spectrum
     averaged_t0 = float(transformed_time_seconds[0])
     # compute the updated chunk start time and the updated microsecond correction based on averaged_t0
-    updated_corrected_start_datetime = input_S.corrected_start_datetime + timedelta(seconds = averaged_t0)
+    updated_corrected_start_datetime = input_spectrogram.corrected_start_datetime + timedelta(seconds = averaged_t0)
     # then, compute the transformed chunk start time and microsecond correction
     transformed_chunk_start_time = updated_corrected_start_datetime.strftime(DEFAULT_TIME_FORMAT)
     transformed_microsecond_correction = updated_corrected_start_datetime.microsecond
@@ -195,39 +195,39 @@ def time_average(input_S: Spectrogram,
     transformed_time_seconds -= transformed_time_seconds[0]
     return Spectrogram(transformed_dynamic_spectra, 
                        transformed_time_seconds, 
-                       input_S.freq_MHz, 
-                       input_S.tag,
+                       input_spectrogram.freq_MHz, 
+                       input_spectrogram.tag,
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = input_S.spectrum_type,
+                       spectrum_type = input_spectrogram.spectrum_type,
                        background_spectrum = None, # reset the background spectrum
                        background_interval = None, # reset the background interval
                        )
 
 
-def frequency_average(input_S: Spectrogram, 
+def frequency_average(input_spectrogram: Spectrogram, 
                       average_over: int) -> Spectrogram:
     
     # if the user has requested no averaging, just return the same instance unchanged
     if average_over == 1:
-        return input_S
+        return input_spectrogram
 
     # We need to assign physical frequencies to the averaged spectrums in the spectrograms.
     # is to assign the i'th averaged spectral component to the i'th averaged frequency.
     # average the dynamic spectra array
-    transformed_dynamic_spectra = _average_array(input_S.dynamic_spectra, average_over, axis=0)
-    transformed_freq_MHz = _average_array(input_S.freq_MHz, average_over)
-    transformed_background_spectrum = _average_array(input_S.background_spectrum, average_over)
+    transformed_dynamic_spectra = _average_array(input_spectrogram.dynamic_spectra, average_over, axis=0)
+    transformed_freq_MHz = _average_array(input_spectrogram.freq_MHz, average_over)
+    transformed_background_spectrum = _average_array(input_spectrogram.background_spectrum, average_over)
 
     return Spectrogram(transformed_dynamic_spectra, 
-                       input_S.time_seconds, 
+                       input_spectrogram.time_seconds, 
                        transformed_freq_MHz, 
-                       input_S.tag,
-                       chunk_start_time = input_S.chunk_start_time, 
-                       microsecond_correction = input_S.microsecond_correction,
-                       spectrum_type = input_S.spectrum_type,
+                       input_spectrogram.tag,
+                       chunk_start_time = input_spectrogram.chunk_start_time, 
+                       microsecond_correction = input_spectrogram.microsecond_correction,
+                       spectrum_type = input_spectrogram.spectrum_type,
                        background_spectrum = transformed_background_spectrum, 
-                       background_interval = input_S.background_interval
+                       background_interval = input_spectrogram.background_interval
                        )
 
 
@@ -250,33 +250,33 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
     
     # extract the first element of the list, and use this as a reference for comparison
     # input validations.
-    S_reference = spectrogram_list[0] 
+    reference_spectrogram = spectrogram_list[0] 
 
     # perform checks on each spectrogram in teh list
-    for S in spectrogram_list:
-        if not np.all(np.equal(S.freq_MHz, S_reference.freq_MHz)):
+    for spectrogram in spectrogram_list:
+        if not np.all(np.equal(spectrogram.freq_MHz, reference_spectrogram.freq_MHz)):
             raise ValueError(f"All spectrograms must have identical frequency ranges.")
-        if S.tag != S_reference.tag:
+        if spectrogram.tag != reference_spectrogram.tag:
             raise ValueError(f"All tags must be equal for each spectrogram in the input list!")
-        if S.spectrum_type != S_reference.spectrum_type:
+        if spectrogram.spectrum_type != reference_spectrogram.spectrum_type:
             raise ValueError(f"All units must be equal for each spectrogram in the input list!")
-        if S.chunk_start_time is None:
-            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {S.chunk_start_time}.")
+        if spectrogram.chunk_start_time is None:
+            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {spectrogram.chunk_start_time}.")
 
 
     # build a list of the time array of each spectrogram in the list
-    conc_datetimes = np.concatenate([S.datetimes for S in spectrogram_list])
+    conc_datetimes = np.concatenate([s.datetimes for s in spectrogram_list])
     # find the total number of time stamps
     num_total_time_bins = len(conc_datetimes)
     # find the total number of frequency bins (we can safely now use the first)
-    num_total_freq_bins = len(S_reference.freq_MHz)
+    num_total_freq_bins = len(reference_spectrogram.freq_MHz)
     # create an empty numpy array to hold the joined spectrograms
     transformed_dynamic_spectra = np.empty((num_total_freq_bins, num_total_time_bins))
 
     start_index = 0
-    for S in spectrogram_list:
-        end_index = start_index + len(S.time_seconds)
-        transformed_dynamic_spectra[:, start_index:end_index] = S.dynamic_spectra
+    for spectrogram in spectrogram_list:
+        end_index = start_index + len(spectrogram.time_seconds)
+        transformed_dynamic_spectra[:, start_index:end_index] = spectrogram.dynamic_spectra
         start_index = end_index
 
     transformed_time_seconds = _seconds_elapsed(conc_datetimes)
@@ -291,11 +291,11 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
 
     return Spectrogram(transformed_dynamic_spectra, 
                        transformed_time_seconds, 
-                       S_reference.freq_MHz, 
-                       S_reference.tag, 
-                       chunk_start_time = S_reference.chunk_start_time,
+                       reference_spectrogram.freq_MHz, 
+                       reference_spectrogram.tag, 
+                       chunk_start_time = reference_spectrogram.chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = S_reference.spectrum_type,
+                       spectrum_type = reference_spectrogram.spectrum_type,
                        background_spectrum = None, # reset the background spectrum
                        background_interval = None # reset the background interval
                        )

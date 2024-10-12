@@ -16,8 +16,7 @@ class AnalyticalFactory:
         builder_method = self.builder_methods.get(test_mode)
         if builder_method is None:
             raise ValueError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}.")
-        S = builder_method(shape, capture_config)
-        return S
+        return builder_method(shape, capture_config)
     
     def cosine_signal_1(self, 
                             shape: tuple,
@@ -61,10 +60,8 @@ class AnalyticalFactory:
         freq_MHz = np.fft.fftfreq(num_frequency_samples, 1/samp_rate)*1e-6
         freq_MHz = np.fft.fftshift(freq_MHz)
 
-        S = Spectrogram(analytical_dynamic_spectra,
-                                   time_seconds,
-                                   freq_MHz,
-                                   'analytically-derived-spectrogram',
-                                   spectrum_type = "amplitude",)
-        
-        return S
+        return Spectrogram(analytical_dynamic_spectra,
+                           time_seconds,
+                           freq_MHz,
+                           'analytically-derived-spectrogram',
+                           spectrum_type = "amplitude",)

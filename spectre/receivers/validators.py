@@ -60,7 +60,7 @@ def validate_window(window_type: str,
     
 
     if window_size*(1/samp_rate) > chunk_size:
-        raise ValueError(f"Windowing interval must be strictly less than the chunk size.")
+        raise ValueError(f"Windowing interval must be strictly less than the chunk size")
     
     try:
         window_params = (window_type, 
@@ -77,12 +77,12 @@ def validate_STFFT_kwargs(STFFT_kwargs: dict):
     
     STFFT_keys = STFFT_kwargs.keys()
     if "hop" not in STFFT_keys:
-        raise KeyError(f"\"hop\" is a required key in STFFT_kwargs. Received: {STFFT_keys}.")
+        raise KeyError(f"\"hop\" is a required key in STFFT_kwargs. Received: {STFFT_keys}")
     
     hop_value = STFFT_kwargs.get("hop")
     hop_value_type = type(hop_value)
     if hop_value_type != int:
-        raise TypeError(f"\"hop\" must be specified as an integer. Received: {hop_value_type}.")
+        raise TypeError(f"\"hop\" must be specified as an integer. Received: {hop_value_type}")
     
     if hop_value < 0:
         raise ValueError(f"\"hop\" must be strictly positive. Received: {hop_value}")
@@ -104,7 +104,7 @@ def validate_bandwidth_strictly_positive(bandwidth: float) -> None:
 def validate_nyquist_criterion(samp_rate: int, 
                                bandwidth: float) -> None:
     if samp_rate < bandwidth:
-        raise ValueError(f"Sample rate must be greater than or equal to the bandwidth.")
+        raise ValueError(f"Sample rate must be greater than or equal to the bandwidth")
     return
 
 
@@ -120,13 +120,23 @@ def validate_chunk_size_strictly_positive(chunk_size: int) -> None:
     return
 
 
-def validate_integration_time(integration_time: int, 
-                              chunk_size: int) -> None:
-    if integration_time < 0:
-        raise ValueError(f'Integration time must be non-negative. Received: {integration_time} [s]')
+def validate_time_resolution(time_resolution: float, 
+                             chunk_size: int) -> None:
+    if time_resolution < 0:
+        raise ValueError(f'Time resolution must be non-negative. Received: {time_resolution} [s]')
     
-    if integration_time > chunk_size:
-        raise ValueError(f'Integration time must be less than or equal to chunk_size. ')
+    if time_resolution > chunk_size:
+        raise ValueError(f'Time resolution must be less than or equal to chunk_size')
+    return
+
+
+def validate_frequency_resolution(frequency_resolution: float,
+                                  bandwidth: float = None) -> None:
+    if frequency_resolution < 0:
+        raise ValueError(f"Frequency resolution must be non-negative. Received {frequency_resolution} [Hz]")
+    
+    if frequency_resolution >= bandwidth:
+        raise ValueError(f"Frequency resolution must be less than the bandwidth. Received frequency resolution to be {frequency_resolution} [Hz], with bandwidth {bandwidth} [Hz]")
     return
 
 
