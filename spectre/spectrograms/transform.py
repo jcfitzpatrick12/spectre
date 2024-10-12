@@ -61,6 +61,7 @@ def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
     # return the averaged array
     return averaged_array
 
+
 def frequency_chop(input_S: Spectrogram, 
                    start_freq_MHz: float | int, 
                    end_freq_MHz: float | int) -> Spectrogram:
