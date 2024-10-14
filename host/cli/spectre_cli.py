@@ -58,7 +58,8 @@ def main(
     )
 ) -> None:
     if not no_logs:
-        configure_root_logger("USER", log_level)
+        logs_handler = configure_root_logger("USER", log_level)
+        typer.secho(f"Generating logs at {logs_handler.file_path}")
     else:
         # Configure minimal logging to suppress output
         logging.basicConfig(level=logging.CRITICAL)
