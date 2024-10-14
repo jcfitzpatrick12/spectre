@@ -2,6 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import logging
 import typer
 from typing import Optional
 
@@ -14,6 +15,8 @@ from host.cli.tools.delete.commands import app as delete_app
 from host.cli.tools.capture.commands import app as capture_app
 from host.cli.tools.update.commands import app as update_app
 from host.cli.tools.web_fetch.commands import app as web_fetch_app
+
+from spectre.logging import configure_root_logger
 
 
 app = typer.Typer()
@@ -42,9 +45,23 @@ def main(
         help="Show the application's version and exit.", 
         callback=_version_callback, 
         is_eager=True,
+    ),
+    no_logs: Optional[bool] = typer.Option(
+        False,
+        "--no-logs",
+        help="Disable logging for this session."
+    ),
+    log_level: Optional[int] = typer.Option(
+        logging.INFO,
+        "--log-level",
+        help="Set the logging level (e.g., 10 for DEBUG, 20 for INFO)."
     )
 ) -> None:
-    return
+    if not no_logs:
+        configure_root_logger("USER", log_level)
+    else:
+        # Configure minimal logging to suppress output
+        logging.basicConfig(level=logging.CRITICAL)
 
 
 
