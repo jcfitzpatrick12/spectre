@@ -13,7 +13,7 @@ from spectre.file_handlers.text.handlers import LogsHandler
 from spectre.cfg import DEFAULT_DATETIME_FORMAT
 
 def configure_root_logger(process_type: str, 
-                          level: int = logging.INFO) -> None:
+                          level: int = logging.INFO) -> LogsHandler:
     system_datetime = datetime.now()
     datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
     logs_handler = LogsHandler(datetime_stamp, 
@@ -30,3 +30,4 @@ def configure_root_logger(process_type: str,
     )
 
     _LOGGER.info("Logging successfully configured.")
+    return logs_handler
