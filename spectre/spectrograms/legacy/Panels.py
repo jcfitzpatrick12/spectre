@@ -58,7 +58,7 @@ class Panels:
         if not self.slice_at_time is None:
             self.check_slice_at_time()
         if self.time_type == "datetimes" and type(self.slice_at_time) == str:
-            self.slice_at_time = datetime.strptime(self.slice_at_time, DEFAULT_TIME_FORMAT)
+            self.slice_at_time = datetime.strptime(self.slice_at_time, DEFAULT_DATETIME_FORMAT)
         
         self.slice_at_frequency = slice_at_frequency
         if not self.slice_at_frequency is None:

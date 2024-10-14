@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 from collections import OrderedDict
 from os import walk
 from os.path import splitext
@@ -16,8 +19,11 @@ from spectre.chunks.base import BaseChunk
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms import transform
 from spectre.cfg import (
-    DEFAULT_TIME_FORMAT,
+    DEFAULT_DATETIME_FORMAT,
     get_chunks_dir_path
+)
+from spectre.exceptions import (
+    SpectrogramNotFoundError
 )
 
 class Chunks:
@@ -26,8 +32,9 @@ class Chunks:
                  year: int = None, 
                  month: int = None, 
                  day: int = None):
+        _LOGGER.info(f"Initialising chunks with tag: {tag}")
         self.tag = tag
-        
+
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
         self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
@@ -49,7 +56,9 @@ class Chunks:
         
         # if there are no files at all
         if len(chunk_files) == 0:
-            warnings.warn("No chunks found, setting chunk map with empty dictionary.")
+            warning_message = "No chunks found, setting chunk map with empty dictionary."
+            _LOGGER.warning(warning_message)
+            warnings.warn(warning_message)
             # set with an empty dictionary
             self.chunk_map = chunk_map
             # and proceed no further
@@ -70,6 +79,7 @@ class Chunks:
 
     # an alias for _set_chunk_map
     def update_chunk_map(self) -> None:
+        _LOGGER("Updating the chunk map.")
         self._set_chunk_map()
         return
     
@@ -91,24 +101,30 @@ class Chunks:
 
     # getter for the list of chunk start times (already sorted chronologically)
     def get_chunk_start_time_list(self) -> list[str]:
+        _LOGGER.info("Getting a list of chunk start times")
         return list(self.chunk_map.keys()) 
 
 
     # getter for the list of chunks (already sorted chronologically)
     def get_chunk_list(self) -> list[BaseChunk]:
+        _LOGGER.info("Getting a list of chunks")
         return list(self.chunk_map.values())
 
 
     # get chunk by the chunk start time
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
-        chunk = self.chunk_map.get(chunk_start_time)
-        if chunk is None:
-            raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
-        return chunk
+        _LOGGER.info(f"Getting the chunk corresponding to chunk start time {chunk_start_time}")
+        try:
+            return self.chunk_map[chunk_start_time]
+        except KeyError:
+            error_message = f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}"
+            _LOGGER.error(error_message, exc_info=True)
+            raise KeyError(error_message)
 
 
     # get chunk by the index
     def get_chunk_by_index(self, chunk_index: int) -> BaseChunk:
+        _LOGGER.info(f"Getting the chunk corresponding to the index {chunk_index}")
         # find the number of chunks
         num_chunks = len(self.chunk_map) 
         index = chunk_index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
@@ -116,22 +132,31 @@ class Chunks:
 
 
     def get_index_by_chunk(self, chunk_to_match: BaseChunk) -> int:
+        _LOGGER.info(f"Getting the corresponding index for the chunk {chunk_to_match.chunk_name}")
         for i, chunk in enumerate(self):
             if chunk.chunk_start_time == chunk_to_match.chunk_start_time:
                 return i
-        raise ValueError(f"No matching chunk found with chunk_start_time {chunk_to_match.chunk_start_time}.")
+            
+        error_message = f"No matching chunk found for chunk {chunk_to_match.chunk_name}"
+        _LOGGER.error(error_message, exc_info=True)
+        raise ValueError(error_message)
     
+
     def count_chunk_files(self, extension: str) -> int:
+        _LOGGER.info("Counting chunk files")
         return sum(1 for chunk_file in self if chunk_file.has_file(extension))
 
 
     def get_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
+        _LOGGER.info(f"Getting spectrogram in the range {start_time} to {end_time}")
         # Convert input strings to datetime objects
-        start_datetime = datetime.strptime(start_time, DEFAULT_TIME_FORMAT)
-        end_datetime = datetime.strptime(end_time, DEFAULT_TIME_FORMAT)
+        start_datetime = datetime.strptime(start_time, DEFAULT_DATETIME_FORMAT)
+        end_datetime = datetime.strptime(end_time, DEFAULT_DATETIME_FORMAT)
 
         if start_datetime.day != end_datetime.day:
-            warnings.warn("Joining spectrograms across multiple days.", RuntimeWarning)
+            warning_message = "Joining spectrograms across multiple days"
+            _LOGGER.warning(warning_message)
+            warnings.warn(warning_message, RuntimeWarning)
 
         # List to store spectrograms, which we will later stitch together
         spectrograms = []
@@ -173,4 +198,4 @@ class Chunks:
         if spectrograms:
             return transform.join_spectrograms(spectrograms)
         else:
-            raise ValueError("No spectrogram data found for the given time range.")
+            raise SpectrogramNotFoundError("No spectrogram data found for the given time range.")

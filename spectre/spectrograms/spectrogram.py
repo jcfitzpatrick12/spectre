@@ -21,7 +21,7 @@ from spectre.spectrograms.array_operations import (
 from spectre.file_handlers.json.handlers import FitsConfigHandler
 
 from spectre.cfg import (
-    DEFAULT_TIME_FORMAT
+    DEFAULT_DATETIME_FORMAT
 )
 from spectre.cfg import get_chunks_dir_path
 
@@ -82,7 +82,7 @@ class Spectrogram:
                          microsecond_correction: float = 0) -> None:
         self.chunk_start_time = chunk_start_time
         self.microsecond_correction = microsecond_correction
-        self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_TIME_FORMAT)
+        self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
         self.datetimes = [self.chunk_start_datetime + timedelta(seconds=(t + microsecond_correction*(10**-6))) for t in self.time_seconds]
         self.corrected_start_datetime = self.datetimes[0]
         return
@@ -142,8 +142,8 @@ class Spectrogram:
             if self.chunk_start_datetime is None:
                 raise ValueError("Chunk start time must be known if specifying background bounds as string or datetime.")
             if background_type is str:
-                start_background = datetime.strptime(start_background, DEFAULT_TIME_FORMAT)
-                end_background = datetime.strptime(end_background, DEFAULT_TIME_FORMAT)
+                start_background = datetime.strptime(start_background, DEFAULT_DATETIME_FORMAT)
+                end_background = datetime.strptime(end_background, DEFAULT_DATETIME_FORMAT)
             self.background_indices = [find_closest_index(start_background, self.datetimes, enforce_strict_bounds=False),
                                        find_closest_index(end_background, self.datetimes, enforce_strict_bounds=False)]
 
@@ -285,7 +285,7 @@ class Spectrogram:
 
         # if at_time is passed in as a string, try and parse as a datetime then proceed
         if isinstance(at_time, str):
-            at_time = datetime.strptime(at_time, DEFAULT_TIME_FORMAT)
+            at_time = datetime.strptime(at_time, DEFAULT_DATETIME_FORMAT)
 
         if isinstance(at_time, datetime):
             if self.chunk_start_time is None:

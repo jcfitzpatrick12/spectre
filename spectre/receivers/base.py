@@ -2,15 +2,20 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 from abc import ABC, abstractmethod
 from typing import Callable, Any
 
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
 from spectre.receivers import validators
+from spectre.exceptions import InvalidModeError, InvalidReceiver
 
 
 class BaseReceiver(ABC):
     def __init__(self, name: str, mode: str = None):
+        _LOGGER.info("Initialising an instance of the receiver {name}")
         self.name = name
 
         self.capture_methods: dict[str, Callable] = None
@@ -53,14 +58,18 @@ class BaseReceiver(ABC):
 
 
     def get_specifications(self) -> dict[dict, Any]:
+        _LOGGER.info("Getting receiver specifications")
         return self.specifications
     
     
     def get_specification(self, specification_key: str) -> Any:
-        specification_value = self.specifications.get(specification_key)
-        if specification_value is None:
-            raise ValueError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
-        return specification_value
+        _LOGGER.info(f"Getting the specifications for key {specification_key}")
+        try:
+            return self.specifications.get(specification_key)
+        except KeyError:
+            error_message = f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}"
+            _LOGGER.error(error_message, exc_info=True)
+            raise KeyError(error_message)
 
     
     # ensure that all receiver maps define the same modes for the receiver
@@ -76,43 +85,43 @@ class BaseReceiver(ABC):
 
 
     def set_mode(self, mode: str) -> None:
+        _LOGGER.info(f"Setting the receiver mode to {mode}")
         if not mode in self.valid_modes:
-            raise ValueError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}.")
+            error_message = f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}."
+            _LOGGER.error(error_message, exc_info=True)
+            raise InvalidModeError(error_message)
         self.mode = mode
 
 
     def mode_set(self):
+        _LOGGER.info("Evaluating whether mode is set")
         return (self.mode is not None)
     
     
     def get_capture_method(self) -> Callable:
-        capture_method = self.capture_methods.get(self.mode)
-        if capture_method is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return capture_method
+        _LOGGER.info("Getting capture method")
+        return self.capture_methods.get(self.mode)
 
 
     def get_validator(self) -> Callable:
-        validator = self.validators.get(self.mode)
-        if validator is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return validator
+        _LOGGER.info("Getting validator")
+        return self.validators.get(self.mode)
 
 
     def get_template(self) -> dict[str, Any]:
-        template = self.templates.get(self.mode)
-        if template is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return template
+        _LOGGER.info("Getting template")
+        return self.templates.get(self.mode)
 
 
     def validate(self, capture_config: dict) -> None:
+        _LOGGER.info("Validating capture config")
         validator = self.get_validator()
         validator(capture_config)
         return
 
 
     def start_capture(self, tags: list[str]) -> None:
+        _LOGGER.info(f"Starting capture for tags {tags}")
         capture_configs = [self.load_capture_config(tag) for tag in tags]
         capture_method = self.get_capture_method()
         capture_method(capture_configs)
@@ -120,6 +129,7 @@ class BaseReceiver(ABC):
 
 
     def save_params_as_capture_config(self, tag: str, params: list[str], doublecheck_overwrite: bool = True) -> None:
+        _LOGGER.info(f"Saving params as capture config with tag {tag}")
         capture_config_handler = CaptureConfigHandler(tag)
         template = self.get_template()
         capture_config = capture_config_handler.type_cast_params(params, template) # type cast the params list according to the active template
@@ -127,6 +137,7 @@ class BaseReceiver(ABC):
 
 
     def save_capture_config(self, tag: str, capture_config: dict, doublecheck_overwrite: bool = True) -> None:
+        _LOGGER.info(f"Saving capture config with tag {tag}")
         capture_config_handler = CaptureConfigHandler(tag)
         # basic validation against the template
         capture_config_handler.validate_against_template(capture_config, 
@@ -142,20 +153,26 @@ class BaseReceiver(ABC):
 
 
     def load_capture_config(self, tag: str) -> dict:
+        _LOGGER.info(f"Loading capture config with tag {tag}")
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
 
         if capture_config['receiver'] != self.name:
-            raise ValueError(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'.")
+            error_message = f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'."
+            _LOGGER.error(error_message, exc_info=True)
+            raise InvalidReceiver(error_message)
         
         if capture_config['mode'] != self.mode:
-            raise ValueError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'.")
+            error_message = f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'."
+            _LOGGER.error(error_message, exc_info=True)
+            raise InvalidModeError(error_message)
 
         self.validate(capture_config)
         return capture_config
 
 
     def template_to_command(self, tag: str, as_string: bool = False) -> str:
+        _LOGGER.info("Creating template command")
         command_as_list = ["spectre", "create", "capture-config", 
                            "--tag", tag, 
                            "--receiver", self.name, 

@@ -2,12 +2,16 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 # Global dictionaries to hold the mappings
 receivers = {}
 
 # classes decorated with @register_receiver("<receiver_name>")
 # will be added to the global map of receivers with key "receiver_name"
 def register_receiver(receiver_name: str):
+    _LOGGER.info(f"Registering receiver with name {receiver_name}")
     def decorator(cls):
         receivers[receiver_name] = cls
         return cls
@@ -15,6 +19,7 @@ def register_receiver(receiver_name: str):
 
 # return a list of all receiver names
 def list_all_receiver_names():
+    _LOGGER.info("Listing all receivers")
     return list(receivers.keys())
 
 

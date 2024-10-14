@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import os
 from abc import ABC, abstractmethod
 from typing import Any
@@ -21,8 +24,18 @@ class BaseFileHandler(ABC):
         
 
     @abstractmethod
-    def read(self) -> Any:
+    def _read(self) -> Any:
         pass
+
+
+    def read(self) -> Any:
+        _LOGGER.info(f"Reading from {self.file_path}")
+        try:
+            return self._read()
+        except Exception as e:
+            error_message = f"An error has occured while reading from {self.file_path}. Received: {e}"
+            _LOGGER.error(error_message, exc_info=True)
+            raise
     
 
     def make_parent_path(self) -> None:

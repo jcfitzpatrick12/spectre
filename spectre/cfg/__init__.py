@@ -20,7 +20,9 @@ JSON_CONFIGS_DIR_PATH = os.environ.get("SPECTRE_JSON_CONFIGS_DIR_PATH",
                                        os.path.join(SPECTRE_DIR_PATH, "json_configs"))
 os.makedirs(JSON_CONFIGS_DIR_PATH, exist_ok=True)
 
-DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+DEFAULT_TIME_FORMAT = "%H:%M:%S"
+DEFAULT_DATE_FORMAT = "%Y-%m-%d"
+DEFAULT_DATETIME_FORMAT = f"{DEFAULT_DATE_FORMAT}T{DEFAULT_TIME_FORMAT}"
 
 INSTRUMENT_CODES = [
     "ALASKA-ANCHORAGE",

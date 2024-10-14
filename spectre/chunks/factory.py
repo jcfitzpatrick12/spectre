@@ -2,21 +2,33 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 # after we decorate all chunks, we can import the chunk_key -> chunk maps
 from spectre.chunks.chunk_register import chunk_map
 from spectre.chunks.base import BaseChunk
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.exceptions import ChunkNotFoundError
 
 
 def get_chunk(chunk_key: str) -> BaseChunk:
-    chunk = chunk_map.get(chunk_key)
-    if chunk is None:
+    _LOGGER.info(f"Getting chunk for the key: {chunk_key}")
+    try:
+        Chunk = chunk_map[chunk_key]
+        return Chunk
+    except KeyError:
         valid_chunk_keys = list(chunk_map.keys())
-        raise ValueError(f"No chunk found for the chunk key: {chunk_key}. Please specify one of the following chunk keys {valid_chunk_keys}.")
-    return chunk
+        error_message = (
+            f"No chunk found for the chunk key: {chunk_key}. "
+            f"Valid chunk keys are: {valid_chunk_keys}"
+        )
+        _LOGGER.error(error_message, exc_info=True)
+        raise ChunkNotFoundError(error_message)
 
 
 def get_chunk_from_tag(tag: str) -> BaseChunk:
+    _LOGGER.info(f"Getting chunk for the tag: {tag}")
     # if we are dealing with a callisto chunk, the chunk key is equal to the tag
     if "callisto" in tag:
         chunk_key = "callisto"
@@ -25,7 +37,4 @@ def get_chunk_from_tag(tag: str) -> BaseChunk:
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
         chunk_key = capture_config.get('chunk_key')
-
-    if chunk_key is None:
-        raise ValueError(f"Chunk key could not be found for tag {tag}")
     return get_chunk(chunk_key)

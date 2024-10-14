@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import json
 from typing import Any
 from abc import ABC
@@ -11,6 +14,9 @@ from spectre.file_handlers.base import BaseFileHandler
 from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH
 )
+from spectre.exceptions import (
+    InvalidTagError
+)
 
 class JsonHandler(BaseFileHandler):
     def __init__(self, parent_path: str, base_file_name: str, **kwargs):
@@ -18,12 +24,13 @@ class JsonHandler(BaseFileHandler):
         return 
     
     
-    def read(self) -> dict:
+    def _read(self) -> dict:
         with open(self.file_path, 'r') as f:
             return json.load(f)
         
 
     def save(self, d: dict, doublecheck_overwrite: bool = True) -> None:
+        _LOGGER.info(f"Saving JSON to {self.file_path}")
         self.make_parent_path()
 
         if self.exists() and doublecheck_overwrite:
@@ -37,11 +44,17 @@ class JsonHandler(BaseFileHandler):
                          key: str, 
                          value: Any, 
                          doublecheck_overwrite: bool = True) -> None:
+        _LOGGER.info(f"Updating the value for the key {key} to the value {value}")
         d = self.read() 
-        valid_keys = list(d.keys())
-        if not key in valid_keys:
-            raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
-        d[key] = value
+        try: 
+            d[key] = value
+        except KeyError:
+            valid_keys = list(d.keys())
+            if not key in valid_keys:
+                error_message = f"Key '{key}' not found. expected one of '{valid_keys}'"
+                _LOGGER.error(error_message, exc_info=True)
+                raise 
+
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
         return
     
@@ -56,15 +69,21 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
-            raise ValueError(f"Tags cannot contain an underscore. Received {tag}.")
+            error_message = f"Tags cannot contain an underscore. Received {tag}."
+            _LOGGER.error(error_message)
+            raise InvalidTagError(error_message)
         if "callisto" in tag:
-            raise ValueError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
+            error_message = f'"callisto" cannot be a substring in a native tag. Received "{tag}"'
+            _LOGGER.error(error_message, exc_info=True)
+            raise InvalidTagError(error_message)
 
 
     def _params_list_to_string_valued_dict(self, params: list) -> dict[str, str]:
         def _unpack(param: str) -> tuple:
             if not param or '=' not in param or param.startswith('=') or param.endswith('='):
-                raise ValueError(f'Invalid format: "{param}". Expected "KEY=VALUE".')
+                error_message = f'Invalid format: "{param}". Expected "KEY=VALUE".'
+                _LOGGER.error(error_message, exc_info=True)
+                raise ValueError(error_message)
             return tuple(map(str.strip, param.split('=', 1)))
         return {k: v for k, v in map(_unpack, params)}
 
@@ -78,13 +97,19 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 return True
             if v in ('false', '0', 'f', 'n', 'no'):
                 return False
-            raise ValueError(f'Cannot convert {v} to bool.')
+            
+            error_message = f'Cannot convert {v} to bool.'
+            _LOGGER.error(error_message, exc_info=True)
+            raise ValueError(error_message)
         
         converted_dict = {}
         for k, v in d.items():
-            dynamic_type = template.get(k)
-            if dynamic_type is None:
-                raise KeyError(f'Key "{k}" not found in template, expected one of {list(template.keys())}')
+            try:
+                dynamic_type = template[k]
+            except KeyError:
+                error_message = f'Key "{k}" not found in template, expected one of {list(template.keys())}'
+                _LOGGER.error(error_message)
+                raise KeyError(error_message)
             try:
                 if dynamic_type == bool:
                     converted_dict[k] = _convert_to_bool(v)
@@ -93,10 +118,11 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 else:
                     converted_dict[k] = dynamic_type(v)
             except ValueError:
-                message = f'Could not convert value at {k}: Received {v}, expected {dynamic_type.__name__}.'
+                error_message = f'Could not convert value at {k}: Received {v}, expected {dynamic_type.__name__}.'
                 if dynamic_type == dict:
-                    message += ' Use syntax {\\"key\\":value}.'
-                raise ValueError(message)
+                    error_message += ' Use syntax {\\"key\\":value}.'
+                _LOGGER.error(error_message, exc_info=True)
+                raise ValueError(error_message)
         return converted_dict
     
 
@@ -133,18 +159,25 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 error_messages.append(f"Missing keys: {', '.join(missing_keys)}.")
             if invalid_keys:
                 error_messages.append(f"Invalid keys: {', '.join(invalid_keys)}.")
-            raise KeyError("Key errors found! " + " ".join(error_messages))
+
+            error_message = "Key errors found! " + " ".join(error_messages)
+            _LOGGER.error(error_messages, exc_info=True)
+            raise KeyError(error_message)
 
 
     def _validate_types(self, d: dict, template: dict, ignore_keys: list = []) -> None:
         for k, v in d.items():
             if k in ignore_keys:
                 continue
-            expected_type = template.get(k)
-            if expected_type is None:
-                raise ValueError(f'Type not found for key "{k}" in template.')
+            try:
+                expected_type = template[k]
+            except KeyError:
+                error_message = f'Type not found for key "{k}" in template.'
+                raise KeyError(error_message)
             if not isinstance(v, expected_type):
-                raise TypeError(f'Expected {expected_type} for "{k}", but got {type(v)}.')
+                error_message = f'Expected {expected_type} for "{k}", but got {type(v)}.'
+                _LOGGER.error(error_message)
+                raise TypeError(error_message)
 
 
 class FitsConfigHandler(SPECTREConfigHandler):
@@ -165,6 +198,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
 
 
     def template_to_command(self, tag: str, as_string = False) -> str:
+        _LOGGER.info("Creating template command")
         command_as_list = ["spectre", "create", "fits-config", "-t", tag]
         template = self.get_template()
         for key, value in template.items():
@@ -180,6 +214,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
                                    params: list[str], 
                                    doublecheck_overwrite: bool = True
                                    ) -> None:
+        _LOGGER.info(f"Saving params {params} as a capture config")
         d = self.type_cast_params(params, self.get_template())
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
         return
