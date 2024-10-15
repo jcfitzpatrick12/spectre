@@ -11,7 +11,6 @@ receivers = {}
 # classes decorated with @register_receiver("<receiver_name>")
 # will be added to the global map of receivers with key "receiver_name"
 def register_receiver(receiver_name: str):
-    _LOGGER.info(f"Registering receiver with name {receiver_name}")
     def decorator(cls):
         receivers[receiver_name] = cls
         return cls
