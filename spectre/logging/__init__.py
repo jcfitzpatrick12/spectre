@@ -147,7 +147,7 @@ class LogHandlers:
 
 
     def get_log_handler_list(self) -> list[LogHandler]:
-        _LOGGER.inf("Getting the list of log handlers")
+        _LOGGER.info("Getting the list of log handlers")
         return self.log_handler_map.values()
     
 
