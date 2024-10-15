@@ -37,6 +37,7 @@ def logs(
         else:
             doublecheck_delete = True
         log_handler.delete(doublecheck_delete=doublecheck_delete)
+        typer.secho(f"File deleted: {log_handler.file_path}.", fg=typer.colors.YELLOW)
 
 @app.command()
 def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
