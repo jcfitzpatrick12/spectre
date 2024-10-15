@@ -20,7 +20,7 @@ from spectre.logging import LogHandler, LogHandlers
 app = typer.Typer()
     
 @app.command()
-def logs(
+def log(
     pid: str = typer.Option(None, "--pid", help="Process ID to identify the log file"),
     file_name: str = typer.Option(None, "--file-name", help="Explicitly specified file name for the log file")
 ) -> None:
