@@ -21,14 +21,20 @@ from spectre.cfg import (
     DEFAULT_TIME_FORMAT
 )
 
-
-class LogHandler(TextHandler):
-
-    PROCESS_TYPES = [
+PROCESS_TYPES = [
         "USER",
         "WORKER"
     ]
-    
+
+
+def validate_process_type(process_type: str) -> None:
+    if process_type not in PROCESS_TYPES:
+        error_message = f"Invalid process type: {process_type}. Expected one of {PROCESS_TYPES}"
+        _LOGGER.error(error_message)
+        raise ValueError(error_message)
+
+
+class LogHandler(TextHandler): 
     def __init__(self, 
                  datetime_stamp: str, # system datetime at log creation
                  pid: str, # process id
@@ -38,9 +44,8 @@ class LogHandler(TextHandler):
         self.datetime_stamp: str = datetime_stamp
         self.pid: str = pid
         self.process_type: str = process_type
-       
-        if process_type not in self.PROCESS_TYPES:
-            raise ValueError(f"Invalid process type: {process_type}. Expected one of {self.PROCESS_TYPES}")
+
+        validate_process_type(process_type)
 
         dt = datetime.strptime(datetime_stamp, DEFAULT_DATETIME_FORMAT)
         # Build the date directory path using os.path.join
@@ -87,6 +92,8 @@ class LogHandlers:
         self.year: int = year
         self.month: int = month
         self.day: int = day
+
+        validate_process_type(process_type)
 
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
         self.logs_dir_path = get_logs_dir_path(year, month, day)
