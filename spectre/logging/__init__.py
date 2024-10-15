@@ -166,7 +166,7 @@ class LogHandlers:
 
 
     def get_log_handler_from_pid(self, pid: str) -> LogHandler:
-        for log_handler in self._log_handler_list():
+        for log_handler in self._log_handler_list:
             if log_handler.pid == pid:
                 return log_handler
         error_message = f"Log handler for PID '{pid}' not found in log map."
