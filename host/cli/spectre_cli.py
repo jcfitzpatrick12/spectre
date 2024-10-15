@@ -47,7 +47,7 @@ def main(
         is_eager=True,
     ),
     generate_log: Optional[bool] = typer.Option(
-        False,
+        True,
         "--generate-log",
         help="Disable logging for this session."
     ),
