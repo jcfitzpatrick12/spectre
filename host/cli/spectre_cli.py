@@ -47,9 +47,10 @@ def main(
         is_eager=True,
     ),
     generate_log: Optional[bool] = typer.Option(
-        True,
+        False,  # Default to False, becomes True when flag is used
         "--generate-log",
-        help="Generate a log for this session."
+        help="Generate a log for this session.",
+        is_flag=True
     ),
     log_level: Optional[int] = typer.Option(
         logging.INFO,
