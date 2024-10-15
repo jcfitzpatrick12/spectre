@@ -6,6 +6,7 @@ import typer
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
+from spectre.logging import configure_root_logger
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
@@ -92,11 +93,13 @@ def start_session(receiver_name: str, mode: str, tags: List[str], force_restart:
 
 # Internal process starters
 def _start_capture(receiver_name: str, mode: str, tags: List[str]) -> None:
+    configure_root_logger("WORKER") #  start worker log
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
 
 
 def _start_watcher(tags: List[str]) -> None:
+    configure_root_logger("WORKER") #  start worker log
     for tag in tags:
         watcher = Watcher(tag)
         watcher.start()
