@@ -7,6 +7,7 @@ import os
 
 from host.cli import __app_name__, __version__
 
+from spectre.logging import LogHandlers
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
@@ -14,6 +15,28 @@ from spectre.file_handlers.json.handlers import (
 from spectre.chunks import Chunks
 
 app = typer.Typer()
+
+@app.command()
+def logs(
+    process_type: str = typer.Option(None, "--process-type", help="Filter logs by process type"),
+    year: int = typer.Option(None, "--year", "-y", help="Specify year for logs"),
+    month: int = typer.Option(None, "--month", "-m", help="Specify month for logs"),
+    day: int = typer.Option(None, "--day", "-d", help="Specify day for logs"),
+    suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help="")
+) -> None:
+    log_handlers = LogHandlers(process_type,
+                               year,
+                               month,
+                               day)
+    for log_handler in log_handlers:
+        # if process type is specified, disregard all logs of differing process types
+        if process_type and log_handler.process_type != process_type:
+            continue
+        if suppress_doublecheck:
+            doublecheck_delete = False
+        else:
+            doublecheck_delete = True
+        log_handler.delete(doublecheck_delete=doublecheck_delete)
 
 @app.command()
 def chunks(tag: str = typer.Option(..., "--tag", "-t", help=""),
