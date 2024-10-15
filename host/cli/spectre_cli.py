@@ -49,7 +49,7 @@ def main(
     generate_log: Optional[bool] = typer.Option(
         True,
         "--generate-log",
-        help="Disable logging for this session."
+        help="Generate a log for this session."
     ),
     log_level: Optional[int] = typer.Option(
         logging.INFO,
@@ -59,7 +59,7 @@ def main(
 ) -> None:
     if generate_log:
         logs_handler = configure_root_logger("USER", log_level)
-        typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.BLUE)
+        typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.GREEN)
     else:
         # Configure minimal logging to suppress output
         logging.basicConfig(level=logging.CRITICAL)
