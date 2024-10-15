@@ -22,20 +22,9 @@ class BaseFileHandler(ABC):
         self.file_path = os.path.join(self.parent_path, self.file_name)
         
         
-
     @abstractmethod
-    def _read(self) -> Any:
-        pass
-
-
     def read(self) -> Any:
-        _LOGGER.info(f"Reading from {self.file_path}")
-        try:
-            return self._read()
-        except Exception as e:
-            error_message = f"An error has occured while reading from {self.file_path}. Received: {e}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
+        pass
     
 
     def make_parent_path(self) -> None:

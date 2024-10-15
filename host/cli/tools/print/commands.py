@@ -26,9 +26,7 @@ def log(
 ) -> None:
     # Ensure that exactly one of --pid or --file-name is specified
     if not (bool(pid) ^ bool(file_name)):
-        error_message = "Exactly one of --pid or --file-name must be specified."
-        _LOGGER.error(error_message)
-        raise ValueError(error_message)
+        raise ValueError("Exactly one of --pid or --file-name must be specified.")
     
     log_handlers = LogHandlers()
     if pid:

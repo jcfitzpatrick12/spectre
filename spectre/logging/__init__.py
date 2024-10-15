@@ -13,6 +13,7 @@ from os.path import splitext
 
 from spectre.cfg import LOGS_DIR_PATH, DEFAULT_DATETIME_FORMAT, DEFAULT_TIME_FORMAT, get_logs_dir_path
 from spectre.file_handlers.text.handlers import TextHandler
+from spectre.exceptions import LogNotFoundError
 
 _LOGGER = getLogger(__name__)
 
@@ -29,11 +30,7 @@ class LogHandler(TextHandler):
         self.pid = pid
         self.process_type = process_type
 
-        try:
-            validate_process_type(process_type)
-        except ValueError as e:
-            _LOGGER.error(str(e), exc_info=True)
-            raise
+        validate_process_type(process_type)
 
         dt = datetime.strptime(datetime_stamp, DEFAULT_DATETIME_FORMAT)
         date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
@@ -56,24 +53,19 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
         filename=log_handler.file_path
     )
 
-    _LOGGER.info("Logging successfully configured.")
     return log_handler
 
 
 class LogHandlers:
     def __init__(self, process_type: str | None = None, year: int = None, month: int = None, day: int = None):
-        _LOGGER.info(f"Initialising logs with process type: {process_type if process_type else 'not specified'}")
         self.process_type = process_type
         self.year = year
         self.month = month
         self.day = day
 
         if self.process_type:
-            try:
-                validate_process_type(process_type)
-            except ValueError as e:
-                _LOGGER.error(str(e), exc_info=True)
-                raise
+            validate_process_type(process_type)
+
 
         self.logs_dir_path = get_logs_dir_path(year, month, day)
         self._set_log_handler_map()
@@ -105,7 +97,6 @@ class LogHandlers:
 
 
     def update_chunk_map(self) -> None:
-        _LOGGER.info("Updating the log handler map.")
         self._set_log_handler_map()
 
 
@@ -124,12 +115,10 @@ class LogHandlers:
 
 
     def get_log_handler_list(self) -> list[LogHandler]:
-        _LOGGER.info("Getting the list of log handlers")
         return list(self.log_handler_map.values())
 
 
     def get_log_file_name_list(self) -> list[str]:
-        _LOGGER.info("Getting the list of log file names")
         return list(self.log_handler_map.keys())
 
 
@@ -137,15 +126,11 @@ class LogHandlers:
         try:
             return self.log_handler_map[file_name]
         except KeyError:
-            error_message = f"Log handler for file name '{file_name}' not found in log map."
-            _LOGGER.error(error_message)
-            raise KeyError(error_message)
+            raise LogNotFoundError(f"Log handler for file name '{file_name}' not found in log map.")
 
 
     def get_log_handler_from_pid(self, pid: str) -> LogHandler:
         for log_handler in self._log_handler_list:
             if log_handler.pid == pid:
                 return log_handler
-        error_message = f"Log handler for PID '{pid}' not found in log map."
-        _LOGGER.error(error_message)
-        raise KeyError(error_message)
+        raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map.")

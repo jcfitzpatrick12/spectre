@@ -19,7 +19,6 @@ def register_receiver(receiver_name: str):
 
 # return a list of all receiver names
 def list_all_receiver_names():
-    _LOGGER.info("Listing all receivers")
     return list(receivers.keys())
 
 

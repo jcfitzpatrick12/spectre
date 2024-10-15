@@ -9,6 +9,6 @@ class TextHandler(BaseFileHandler):
         super().__init__(parent_path, base_file_name, extension = "txt", **kwargs)
         return 
     
-    def _read(self) -> dict:
+    def read(self) -> dict:
         with open(self.file_path, 'r') as f:
             return f.read()

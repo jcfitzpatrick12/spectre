@@ -54,7 +54,6 @@ class Chunk(SPECTREChunk):
         self.prep_sweep_IQ_data: np.ndarray = None
 
     def build_spectrogram(self, previous_chunk: Optional[SPECTREChunk] = None) -> Spectrogram:
-        _LOGGER.info(f"Building spectrogram for the chunk {self.chunk_name}")
         # read the (raw) swept IQ data
         self.sweep_IQ_data = self.read_file("bin")
         # read the millisecond correction and sweep metadata
@@ -75,14 +74,10 @@ class Chunk(SPECTREChunk):
 
         # convert the millisecond correction to a microsecond correction
         microsecond_correction = millisecond_correction * 1e3
+  
+        # and (essentially) perform the STFFT on the IQ samples
+        time_seconds, freq_MHz, dynamic_spectra = self._do_STFFT()
 
-        try:      
-            # and (essentially) perform the STFFT on the IQ samples
-            time_seconds, freq_MHz, dynamic_spectra = self._do_STFFT()
-        except Exception as e:
-            error_message = f"An error has occured while performing the STFFT. Received: {str(e)}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
 
         return Spectrogram(
             dynamic_spectra=np.array(dynamic_spectra, dtype='float32'),
@@ -122,9 +117,7 @@ class Chunk(SPECTREChunk):
         expected_num_samples = np.sum(final_num_samples)
         actual_num_samples = len(final_sweep_IQ_data) 
         if actual_num_samples != expected_num_samples:
-            error_message = f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep."
-            _LOGGER.error(error_message, exc_info=True)
-            raise ValueError(error_message)
+            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep.")
 
         # return the data for the final sweep as required
         return final_sweep_IQ_data, (final_center_freqs, final_num_samples)
@@ -176,7 +169,6 @@ class Chunk(SPECTREChunk):
 
 
     def _do_STFFT(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        _LOGGER.info(f"Performing a swept STFFT")
         # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
         self._validate_center_frequencies_ordering()
         # set the attributes used to define the swept STFFT procedure
@@ -207,9 +199,7 @@ class Chunk(SPECTREChunk):
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
             if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
-                error_message = f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern."
-                _LOGGER.error(error_message, exc_info=True)
-                raise InvalidSweepMetadataError(error_message)
+                raise InvalidSweepMetadataError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern.")
         return
 
 
@@ -235,9 +225,7 @@ class Chunk(SPECTREChunk):
         unique_num_steps_per_sweep = np.unique(np.diff(min_freq_indices))
         # we expect that the difference is always the same, so that the result of np.unique has a single element
         if len(unique_num_steps_per_sweep) != 1:
-            error_message = "Irregular step count per sweep, expected a consistent number of steps per sweep."
-            _LOGGER.error(error_message, exc_info=True)
-            raise InvalidSweepMetadataError(error_message)
+            raise InvalidSweepMetadataError("Irregular step count per sweep, expected a consistent number of steps per sweep.")
         # finally, we return the ensured unique element
         return int(unique_num_steps_per_sweep[0])
 
@@ -334,8 +322,8 @@ class HdrChunk(ChunkFile):
     def __init__(self, chunk_parent_path: str, chunk_name: str):
         super().__init__(chunk_parent_path, chunk_name, "hdr")
 
-    def _read(self) -> Tuple[int, np.ndarray, np.ndarray]:
-        hdr_contents = self._read_file_contents()
+    def read(self) -> Tuple[int, np.ndarray, np.ndarray]:
+        hdr_contents = self.read_file_contents()
         millisecond_correction = self._get_millisecond_correction(hdr_contents)
         center_frequencies = self._get_center_frequencies(hdr_contents)
         num_samples = self._get_num_samples(hdr_contents)
@@ -343,7 +331,7 @@ class HdrChunk(ChunkFile):
         return millisecond_correction, (center_frequencies, num_samples)
         
 
-    def _read_file_contents(self) -> np.ndarray:
+    def read_file_contents(self) -> np.ndarray:
         # Reads the contents of the .hdr file into a numpy array
         with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
@@ -354,9 +342,7 @@ class HdrChunk(ChunkFile):
         millisecond_correction_as_float = float(hdr_contents[0])
 
         if not millisecond_correction_as_float.is_integer():
-            error_message = f"Expected integer value for millisecond correction, but got {millisecond_correction_as_float}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise TypeError(error_message)
+            raise TypeError(f"Expected integer value for millisecond correction, but got {millisecond_correction_as_float}")
         
         return int(millisecond_correction_as_float)
 
@@ -370,15 +356,11 @@ class HdrChunk(ChunkFile):
         # Extracts the number of samples per frequency from the file contents
         num_samples_as_float = hdr_contents[2::2]
         if not all(num_samples_as_float == num_samples_as_float.astype(int)):
-            error_message = "Number of samples per frequency is expected to describe an integer."
-            _LOGGER.error(error_message, exc_info=True)
-            raise InvalidSweepMetadataError(error_message)
+            raise InvalidSweepMetadataError("Number of samples per frequency is expected to describe an integer.")
         return num_samples_as_float.astype(int)
 
 
     def _validate_frequencies_and_samples(self, center_frequencies: np.ndarray, num_samples: np.ndarray) -> None:
         """Validates that the center frequencies and the number of samples arrays have the same length."""
         if len(center_frequencies) != len(num_samples):
-            error_message = "Center frequencies and number of samples arrays are not the same length."
-            _LOGGER.error(error_message, exc_info=True)
-            raise InvalidSweepMetadataError(error_message)
+            raise InvalidSweepMetadataError("Center frequencies and number of samples arrays are not the same length.")

@@ -32,7 +32,6 @@ class Chunks:
                  year: int = None, 
                  month: int = None, 
                  day: int = None):
-        _LOGGER.info(f"Initialising chunks with tag: {tag}")
         self.tag: str = tag
         self.year: int = year
         self.month: int = month
@@ -82,7 +81,6 @@ class Chunks:
 
     # an alias for _set_chunk_map
     def update_chunk_map(self) -> None:
-        _LOGGER("Updating the chunk map.")
         self._set_chunk_map()
         return
     
@@ -104,30 +102,24 @@ class Chunks:
 
     # getter for the list of chunk start times (already sorted chronologically)
     def get_chunk_start_time_list(self) -> list[str]:
-        _LOGGER.info("Getting a list of chunk start times")
         return list(self.chunk_map.keys()) 
 
 
     # getter for the list of chunks (already sorted chronologically)
     def get_chunk_list(self) -> list[BaseChunk]:
-        _LOGGER.info("Getting a list of chunks")
         return list(self.chunk_map.values())
 
 
     # get chunk by the chunk start time
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
-        _LOGGER.info(f"Getting the chunk corresponding to chunk start time {chunk_start_time}")
         try:
             return self.chunk_map[chunk_start_time]
         except KeyError:
-            error_message = f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise KeyError(error_message)
+            raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
 
 
     # get chunk by the index
     def get_chunk_by_index(self, chunk_index: int) -> BaseChunk:
-        _LOGGER.info(f"Getting the chunk corresponding to the index {chunk_index}")
         # find the number of chunks
         num_chunks = len(self.chunk_map) 
         index = chunk_index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
@@ -135,23 +127,18 @@ class Chunks:
 
 
     def get_index_by_chunk(self, chunk_to_match: BaseChunk) -> int:
-        _LOGGER.info(f"Getting the corresponding index for the chunk {chunk_to_match.chunk_name}")
         for i, chunk in enumerate(self):
             if chunk.chunk_start_time == chunk_to_match.chunk_start_time:
                 return i
             
-        error_message = f"No matching chunk found for chunk {chunk_to_match.chunk_name}"
-        _LOGGER.error(error_message, exc_info=True)
-        raise ValueError(error_message)
+        raise ValueError(f"No matching chunk found for chunk {chunk_to_match.chunk_name}")
     
 
     def count_chunk_files(self, extension: str) -> int:
-        _LOGGER.info("Counting chunk files")
         return sum(1 for chunk_file in self if chunk_file.has_file(extension))
 
 
     def get_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
-        _LOGGER.info(f"Getting spectrogram in the range {start_time} to {end_time}")
         # Convert input strings to datetime objects
         start_datetime = datetime.strptime(start_time, DEFAULT_DATETIME_FORMAT)
         end_datetime = datetime.strptime(end_time, DEFAULT_DATETIME_FORMAT)

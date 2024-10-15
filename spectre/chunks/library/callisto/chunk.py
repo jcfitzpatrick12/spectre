@@ -34,7 +34,7 @@ class FitsChunk(ChunkFile):
         super().__init__(chunk_parent_path, chunk_name, "fits")
 
 
-    def _read(self) -> Spectrogram:
+    def read(self) -> Spectrogram:
         with fits.open(self.file_path, mode='readonly') as hdulist:
             primary_hdu = self._get_primary_hdu(hdulist)
             dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
@@ -53,7 +53,7 @@ class FitsChunk(ChunkFile):
                         microsecond_correction = microsecond_correction,
                         spectrum_type = spectrum_type)
             else:
-                raise ValueError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
+                raise NotImplementedError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
             
 
     def _get_primary_hdu(self, hdulist: HDUList) -> PrimaryHDU:
@@ -94,14 +94,9 @@ class FitsChunk(ChunkFile):
 
 
     def get_datetimes(self) -> np.ndarray:
-        _LOGGER.info(f"Getting datetimes from {self.file_name}")
-        try:
-            with fits.open(self.file_path, mode='readonly') as hdulist:
-                bintable_data = hdulist[1].data
-                time_seconds = bintable_data['TIME'][0]
-                return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            bintable_data = hdulist[1].data
+            time_seconds = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
 
-        except Exception as e:
-            error_message = f"An unexpected error has occured while getting the datetimes from {self.file_name}. Received: {e}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
+

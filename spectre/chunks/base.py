@@ -43,52 +43,40 @@ class BaseChunk:
 
 
     def add_file(self, chunk_file: ChunkFile) -> None:
-        _LOGGER.debug(f"Adding chunk file with extension {chunk_file.extension}")
         self.chunk_files[chunk_file.extension] = chunk_file
         return
     
 
     def get_extensions(self) -> list[str]:
-        _LOGGER.info(f"Getting extension")
         return self.chunk_files.keys()
 
 
     def get_file(self, extension: str) -> ChunkFile:
-        _LOGGER.info(f"Getting chunk file with extension {extension}")
         try:
             return self.chunk_files[extension]
         except KeyError:
-            error_message = f"No chunk file registered with extension '{extension}'"
-            _LOGGER.error(error_message, exc_info=True)
-            raise ChunkFileNotFoundError(error_message)
+            raise ChunkFileNotFoundError(f"No chunk file found with extension '{extension}'")
 
 
     def read_file(self, extension: str):
-        _LOGGER.info(f"Reading chunk file with extension {extension}")
         chunk_file = self.get_file(extension)
-        if chunk_file.exists():
-            return chunk_file.read()
-        else:
-            error_message = f"The chunk file at path {chunk_file.file_path} was not found"
-            _LOGGER.error(error_message, exc_info=True)
-            raise ChunkFileNotFoundError(error_message)
+        return chunk_file.read()
 
 
     def delete_file(self, extension: str, doublecheck_delete: bool = True):
-        _LOGGER.info(f"Deleting chunk file with extension {extension}")
         chunk_file = self.get_file(extension)
-        if chunk_file.exists():
+        try:
             chunk_file.delete(doublecheck_delete=doublecheck_delete)
-        else:
-            error_message = f"The chunk file at path {chunk_file.file_path} was not found"
-            _LOGGER.error(error_message, exc_info=True)
-            raise ChunkFileNotFoundError(error_message)
+        except FileNotFoundError as e:
+            raise ChunkFileNotFoundError(str(e))
 
 
     def has_file(self, extension: str) -> bool:
-        _LOGGER.info(f"Checking existance of chunk file with extension {extension}")
-        chunk_file = self.get_file(extension)
-        return chunk_file.exists()
+        try:
+            chunk_file = self.get_file(extension)
+            return chunk_file.exists()
+        except ChunkFileNotFoundError:
+            return False
 
 
 class SPECTREChunk(BaseChunk):

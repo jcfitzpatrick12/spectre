@@ -13,22 +13,15 @@ from spectre.exceptions import ChunkNotFoundError
 
 
 def get_chunk(chunk_key: str) -> BaseChunk:
-    _LOGGER.info(f"Getting chunk for the key: {chunk_key}")
     try:
         Chunk = chunk_map[chunk_key]
         return Chunk
     except KeyError:
         valid_chunk_keys = list(chunk_map.keys())
-        error_message = (
-            f"No chunk found for the chunk key: {chunk_key}. "
-            f"Valid chunk keys are: {valid_chunk_keys}"
-        )
-        _LOGGER.error(error_message, exc_info=True)
-        raise ChunkNotFoundError(error_message)
+        raise ChunkNotFoundError(f"No chunk found for the chunk key: {chunk_key}. Valid chunk keys are: {valid_chunk_keys}")
 
 
 def get_chunk_from_tag(tag: str) -> BaseChunk:
-    _LOGGER.info(f"Getting chunk for the tag: {tag}")
     # if we are dealing with a callisto chunk, the chunk key is equal to the tag
     if "callisto" in tag:
         chunk_key = "callisto"

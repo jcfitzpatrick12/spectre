@@ -11,8 +11,6 @@ from spectre.exceptions import ReceiverNotFoundError
 
 # used to fetch an instance of the receiver class
 def get_receiver(receiver_name: str, mode: str = None) -> BaseReceiver:
-    info_message = f"Getting an instance of a receiver with name {receiver_name} {' in mode: ' + mode if mode else 'no mode specified'}"
-    _LOGGER.info(info_message)
     # try and fetch the capture config mount
     try:
         Receiver = receivers[receiver_name]

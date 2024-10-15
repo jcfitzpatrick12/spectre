@@ -28,7 +28,6 @@ from spectre.exceptions import (
 @register_chunk('default')
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time: str, tag: str):
-        _LOGGER.info("Creating an instance of the default chunk")
         super().__init__(chunk_start_time, tag) 
         
         self.add_file(BinChunk(self.chunk_parent_path, self.chunk_name))
@@ -37,7 +36,6 @@ class Chunk(SPECTREChunk):
 
 
     def build_spectrogram(self) -> Spectrogram:
-        _LOGGER.info(f"Building spectrogram for chunk with name {self.chunk_name}")
         # fetch the raw IQ sample receiver output from the binary file
         IQ_data = self.read_file("bin")
         # and the millisecond correction from the accompanying header file
@@ -45,13 +43,10 @@ class Chunk(SPECTREChunk):
         # convert the millisecond correction to microseconds
         microsecond_correction = millisecond_correction * 1000
 
-        try:
-            # do the short time fft
-            time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data)
-        except Exception as e:
-            error_message = f"An error has occured while performing the STFFT. Received: {str(e)}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
+
+        # do the short time fft
+        time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data)
+
 
         # convert all arrays to the standard type
         time_seconds = np.array(time_seconds, dtype = 'float32')
@@ -74,19 +69,14 @@ class Chunk(SPECTREChunk):
         ## note the implementation ignores the keys by necessity, due to the scipy implementation of get_window
         window_params = (window_type, *window_kwargs.values())
         window_size = self.capture_config.get('window_size')
-        try:
-            return get_window(window_params, window_size)
-        except Exception as e:
-            error_message = f"An error has occured while fetching the window for chunk with name {self.chunk_name}. Received {str(e)}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
+        return get_window(window_params, window_size)
+
     
 
     def __do_STFFT(self, IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         '''
         For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
         '''
-        _LOGGER.info(f"Performing a STFFT")
         # fetch the window
         w = self.__fetch_window()
         # find the number of samples 
@@ -125,7 +115,7 @@ class BinChunk(ChunkFile):
     def __init__(self, chunk_parent_path: str, chunk_name: str):
         super().__init__(chunk_parent_path, chunk_name, "bin")
 
-    def _read(self) -> np.ndarray:
+    def read(self) -> np.ndarray:
         with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.complex64)
 
@@ -136,7 +126,7 @@ class HdrChunk(ChunkFile):
         super().__init__(chunk_parent_path, chunk_name, "hdr")
 
 
-    def _read(self) -> int:
+    def read(self) -> int:
         hdr_contents = self._extract_contents()
         return self._get_millisecond_correction(hdr_contents)
 
@@ -150,17 +140,13 @@ class HdrChunk(ChunkFile):
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
         # Validates that the header file contains exactly one element 
         if len(hdr_contents) != 1:
-            error_message = f"Expected exactly one integer in the header, but received header contents: {hdr_contents}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise ValueError(error_message)
+            raise ValueError(f"Expected exactly one integer in the header, but received header contents: {hdr_contents}")
         
         # Extracts and returns the millisecond correction from the file contents 
         millisecond_correction_as_float = float(hdr_contents[0])
 
         if not millisecond_correction_as_float.is_integer():
-            error_message = f"Expected integer value for millisecond correction, but got {millisecond_correction_as_float}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise TypeError(error_message)
+            raise TypeError(f"Expected integer value for millisecond correction, but got {millisecond_correction_as_float}")
         
         return int(millisecond_correction_as_float)
         
@@ -172,7 +158,7 @@ class FitsChunk(ChunkFile):
         super().__init__(chunk_parent_path, chunk_name, "fits")
 
 
-    def _read(self) -> Spectrogram:
+    def read(self) -> Spectrogram:
         with fits.open(self.file_path, mode='readonly') as hdulist:
             primary_hdu = self._get_primary_hdu(hdulist)
             dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
@@ -221,14 +207,8 @@ class FitsChunk(ChunkFile):
 
 
     def get_datetimes(self) -> np.ndarray:
-        _LOGGER.info(f"Getting datetimes from {self.file_name}")
-        try:
-            with fits.open(self.file_path, mode='readonly') as hdulist:
-                bintable_data = hdulist[1].data
-                time_seconds = bintable_data['TIME'][0]
-                return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            bintable_data = hdulist[1].data
+            time_seconds = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
 
-        except Exception as e:
-            error_message = f"An unexpected error has occured while getting the datetimes from {self.file_name}. Received: {e}"
-            _LOGGER.error(error_message, exc_info=True)
-            raise
