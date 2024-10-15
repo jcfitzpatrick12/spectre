@@ -81,6 +81,7 @@ class LogHandlers:
             _LOGGER.warning(warning_message)
             warnings.warn(warning_message)
             self.log_handler_map = log_handler_map
+            self._log_handler_list = []
             return
 
         for log_file in log_files:
