@@ -51,8 +51,7 @@ class LogHandler(TextHandler):
         )
         parent_path = os.path.join(LOGS_DIR_PATH, date_dir)
 
-        time_stamp = dt.strftime(DEFAULT_TIME_FORMAT)
-        base_file_name = f"{time_stamp}_{pid}_{process_type}"
+        base_file_name = f"{datetime_stamp}_{pid}_{process_type}"
         super().__init__(parent_path, base_file_name, override_extension = "log")
     
 
