@@ -46,9 +46,9 @@ def main(
         callback=_version_callback, 
         is_eager=True,
     ),
-    generate_log: Optional[bool] = typer.Option(
+    log: Optional[bool] = typer.Option(
         False,  # Default to False, becomes True when flag is used
-        "--generate-log",
+        "--log",
         help="Generate a log for this session.",
         is_flag=True
     ),
@@ -58,7 +58,7 @@ def main(
         help="Set the logging level (e.g., 10 for DEBUG, 20 for INFO)."
     )
 ) -> None:
-    if generate_log:
+    if log:
         logs_handler = configure_root_logger("USER", log_level)
         typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.GREEN)
     else:
