@@ -33,18 +33,20 @@ class Chunks:
                  month: int = None, 
                  day: int = None):
         _LOGGER.info(f"Initialising chunks with tag: {tag}")
-        self.tag = tag
+        self.tag: str = tag
+        self.year: int = year
+        self.month: int = month
+        self.day: int = day
 
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
         self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
         # extract the appropriate chunk class based on the input tag
         self.Chunk = get_chunk_from_tag(tag)
-        # set the chunk map
+
         self._set_chunk_map()
 
-        # set some internal attributes which assist in making Chunks iterable
-        self._chunk_list = self.get_chunk_list()
+        # internal attribute to assist in making Chunks iterable
         self._current_index = 0
 
     # setter for chunk map
@@ -76,6 +78,7 @@ class Chunks:
         
         # with all chunks accounted for, sort chronologically (as a precautionary measure) and set the populated chunk map
         self.chunk_map = OrderedDict(sorted(chunk_map.items()))
+        self._chunk_list = self.get_chunk_list()
 
     # an alias for _set_chunk_map
     def update_chunk_map(self) -> None:
@@ -85,7 +88,7 @@ class Chunks:
     
 
     # enable iterative chunks
-    def __iter__(self) -> Iterator[BaseChunk]:
+    def __iter__(self):
         self._current_index = 0
         return self
     

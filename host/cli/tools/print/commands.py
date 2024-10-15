@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import typer
 import os
 
@@ -11,11 +14,30 @@ from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
-from spectre.file_handlers.text.handlers import TextHandler
 from spectre.receivers.factory import get_receiver
+from spectre.logging import LogHandler, LogHandlers
 
 app = typer.Typer()
     
+@app.command()
+def logs(
+    pid: str = typer.Option(None, "--pid", help="Process ID to identify the log file"),
+    file_name: str = typer.Option(None, "--file-name", help="Explicitly specified file name for the log file")
+) -> None:
+    # Ensure that exactly one of --pid or --file-name is specified
+    if not (bool(pid) ^ bool(file_name)):
+        error_message = "Exactly one of --pid or --file-name must be specified."
+        _LOGGER.error(error_message)
+        raise ValueError(error_message)
+    
+    log_handlers = LogHandlers()
+    if pid:
+        log_handler = log_handlers.get_log_handler_from_pid(pid)
+    if file_name:
+        log_handler = log_handlers.get_log_handler_from_file_name(file_name)
+        
+    log_handler.cat()
+
 
 @app.command()
 def fits_config_template(

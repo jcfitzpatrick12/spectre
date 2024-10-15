@@ -11,6 +11,7 @@ from host.cli import __app_name__, __version__
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.chunks import Chunks
+from spectre.logging import LogHandlers
 
 from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH,
@@ -27,6 +28,26 @@ def callisto_instrument_codes(
     for callisto_instrument_code in INSTRUMENT_CODES:
         typer.secho(f"{callisto_instrument_code}")
     raise typer.Exit()
+
+
+@app.command()
+def logs(
+    process_type: str = typer.Option(None, "--process-type", help="Filter logs by process type"),
+    year: int = typer.Option(None, "--year", "-y", help="Specify year for logs"),
+    month: int = typer.Option(None, "--month", "-m", help="Specify month for logs"),
+    day: int = typer.Option(None, "--day", "-d", help="Specify day for logs")
+) -> None:
+    log_handlers = LogHandlers(process_type,
+                               year,
+                               month,
+                               day)
+    
+    for log_handler in log_handlers:
+        # if process type is specified, disregard all logs of differing process types
+        if process_type and log_handler.process_type != process_type:
+            continue
+        typer.secho(log_handler.file_name)
+
 
 @app.command()
 def chunks(
