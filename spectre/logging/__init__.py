@@ -52,7 +52,7 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
         datefmt=DEFAULT_DATETIME_FORMAT,
         filename=log_handler.file_path
     )
-
+    _LOGGER.info("Logging successfully configured.")
     return log_handler
 
 
