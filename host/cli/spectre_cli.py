@@ -59,7 +59,7 @@ def main(
 ) -> None:
     if not no_logs:
         logs_handler = configure_root_logger("USER", log_level)
-        typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.GREY)
+        typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.BLUE)
     else:
         # Configure minimal logging to suppress output
         logging.basicConfig(level=logging.CRITICAL)
