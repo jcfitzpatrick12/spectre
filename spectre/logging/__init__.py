@@ -88,12 +88,13 @@ class LogHandlers:
                  month: int = None, 
                  day: int = None):
         _LOGGER.info(f"Initialising logs with process type: {process_type if process_type else 'not specified'}")
-        self.process_type: str = process_type
-        self.year: int = year
-        self.month: int = month
-        self.day: int = day
+        self.process_type: str | None = process_type
+        self.year: int | None = year
+        self.month: int | None = month
+        self.day: int | None = day
 
-        validate_process_type(process_type)
+        if self.process_type:
+            validate_process_type(process_type)
 
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
         self.logs_dir_path = get_logs_dir_path(year, month, day)
