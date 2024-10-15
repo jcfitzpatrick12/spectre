@@ -30,7 +30,7 @@ PROCESS_TYPES = [
 def validate_process_type(process_type: str) -> None:
     if process_type not in PROCESS_TYPES:
         error_message = f"Invalid process type: {process_type}. Expected one of {PROCESS_TYPES}"
-        _LOGGER.error(error_message)
+        _LOGGER.error(error_message, exc_info=True)
         raise ValueError(error_message)
 
 
