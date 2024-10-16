@@ -149,7 +149,7 @@ def log_service_call(logger: logging.Logger) -> Callable:
                 _LOGGER.info(f"Calling the service function: {func.__name__}")
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.error(f"An error occurred while calling the function: {func.__name__}. Received: {str(e)}", exc_info=True)
+                logger.error(f"An error occurred while calling the service function: {func.__name__}. Received: {str(e)}", exc_info=True)
                 raise
         return wrapper
     return decorator
