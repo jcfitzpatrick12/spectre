@@ -52,13 +52,20 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
     log_handler = LogHandler(datetime_stamp, pid, process_type)
     log_handler.make_parent_path()
 
-    logging.basicConfig(
-        format="[%(asctime)s] %(levelname)s [%(name)s] %(message)s",
-        level=level,
-        datefmt=DEFAULT_DATETIME_FORMAT,
-        filename=log_handler.file_path
-    )
-    _LOGGER.info(f"Logging successfully configured for process type {process_type} with pid {pid} with logging level {level}")
+    # configure the root logger
+    logger = logging.getLogger()
+    logger.setLevel(level)
+    # Remove any existing handlers to avoid duplicate logs
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+    # Set up file handler with specific filename
+    file_handler = logging.FileHandler(log_handler.file_name)
+    file_handler.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    # and add it to the root logger
+    logger.addHandler(file_handler)
+
     return log_handler
 
 

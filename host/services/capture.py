@@ -84,27 +84,11 @@ def _monitor_processes(process_infos: List[tuple],
         _terminate_processes([p[0] for p in process_infos])
 
 
-def configure_logger(filename):
-    """Configure logger with a specific filename."""
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    # Remove any existing handlers to avoid duplicate logs
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-    # Set up file handler with specific filename
-    file_handler = logging.FileHandler(filename)
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    return logger
-
-
 def _start_capture(receiver_name: str, 
                    mode: str, 
                    tags: List[str]) -> None:
     from spectre.cfg import LOGS_DIR_PATH
-    configure_logger(f"{LOGS_DIR_PATH}/2024/10/16/test.log")
+    configure_root_logger(f"WORKER")
     _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
