@@ -2,6 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import Callable
 import logging
 import os
 import warnings
@@ -139,3 +140,15 @@ class LogHandlers:
             if log_handler.pid == pid:
                 return log_handler
         raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")
+
+
+def log_exceptions(logger: logging.Logger) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                logger.error("An error occurred in function %s: %s", func.__name__, e, exc_info=True)
+                raise
+        return wrapper
+    return decorator

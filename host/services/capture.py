@@ -11,8 +11,10 @@ from typing import List
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
-from spectre.logging import configure_root_logger
-from spectre.exceptions import log_exceptions
+from spectre.logging import (
+    configure_root_logger, 
+    log_exceptions
+)
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:

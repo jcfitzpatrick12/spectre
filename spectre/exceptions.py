@@ -17,15 +17,3 @@ class ReceiverNotFoundError(Exception): ...
 class InvalidReceiver(Exception): ...
 class InvalidModeError(Exception): ...
 
-
-def log_exceptions(logger: logging.Logger) -> Callable:
-    def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                logger.error("An error occurred in function %s: %s", func.__name__, e, exc_info=True)
-                raise
-        return wrapper
-    return decorator
-

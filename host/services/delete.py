@@ -7,7 +7,7 @@ _LOGGER = getLogger(__name__)
 
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
-from spectre.exceptions import log_exceptions
+from spectre.logging import log_exceptions
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler

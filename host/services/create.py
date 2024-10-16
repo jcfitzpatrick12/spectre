@@ -9,7 +9,7 @@ from typing import List
 
 from spectre.receivers.factory import get_receiver
 from spectre.file_handlers.json.handlers import FitsConfigHandler
-from spectre.exceptions import log_exceptions
+from spectre.logging import log_exceptions
 
 
 @log_exceptions(_LOGGER)

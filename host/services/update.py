@@ -8,7 +8,7 @@ _LOGGER = getLogger(__name__)
 from typing import List
 
 from spectre.receivers.factory import get_receiver
-from spectre.exceptions import log_exceptions
+from spectre.logging import log_exceptions
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler

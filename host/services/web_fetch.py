@@ -6,7 +6,7 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 from spectre.web_fetch.callisto import fetch_chunks
-from spectre.exceptions import log_exceptions
+from spectre.logging import log_exceptions
 
 
 @log_exceptions(_LOGGER)
