@@ -7,7 +7,6 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 import multiprocessing
-multiprocessing.set_start_method('spawn')
 
 import time
 from typing import List
