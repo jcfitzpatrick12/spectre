@@ -48,7 +48,8 @@ class LogHandler(TextHandler):
 def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHandler:
     system_datetime = datetime.now()
     datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
-    log_handler = LogHandler(datetime_stamp, os.getpid(), process_type)
+    pid = os.getpid()
+    log_handler = LogHandler(datetime_stamp, pid, process_type)
     log_handler.make_parent_path()
 
     logging.basicConfig(
@@ -57,7 +58,7 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
         datefmt=DEFAULT_DATETIME_FORMAT,
         filename=log_handler.file_path
     )
-    _LOGGER.info(f"Logging successfully configured for process type {process_type} with logging level {level}")
+    _LOGGER.info(f"Logging successfully configured for process type {process_type} with pid {pid} with logging level {level}")
     return log_handler
 
 
