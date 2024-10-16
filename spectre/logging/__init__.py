@@ -57,7 +57,7 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
         datefmt=DEFAULT_DATETIME_FORMAT,
         filename=log_handler.file_path
     )
-    _LOGGER.info("Logging successfully configured")
+    _LOGGER.info(f"Logging successfully configured for process type {process_type} with logging level {level}")
     return log_handler
 
 
@@ -142,13 +142,14 @@ class LogHandlers:
         raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")
 
 
-def log_exceptions(logger: logging.Logger) -> Callable:
+def log_service_call(logger: logging.Logger) -> Callable:
     def decorator(func: Callable) -> Callable:
+        _LOGGER.info("Calling the service function %s", func.__name__)
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.error("An error occurred in function %s: %s", func.__name__, e, exc_info=True)
+                logger.error("An error occurred while calling the function %s: %s", func.__name__, e, exc_info=True)
                 raise
         return wrapper
     return decorator

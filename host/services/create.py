@@ -9,10 +9,10 @@ from typing import List
 
 from spectre.receivers.factory import get_receiver
 from spectre.file_handlers.json.handlers import FitsConfigHandler
-from spectre.logging import log_exceptions
+from spectre.logging import log_service_call
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def fits_config(tag: str,
                 params: List[str] | None = None,
 ) -> None:
@@ -23,7 +23,7 @@ def fits_config(tag: str,
     _LOGGER.info(f"The fits-config for tag \"{tag}\" has been created")
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def capture_config(tag: str,
                    receiver_name: str,
                    mode: str,

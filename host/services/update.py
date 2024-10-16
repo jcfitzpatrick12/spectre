@@ -8,14 +8,14 @@ _LOGGER = getLogger(__name__)
 from typing import List
 
 from spectre.receivers.factory import get_receiver
-from spectre.logging import log_exceptions
+from spectre.logging import log_service_call
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def capture_config(tag: str,
                    params: List[str]
 ) -> None:
@@ -42,7 +42,7 @@ def capture_config(tag: str,
     receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def fits_config(tag: str,
                 params: List[str]
 ) -> None:

@@ -6,10 +6,10 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 from spectre.web_fetch.callisto import fetch_chunks
-from spectre.logging import log_exceptions
+from spectre.logging import log_service_call
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def callisto(
     instrument_code: str,
     year: int | None = None,

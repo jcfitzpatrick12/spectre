@@ -13,7 +13,7 @@ from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
 from spectre.logging import (
     configure_root_logger, 
-    log_exceptions
+    log_service_call
 )
 
 # Utility functions
@@ -52,6 +52,7 @@ def _restart_all_processes(process_infos: List[tuple]) -> List[tuple]:
     for process, target_func, args in process_infos:
         new_process = start_process(target_func, args, process.name)
         new_process_infos.append((new_process, target_func, args))
+    _LOGGER.info("Processes successfully restarted")
     return new_process_infos
 
 
@@ -86,17 +87,20 @@ def _start_capture(receiver_name: str,
                    mode: str, 
                    tags: List[str]) -> None:
     configure_root_logger("WORKER") #  start worker log
+    _LOGGER.info(f"Starting capture with the receiver {receiver_name} operating in mode {mode} with tags {tags}")
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
 
 
 def _start_watcher(tags: List[str]) -> None:
     configure_root_logger("WORKER") #  start worker log
+    _LOGGER.info(f"Starting watcher with tags {tags}")
     for tag in tags:
         watcher = Watcher(tag)
         watcher.start()
 
-@log_exceptions(_LOGGER)
+
+@log_service_call(_LOGGER)
 def start(receiver_name: str, 
           mode: str, 
           tags: List[str], 
@@ -110,7 +114,7 @@ def start(receiver_name: str,
     _monitor_processes([(capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
 
 
-@log_exceptions(_LOGGER)
+@log_service_call(_LOGGER)
 def session(receiver_name: str,
             mode: str, 
             tags: List[str], 
