@@ -59,7 +59,7 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
     for handler in logger.handlers:
         logger.removeHandler(handler)
     # Set up file handler with specific filename
-    file_handler = logging.FileHandler(log_handler.file_name)
+    file_handler = logging.FileHandler(log_handler.file_path)
     file_handler.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
