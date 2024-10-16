@@ -45,30 +45,6 @@ class LogHandler(TextHandler):
         super().__init__(parent_path, base_file_name, override_extension="log")
 
 
-def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHandler:
-    system_datetime = datetime.now()
-    datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
-    pid = os.getpid()
-    log_handler = LogHandler(datetime_stamp, pid, process_type)
-    log_handler.make_parent_path()
-
-    # configure the root logger
-    logger = logging.getLogger()
-    logger.setLevel(level)
-    # Remove any existing handlers to avoid duplicate logs
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-    # Set up file handler with specific filename
-    file_handler = logging.FileHandler(log_handler.file_path)
-    file_handler.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    # and add it to the root logger
-    logger.addHandler(file_handler)
-
-    return log_handler
-
-
 class LogHandlers:
     def __init__(self, process_type: str | None = None, year: int = None, month: int = None, day: int = None):
         self.process_type = process_type
@@ -148,6 +124,31 @@ class LogHandlers:
             if log_handler.pid == pid:
                 return log_handler
         raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")
+
+
+def configure_root_logger(process_type: str, 
+                          level: int = logging.INFO) -> LogHandler:
+    system_datetime = datetime.now()
+    datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
+    pid = os.getpid()
+    log_handler = LogHandler(datetime_stamp, pid, process_type)
+    log_handler.make_parent_path()
+
+    # configure the root logger
+    logger = logging.getLogger()
+    logger.setLevel(level)
+    # Remove any existing handlers to avoid duplicate logs
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+    # Set up file handler with specific filename
+    file_handler = logging.FileHandler(log_handler.file_path)
+    file_handler.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    # and add it to the root logger
+    logger.addHandler(file_handler)
+
+    return log_handler
 
 
 def log_service_call(logger: logging.Logger) -> Callable:
