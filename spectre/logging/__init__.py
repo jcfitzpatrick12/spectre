@@ -49,7 +49,6 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
     system_datetime = datetime.now()
     datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
     log_handler = LogHandler(datetime_stamp, os.getpid(), process_type)
-    print(os.getpid())
     log_handler.make_parent_path()
 
     logging.basicConfig(

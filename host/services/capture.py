@@ -87,7 +87,7 @@ def _start_capture(receiver_name: str,
                    mode: str, 
                    tags: List[str]) -> None:
     configure_root_logger("WORKER") #  start worker log
-    _LOGGER.info(f"Starting capture with the receiver {receiver_name} operating in mode {mode} with tags {tags}")
+    _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
 
