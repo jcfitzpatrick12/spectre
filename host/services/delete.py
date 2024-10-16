@@ -7,11 +7,14 @@ _LOGGER = getLogger(__name__)
 
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
+from spectre.exceptions import log_exceptions
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
 
+
+@log_exceptions(_LOGGER)
 def logs(process_type: str | None = None,
          year: int | None = None,
          month: int | None = None,
@@ -34,6 +37,7 @@ def logs(process_type: str | None = None,
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
 
 
+@log_exceptions(_LOGGER)
 def chunks(tag: str,
            extensions: list[str],
            year: int | None = None,

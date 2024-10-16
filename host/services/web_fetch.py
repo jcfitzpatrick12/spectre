@@ -2,10 +2,14 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import List
+from logging import getLogger
+_LOGGER = getLogger(__name__)
 
 from spectre.web_fetch.callisto import fetch_chunks
+from spectre.exceptions import log_exceptions
 
+
+@log_exceptions(_LOGGER)
 def callisto(
     instrument_code: str,
     year: int | None = None,

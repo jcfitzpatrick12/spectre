@@ -2,15 +2,20 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 from typing import List
 
 from spectre.receivers.factory import get_receiver
+from spectre.exceptions import log_exceptions
 from spectre.file_handlers.json.handlers import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
 
 
+@log_exceptions(_LOGGER)
 def capture_config(tag: str,
                    params: List[str]
 ) -> None:
@@ -37,6 +42,7 @@ def capture_config(tag: str,
     receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
 
 
+@log_exceptions(_LOGGER)
 def fits_config(tag: str,
                 params: List[str]
 ) -> None:

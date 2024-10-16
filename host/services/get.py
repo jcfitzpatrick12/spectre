@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER =  getLogger(__name__)
+
 from os import listdir, walk
 from os.path import splitext
 from typing import Any
@@ -11,6 +14,7 @@ from spectre.receivers.receiver_register import list_all_receiver_names
 from spectre.chunks import Chunks
 from spectre.logging import LogHandlers, LogHandler
 from spectre.chunks.base import ChunkFile
+from spectre.exceptions import log_exceptions
 from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH,
     CALLISTO_INSTRUMENT_CODES,
@@ -21,12 +25,15 @@ from spectre.file_handlers.json.handlers import (
     CaptureConfigHandler
 )
 
+
+@log_exceptions(_LOGGER)
 def callisto_instrument_codes(
 ) -> None:
     """Gets all defined CALLISTO instrument codes"""
     return CALLISTO_INSTRUMENT_CODES
 
 
+@log_exceptions(_LOGGER)
 def log_handlers(process_type: str | None = None,
                  year: int | None = None,
                  month: int | None = None,
@@ -40,6 +47,7 @@ def log_handlers(process_type: str | None = None,
     return log_handlers.get_log_handler_list()
 
 
+@log_exceptions(_LOGGER)
 def log_file_names(process_type: str | None = None,
                    year: int | None = None,
                    month: int | None = None,
@@ -49,6 +57,7 @@ def log_file_names(process_type: str | None = None,
     return [log_handler.file_name for log_handler in log_handler_list]
 
 
+@log_exceptions(_LOGGER)
 def chunk_files(tag: str,
                 year: int | None = None,
                 month: int | None = None,
@@ -74,6 +83,7 @@ def chunk_files(tag: str,
     return chunk_files
 
 
+@log_exceptions(_LOGGER)
 def chunk_file_names(tag: str,
                      year: int | None = None,
                      month: int | None = None,
@@ -83,35 +93,40 @@ def chunk_file_names(tag: str,
     chunk_file_list = chunk_files(tag, year, month, day, extensions)
     return [chunk_file.file_name for chunk_file in chunk_file_list]
     
-        
 
+@log_exceptions(_LOGGER)
 def receiver_names(
 ) -> list[str]:
     return list_all_receiver_names()
 
 
+@log_exceptions(_LOGGER)
 def receiver_modes(receiver_name: str,
 ) -> list[str]:
     receiver = get_receiver(receiver_name)
     return receiver.valid_modes
 
 
+@log_exceptions(_LOGGER)
 def receiver_specifications(receiver_name: str,
 ) -> dict[str, Any]:
     receiver = get_receiver(receiver_name)
     return receiver.get_specifications()
 
 
+@log_exceptions(_LOGGER)
 def fits_config_file_names(
 ) -> list[str]:
     return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("fits_config")]
 
 
+@log_exceptions(_LOGGER)
 def capture_config_names(
 ) -> list[str]:
     return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("capture_config")]   
 
 
+@log_exceptions(_LOGGER)
 def tags(year: int | None = None,
          month: int | None = None,
          day: int | None = None,
@@ -126,6 +141,7 @@ def tags(year: int | None = None,
     return sorted(list(tags))
 
 
+@log_exceptions(_LOGGER)
 def log_handler(pid: str | None = None,
         file_name: str | None = None
 ) -> LogHandler:
@@ -140,6 +156,7 @@ def log_handler(pid: str | None = None,
         return log_handlers.get_log_handler_from_file_name(file_name)
 
 
+@log_exceptions(_LOGGER)
 def fits_config_template(tag: str | None = None,
                          as_command: bool = False
 ) -> dict[str, Any] | str:
@@ -152,6 +169,7 @@ def fits_config_template(tag: str | None = None,
         return FitsConfigHandler.get_template()
 
 
+@log_exceptions(_LOGGER)
 def capture_config_template(receiver_name: str,
                             mode: str,
                             as_command: bool = False,
@@ -166,12 +184,14 @@ def capture_config_template(receiver_name: str,
         return receiver.get_template()
 
 
+@log_exceptions(_LOGGER)
 def fits_config(tag: str
 ) -> dict[str, Any]:
     fits_config_handler = FitsConfigHandler(tag)
     return fits_config_handler.read()
 
 
+@log_exceptions(_LOGGER)
 def capture_config(tag: str
 ) -> dict[str, Any]:
     capture_config_handler = CaptureConfigHandler(tag)

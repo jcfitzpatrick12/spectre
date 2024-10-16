@@ -12,6 +12,7 @@ from typing import List
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
 from spectre.logging import configure_root_logger
+from spectre.exceptions import log_exceptions
 
 # Utility functions
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
@@ -93,8 +94,7 @@ def _start_watcher(tags: List[str]) -> None:
         watcher = Watcher(tag)
         watcher.start()
 
-
-# public capture functions
+@log_exceptions(_LOGGER)
 def start(receiver_name: str, 
           mode: str, 
           tags: List[str], 
@@ -108,6 +108,7 @@ def start(receiver_name: str,
     _monitor_processes([(capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
 
 
+@log_exceptions(_LOGGER)
 def session(receiver_name: str,
             mode: str, 
             tags: List[str], 
