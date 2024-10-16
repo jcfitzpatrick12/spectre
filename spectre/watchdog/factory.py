@@ -10,7 +10,7 @@ def get_event_handler(event_handler_key: str):
     event_handler = event_handler_map.get(event_handler_key)
     if event_handler is None:
         valid_event_handler_keys = list(event_handler_map.keys())
-        raise ValueError(f"No chunk found for the event handler key: {event_handler_key}. Please specify one of the following event handler keys {valid_event_handler_keys}.")
+        raise ValueError(f"No chunk found for the event handler key: {event_handler_key}. Please specify one of the following event handler keys {valid_event_handler_keys}")
     return event_handler
 
 def get_event_handler_from_tag(tag: str):

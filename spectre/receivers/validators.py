@@ -36,7 +36,7 @@ def closed_confine_samp_rate(samp_rate: int,
                              samp_rate_lower_bound: int, 
                              samp_rate_upper_bound: int) -> None:
     if not (samp_rate_lower_bound <= samp_rate <= samp_rate_upper_bound):
-        raise ValueError(f"Sampling rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz].")
+        raise ValueError(f"Sampling rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz]")
     return
 
 
@@ -76,7 +76,7 @@ def validate_window(window_type: str,
 
 def validate_STFFT_kwargs(STFFT_kwargs: dict):
     if len(STFFT_kwargs) == 0:
-        raise ValueError("STFFT kwargs cannot be empty.")
+        raise ValueError("STFFT kwargs cannot be empty")
     
     STFFT_keys = STFFT_kwargs.keys()
     if "hop" not in STFFT_keys:
@@ -107,7 +107,7 @@ def validate_bandwidth_strictly_positive(bandwidth: float) -> None:
 def validate_nyquist_criterion(samp_rate: int, 
                                bandwidth: float) -> None:
     if samp_rate < bandwidth:
-        raise ValueError("Sample rate must be greater than or equal to the bandwidth.")
+        raise ValueError("Sample rate must be greater than or equal to the bandwidth")
     return
 
 
@@ -129,7 +129,7 @@ def validate_time_resolution(time_resolution: float,
         raise ValueError(f"Time resolution must be non-negative. Received: {time_resolution} [s]")
     
     if time_resolution > chunk_size:
-        raise ValueError("Time resolution must be less than or equal to chunk size.")
+        raise ValueError("Time resolution must be less than or equal to chunk size")
     return
 
 
@@ -203,7 +203,7 @@ def validate_sweep_interval(min_freq: float,
 def validate_num_samples_per_step(samples_per_step: int, 
                                   window_size: int) -> None:
     if window_size >= samples_per_step:
-        raise ValueError(f"Window size must be strictly less than the number of samples per step. Received window size {window_size} [samples], which is more than or equal to the number of samples per step {samples_per_step}.")
+        raise ValueError(f"Window size must be strictly less than the number of samples per step. Received window size {window_size} [samples], which is more than or equal to the number of samples per step {samples_per_step}")
     return
 
 

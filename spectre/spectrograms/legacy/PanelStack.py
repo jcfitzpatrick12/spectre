@@ -67,7 +67,7 @@ class PanelStack(Panels):
                         ax.set_xlabel(f'Time [s]', size=self.fsize_head) 
                     
                     else:
-                        raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
+                        raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}")
             # Hide x-tick labels for all but the last ax
                 else:
                     ax.tick_params(labelbottom=False) 

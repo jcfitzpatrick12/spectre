@@ -21,7 +21,7 @@ class JsonHandler(BaseFileHandler):
         return 
     
     
-    def read(self) -> dict:
+    def read(self) -> dict[str, Any]:
         with open(self.file_path, 'r') as f:
             return json.load(f)
         
@@ -61,7 +61,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
-            raise InvalidTagError(f"Tags cannot contain an underscore. Received {tag}.")
+            raise InvalidTagError(f"Tags cannot contain an underscore. Received {tag}")
         if "callisto" in tag:
             raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
@@ -137,9 +137,9 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         if missing_keys or invalid_keys:
             error_messages = []
             if missing_keys:
-                error_messages.append(f"Missing keys: {', '.join(missing_keys)}.")
+                error_messages.append(f"Missing keys: {', '.join(missing_keys)}")
             if invalid_keys:
-                error_messages.append(f"Invalid keys: {', '.join(invalid_keys)}.")
+                error_messages.append(f"Invalid keys: {', '.join(invalid_keys)}")
             raise KeyError("Key errors found! " + " ".join(error_messages))
 
 
@@ -161,7 +161,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
         super().__init__(tag, "fits", **kwargs)
 
     @classmethod
-    def get_template(cls) -> dict:
+    def get_template(cls) -> dict[str, Any]:
         return {
             "ORIGIN": str,
             "TELESCOP": str,

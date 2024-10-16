@@ -15,7 +15,7 @@ class AnalyticalFactory:
     def get_spectrogram(self, test_mode: str, shape: tuple, capture_config: dict) -> Spectrogram:
         builder_method = self.builder_methods.get(test_mode)
         if builder_method is None:
-            raise ValueError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}.")
+            raise ValueError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
         return builder_method(shape, capture_config)
     
     def cosine_signal_1(self, 

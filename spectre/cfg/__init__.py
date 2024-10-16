@@ -6,7 +6,7 @@ import os
 
 SPECTRE_DIR_PATH = os.environ.get("SPECTRE_DIR_PATH")
 if SPECTRE_DIR_PATH is None:
-    raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set.")
+    raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set")
 
 CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR_PATH", 
                                  os.path.join(SPECTRE_DIR_PATH, 'chunks'))
@@ -24,7 +24,7 @@ DEFAULT_TIME_FORMAT = "%H:%M:%S"
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 DEFAULT_DATETIME_FORMAT = f"{DEFAULT_DATE_FORMAT}T{DEFAULT_TIME_FORMAT}"
 
-INSTRUMENT_CODES = [
+CALLISTO_INSTRUMENT_CODES = [
     "ALASKA-ANCHORAGE",
     "ALASKA-COHOE",
     "ALASKA-HAARP",
@@ -83,9 +83,9 @@ INSTRUMENT_CODES = [
 def _get_date_based_dir_path(base_dir: str, year: int = None, 
                              month: int = None, day: int = None) -> str:
     if day and not (year and month):
-        raise ValueError("A day requires both a month and a year.")
+        raise ValueError("A day requires both a month and a year")
     if month and not year:
-        raise ValueError("A month requires a year.")
+        raise ValueError("A month requires a year")
     
     date_dir_components = []
     if year:

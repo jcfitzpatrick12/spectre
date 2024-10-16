@@ -8,13 +8,13 @@ from typing import Optional
 
 from host.cli import __app_name__, __version__
 
-from host.cli.tools.create.commands import app as create_app
-from host.cli.tools.list.commands import app as list_app
-from host.cli.tools.print.commands import app as print_app
-from host.cli.tools.delete.commands import app as delete_app
-from host.cli.tools.capture.commands import app as capture_app
-from host.cli.tools.update.commands import app as update_app
-from host.cli.tools.web_fetch.commands import app as web_fetch_app
+from host.cli.tools.create import app as create_app
+from host.cli.tools.list import app as list_app
+from host.cli.tools.print import app as print_app
+from host.cli.tools.delete import app as delete_app
+from host.cli.tools.capture import app as capture_app
+from host.cli.tools.update import app as update_app
+from host.cli.tools.web_fetch import app as web_fetch_app
 
 from spectre.logging import configure_root_logger
 

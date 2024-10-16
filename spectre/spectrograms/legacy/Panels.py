@@ -52,7 +52,7 @@ class Panels:
         elif self.time_type == "time_seconds":
             self.times = S.time_seconds
         else:
-            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
+            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}")
         
         self.slice_at_time = slice_at_time
         if not self.slice_at_time is None:
@@ -77,7 +77,7 @@ class Panels:
         elif slice_type == "raw":
             self.S.slice_type = "raw"
         else:
-            raise ValueError("Slice type is not recognised. Expected \"raw\" or \"dBb\".")
+            raise ValueError("Slice type is not recognised. Expected \"raw\" or \"dBb\"")
         
         self.fsize_head = fsize_head
         self.fsize = fsize
@@ -90,14 +90,14 @@ class Panels:
     def get_plot_method(self, panel_type: str):
         plot_method = self.panel_type_dict.get(panel_type, None)
         if plot_method is None:
-            raise KeyError(f"{panel_type} is not valid. Expected one of {self.valid_panel_types}.")
+            raise KeyError(f"{panel_type} is not valid. Expected one of {self.valid_panel_types}")
         return plot_method
     
 
     def frequency_slice(self, ax: Axes, cax: Axes) -> None:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_time is None:
-                raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_time}.")
+                raise ValueError(f"No times specified to slice spectrogram. Received {self.slice_at_time}")
 
             if self.normalise_line_plots:
                 normalise_frequency_slice = True
@@ -129,7 +129,7 @@ class Panels:
     def time_slice(self, ax: Axes, cax: Axes) -> None:
             # ensure that the slice_at_times keyword is non-empty
             if self.slice_at_frequency is None:
-                raise ValueError(f"No frequencies specified to slice spectrogram. Received {self.slice_at_time}.")
+                raise ValueError(f"No frequencies specified to slice spectrogram. Received {self.slice_at_time}")
 
             if self.normalise_line_plots:
                 normalise_time_slice = True
@@ -290,20 +290,20 @@ class Panels:
         slice_type = type(self.slice_at_time)
         if self.time_type == "time_seconds":
             if not (slice_type == float or slice_type == int):
-                raise TypeError(f"Unexpected type for slice_at_time, with Panels having time_type {self.time_type}. Received {slice_type}, expected float or int.")
+                raise TypeError(f"Unexpected type for slice_at_time, with Panels having time_type {self.time_type}. Received {slice_type}, expected float or int")
             
         elif self.time_type == "datetimes":
             if not (slice_type == datetime or slice_type == str):
-                raise TypeError(f"Unexpected type for slice_at_time, with Panels having time_type {self.time_type}. Received {slice_type}, expected datetime or str.")
+                raise TypeError(f"Unexpected type for slice_at_time, with Panels having time_type {self.time_type}. Received {slice_type}, expected datetime or str")
         else:
-            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}.")
+            raise ValueError(f"Must set a valid time type. Received {self.time_type}, expected one of {self.valid_time_types}")
         return
     
         
     def check_slice_at_frequency(self) -> None:
         slice_type = type(self.slice_at_frequency)
         if not (slice_type == float or slice_type == int):
-            raise TypeError(f"Unexpected type for frequency slice Received {slice_type}, expected either float or int.")
+            raise TypeError(f"Unexpected type for frequency slice Received {slice_type}, expected either float or int")
         return
     
 

@@ -73,12 +73,12 @@ class BaseReceiver(ABC):
         if capture_method_modes == validator_modes == template_modes:
             self.valid_modes = capture_method_modes
         else:
-            raise KeyError(f"Mode key mismatch for the receiver {self.name}. Could not define valid modes.")
+            raise KeyError(f"Mode key mismatch for the receiver {self.name}. Could not define valid modes")
 
 
     def set_mode(self, mode: str) -> None:
         if not mode in self.valid_modes:
-            raise InvalidModeError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}.")
+            raise InvalidModeError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}")
         self.mode = mode
 
 
@@ -138,10 +138,10 @@ class BaseReceiver(ABC):
         capture_config = capture_config_handler.read()
 
         if capture_config['receiver'] != self.name:
-            raise InvalidReceiver(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'.")
+            raise InvalidReceiver(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'")
         
         if capture_config['mode'] != self.mode:
-            raise InvalidModeError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'.")
+            raise InvalidModeError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'")
 
         self.validate(capture_config)
         return capture_config

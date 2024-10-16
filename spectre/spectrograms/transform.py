@@ -18,13 +18,13 @@ def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
 
     # Check if average_over is an integer
     if type(average_over) != int:
-        raise TypeError(f"average_over must be an integer. Got {type(average_over)}.")
+        raise TypeError(f"average_over must be an integer. Got {type(average_over)}")
 
     # Get the size of the specified axis which we will average over
     axis_size = array.shape[axis]
     # Check if average_over is within the valid range
     if not 1 <= average_over <= axis_size:
-        raise ValueError(f"average_over must be between 1 and the length of the axis ({axis_size}).")
+        raise ValueError(f"average_over must be between 1 and the length of the axis ({axis_size})")
     
     max_axis_index = len(np.shape(array)) - 1
     if axis > max_axis_index: # zero indexing on specifying axis, so minus one
@@ -78,7 +78,7 @@ def frequency_chop(input_spectrogram: Spectrogram,
     
     # enforce distinct start and end indices
     if start_index == end_index:
-        raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")  
+        raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}")  
     
     # if start index is more than end index, swap the ordering so to enforce start_index <= end_index
     if start_index > end_index:
@@ -113,7 +113,7 @@ def time_chop(input_spectrogram: Spectrogram,
 
     # spectre does not currently support time chop for non-datetime assigned spectrograms
     if input_spectrogram.chunk_start_time is None:
-        raise ValueError(f"Input spectrogram is missing chunk start time. Time chop not yet supported for non-datetime assigned spectrograms.")
+        raise ValueError(f"Input spectrogram is missing chunk start time. Time chop not yet supported for non-datetime assigned spectrograms")
     
     # parse the strings as datetimes
     start_datetime = datetime.strptime(start_time, time_format)
@@ -129,7 +129,7 @@ def time_chop(input_spectrogram: Spectrogram,
     end_index = find_closest_index(end_datetime, input_spectrogram.datetimes)
     
     if start_index == end_index:
-        raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}.")
+        raise ValueError(f"Start and end indices are equal! Got start_index: {start_index} and end_index: {end_index}")
     
     if start_index > end_index:
         start_index, end_index = end_index, start_index
@@ -166,7 +166,7 @@ def time_average(input_spectrogram: Spectrogram,
     
     # spectre does not currently support averaging of non-datetime assigned spectrograms
     if input_spectrogram.chunk_start_time is None:
-        raise ValueError(f"Input spectrogram is missing chunk start time. Averaging is not yet supported for non-datetime assigned spectrograms.")
+        raise ValueError(f"Input spectrogram is missing chunk start time. Averaging is not yet supported for non-datetime assigned spectrograms")
     
     # if the user has requested no averaging, just return the same instance unchanged
     if average_over == 1:
@@ -255,13 +255,13 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
     # perform checks on each spectrogram in teh list
     for spectrogram in spectrogram_list:
         if not np.all(np.equal(spectrogram.freq_MHz, reference_spectrogram.freq_MHz)):
-            raise ValueError(f"All spectrograms must have identical frequency ranges.")
+            raise ValueError(f"All spectrograms must have identical frequency ranges")
         if spectrogram.tag != reference_spectrogram.tag:
             raise ValueError(f"All tags must be equal for each spectrogram in the input list!")
         if spectrogram.spectrum_type != reference_spectrogram.spectrum_type:
             raise ValueError(f"All units must be equal for each spectrogram in the input list!")
         if spectrogram.chunk_start_time is None:
-            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {spectrogram.chunk_start_time}.")
+            raise ValueError(f"All spectrograms must have chunk_start_time set. Received {spectrogram.chunk_start_time}")
 
 
     # build a list of the time array of each spectrogram in the list
@@ -284,7 +284,7 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
     # # check the transformed time seconds are strictly increasing
     # strictly_increasing = np.all(np.diff(transformed_time_seconds) > 0)
     # if not strictly_increasing:
-    #     raise ValueError(f"The transformed time values are not strictly increasing. Ensure that the time data is well ordered.")
+    #     raise ValueError(f"The transformed time values are not strictly increasing. Ensure that the time data is well ordered")
 
     # compute the microsecond correction
     transformed_microsecond_correction = conc_datetimes[0].microsecond

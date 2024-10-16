@@ -2,13 +2,13 @@ from datetime import datetime
 
 from spectre.chunks import Chunks
 from spectre.spectrograms.transform import frequency_chop
-from spectre.cfg import DEFAULT_TIME_FORMAT
+from spectre.cfg import DEFAULT_DATETIME_FORMAT
 
 def main(tag: str, 
          start_time: str, 
          end_time: str):
     start_datetime = datetime.strptime(start_time, 
-                                       DEFAULT_TIME_FORMAT)
+                                       DEFAULT_DATETIME_FORMAT)
     chunks = Chunks(tag, 
                     year=start_datetime.year, 
                     month=start_datetime.month,

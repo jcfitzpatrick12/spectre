@@ -188,4 +188,4 @@ class Chunks:
         if spectrograms:
             return transform.join_spectrograms(spectrograms)
         else:
-            raise SpectrogramNotFoundError("No spectrogram data found for the given time range.")
+            raise SpectrogramNotFoundError("No spectrogram data found for the given time range")

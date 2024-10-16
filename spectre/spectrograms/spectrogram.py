@@ -96,7 +96,7 @@ class Spectrogram:
         if not (background_spectrum is None):
             # if it has, but the interval was also specified, raise an error (as we cannot use both)
             if not (background_interval is None):
-                raise ValueError(f"Cannot specify both background spectrum and background interval! Background must be assigned either explictly or via the interval.")
+                raise ValueError(f"Cannot specify both background spectrum and background interval! Background must be assigned either explictly or via the interval")
             # otherwise, set the background spectrum and proceed
             self.background_spectrum = background_spectrum
 
@@ -130,17 +130,17 @@ class Spectrogram:
 
     def _set_background_indices(self) -> list[int]:
         if not isinstance(self.background_interval, list) or len(self.background_interval) != 2:
-            raise ValueError("Background interval must be a list with exactly two elements.")
+            raise ValueError("Background interval must be a list with exactly two elements")
 
         start_background, end_background = self.background_interval
         background_type = type(start_background)
 
         if background_type != type(end_background):
-            raise TypeError("All elements of the background interval list must be of the same type.")
+            raise TypeError("All elements of the background interval list must be of the same type")
 
         if background_type in [str, datetime]:
             if self.chunk_start_datetime is None:
-                raise ValueError("Chunk start time must be known if specifying background bounds as string or datetime.")
+                raise ValueError("Chunk start time must be known if specifying background bounds as string or datetime")
             if background_type is str:
                 start_background = datetime.strptime(start_background, DEFAULT_DATETIME_FORMAT)
                 end_background = datetime.strptime(end_background, DEFAULT_DATETIME_FORMAT)
@@ -152,7 +152,7 @@ class Spectrogram:
                                        find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=False)]
 
         else:
-            raise TypeError(f"Unrecognized background interval type! Received {background_type}.")
+            raise TypeError(f"Unrecognized background interval type! Received {background_type}")
 
         return
 
@@ -178,17 +178,17 @@ class Spectrogram:
         num_spectrogram_dims = np.ndim(self.dynamic_spectra)
         # Check if 'dynamic_spectra' is a 2D array
         if num_spectrogram_dims != 2:
-            raise ValueError(f"Expected 'dynamic_spectra' to be a 2D array, but got {num_spectrogram_dims}D array.")
+            raise ValueError(f"Expected 'dynamic_spectra' to be a 2D array, but got {num_spectrogram_dims}D array")
 
         dynamic_spectra_shape = self.dynamic_spectra.shape
         num_freq_bins = len(self.freq_MHz)
         num_time_bins = len(self.time_seconds)
         # Check if the dimensions of 'dynamic_spectra' are consistent with 'time_seconds' and 'freq_MHz'
         if dynamic_spectra_shape[0] != num_freq_bins:
-            raise ValueError(f"Mismatch in number of columns: Expected {num_freq_bins}, but got {dynamic_spectra_shape[0]}.")
+            raise ValueError(f"Mismatch in number of columns: Expected {num_freq_bins}, but got {dynamic_spectra_shape[0]}")
         
         if dynamic_spectra_shape[1] != num_time_bins:
-            raise ValueError(f"Mismatch in number of rows: Expected {num_time_bins}, but got {dynamic_spectra_shape[1]}.")
+            raise ValueError(f"Mismatch in number of rows: Expected {num_time_bins}, but got {dynamic_spectra_shape[1]}")
         
         # Check if the shape of the background spectrum is consistent with the shape of dynamic spectrum
         num_freq_bins_in_background_spectrum = len(self.background_spectrum)
@@ -247,7 +247,7 @@ class Spectrogram:
             raise ValueError(f'Unexpected time type. Expected "time_seconds" or "datetimes", but received {time_type}.')
 
         if log_norm and dBb:
-            raise ValueError(f"Please specify either log_norm or dBb. Both is not supported.")
+            raise ValueError(f"Please specify either log_norm or dBb. Both is not supported")
         
         # Select the appropriate data and normalization
         ds = self.dynamic_spectra_as_dBb if dBb else self.dynamic_spectra
@@ -289,14 +289,14 @@ class Spectrogram:
 
         if isinstance(at_time, datetime):
             if self.chunk_start_time is None:
-                raise ValueError(f"With at_time specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}.")
+                raise ValueError(f"With at_time specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}")
             index_of_slice = find_closest_index(at_time, self.datetimes, enforce_strict_bounds = False)
             time_of_slice = self.datetimes[index_of_slice]  
         elif isinstance(at_time, float) or isinstance(at_time, int):
             index_of_slice = find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
             time_of_slice = self.time_seconds[index_of_slice]       
         else:
-            raise TypeError(f"Unexpected time type. Received {type(at_time)} expected one of str, datetime, float or int.")
+            raise TypeError(f"Unexpected time type. Received {type(at_time)} expected one of str, datetime, float or int")
 
         # dependent on the requested slice type, we return the dynamic spectra in the preferred units
         if slice_type == "raw":
@@ -305,7 +305,7 @@ class Spectrogram:
         elif slice_type == "dBb":
             ds = self.dynamic_spectra_as_dBb
         else:
-            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\".")
+            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\"")
         
         frequency_slice = ds[:, index_of_slice].copy() # make a copy so to preserve the spectrum on transformations of the slice
 
@@ -335,7 +335,7 @@ class Spectrogram:
         elif return_time_type == "time_seconds":
             times = self.time_seconds
         else:
-            raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"time_seconds\".")
+            raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"time_seconds\"")
 
 
         # dependent on the requested slice type, we return the dynamic spectra in the preferred units
@@ -345,7 +345,7 @@ class Spectrogram:
         elif slice_type == "dBb":
             ds = self.dynamic_spectra_as_dBb
         else:
-            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\".")
+            raise ValueError(f"Unexpected slice type. Received {slice_type} but expected \"raw\" or \"dBb\"")
         
         time_slice = ds[index_of_slice,:].copy() # make a copy so to preserve the spectrum on transformations of the slice
 
@@ -367,7 +367,7 @@ def _save_spectrogram(write_path: str,
                       spectrogram: Spectrogram, 
                       fits_config: dict) -> None:
     if spectrogram.chunk_start_time is None:
-        raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}.")
+        raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}")
     
     # Primary HDU with data
     primary_data = spectrogram.dynamic_spectra.astype(dtype=np.float32) 

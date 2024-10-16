@@ -13,7 +13,7 @@ def get_receiver(receiver_name: str, mode: str = None) -> BaseReceiver:
         Receiver = receivers[receiver_name]
     except KeyError:
         valid_receivers = list(receivers.keys())
-        raise ReceiverNotFoundError(f"No class found for the receiver: {receiver_name}. Please specify one of the following receivers {valid_receivers}.")
+        raise ReceiverNotFoundError(f"No class found for the receiver: {receiver_name}. Please specify one of the following receivers {valid_receivers}")
     
     # return an instance of the receiver
     return Receiver(receiver_name, mode = mode)

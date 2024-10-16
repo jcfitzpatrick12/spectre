@@ -52,7 +52,7 @@ def configure_root_logger(process_type: str, level: int = logging.INFO) -> LogHa
         datefmt=DEFAULT_DATETIME_FORMAT,
         filename=log_handler.file_path
     )
-    _LOGGER.info("Logging successfully configured.")
+    _LOGGER.info("Logging successfully configured")
     return log_handler
 
 
@@ -127,11 +127,11 @@ class LogHandlers:
         try:
             return self.log_handler_map[file_name]
         except KeyError:
-            raise LogNotFoundError(f"Log handler for file name '{file_name}' not found in log map.")
+            raise LogNotFoundError(f"Log handler for file name '{file_name}' not found in log map")
 
 
     def get_log_handler_from_pid(self, pid: str) -> LogHandler:
         for log_handler in self._log_handler_list:
             if log_handler.pid == pid:
                 return log_handler
-        raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map.")
+        raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")

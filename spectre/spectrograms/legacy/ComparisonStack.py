@@ -61,7 +61,7 @@ class ComparisonStack:
         
         expected_spectrogram_types = ["dBb", "rawlog", "raw"]
         if spectrogram_type not in expected_spectrogram_types:
-            raise ValueError(f"Received unexpected spectrogram_type: {spectrogram_type}. Expected one of {expected_spectrogram_types}.")
+            raise ValueError(f"Received unexpected spectrogram_type: {spectrogram_type}. Expected one of {expected_spectrogram_types}")
         
         axs[3,1].axis('off')
         axs[3,0].tick_params(labelbottom=False) 

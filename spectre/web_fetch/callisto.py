@@ -11,7 +11,7 @@ from pathlib import Path
 
 from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT,
-    INSTRUMENT_CODES
+    CALLISTO_INSTRUMENT_CODES
 )
 from spectre.cfg import get_chunks_dir_path
 
@@ -87,13 +87,13 @@ def fetch_chunks(instrument_code: str | None,
 
 
     if (year is None) or (month is None) or (day is None):
-        raise ValueError(f"All of year, month and day should be specified.")
+        raise ValueError(f"All of year, month and day should be specified")
     
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
-    if instrument_code not in INSTRUMENT_CODES:
-        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {INSTRUMENT_CODES}")
+    if instrument_code not in CALLISTO_INSTRUMENT_CODES:
+        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {CALLISTO_INSTRUMENT_CODES}")
 
     download_callisto_data(instrument_code, year, month, day)
     unzip_to_chunks()

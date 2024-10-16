@@ -2,7 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
 from typing import List
 
 from spectre.receivers.factory import get_receiver
@@ -11,13 +10,10 @@ from spectre.file_handlers.json.handlers import (
     CaptureConfigHandler
 )
 
-app = typer.Typer()
 
-@app.command()
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
-                   params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+def capture_config(tag: str,
+                   params: List[str]
 ) -> None:
-    
     # extract the current capture config saved (which will be type cast!)
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
@@ -39,13 +35,10 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     capture_config.update(d)
     # save the updated capture config
     receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
-    typer.secho(f"The capture-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
-    raise typer.Exit()
 
 
-@app.command()
-def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
-                   params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+def fits_config(tag: str,
+                params: List[str]
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
     fits_config = fits_config_handler.read()
@@ -56,5 +49,3 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=""),
     fits_config.update(d)
     fits_config_handler.validate_against_template(fits_config, template)
     fits_config_handler.save(fits_config, doublecheck_overwrite=False)
-    typer.secho(f"The fits-config for tag \"{tag}\" has been updated.", fg=typer.colors.GREEN)
-    raise typer.Exit()

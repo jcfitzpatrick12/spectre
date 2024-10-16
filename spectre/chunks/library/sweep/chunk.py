@@ -114,7 +114,7 @@ class Chunk(SPECTREChunk):
         expected_num_samples = np.sum(final_num_samples)
         actual_num_samples = len(final_sweep_IQ_data) 
         if actual_num_samples != expected_num_samples:
-            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep.")
+            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep")
 
         # return the data for the final sweep as required
         return final_sweep_IQ_data, (final_center_freqs, final_num_samples)
@@ -196,7 +196,7 @@ class Chunk(SPECTREChunk):
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
             if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
-                raise InvalidSweepMetadataError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern.")
+                raise InvalidSweepMetadataError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern")
         return
 
 
@@ -222,7 +222,7 @@ class Chunk(SPECTREChunk):
         unique_num_steps_per_sweep = np.unique(np.diff(min_freq_indices))
         # we expect that the difference is always the same, so that the result of np.unique has a single element
         if len(unique_num_steps_per_sweep) != 1:
-            raise InvalidSweepMetadataError("Irregular step count per sweep, expected a consistent number of steps per sweep.")
+            raise InvalidSweepMetadataError("Irregular step count per sweep, expected a consistent number of steps per sweep")
         # finally, we return the ensured unique element
         return int(unique_num_steps_per_sweep[0])
 
@@ -353,11 +353,11 @@ class HdrChunk(ChunkFile):
         # Extracts the number of samples per frequency from the file contents
         num_samples_as_float = hdr_contents[2::2]
         if not all(num_samples_as_float == num_samples_as_float.astype(int)):
-            raise InvalidSweepMetadataError("Number of samples per frequency is expected to describe an integer.")
+            raise InvalidSweepMetadataError("Number of samples per frequency is expected to describe an integer")
         return num_samples_as_float.astype(int)
 
 
     def _validate_frequencies_and_samples(self, center_frequencies: np.ndarray, num_samples: np.ndarray) -> None:
         """Validates that the center frequencies and the number of samples arrays have the same length."""
         if len(center_frequencies) != len(num_samples):
-            raise InvalidSweepMetadataError("Center frequencies and number of samples arrays are not the same length.")
+            raise InvalidSweepMetadataError("Center frequencies and number of samples arrays are not the same length")

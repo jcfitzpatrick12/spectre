@@ -26,9 +26,9 @@ def find_closest_index(
     if enforce_strict_bounds:
         max_value, min_value = np.nanmax(array), np.nanmin(array)
         if target_value > max_value:
-            raise ValueError(f"Target value {target_value} exceeds max array value {max_value}.")
+            raise ValueError(f"Target value {target_value} exceeds max array value {max_value}")
         if target_value < min_value:
-            raise ValueError(f"Target value {target_value} is less than min array value {min_value}.")
+            raise ValueError(f"Target value {target_value} is less than min array value {min_value}")
 
     # Find the index of the closest value
     return np.argmin(np.abs(array - target_value))
@@ -41,10 +41,10 @@ def normalise_peak_intensity(yvals: np.ndarray) -> np.ndarray:
 def compute_resolution(array: np.ndarray) -> float:
     # Check that the array is one-dimensional
     if array.ndim != 1:
-        raise ValueError("Input array must be one-dimensional.")
+        raise ValueError("Input array must be one-dimensional")
     
     if len(array) < 2:
-        raise ValueError("Input array must contain at least two elements.")
+        raise ValueError("Input array must contain at least two elements")
     
     # Calculate differences between consecutive elements.
     resolutions = np.diff(array)

@@ -55,10 +55,10 @@ class BaseFileHandler(ABC):
             if user_input == "y":
                 proceed_with_action = True
             elif user_input == "n":
-                print("Operation cancelled by the user.")
+                print("Operation cancelled by the user")
                 raise exit(1)
             else:
-                print(f"Please enter one of [y/n], received {user_input}.")
+                print(f"Please enter one of [y/n], received {user_input}")
                 proceed_with_action = False
 
 
