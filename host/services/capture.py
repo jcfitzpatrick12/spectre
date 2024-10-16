@@ -5,8 +5,10 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-import time
 import multiprocessing
+multiprocessing.set_start_method('spawn')
+
+import time
 from typing import List
 
 from spectre.receivers.factory import get_receiver
@@ -87,16 +89,14 @@ def _start_capture(receiver_name: str,
                    mode: str, 
                    tags: List[str]) -> None:
     configure_root_logger("WORKER") #  start worker log
-    logger = multiprocessing.get_logger() # get a threadsafe multiprocessing logger
-    logger.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
+    _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
 
 
 def _start_watcher(tags: List[str]) -> None:
     configure_root_logger("WORKER") #  start worker log
-    logger = multiprocessing.get_logger() # get a threadsafe multiprocessing logger
-    logger.info(f"Starting watcher with tags {tags}")
+    _LOGGER.info(f"Starting watcher with tags {tags}")
     for tag in tags:
         watcher = Watcher(tag)
         watcher.start()
