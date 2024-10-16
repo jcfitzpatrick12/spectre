@@ -11,7 +11,11 @@ from logging import getLogger
 from os import walk
 from os.path import splitext
 
-from spectre.cfg import LOGS_DIR_PATH, DEFAULT_DATETIME_FORMAT, DEFAULT_TIME_FORMAT, get_logs_dir_path
+from spectre.cfg import (
+    LOGS_DIR_PATH, 
+    DEFAULT_DATETIME_FORMAT, 
+    get_logs_dir_path
+)
 from spectre.file_handlers.text.handlers import TextHandler
 from spectre.exceptions import LogNotFoundError
 
