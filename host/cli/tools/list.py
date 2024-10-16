@@ -37,7 +37,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 
 
 @app.command()
-def chunk_files(
+def chunks(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
