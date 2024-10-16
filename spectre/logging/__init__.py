@@ -144,9 +144,9 @@ class LogHandlers:
 
 def log_service_call(logger: logging.Logger) -> Callable:
     def decorator(func: Callable) -> Callable:
-        _LOGGER.info("Calling the service function %s", func.__name__)
         def wrapper(*args, **kwargs):
             try:
+                _LOGGER.info("Calling the service function %s", func.__name__)
                 return func(*args, **kwargs)
             except Exception as e:
                 logger.error("An error occurred while calling the function %s: %s", func.__name__, e, exc_info=True)
