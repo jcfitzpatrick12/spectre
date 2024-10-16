@@ -2,10 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
-
-from typing import Callable
-
 class ChunkNotFoundError(Exception): ...
 class ChunkFileNotFoundError(FileNotFoundError): ...
 class InvalidMetadataError(Exception): ...
