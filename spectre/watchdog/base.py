@@ -51,7 +51,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
 
 
     def wait_until_stable(self, file_path: str):
-        _LOGGER.info(f"Waiting until {file_path} is stable")
+        _LOGGER.info(f"Waiting for file stability: {file_path}")
         size = -1
         while True:
             try:
