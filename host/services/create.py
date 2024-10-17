@@ -20,7 +20,7 @@ def fits_config(tag: str,
         params = []
     fits_config_handler = FitsConfigHandler(tag)
     fits_config_handler.save_params_as_fits_config(params)
-    _LOGGER.info(f"The fits-config for tag \"{tag}\" has been created")
+    _LOGGER.info(f"The fits-config for tag: {tag} has been created")
 
 
 @log_service_call(_LOGGER)
@@ -33,4 +33,4 @@ def capture_config(tag: str,
         params = []
     receiver = get_receiver(receiver_name, mode = mode)
     receiver.save_params_as_capture_config(tag, params)
-    _LOGGER.info(f"The capture-config for tag \"{tag}\" has been created")
+    _LOGGER.info(f"The capture-config for tag: {tag} has been created")
