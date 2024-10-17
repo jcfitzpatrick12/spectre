@@ -7,7 +7,6 @@ import subprocess
 import shutil
 import gzip
 from datetime import datetime
-from pathlib import Path
 
 from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT,
@@ -69,7 +68,8 @@ def download_callisto_data(instrument_code: str,
     date_str = f"{year:04d}/{month:02d}/{day:02d}"
     base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{date_str}/"
     command = [
-        'wget', '-r', '-l1', '-nd', '-np', '-R', '.tmp',
+        'wget', '-r', '-l1', '-nd', '-np', 
+        '-R', '.tmp',
         '-A', f'{instrument_code}*.fit.gz',
         '-P', temp_dir,
         base_url
