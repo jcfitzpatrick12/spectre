@@ -40,6 +40,7 @@ def capture_config(tag: str,
     capture_config.update(d)
     # save the updated capture config
     receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
+    _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated")
 
 
 @log_service_call(_LOGGER)
@@ -55,3 +56,4 @@ def fits_config(tag: str,
     fits_config.update(d)
     fits_config_handler.validate_against_template(fits_config, template)
     fits_config_handler.save(fits_config, doublecheck_overwrite=False)
+    _LOGGER.info(f"Fits config for tag: {tag} has been successfully updated")
