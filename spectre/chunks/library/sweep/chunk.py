@@ -197,10 +197,10 @@ class Chunk(SPECTREChunk):
         # Validate frequency steps
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
-            _LOGGER.debug(f"diff: {diff}")
-            _LOGGER.debug(f"freq_step: {freq_step}")
-            _LOGGER.debug(f"min_frequency: {min_frequency}")
-            _LOGGER.debug(f"spread: {self.center_frequencies[i-4:i+4]}")
+            _LOGGER.info(f"diff: {diff}")
+            _LOGGER.info(f"freq_step: {freq_step}")
+            _LOGGER.info(f"min_frequency: {min_frequency}")
+            _LOGGER.info(f"spread: {self.center_frequencies[i-4:i+4]}")
             if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
                 raise InvalidSweepMetadataError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern")
         return
