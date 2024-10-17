@@ -21,7 +21,7 @@ class EventHandler(BaseEventHandler):
         self.previous_chunk = None # at instantiation, there is no previous chunk
 
     def process(self, file_path: str):
-        _LOGGER.info(f"Processing {file_path}")
+        _LOGGER.info(f"Processing: {file_path}")
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
         chunk = self.Chunk(chunk_start_time, self.tag)
