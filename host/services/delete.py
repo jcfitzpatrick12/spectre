@@ -65,11 +65,11 @@ def fits_config(tag: str,
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
     fits_config_handler.delete()
-    _LOGGER.info(f"File deleted: {fits_config_handler.get_path()}")
+    _LOGGER.info(f"File deleted: {fits_config_handler.file_path}")
 
 
 def capture_config(tag: str,
 ) -> None:
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config_handler.delete()
-    _LOGGER.info(f"File deleted: {capture_config_handler.get_path()}")
+    _LOGGER.info(f"File deleted: {capture_config_handler.file_path}")
