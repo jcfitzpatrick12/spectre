@@ -157,10 +157,10 @@ def log_service_call(logger: logging.Logger) -> Callable:
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             try:
-                logger.info(f"Calling the service function: {func.__name__} from module: {func.__module__}")
+                logger.info(f"Calling the service function: {func.__name__}")
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.error(f"An error occurred while calling the service function: {func.__name__} from module: {func.__module__}.",
+                logger.error(f"An error occurred while calling the service function: {func.__name__}",
                               exc_info=True)
                 raise
         return wrapper
