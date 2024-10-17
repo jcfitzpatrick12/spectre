@@ -57,7 +57,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
             try:
                 current_size = os.path.getsize(file_path)
                 if current_size == size:
-                    _LOGGER.info(f"{file_path} is now stable")
+                    _LOGGER.info(f"File is now stable: {file_path}")
                     break  # File is stable when the size hasn't changed
                 size = current_size
                 time.sleep(0.5)
