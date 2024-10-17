@@ -193,16 +193,12 @@ class Chunk(SPECTREChunk):
         # Compute the differences between each step
         diffs = np.diff(self.center_frequencies)
         # Extract the expected difference between each step within a sweep
-        freq_step = self.capture_config.get("freq_step")
+        freq_step = self.capture_config.get("freq_step") if ("freq_step" in self.capture_config) else self.samp_rate/2
         # Validate frequency steps
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
-            _LOGGER.info(f"diff: {diff}")
-            _LOGGER.info(f"freq_step: {freq_step}")
-            _LOGGER.info(f"min_frequency: {min_frequency}")
-            _LOGGER.info(f"spread: {self.center_frequencies[i-4:i+4]}")
             if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
-                raise InvalidSweepMetadataError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern")
+                raise InvalidSweepMetadataError(f"Unordered center frequencies detected")
         return
 
 
