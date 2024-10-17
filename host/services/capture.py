@@ -35,7 +35,7 @@ def _terminate_processes(processes: List[multiprocessing.Process]) -> None:
 def start_process(target_func, 
                   args: tuple, 
                   process_name: str) -> multiprocessing.Process:
-    _LOGGER.info("Starting {process_name} process..")
+    _LOGGER.info(f"Starting {process_name} process..")
     process = multiprocessing.Process(target=target_func, args=args, name=process_name, daemon=True)
     process.start()
     time.sleep(1)  # Allow the process to initialize
