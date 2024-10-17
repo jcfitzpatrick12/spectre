@@ -88,14 +88,14 @@ def _start_capture(receiver_name: str,
                    mode: str, 
                    tags: List[str]) -> None:
     from spectre.cfg import LOGS_DIR_PATH
-    configure_root_logger(f"WORKER")
+    configure_root_logger(f"WORKER", level = logging.DEBUG)
     _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tags)
 
 
 def _start_watcher(tags: List[str]) -> None:
-    configure_root_logger("WORKER") #  start worker log
+    configure_root_logger(f"WORKER", level = logging.DEBUG) #  start worker log
     _LOGGER.info(f"Starting watcher with tags {tags}")
     for tag in tags:
         watcher = Watcher(tag)
