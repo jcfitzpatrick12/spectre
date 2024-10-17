@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from logging import getLogger
-_LOGGER = getLogger(__name__s)
+_LOGGER = getLogger(__name__)
 
 import queue
 from watchdog.observers import Observer
