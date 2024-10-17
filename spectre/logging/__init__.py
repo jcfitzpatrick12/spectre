@@ -150,7 +150,7 @@ def configure_root_logger(process_type: str,
 
     return log_handler
 
-
+# Logger must be passed in to preserve context of the service function
 def log_service_call(logger: logging.Logger) -> Callable:
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
