@@ -42,11 +42,13 @@ class EventHandler(BaseEventHandler):
             
         # otherwise the previous chunk is defined (and by this point has already been processed)
         else:
-            _LOGGER.info(f"Deleting {self.previous_chunk.get_file("bin").file_path}")
-            self.previous_chunk.delete_file("bin", doublecheck_delete = False)
+            bin_chunk = self.previous_chunk.get_file('bin')
+            _LOGGER.info(f"Deleting {bin_chunk.file_path}")
+            bin_chunk.delete(doublecheck_delete = False)
 
-            _LOGGER.info(f"Deleting {self.previous_chunk.get_file("hdr").file_path}")
-            self.previous_chunk.delete_file("hdr", doublecheck_delete = False)
+            hdr_chunk = self.previous_chunk.get_file('hdr')
+            _LOGGER.info(f"Deleting {hdr_chunk.file_path}")
+            hdr_chunk.delete(doublecheck_delete = False)
 
             # and reassign the current chunk to be used as the previous chunk at the next call of this method
             self.previous_chunk = chunk

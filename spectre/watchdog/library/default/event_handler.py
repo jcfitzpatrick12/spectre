@@ -29,9 +29,11 @@ class EventHandler(BaseEventHandler):
         _LOGGER.info("Saving spectrogram to file...")
         spectrogram.save()
 
-        _LOGGER.info(f"Deleting {self.previous_chunk.get_file("bin").file_path}")
-        chunk.delete_file("bin", doublecheck_delete = False)
+        bin_chunk = chunk.get_file('bin')
+        _LOGGER.info(f"Deleting {bin_chunk.file_path}")
+        bin_chunk.delete(doublecheck_delete = False)
 
-        _LOGGER.info(f"Deleting {self.previous_chunk.get_file("hdr").file_path}")
-        chunk.delete_file("hdr", doublecheck_delete = False)
+        hdr_chunk = chunk.get_file('hdr')
+        _LOGGER.info(f"Deleting {hdr_chunk.file_path}")
+        hdr_chunk.delete(doublecheck_delete = False)
         return
