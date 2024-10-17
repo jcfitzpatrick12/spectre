@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import os
 import time
 import queue
@@ -34,22 +37,27 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
 
 
     def on_created(self, event):
+        _LOGGER.info(f"Noticed: {event.src_path}")
         if not event.is_directory and event.src_path.endswith(self.extension):
             self.wait_until_stable(event.src_path)
             try:
                 # Process the file once it's stable
                 self.process(event.src_path)
             except Exception as e:
+                _LOGGER.error(f"An error has occured while processing {event.src_path}",
+                              exc_info=True)
                 # Capture the exception and propagate it through the queue
                 self.exception_queue.put(e)
 
 
     def wait_until_stable(self, file_path: str):
+        _LOGGER.info(f"Waiting until {file_path} is stable")
         size = -1
         while True:
             try:
                 current_size = os.path.getsize(file_path)
                 if current_size == size:
+                    _LOGGER.info(f"{file_path} is now stable")
                     break  # File is stable when the size hasn't changed
                 size = current_size
                 time.sleep(0.5)

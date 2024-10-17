@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__s)
+
 import queue
 from watchdog.observers import Observer
 
@@ -19,6 +22,7 @@ class Watcher:
         self.event_handler = EventHandler(tag, self.exception_queue)
 
     def start(self):
+        _LOGGER.info("Starting watcher...")
         try:
             # Schedule the observer with the event handler
             self.observer.schedule(self.event_handler, CHUNKS_DIR_PATH, recursive=True)

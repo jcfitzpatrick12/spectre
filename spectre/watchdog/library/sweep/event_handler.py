@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import os
 
 from spectre.watchdog.base import BaseEventHandler
@@ -18,12 +21,17 @@ class EventHandler(BaseEventHandler):
         self.previous_chunk = None # at instantiation, there is no previous chunk
 
     def process(self, file_path: str):
+        _LOGGER.info(f"Processing {file_path}")
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
         chunk = self.Chunk(chunk_start_time, self.tag)
         spectrogram = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
+
+        _LOGGER.info("Spectrogram successfully created. Averaging...")
         spectrogram = self.average_in_time(spectrogram)
         spectrogram = self.average_in_frequency(spectrogram)
+
+        _LOGGER.info("Saving spectrogram to file...")
         spectrogram.save()
 
         # if the previous chunk has not yet been set, it means we were processing the first chunk
@@ -34,9 +42,12 @@ class EventHandler(BaseEventHandler):
             
         # otherwise the previous chunk is defined (and by this point has already been processed)
         else:
-            # delete the used binary and detached header files
+            _LOGGER.info(f"Deleting {self.previous_chunk.get_file("bin").file_path}")
             self.previous_chunk.delete_file("bin", doublecheck_delete = False)
+
+            _LOGGER.info(f"Deleting {self.previous_chunk.get_file("hdr").file_path}")
             self.previous_chunk.delete_file("hdr", doublecheck_delete = False)
+
             # and reassign the current chunk to be used as the previous chunk at the next call of this method
             self.previous_chunk = chunk
 
