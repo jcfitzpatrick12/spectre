@@ -143,7 +143,7 @@ def configure_root_logger(process_type: str,
     # Set up file handler with specific filename
     file_handler = logging.FileHandler(log_handler.file_path)
     file_handler.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(module)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("[%(asctime)s] [%(levelname)8s] --- %(message)s (%(name)s:%(lineno)s)")
     file_handler.setFormatter(formatter)
     # and add it to the root logger
     logger.addHandler(file_handler)
