@@ -113,6 +113,8 @@ class LogHandlers:
 
 
     def get_log_handler_from_file_name(self, file_name: str) -> LogHandler:
+        # auto strip the extension if present
+        file_name, _ = os.path.splitext(file_name)
         try:
             return self.log_handler_map[file_name]
         except KeyError:
