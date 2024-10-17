@@ -193,7 +193,7 @@ class Chunk(SPECTREChunk):
         # Compute the differences between each step
         diffs = np.diff(self.center_frequencies)
         # Extract the expected difference between each step within a sweep
-        freq_step = self.capture_config.get("freq_step") if ("freq_step" in self.capture_config) else self.capture_config.get("samp_rate")/2
+        freq_step = self.capture_config.get("freq_step") if ("freq_step" in self.capture_config) else self.capture_config.get("samp_rate")
         # Validate frequency steps
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
