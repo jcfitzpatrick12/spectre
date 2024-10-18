@@ -83,7 +83,7 @@ class Spectrogram:
         self.chunk_start_time = chunk_start_time
         self.microsecond_correction = microsecond_correction
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
-        self.datetimes = [self.chunk_start_datetime + timedelta(times=(t + microsecond_correction*(10**-6))) for t in self.times]
+        self.datetimes = [self.chunk_start_datetime + timedelta(seconds=(t + microsecond_correction*1e-6)) for t in self.times]
         self.corrected_start_datetime = self.datetimes[0]
         return
 
@@ -253,7 +253,7 @@ class Spectrogram:
         norm = LogNorm(vmin=np.min(ds[ds > 0]), vmax=np.max(ds)) if log_norm else None
 
         # Assign the y label
-        ax.set_ylabel('Frequency [Hz]', size=15)
+        ax.set_ylabel('Frequency [MHz]', size=15)
 
         # Format the x and y tick labels
         ax.tick_params(axis='x', labelsize=15)
@@ -261,7 +261,7 @@ class Spectrogram:
 
         # Plot the dynamic spectra
         pcolor_plot = ax.pcolormesh(times, 
-                                    self.frequencies, 
+                                    self.frequencies*1e-6, 
                                     ds, 
                                     vmin=vmin if dBb else None, 
                                     vmax=vmax if dBb else None, 
