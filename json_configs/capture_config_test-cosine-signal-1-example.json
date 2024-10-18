@@ -5,6 +5,7 @@
     "frequency_resolution": 0.0,
     "samp_rate": 128000,
     "chunk_size": 2,
+    "joining_time": 0,
     "window_type": "boxcar",
     "window_kwargs": {},
     "STFFT_kwargs": {
