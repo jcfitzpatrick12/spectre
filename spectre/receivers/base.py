@@ -138,10 +138,10 @@ class BaseReceiver(ABC):
         capture_config = capture_config_handler.read()
 
         if capture_config["receiver"] != self.name:
-            raise InvalidReceiver(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config["receiver"]}")
+            raise InvalidReceiver(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config['receiver']}")
         
         if capture_config["mode"] != self.mode:
-            raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config["mode"]}")
+            raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config['mode']}")
 
         self.validate(capture_config)
         return capture_config
