@@ -195,6 +195,7 @@ class SPECTREReceiver(BaseReceiver):
                 "IF_gain": int, # [dB]
                 "RF_gain": int, # [dB]
                 "chunk_size": int, #  [s]
+                "joining_time": int, # [s]
                 "time_resolution": float, # [s]
                 "frequency_resolution": float, # [Hz]
                 "window_type": str, # window type for STFFT
