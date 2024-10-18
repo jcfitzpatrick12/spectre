@@ -22,7 +22,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     
     create.capture_config(tag,
                           params)
-    typer.secho(f"The fits-config for tag \"{tag}\" has been created", fg=typer.colors.GREEN)
+    typer.secho(f"The fits-config for tag \"{tag}\" has been successfully created", fg=typer.colors.GREEN)
     raise typer.Exit()
 
 @app.command()
@@ -36,7 +36,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                           receiver_name,
                           mode,
                           params)
-    typer.secho(f"The capture-config for tag \"{tag}\" has been created", fg=typer.colors.GREEN)
+    typer.secho(f"The capture-config for tag \"{tag}\" has been successfully created", fg=typer.colors.GREEN)
     raise typer.Exit()
 
         
