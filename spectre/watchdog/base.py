@@ -70,14 +70,13 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         requested_time_resolution = self.capture_config.get('time_resolution') # [s]
         if requested_time_resolution is None:
             raise KeyError(f"Time resolution has not been specified in the capture config!")
-        average_over = floor(requested_time_resolution/spectrogram.time_res_seconds) if requested_time_resolution > spectrogram.time_res_seconds else 1
+        average_over = floor(requested_time_resolution/spectrogram.time_resolution) if requested_time_resolution > spectrogram.time_resolution else 1
         return time_average(spectrogram, average_over)
     
     
     def average_in_frequency(self, spectrogram: Spectrogram) -> Spectrogram:
-        requested_frequency_resolution = self.capture_config.get('frequency_resolution') # [Hz]
-        if requested_frequency_resolution is None:
+        frequency_resolution = self.capture_config.get('frequency_resolution') # [Hz]
+        if frequency_resolution is None:
             raise KeyError(f"Frequency resolution has not been specified in the capture config!")
-        freq_res_MHz = requested_frequency_resolution*1e-6 # converting to [MHz]
-        average_over = floor(freq_res_MHz/spectrogram.freq_res_MHz) if freq_res_MHz > spectrogram.freq_res_MHz else 1
+        average_over = floor(frequency_resolution/spectrogram.frequency_resolution) if frequency_resolution > spectrogram.frequency_resolution else 1
         return frequency_average(spectrogram, average_over)

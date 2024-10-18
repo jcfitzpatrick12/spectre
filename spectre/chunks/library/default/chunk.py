@@ -42,17 +42,17 @@ class Chunk(SPECTREChunk):
 
 
         # do the short time fft
-        time_seconds, freq_MHz, dynamic_spectra = self.__do_STFFT(IQ_data)
+        times, frequencies, dynamic_spectra = self.__do_STFFT(IQ_data)
 
 
         # convert all arrays to the standard type
-        time_seconds = np.array(time_seconds, dtype = 'float32')
-        freq_MHz = np.array(freq_MHz, dtype = 'float32')
+        times = np.array(times, dtype = 'float32')
+        frequencies = np.array(frequencies, dtype = 'float32')
         dynamic_spectra = np.array(dynamic_spectra, dtype = 'float32')
 
         return Spectrogram(dynamic_spectra, 
-                           time_seconds, 
-                           freq_MHz, 
+                           times, 
+                           frequencies, 
                            self.tag, 
                            chunk_start_time = self.chunk_start_time, 
                            microsecond_correction = microsecond_correction,
@@ -97,15 +97,14 @@ class Chunk(SPECTREChunk):
         dynamic_spectra = np.abs(signal_spectra)
 
         # build the time array
-        time_seconds = SFT.t(num_samples, p0=0, p1=p1) # seconds
+        times = SFT.t(num_samples, p0=0, p1=p1) # seconds
 
         # fetch the center_freq (if not specified, defaults to zero)
         center_freq = self.capture_config.get('center_freq', 0)
         # build the frequency array
-        frequency_array = SFT.f + center_freq # Hz
-        # convert the frequency array to MHz
-        freq_MHz = frequency_array / 10**6
-        return time_seconds, freq_MHz, dynamic_spectra
+        frequencies = SFT.f + center_freq # Hz
+
+        return times, frequencies, dynamic_spectra
 
 
 class BinChunk(ChunkFile):
@@ -162,11 +161,11 @@ class FitsChunk(ChunkFile):
             spectrum_type = self._get_spectrum_type(primary_hdu)
             microsecond_correction = self._get_microsecond_correction(primary_hdu)
             bintable_hdu = self._get_bintable_hdu(hdulist)
-            time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
+            times, frequencies = self._get_time_and_frequency(bintable_hdu)
 
         return Spectrogram(dynamic_spectra, 
-                           time_seconds, 
-                           freq_MHz, 
+                           times, 
+                           frequencies, 
                            self.tag, 
                            chunk_start_time=self.chunk_start_time, 
                            microsecond_correction=microsecond_correction,
@@ -198,14 +197,15 @@ class FitsChunk(ChunkFile):
 
     def _get_time_and_frequency(self, bintable_hdu: BinTableHDU) -> Tuple[np.ndarray, np.ndarray]:
         data = bintable_hdu.data
-        time_seconds = data['TIME'][0]
-        freq_MHz = data['FREQUENCY'][0]
-        return time_seconds, freq_MHz
+        times = data['TIME'][0]
+        frequencies_MHz = data['FREQUENCY'][0]
+        frequencies = frequencies_MHz * 1e6 # convert to Hz
+        return times, frequencies
 
 
     def get_datetimes(self) -> np.ndarray:
         with fits.open(self.file_path, mode='readonly') as hdulist:
             bintable_data = hdulist[1].data
-            time_seconds = bintable_data['TIME'][0]
-            return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
+            times = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]
 

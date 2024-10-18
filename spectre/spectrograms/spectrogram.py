@@ -29,8 +29,8 @@ from spectre.cfg import get_chunks_dir_path
 class Spectrogram:
     def __init__(self, 
                  dynamic_spectra: np.ndarray[np.float32, np.float32], # holds the spectrogram data
-                 time_seconds: np.ndarray[np.float32], # holds the time stamp [s] for each spectrum
-                 freq_MHz: np.ndarray[np.float32],  # physical frequencies [MHz] for each spectral component
+                 times: np.ndarray[np.float32], # holds the time stamp [s] for each spectrum
+                 frequencies: np.ndarray[np.float32],  # physical frequencies [Hz] for each spectral component
                  tag: str,  # the tag associated with that spectrogram
                  chunk_start_time: str = None, # (optional) the datetime (as a string) assigned to the first spectrum in the spectrogram (floored second precision)
                  microsecond_correction: int = 0, # (optional) a correction to the chunk start time
@@ -40,12 +40,12 @@ class Spectrogram:
 
         # set the mandatory attributes
         self.dynamic_spectra: np.ndarray[np.float32, np.float32] = dynamic_spectra
-        self.time_seconds: np.ndarray[np.float32] = time_seconds
-        self.freq_MHz: np.ndarray[np.float32] = freq_MHz
+        self.times: np.ndarray[np.float32] = times
+        self.frequencies: np.ndarray[np.float32] = frequencies
         self.tag: str = tag
         # set all dependent attributes initially to None to ensure a defined state for the class
-        self.time_res_seconds: float = None
-        self.freq_res_MHz: float = None
+        self.time_resolution: float = None
+        self.frequency_resolution: float = None
         self.spectrum_type: str = None
         self.chunk_start_time: str | None = None
         self.microsecond_correction: int = None
@@ -58,8 +58,8 @@ class Spectrogram:
         self.dynamic_spectra_as_dBb: np.ndarray[float, float] = None
 
         # directly compute the array resolutions
-        self.time_res_seconds = compute_resolution(time_seconds)
-        self.freq_res_MHz = compute_resolution(freq_MHz)
+        self.time_resolution = compute_resolution(times)
+        self.frequency_resolution = compute_resolution(frequencies)
 
         # set the spectrum type based on constructor input
         self.spectrum_type = spectrum_type
@@ -83,7 +83,7 @@ class Spectrogram:
         self.chunk_start_time = chunk_start_time
         self.microsecond_correction = microsecond_correction
         self.chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
-        self.datetimes = [self.chunk_start_datetime + timedelta(seconds=(t + microsecond_correction*(10**-6))) for t in self.time_seconds]
+        self.datetimes = [self.chunk_start_datetime + timedelta(times=(t + microsecond_correction*(10**-6))) for t in self.times]
         self.corrected_start_datetime = self.datetimes[0]
         return
 
@@ -148,8 +148,8 @@ class Spectrogram:
                                        find_closest_index(end_background, self.datetimes, enforce_strict_bounds=False)]
 
         elif background_type in [int, float]:
-            self.background_indices = [find_closest_index(start_background, self.time_seconds, enforce_strict_bounds=False),
-                                       find_closest_index(end_background, self.time_seconds, enforce_strict_bounds=False)]
+            self.background_indices = [find_closest_index(start_background, self.times, enforce_strict_bounds=False),
+                                       find_closest_index(end_background, self.times, enforce_strict_bounds=False)]
 
         else:
             raise TypeError(f"Unrecognized background interval type! Received {background_type}")
@@ -181,9 +181,9 @@ class Spectrogram:
             raise ValueError(f"Expected dynamic spectrogram to be a 2D array, but got {num_spectrogram_dims}D array")
 
         dynamic_spectra_shape = self.dynamic_spectra.shape
-        num_freq_bins = len(self.freq_MHz)
-        num_time_bins = len(self.time_seconds)
-        # Check if the dimensions of 'dynamic_spectra' are consistent with 'time_seconds' and 'freq_MHz'
+        num_freq_bins = len(self.frequencies)
+        num_time_bins = len(self.times)
+        # Check if the dimensions of 'dynamic_spectra' are consistent with the time and frequency arrays
         if dynamic_spectra_shape[0] != num_freq_bins:
             raise ValueError(f"Mismatch in number of columns: Expected {num_freq_bins}, but got {dynamic_spectra_shape[0]}")
         
@@ -214,8 +214,7 @@ class Spectrogram:
                                  correct_background: bool = False, 
                                  peak_normalise: bool = False):
             
-        freq_Hz = self.freq_MHz * 1e-6  # Convert MHz to Hz
-        I = np.nansum(self.dynamic_spectra * freq_Hz[:, np.newaxis], axis=0) # integrate over frequency
+        I = np.nansum(self.dynamic_spectra * self.frequencies[:, np.newaxis], axis=0) # integrate over frequency
 
         if correct_background:
             I = subtract_background(I, self.background_indices)
@@ -225,7 +224,7 @@ class Spectrogram:
     
 
     def quick_plot(self, 
-                time_type: str = "time_seconds", 
+                time_type: str = "seconds", 
                 log_norm: bool = False, 
                 dBb: bool = False, 
                 vmin: int = -1, 
@@ -234,8 +233,8 @@ class Spectrogram:
         fig, ax = plt.subplots(1)
 
         # Set up the time axis
-        if time_type == "time_seconds":
-            times = self.time_seconds
+        if time_type == "seconds":
+            times = self.times
             ax.set_xlabel('Time [s]', size=15)
         elif time_type == "datetimes":
             if self.chunk_start_time is None:
@@ -244,7 +243,7 @@ class Spectrogram:
             ax.set_xlabel('Time [UTC]', size=15)
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         else:
-            raise ValueError(f'Unexpected time type. Expected "time_seconds" or "datetimes", but received {time_type}.')
+            raise ValueError(f'Unexpected time type. Expected "seconds" or "datetimes", but received {time_type}.')
 
         if log_norm and dBb:
             raise ValueError(f"Please specify either log_norm or dBb. Both is not supported")
@@ -254,7 +253,7 @@ class Spectrogram:
         norm = LogNorm(vmin=np.min(ds[ds > 0]), vmax=np.max(ds)) if log_norm else None
 
         # Assign the y label
-        ax.set_ylabel('Frequency [MHz]', size=15)
+        ax.set_ylabel('Frequency [Hz]', size=15)
 
         # Format the x and y tick labels
         ax.tick_params(axis='x', labelsize=15)
@@ -262,7 +261,7 @@ class Spectrogram:
 
         # Plot the dynamic spectra
         pcolor_plot = ax.pcolormesh(times, 
-                                    self.freq_MHz, 
+                                    self.frequencies, 
                                     ds, 
                                     vmin=vmin if dBb else None, 
                                     vmax=vmax if dBb else None, 
@@ -293,8 +292,8 @@ class Spectrogram:
             index_of_slice = find_closest_index(at_time, self.datetimes, enforce_strict_bounds = False)
             time_of_slice = self.datetimes[index_of_slice]  
         elif isinstance(at_time, float) or isinstance(at_time, int):
-            index_of_slice = find_closest_index(at_time, self.time_seconds, enforce_strict_bounds = True)
-            time_of_slice = self.time_seconds[index_of_slice]       
+            index_of_slice = find_closest_index(at_time, self.times, enforce_strict_bounds = True)
+            time_of_slice = self.times[index_of_slice]       
         else:
             raise TypeError(f"Unexpected time type. Received {type(at_time)} expected one of str, datetime, float or int")
 
@@ -312,7 +311,7 @@ class Spectrogram:
         if peak_normalise and time_of_slice != "dBb":
             frequency_slice = normalise_peak_intensity(frequency_slice)
         
-        return (time_of_slice, self.freq_MHz, frequency_slice)
+        return (time_of_slice, self.frequencies, frequency_slice)
 
         
     def slice_at_frequency(self,
@@ -325,17 +324,17 @@ class Spectrogram:
         # it is important to note that the "at frequency" specified by the user likely does not correspond
         # exactly to one of the physical frequencies assigned to each spectral component. So, we compute the nearest achievable,
         # and return it from the function as output too.
-        index_of_slice = find_closest_index(at_frequency, self.freq_MHz, enforce_strict_bounds = False)
-        frequency_of_slice = self.freq_MHz[index_of_slice]
+        index_of_slice = find_closest_index(at_frequency, self.frequencies, enforce_strict_bounds = False)
+        frequency_of_slice = self.frequencies[index_of_slice]
 
         if return_time_type == "datetimes":
             if self.chunk_start_time is None:
                 raise ValueError(f"With return_time_type specified as a datetime object, the spectrogram chunk start time must be set. Currently, chunk_start_time={self.chunk_start_time}")
             times = self.datetimes
-        elif return_time_type == "time_seconds":
-            times = self.time_seconds
+        elif return_time_type == "seconds":
+            times = self.times
         else:
-            raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"time_seconds\"")
+            raise KeyError(f"Must specify a valid return_time_type. Got {return_time_type}, expected one of \"datetimes\" or \"seconds\"")
 
 
         # dependent on the requested slice type, we return the dynamic spectra in the preferred units
@@ -422,12 +421,12 @@ def _save_spectrogram(write_path: str,
     primary_hdu.header.set('CRVAL1', f'{_seconds_of_day(start_datetime)}', 'value on axis 1 at reference pixel [sec of day]')
     primary_hdu.header.set('CRPIX1', 0, 'reference pixel of axis 1')
     primary_hdu.header.set('CTYPE1', 'TIME [UT]', 'title of axis 1')
-    primary_hdu.header.set('CDELT1', spectrogram.time_res_seconds, 'step between first and second element in x-axis')
+    primary_hdu.header.set('CDELT1', spectrogram.time_resolution, 'step between first and second element in x-axis')
 
     primary_hdu.header.set('CRVAL2', 0, 'value on axis 2 at reference pixel')
     primary_hdu.header.set('CRPIX2', 0, 'reference pixel of axis 2')
-    primary_hdu.header.set('CTYPE2', 'Frequency [MHz]', 'title of axis 2')
-    primary_hdu.header.set('CDELT2', spectrogram.freq_res_MHz, 'step between first and second element in axis')
+    primary_hdu.header.set('CTYPE2', 'Frequency [Hz]', 'title of axis 2')
+    primary_hdu.header.set('CDELT2', spectrogram.frequency_resolution, 'step between first and second element in axis')
 
     primary_hdu.header.set('OBS_LAT', f'{fits_config.get("OBS_LAT")}', 'observatory latitude in degree')
     primary_hdu.header.set('OBS_LAC', 'N', 'observatory latitude code {N,S}')
@@ -437,12 +436,14 @@ def _save_spectrogram(write_path: str,
 
 
     # Wrap arrays in an additional dimension to mimic the e-CALLISTO storage
-    time_array_wrapped = np.array([spectrogram.time_seconds.astype(np.float32)])
-    freqs_MHz_wrapped = np.array([spectrogram.freq_MHz.astype(np.float32)])
+    times_wrapped = np.array([spectrogram.times.astype(np.float32)])
+    # To mimic e-Callisto storage, convert frequencies to MHz
+    frequencies_MHz = spectrogram.frequencies *1e-6
+    frequencies_wrapped = np.array([frequencies_MHz.astype(np.float32)])
     
     # Binary Table HDU (extension)
-    col1 = fits.Column(name='TIME', format='PD', array=time_array_wrapped)
-    col2 = fits.Column(name='FREQUENCY', format='PD', array=freqs_MHz_wrapped)
+    col1 = fits.Column(name='TIME', format='PD', array=times_wrapped)
+    col2 = fits.Column(name='FREQUENCY', format='PD', array=frequencies_wrapped)
     cols = fits.ColDefs([col1, col2])
 
     bin_table_hdu = fits.BinTableHDU.from_columns(cols)

@@ -37,14 +37,14 @@ class FitsChunk(ChunkFile):
             dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
             microsecond_correction = self._get_microsecond_correction(primary_hdu)
             bintable_hdu = self._get_bintable_hdu(hdulist)
-            time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
+            times, frequencies = self._get_time_and_frequency(bintable_hdu)
             spectrum_type = self._get_spectrum_type(primary_hdu)
 
             if spectrum_type == "digits":
                 dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
                 return Spectrogram(dynamic_spectra_linearised[::-1, :], # reverse the spectra along the frequency axis
-                        time_seconds, 
-                        freq_MHz[::-1], # sort the frequencies in ascending order
+                        times, 
+                        frequencies[::-1], # sort the frequencies in ascending order
                         self.tag, 
                         chunk_start_time=self.chunk_start_time, 
                         microsecond_correction = microsecond_correction,
@@ -74,9 +74,10 @@ class FitsChunk(ChunkFile):
 
     def _get_time_and_frequency(self, bintable_hdu: BinTableHDU) -> Tuple[np.ndarray, np.ndarray]:
         data = bintable_hdu.data
-        time_seconds = data['TIME'][0]
-        freq_MHz = data['FREQUENCY'][0]
-        return time_seconds, freq_MHz
+        times = data['TIME'][0]
+        frequencies_MHz = data['FREQUENCY'][0]
+        frequencies = frequencies_MHz * 1e6 # convert to Hz
+        return times, frequencies
 
 
     def _get_spectrum_type(self, primary_hdu: PrimaryHDU) -> str:
@@ -93,7 +94,7 @@ class FitsChunk(ChunkFile):
     def get_datetimes(self) -> np.ndarray:
         with fits.open(self.file_path, mode='readonly') as hdulist:
             bintable_data = hdulist[1].data
-            time_seconds = bintable_data['TIME'][0]
-            return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
+            times = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]
 
 
