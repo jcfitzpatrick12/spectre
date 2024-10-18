@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import numpy as np
+
 from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.exceptions import InvalidModeError
 
 class AnalyticalFactory:
     def __init__(self,):
@@ -15,13 +17,12 @@ class AnalyticalFactory:
     def get_spectrogram(self, test_mode: str, shape: tuple, capture_config: dict) -> Spectrogram:
         builder_method = self.builder_methods.get(test_mode)
         if builder_method is None:
-            raise ValueError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
+            raise InvalidModeError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
         return builder_method(shape, capture_config)
     
     def cosine_signal_1(self, 
-                            shape: tuple,
-                            capture_config: dict
-                             ):
+                        shape: tuple,
+                        capture_config: dict) -> Spectrogram:
         
         window_size = capture_config['window_size']
         samp_rate = capture_config['samp_rate'] 
@@ -31,7 +32,7 @@ class AnalyticalFactory:
         
         shape_type = type(shape)
         if shape_type != tuple:
-            raise TypeError(f"\"shape\" must be set as a tuple. Received {shape_type}")
+            raise TypeError(f"The shape must be set as a tuple. Received: {shape_type}")
 
         # a defines the ratio of the sampling rate to the frequency of the synthetic signal
         a = int(samp_rate / frequency)
