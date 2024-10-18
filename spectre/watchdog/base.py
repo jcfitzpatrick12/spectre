@@ -45,6 +45,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 # Process the file once it's stable
                 self.process(event.src_path)
             except Exception as e:
+                self.flush_spectrogram() # flush the internally stored spectrogram
                 _LOGGER.error(f"An error has occured while processing {event.src_path}",
                               exc_info=True)
                 # Capture the exception and propagate it through the queue
