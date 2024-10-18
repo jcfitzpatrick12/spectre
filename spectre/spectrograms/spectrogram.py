@@ -238,12 +238,12 @@ class Spectrogram:
             ax.set_xlabel('Time [s]', size=15)
         elif time_type == "datetimes":
             if self.chunk_start_time is None:
-                raise ValueError('Cannot plot with time type "datetimes" if chunk start time is not set.')
+                raise ValueError('Cannot plot with time type "datetimes" if chunk start time is not set')
             times = self.datetimes
             ax.set_xlabel('Time [UTC]', size=15)
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         else:
-            raise ValueError(f'Unexpected time type. Expected "seconds" or "datetimes", but received {time_type}.')
+            raise ValueError(f'Unexpected time type. Expected "seconds" or "datetimes", but received \"{time_type}\"')
 
         if log_norm and dBb:
             raise ValueError(f"Please specify either log_norm or dBb. Both is not supported")
