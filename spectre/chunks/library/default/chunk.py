@@ -37,7 +37,7 @@ class Chunk(SPECTREChunk):
         IQ_data = self.read_file("bin")
         # and the millisecond correction from the accompanying header file
         millisecond_correction = self.read_file("hdr")
-        # convert the millisecond correction to microseconds
+        # convert the millisecond correction to microseconds (for Python datetime support)
         microsecond_correction = millisecond_correction * 1000
 
 
@@ -97,7 +97,7 @@ class Chunk(SPECTREChunk):
         dynamic_spectra = np.abs(signal_spectra)
 
         # build the time array
-        times = SFT.t(num_samples, p0=0, p1=p1) # seconds
+        times = SFT.t(num_samples, p0=0, p1=p1)
 
         # fetch the center_freq (if not specified, defaults to zero)
         center_freq = self.capture_config.get('center_freq', 0)
