@@ -6,7 +6,7 @@ import os
 
 SPECTRE_DIR_PATH = os.environ.get("SPECTRE_DIR_PATH")
 if SPECTRE_DIR_PATH is None:
-    raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set.")
+    raise ValueError("The environment variable SPECTRE_DIR_PATH has not been set")
 
 CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR_PATH", 
                                  os.path.join(SPECTRE_DIR_PATH, 'chunks'))
@@ -20,9 +20,11 @@ JSON_CONFIGS_DIR_PATH = os.environ.get("SPECTRE_JSON_CONFIGS_DIR_PATH",
                                        os.path.join(SPECTRE_DIR_PATH, "json_configs"))
 os.makedirs(JSON_CONFIGS_DIR_PATH, exist_ok=True)
 
-DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+DEFAULT_TIME_FORMAT = "%H:%M:%S"
+DEFAULT_DATE_FORMAT = "%Y-%m-%d"
+DEFAULT_DATETIME_FORMAT = f"{DEFAULT_DATE_FORMAT}T{DEFAULT_TIME_FORMAT}"
 
-INSTRUMENT_CODES = [
+CALLISTO_INSTRUMENT_CODES = [
     "ALASKA-ANCHORAGE",
     "ALASKA-COHOE",
     "ALASKA-HAARP",
@@ -78,16 +80,13 @@ INSTRUMENT_CODES = [
     "USA-BOSTON",
 ]
 
-def get_chunks_dir_path(year: int = None, 
-                        month: int = None, 
-                        day: int = None):
-    # Validate the input for proper year, month, and day relationships
+def _get_date_based_dir_path(base_dir: str, year: int = None, 
+                             month: int = None, day: int = None) -> str:
     if day and not (year and month):
-        raise ValueError("A day requires both a month and a year.")
+        raise ValueError("A day requires both a month and a year")
     if month and not year:
-        raise ValueError("A month requires a year.")
+        raise ValueError("A month requires a year")
     
-    # Create the list of date components, skipping None values
     date_dir_components = []
     if year:
         date_dir_components.append(f"{year:04}")
@@ -96,5 +95,12 @@ def get_chunks_dir_path(year: int = None,
     if day:
         date_dir_components.append(f"{day:02}")
     
-    # Combine base directory with the date components
-    return os.path.join(CHUNKS_DIR_PATH, *date_dir_components)
+    return os.path.join(base_dir, *date_dir_components)
+
+
+def get_chunks_dir_path(year: int = None, month: int = None, day: int = None) -> str:
+    return _get_date_based_dir_path(CHUNKS_DIR_PATH, year, month, day)
+
+
+def get_logs_dir_path(year: int = None, month: int = None, day: int = None) -> str:
+    return _get_date_based_dir_path(LOGS_DIR_PATH, year, month, day)

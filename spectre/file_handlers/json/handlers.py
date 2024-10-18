@@ -11,6 +11,9 @@ from spectre.file_handlers.base import BaseFileHandler
 from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH
 )
+from spectre.exceptions import (
+    InvalidTagError
+)
 
 class JsonHandler(BaseFileHandler):
     def __init__(self, parent_path: str, base_file_name: str, **kwargs):
@@ -18,7 +21,7 @@ class JsonHandler(BaseFileHandler):
         return 
     
     
-    def read(self) -> dict:
+    def read(self) -> dict[str, Any]:
         with open(self.file_path, 'r') as f:
             return json.load(f)
         
@@ -38,10 +41,12 @@ class JsonHandler(BaseFileHandler):
                          value: Any, 
                          doublecheck_overwrite: bool = True) -> None:
         d = self.read() 
-        valid_keys = list(d.keys())
-        if not key in valid_keys:
+        try: 
+            d[key] = value
+        except KeyError:
+            valid_keys = list(d.keys())
             raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
-        d[key] = value
+
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
         return
     
@@ -56,9 +61,9 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
-            raise ValueError(f"Tags cannot contain an underscore. Received {tag}.")
+            raise InvalidTagError(f"Tags cannot contain an underscore. Received {tag}")
         if "callisto" in tag:
-            raise ValueError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
+            raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
 
     def _params_list_to_string_valued_dict(self, params: list) -> dict[str, str]:
@@ -78,12 +83,14 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 return True
             if v in ('false', '0', 'f', 'n', 'no'):
                 return False
+        
             raise ValueError(f'Cannot convert {v} to bool.')
         
         converted_dict = {}
         for k, v in d.items():
-            dynamic_type = template.get(k)
-            if dynamic_type is None:
+            try:
+                dynamic_type = template[k]
+            except KeyError:
                 raise KeyError(f'Key "{k}" not found in template, expected one of {list(template.keys())}')
             try:
                 if dynamic_type == bool:
@@ -93,10 +100,10 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 else:
                     converted_dict[k] = dynamic_type(v)
             except ValueError:
-                message = f'Could not convert value at {k}: Received {v}, expected {dynamic_type.__name__}.'
+                error_message = f'Could not convert value at {k}: Received {v}, expected {dynamic_type.__name__}.'
                 if dynamic_type == dict:
-                    message += ' Use syntax {\\"key\\":value}.'
-                raise ValueError(message)
+                    error_message += ' Use syntax {\\"key\\":value}.'
+                raise ValueError(error_message)
         return converted_dict
     
 
@@ -130,9 +137,9 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         if missing_keys or invalid_keys:
             error_messages = []
             if missing_keys:
-                error_messages.append(f"Missing keys: {', '.join(missing_keys)}.")
+                error_messages.append(f"Missing keys: {', '.join(missing_keys)}")
             if invalid_keys:
-                error_messages.append(f"Invalid keys: {', '.join(invalid_keys)}.")
+                error_messages.append(f"Invalid keys: {', '.join(invalid_keys)}")
             raise KeyError("Key errors found! " + " ".join(error_messages))
 
 
@@ -140,9 +147,11 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         for k, v in d.items():
             if k in ignore_keys:
                 continue
-            expected_type = template.get(k)
-            if expected_type is None:
-                raise ValueError(f'Type not found for key "{k}" in template.')
+            try:
+                expected_type = template[k]
+            except KeyError:
+                error_message = f'Type not found for key "{k}" in template.'
+                raise KeyError(error_message)
             if not isinstance(v, expected_type):
                 raise TypeError(f'Expected {expected_type} for "{k}", but got {type(v)}.')
 
@@ -152,7 +161,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
         super().__init__(tag, "fits", **kwargs)
 
     @classmethod
-    def get_template(cls) -> dict:
+    def get_template(cls) -> dict[str, Any]:
         return {
             "ORIGIN": str,
             "TELESCOP": str,

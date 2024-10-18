@@ -7,11 +7,10 @@ import subprocess
 import shutil
 import gzip
 from datetime import datetime
-from pathlib import Path
 
 from spectre.cfg import (
-    DEFAULT_TIME_FORMAT,
-    INSTRUMENT_CODES
+    DEFAULT_DATETIME_FORMAT,
+    CALLISTO_INSTRUMENT_CODES
 )
 from spectre.cfg import get_chunks_dir_path
 
@@ -19,7 +18,7 @@ temp_dir = os.path.join(os.environ['SPECTRE_DIR_PATH'], "tmp")
 
 def get_chunk_name(station: str, date: str, time: str, instrument_code: str) -> str:
     dt = datetime.strptime(f"{date}T{time}", '%Y%m%dT%H%M%S')
-    formatted_time = dt.strftime(DEFAULT_TIME_FORMAT)
+    formatted_time = dt.strftime(DEFAULT_DATETIME_FORMAT)
     return f"{formatted_time}_callisto-{station.lower()}-{instrument_code}.fits"
 
 
@@ -40,7 +39,7 @@ def get_chunk_path(gz_path: str) -> str:
     station, date, time, instrument_code = get_chunk_components(gz_path)
     fits_chunk_name = get_chunk_name(station, date, time, instrument_code)
     chunk_start_time = fits_chunk_name.split('_')[0]
-    chunk_start_datetime = datetime.strptime(chunk_start_time, DEFAULT_TIME_FORMAT)
+    chunk_start_datetime = datetime.strptime(chunk_start_time, DEFAULT_DATETIME_FORMAT)
     chunk_parent_path = get_chunks_dir_path(year = chunk_start_datetime.year,
                                             month = chunk_start_datetime.month,
                                             day = chunk_start_datetime.day)
@@ -69,7 +68,8 @@ def download_callisto_data(instrument_code: str,
     date_str = f"{year:04d}/{month:02d}/{day:02d}"
     base_url = f"http://soleil.i4ds.ch/solarradio/data/2002-20yy_Callisto/{date_str}/"
     command = [
-        'wget', '-r', '-l1', '-nd', '-np', '-R', '.tmp',
+        'wget', '-r', '-l1', '-nd', '-np', 
+        '-R', '.tmp',
         '-A', f'{instrument_code}*.fit.gz',
         '-P', temp_dir,
         base_url
@@ -87,13 +87,13 @@ def fetch_chunks(instrument_code: str | None,
 
 
     if (year is None) or (month is None) or (day is None):
-        raise ValueError(f"All of year, month and day should be specified.")
+        raise ValueError(f"All of year, month and day should be specified")
     
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
 
-    if instrument_code not in INSTRUMENT_CODES:
-        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {INSTRUMENT_CODES}")
+    if instrument_code not in CALLISTO_INSTRUMENT_CODES:
+        raise ValueError(f"No match found for \"{instrument_code}\". Expected one of {CALLISTO_INSTRUMENT_CODES}")
 
     download_callisto_data(instrument_code, year, month, day)
     unzip_to_chunks()

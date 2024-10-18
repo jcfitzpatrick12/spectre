@@ -2,10 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from astropy.io import fits
-import numpy as np
 from datetime import datetime, timedelta
 from typing import Tuple
+
+import numpy as np
+from astropy.io import fits
 from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
 from astropy.io.fits.hdu.hdulist import HDUList
@@ -22,7 +23,6 @@ from spectre.spectrograms.spectrogram import Spectrogram
 class Chunk(BaseChunk):
     def __init__(self, chunk_start_time: str, tag: str):
         super().__init__(chunk_start_time, tag) 
-        
         self.add_file(FitsChunk(self.chunk_parent_path, self.chunk_name))
 
 
@@ -32,32 +32,26 @@ class FitsChunk(ChunkFile):
 
 
     def read(self) -> Spectrogram:
-        try:
-            with fits.open(self.file_path, mode='readonly') as hdulist:
-                primary_hdu = self._get_primary_hdu(hdulist)
-                dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
-                microsecond_correction = self._get_microsecond_correction(primary_hdu)
-                bintable_hdu = self._get_bintable_hdu(hdulist)
-                time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
-                spectrum_type = self._get_spectrum_type(primary_hdu)
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            primary_hdu = self._get_primary_hdu(hdulist)
+            dynamic_spectra = self._get_dynamic_spectra(primary_hdu)
+            microsecond_correction = self._get_microsecond_correction(primary_hdu)
+            bintable_hdu = self._get_bintable_hdu(hdulist)
+            time_seconds, freq_MHz = self._get_time_and_frequency(bintable_hdu)
+            spectrum_type = self._get_spectrum_type(primary_hdu)
 
-                if spectrum_type == "digits":
-                    dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
-                    return Spectrogram(dynamic_spectra_linearised[::-1, :], # reverse the spectra along the frequency axis
-                           time_seconds, 
-                           freq_MHz[::-1], # sort the frequencies in ascending order
-                           self.tag, 
-                           chunk_start_time=self.chunk_start_time, 
-                           microsecond_correction = microsecond_correction,
-                           spectrum_type = spectrum_type)
-                else:
-                    raise ValueError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
-                
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Could not load spectrogram, {self.file_path} not found.")
-        except Exception as e:
-            raise RuntimeError(f"An error occurred while reading the FITS file: {e}")
-
+            if spectrum_type == "digits":
+                dynamic_spectra_linearised = self._convert_units_to_linearised(dynamic_spectra)
+                return Spectrogram(dynamic_spectra_linearised[::-1, :], # reverse the spectra along the frequency axis
+                        time_seconds, 
+                        freq_MHz[::-1], # sort the frequencies in ascending order
+                        self.tag, 
+                        chunk_start_time=self.chunk_start_time, 
+                        microsecond_correction = microsecond_correction,
+                        spectrum_type = spectrum_type)
+            else:
+                raise NotImplementedError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
+            
 
     def _get_primary_hdu(self, hdulist: HDUList) -> PrimaryHDU:
         return hdulist['PRIMARY']
@@ -97,12 +91,9 @@ class FitsChunk(ChunkFile):
 
 
     def get_datetimes(self) -> np.ndarray:
-        try:
-            with fits.open(self.file_path, mode='readonly') as hdulist:
-                bintable_data = hdulist[1].data
-                time_seconds = bintable_data['TIME'][0]
-                return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Could not load spectrogram, {self.file_path} not found.")
-        except Exception as e:
-            raise RuntimeError(f"An error occurred while retrieving datetime array: {e}")
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            bintable_data = hdulist[1].data
+            time_seconds = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in time_seconds]
+
+

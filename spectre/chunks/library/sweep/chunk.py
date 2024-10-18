@@ -1,21 +1,31 @@
-import numpy as np
-from typing import Tuple, Optional
-from scipy.signal import ShortTimeFFT, get_window
-from datetime import datetime, timedelta
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
+from datetime import datetime, timedelta
+from typing import Tuple, Optional
+import numpy as np
+from scipy.signal import ShortTimeFFT, get_window
+
+from spectre.chunks.chunk_register import register_chunk
+from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.chunks.library.default.chunk import (
+    BinChunk,
+    FitsChunk)
 from spectre.cfg import (
-    DEFAULT_TIME_FORMAT
+    DEFAULT_DATETIME_FORMAT
 )
 from spectre.chunks.base import (
     SPECTREChunk, 
     ChunkFile
 )
-from spectre.chunks.chunk_register import register_chunk
-from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.chunks.library.default.chunk import (
-    BinChunk,
-    FitsChunk
+from spectre.exceptions import (
+    InvalidSweepMetadataError
 )
+
 
 @register_chunk('sweep')
 class Chunk(SPECTREChunk):
@@ -61,13 +71,12 @@ class Chunk(SPECTREChunk):
         # unpack the sweep metadata attributes explictly 
         (self.center_frequencies, self.num_samples) = self.sweep_metadata
 
-        # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
-        self._validate_center_frequencies_ordering()
-
         # convert the millisecond correction to a microsecond correction
         microsecond_correction = millisecond_correction * 1e3
+  
         # and (essentially) perform the STFFT on the IQ samples
         time_seconds, freq_MHz, dynamic_spectra = self._do_STFFT()
+
 
         return Spectrogram(
             dynamic_spectra=np.array(dynamic_spectra, dtype='float32'),
@@ -78,21 +87,6 @@ class Chunk(SPECTREChunk):
             microsecond_correction=microsecond_correction,
             spectrum_type="amplitude"
         )
-    
-
-    def _validate_center_frequencies_ordering(self) -> None:
-        # Extract the smallest step of each sweep
-        min_frequency = np.min(self.center_frequencies)
-        # Compute the differences between each step
-        diffs = np.diff(self.center_frequencies)
-        # Extract the expected difference between each step within a sweep
-        freq_step = self.capture_config.get("freq_step")
-        # Validate frequency steps
-        for i, diff in enumerate(diffs):
-            # steps should either increase by freq_step or drop to the minimum
-            if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
-                raise ValueError(f"Unordered center frequencies detected at index {i + 1}: frequency {self.center_frequencies[i + 1]} does not match expected pattern.")
-        return
 
 
     def _reconstruct_initial_sweep(self, previous_chunk: SPECTREChunk):
@@ -122,7 +116,7 @@ class Chunk(SPECTREChunk):
         expected_num_samples = np.sum(final_num_samples)
         actual_num_samples = len(final_sweep_IQ_data) 
         if actual_num_samples != expected_num_samples:
-            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep.")
+            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep")
 
         # return the data for the final sweep as required
         return final_sweep_IQ_data, (final_center_freqs, final_num_samples)
@@ -170,10 +164,12 @@ class Chunk(SPECTREChunk):
         # subtract this from the (millisecond corrected) chunk start time for the current chunk
         corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds=millisecond_correction) - timedelta(seconds=elapsed_seconds)
         # return the chunk_start_time (i.e. formatted as a string, truncated to second precision), along with the millisecond correction in order to recover full accuracy
-        return datetime.strftime(corrected_datetime, DEFAULT_TIME_FORMAT), corrected_datetime.microsecond / 1e3
+        return datetime.strftime(corrected_datetime, DEFAULT_DATETIME_FORMAT), corrected_datetime.microsecond / 1e3
 
 
     def _do_STFFT(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
+        self._validate_center_frequencies_ordering()
         # set the attributes used to define the swept STFFT procedure
         self._initialize_STFFT_params()
         # create the stepped spectrogram
@@ -189,6 +185,24 @@ class Chunk(SPECTREChunk):
         time_seconds = self._compute_time_seconds()
         freq_MHz = self._compute_frequencies()
         return time_seconds, freq_MHz, swept_dynamic_spectra
+
+
+    def _validate_center_frequencies_ordering(self) -> None:
+        # Extract the smallest step of each sweep
+        min_frequency = np.min(self.center_frequencies)
+        # Compute the differences between each step
+        diffs = np.diff(self.center_frequencies)
+        # Extract the expected difference between each step within a sweep. 
+        # By default, if the "freq_step" key in the capture config is undefined, we assume the frequency step is equal to the sampling rate
+        # This is a hard-coded workaround since the tagged-staircase block is currently hard-coded to jump in (modelled) frequency by 
+        # the sampling rate [Hz] at each defined step. This will be remediated in the future.
+        freq_step = self.capture_config.get("freq_step") if ("freq_step" in self.capture_config) else self.capture_config.get("samp_rate")
+        # Validate frequency steps
+        for i, diff in enumerate(diffs):
+            # steps should either increase by freq_step or drop to the minimum
+            if (diff != freq_step) and (self.center_frequencies[i + 1] != min_frequency):
+                raise InvalidSweepMetadataError(f"Unordered center frequencies detected")
+        return
 
 
     def _initialize_STFFT_params(self):
@@ -213,7 +227,7 @@ class Chunk(SPECTREChunk):
         unique_num_steps_per_sweep = np.unique(np.diff(min_freq_indices))
         # we expect that the difference is always the same, so that the result of np.unique has a single element
         if len(unique_num_steps_per_sweep) != 1:
-            raise ValueError("Irregular step count per sweep, expected a consistent number of steps per sweep.")
+            raise InvalidSweepMetadataError("Irregular step count per sweep, expected a consistent number of steps per sweep")
         # finally, we return the ensured unique element
         return int(unique_num_steps_per_sweep[0])
 
@@ -281,6 +295,7 @@ class Chunk(SPECTREChunk):
             assigned_sample_indices.append(midpoint_sample)
             # add to the cumulative samples how many samples there were in the current sweep we just processed
             cumulative_samples += np.sum(self.num_samples[start_step:end_step])
+        
         # convert the sample indices to seconds by using the sampling interval (the assumed time elapsed between samples)
         return np.array(assigned_sample_indices) * (1 / self.samp_rate)
 
@@ -310,7 +325,7 @@ class HdrChunk(ChunkFile):
         super().__init__(chunk_parent_path, chunk_name, "hdr")
 
     def read(self) -> Tuple[int, np.ndarray, np.ndarray]:
-        hdr_contents = self._read_file_contents()
+        hdr_contents = self.read_file_contents()
         millisecond_correction = self._get_millisecond_correction(hdr_contents)
         center_frequencies = self._get_center_frequencies(hdr_contents)
         num_samples = self._get_num_samples(hdr_contents)
@@ -318,18 +333,20 @@ class HdrChunk(ChunkFile):
         return millisecond_correction, (center_frequencies, num_samples)
         
 
-    def _read_file_contents(self) -> np.ndarray:
+    def read_file_contents(self) -> np.ndarray:
         # Reads the contents of the .hdr file into a numpy array
         with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
 
 
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
-        # Extracts and returns the millisecond correction from the file contents
-        millisecond_correction_as_float = hdr_contents[0]
-        if millisecond_correction_as_float.is_integer():
-            return int(millisecond_correction_as_float)
-        raise ValueError("Millisecond correction value is not an integer.")
+        # Extracts and returns the millisecond correction from the file contents 
+        millisecond_correction_as_float = float(hdr_contents[0])
+
+        if not millisecond_correction_as_float.is_integer():
+            raise TypeError(f"Expected integer value for millisecond correction, but got {millisecond_correction_as_float}")
+        
+        return int(millisecond_correction_as_float)
 
 
     def _get_center_frequencies(self, hdr_contents: np.ndarray) -> np.ndarray:
@@ -341,11 +358,11 @@ class HdrChunk(ChunkFile):
         # Extracts the number of samples per frequency from the file contents
         num_samples_as_float = hdr_contents[2::2]
         if not all(num_samples_as_float == num_samples_as_float.astype(int)):
-            raise ValueError("Number of samples per frequency is expected to describe an integer.")
+            raise InvalidSweepMetadataError("Number of samples per frequency is expected to describe an integer")
         return num_samples_as_float.astype(int)
 
 
     def _validate_frequencies_and_samples(self, center_frequencies: np.ndarray, num_samples: np.ndarray) -> None:
         """Validates that the center frequencies and the number of samples arrays have the same length."""
         if len(center_frequencies) != len(num_samples):
-            raise ValueError("Center frequencies and number of samples arrays are not the same length.")
+            raise InvalidSweepMetadataError("Center frequencies and number of samples arrays are not the same length")

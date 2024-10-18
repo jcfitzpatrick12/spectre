@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 from collections import OrderedDict
 from os import walk
 from os.path import splitext
@@ -16,8 +19,11 @@ from spectre.chunks.base import BaseChunk
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms import transform
 from spectre.cfg import (
-    DEFAULT_TIME_FORMAT,
+    DEFAULT_DATETIME_FORMAT,
     get_chunks_dir_path
+)
+from spectre.exceptions import (
+    SpectrogramNotFoundError
 )
 
 class Chunks:
@@ -26,18 +32,20 @@ class Chunks:
                  year: int = None, 
                  month: int = None, 
                  day: int = None):
-        self.tag = tag
-        
+        self.tag: str = tag
+        self.year: int = year
+        self.month: int = month
+        self.day: int = day
+
         # set the directory which holds the chunks (by default, we use the entire chunks directory)
         self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
         # extract the appropriate chunk class based on the input tag
         self.Chunk = get_chunk_from_tag(tag)
-        # set the chunk map
+
         self._set_chunk_map()
 
-        # set some internal attributes which assist in making Chunks iterable
-        self._chunk_list = self.get_chunk_list()
+        # internal attribute to assist in making Chunks iterable
         self._current_index = 0
 
     # setter for chunk map
@@ -49,7 +57,9 @@ class Chunks:
         
         # if there are no files at all
         if len(chunk_files) == 0:
-            warnings.warn("No chunks found, setting chunk map with empty dictionary.")
+            warning_message = "No chunks found, setting chunk map with empty dictionary."
+            _LOGGER.warning(warning_message)
+            warnings.warn(warning_message)
             # set with an empty dictionary
             self.chunk_map = chunk_map
             # and proceed no further
@@ -67,6 +77,7 @@ class Chunks:
         
         # with all chunks accounted for, sort chronologically (as a precautionary measure) and set the populated chunk map
         self.chunk_map = OrderedDict(sorted(chunk_map.items()))
+        self._chunk_list = self.get_chunk_list()
 
     # an alias for _set_chunk_map
     def update_chunk_map(self) -> None:
@@ -75,7 +86,7 @@ class Chunks:
     
 
     # enable iterative chunks
-    def __iter__(self) -> Iterator[BaseChunk]:
+    def __iter__(self):
         self._current_index = 0
         return self
     
@@ -101,10 +112,10 @@ class Chunks:
 
     # get chunk by the chunk start time
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
-        chunk = self.chunk_map.get(chunk_start_time)
-        if chunk is None:
+        try:
+            return self.chunk_map[chunk_start_time]
+        except KeyError:
             raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
-        return chunk
 
 
     # get chunk by the index
@@ -119,19 +130,23 @@ class Chunks:
         for i, chunk in enumerate(self):
             if chunk.chunk_start_time == chunk_to_match.chunk_start_time:
                 return i
-        raise ValueError(f"No matching chunk found with chunk_start_time {chunk_to_match.chunk_start_time}.")
+            
+        raise ValueError(f"No matching chunk found for chunk {chunk_to_match.chunk_name}")
     
+
     def count_chunk_files(self, extension: str) -> int:
         return sum(1 for chunk_file in self if chunk_file.has_file(extension))
 
 
     def get_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
         # Convert input strings to datetime objects
-        start_datetime = datetime.strptime(start_time, DEFAULT_TIME_FORMAT)
-        end_datetime = datetime.strptime(end_time, DEFAULT_TIME_FORMAT)
+        start_datetime = datetime.strptime(start_time, DEFAULT_DATETIME_FORMAT)
+        end_datetime = datetime.strptime(end_time, DEFAULT_DATETIME_FORMAT)
 
         if start_datetime.day != end_datetime.day:
-            warnings.warn("Joining spectrograms across multiple days.", RuntimeWarning)
+            warning_message = "Joining spectrograms across multiple days"
+            _LOGGER.warning(warning_message)
+            warnings.warn(warning_message, RuntimeWarning)
 
         # List to store spectrograms, which we will later stitch together
         spectrograms = []
@@ -173,4 +188,4 @@ class Chunks:
         if spectrograms:
             return transform.join_spectrograms(spectrograms)
         else:
-            raise ValueError("No spectrogram data found for the given time range.")
+            raise SpectrogramNotFoundError("No spectrogram data found for the given time range")

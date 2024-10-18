@@ -6,14 +6,16 @@
 from spectre.chunks.chunk_register import chunk_map
 from spectre.chunks.base import BaseChunk
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.exceptions import ChunkNotFoundError
 
 
 def get_chunk(chunk_key: str) -> BaseChunk:
-    chunk = chunk_map.get(chunk_key)
-    if chunk is None:
+    try:
+        Chunk = chunk_map[chunk_key]
+        return Chunk
+    except KeyError:
         valid_chunk_keys = list(chunk_map.keys())
-        raise ValueError(f"No chunk found for the chunk key: {chunk_key}. Please specify one of the following chunk keys {valid_chunk_keys}.")
-    return chunk
+        raise ChunkNotFoundError(f"No chunk found for the chunk key: {chunk_key}. Valid chunk keys are: {valid_chunk_keys}")
 
 
 def get_chunk_from_tag(tag: str) -> BaseChunk:
@@ -25,7 +27,4 @@ def get_chunk_from_tag(tag: str) -> BaseChunk:
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
         chunk_key = capture_config.get('chunk_key')
-
-    if chunk_key is None:
-        raise ValueError(f"Chunk key could not be found for tag {tag}")
     return get_chunk(chunk_key)

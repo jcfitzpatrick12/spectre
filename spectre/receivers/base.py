@@ -7,6 +7,7 @@ from typing import Callable, Any
 
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
 from spectre.receivers import validators
+from spectre.exceptions import InvalidModeError, InvalidReceiver
 
 
 class BaseReceiver(ABC):
@@ -57,10 +58,10 @@ class BaseReceiver(ABC):
     
     
     def get_specification(self, specification_key: str) -> Any:
-        specification_value = self.specifications.get(specification_key)
-        if specification_value is None:
-            raise ValueError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
-        return specification_value
+        try:
+            return self.specifications.get(specification_key)
+        except KeyError:
+            raise KeyError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
 
     
     # ensure that all receiver maps define the same modes for the receiver
@@ -72,12 +73,12 @@ class BaseReceiver(ABC):
         if capture_method_modes == validator_modes == template_modes:
             self.valid_modes = capture_method_modes
         else:
-            raise KeyError(f"Mode key mismatch for the receiver {self.name}. Could not define valid modes.")
+            raise KeyError(f"Mode key mismatch for the receiver {self.name}. Could not define valid modes")
 
 
     def set_mode(self, mode: str) -> None:
         if not mode in self.valid_modes:
-            raise ValueError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}.")
+            raise InvalidModeError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}")
         self.mode = mode
 
 
@@ -86,24 +87,15 @@ class BaseReceiver(ABC):
     
     
     def get_capture_method(self) -> Callable:
-        capture_method = self.capture_methods.get(self.mode)
-        if capture_method is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return capture_method
+        return self.capture_methods.get(self.mode)
 
 
     def get_validator(self) -> Callable:
-        validator = self.validators.get(self.mode)
-        if validator is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return validator
+        return self.validators.get(self.mode)
 
 
     def get_template(self) -> dict[str, Any]:
-        template = self.templates.get(self.mode)
-        if template is None:
-            raise ValueError(f"Invalid mode '{self.mode}'. Valid modes are: {self.valid_modes}")
-        return template
+        return self.templates.get(self.mode)
 
 
     def validate(self, capture_config: dict) -> None:
@@ -146,10 +138,10 @@ class BaseReceiver(ABC):
         capture_config = capture_config_handler.read()
 
         if capture_config['receiver'] != self.name:
-            raise ValueError(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'.")
+            raise InvalidReceiver(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'")
         
         if capture_config['mode'] != self.mode:
-            raise ValueError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'.")
+            raise InvalidModeError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'")
 
         self.validate(capture_config)
         return capture_config

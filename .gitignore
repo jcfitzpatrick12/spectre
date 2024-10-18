@@ -5,3 +5,4 @@ scrap
 *venv
 tmp
 *.log
+logs/*
