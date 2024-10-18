@@ -21,28 +21,23 @@ class Watcher:
         EventHandler = get_event_handler_from_tag(tag)
         self.event_handler = EventHandler(tag, self.exception_queue)
 
+
     def start(self):
         _LOGGER.info("Starting watcher...")
+
+        # Schedule and start the observer
+        self.observer.schedule(self.event_handler, CHUNKS_DIR_PATH, recursive=True)
+        self.observer.start()
+
         try:
-            # Schedule the observer with the event handler
-            self.observer.schedule(self.event_handler, CHUNKS_DIR_PATH, recursive=True)
-            self.observer.start()
-
-            # Monitor the observer and check for exceptions in the queue
-            while True:
+            # Monitor the observer and handle exceptions
+            while self.observer.is_alive():
                 try:
-                    # Block and wait for exceptions with a 1-second timeout
-                    exc = self.exception_queue.get(block=True, timeout=0.5)
-                    raise exc  # Propagate the exception to the main thread
+                    exc = self.exception_queue.get(block=True, timeout=0.25)
+                    if exc:
+                        raise exc  # Propagate the exception
                 except queue.Empty:
-                    # No exceptions in queue, continue checking
-                    pass
-
-                # Stop if the observer thread stops running
-                if not self.observer.is_alive():
-                    break
-        except Exception as e:
-            raise e
+                    pass  # Continue looping if no exception in queue
         finally:
             # Ensure the observer is properly stopped
             self.observer.stop()
