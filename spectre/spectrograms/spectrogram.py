@@ -89,14 +89,14 @@ class Spectrogram:
 
 
     def assign_background(self,
-                          background_spectrum: np.ndarray = None,
-                          background_interval: list = None) -> None:
+                          background_spectrum: np.ndarray | None = None,
+                          background_interval: list | None = None) -> None:
         
         # first check if the background spectrum has been specified explictly
         if not (background_spectrum is None):
             # if it has, but the interval was also specified, raise an error (as we cannot use both)
             if not (background_interval is None):
-                raise ValueError(f"Cannot specify both background spectrum and background interval! Background must be assigned either explictly or via the interval")
+                raise ValueError(f"Cannot specify both a background spectrum and background interval!")
             # otherwise, set the background spectrum and proceed
             self.background_spectrum = background_spectrum
 
@@ -178,7 +178,7 @@ class Spectrogram:
         num_spectrogram_dims = np.ndim(self.dynamic_spectra)
         # Check if 'dynamic_spectra' is a 2D array
         if num_spectrogram_dims != 2:
-            raise ValueError(f"Expected 'dynamic_spectra' to be a 2D array, but got {num_spectrogram_dims}D array")
+            raise ValueError(f"Expected dynamic spectrogram to be a 2D array, but got {num_spectrogram_dims}D array")
 
         dynamic_spectra_shape = self.dynamic_spectra.shape
         num_freq_bins = len(self.freq_MHz)
@@ -193,7 +193,7 @@ class Spectrogram:
         # Check if the shape of the background spectrum is consistent with the shape of dynamic spectrum
         num_freq_bins_in_background_spectrum = len(self.background_spectrum)
         if dynamic_spectra_shape[0] != num_freq_bins_in_background_spectrum:
-            raise ValueError(f"Shape of background spectrum must be consistent with dynamic spectra. Expected {dynamic_spectra_shape[0]} frequency bins, got {num_freq_bins_in_background_spectrum}")
+            raise ValueError(f"Shape of background spectrum must be consistent with the dynamic spectrogram. Expected {dynamic_spectra_shape[0]} frequency bins, but got {num_freq_bins_in_background_spectrum}")
         return
 
 
@@ -367,14 +367,14 @@ def _save_spectrogram(write_path: str,
                       spectrogram: Spectrogram, 
                       fits_config: dict) -> None:
     if spectrogram.chunk_start_time is None:
-        raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {S.chunk_start_time}")
+        raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {spectrogram.chunk_start_time}")
     
     # Primary HDU with data
     primary_data = spectrogram.dynamic_spectra.astype(dtype=np.float32) 
     primary_hdu = fits.PrimaryHDU(primary_data)
 
     primary_hdu.header.set('SIMPLE', True, 'file does conform to FITS standard')
-    primary_hdu.header.set('BITPIX', -64, 'number of bits per data pixel')
+    primary_hdu.header.set('BITPIX', -32, 'number of bits per data pixel')
     primary_hdu.header.set('NAXIS', 2, 'number of data axes')
     primary_hdu.header.set('NAXIS1', spectrogram.dynamic_spectra.shape[1], 'length of data axis 1')
     primary_hdu.header.set('NAXIS2', spectrogram.dynamic_spectra.shape[0], 'length of data axis 2')
