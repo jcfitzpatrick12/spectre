@@ -29,9 +29,11 @@ class EventHandler(BaseEventHandler):
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
         chunk = self.Chunk(chunk_start_time, self.tag)
+
+        _LOGGER.info("Creating spectrogram")
         spectrogram = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
 
-        _LOGGER.info("Spectrogram successfully created. Averaging...")
+        _LOGGER.info("Averaging spectrogram")
         spectrogram = self.average_in_time(spectrogram)
         spectrogram = self.average_in_frequency(spectrogram)
 
