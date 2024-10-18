@@ -93,8 +93,8 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
     
 
     def flush_spectrogram(self) -> None:
-        _LOGGER.info("Flushing spectrogram to file")
         if self.spectrogram:
+            _LOGGER.info(f"Flushing spectrogram to file with chunk start time {self.spectrogram.chunk_start_time}")
             self.spectrogram.save()
             _LOGGER.info("Flush successful, resetting state")
             self.spectrogram = None
