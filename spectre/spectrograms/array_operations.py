@@ -52,6 +52,16 @@ def compute_resolution(array: np.ndarray) -> float:
     return np.nanmedian(resolutions)
 
 
+def compute_range(array: np.ndarray) -> float:
+    # Check that the array is one-dimensional
+    if array.ndim != 1:
+        raise ValueError("Input array must be one-dimensional")
+    
+    if len(array) < 2:
+        raise ValueError("Input array must contain at least two elements")
+    return array[-1] - array[0]
+
+
 def subtract_background(yvals: np.ndarray, background_indices: list | None) -> np.ndarray:
     if background_indices is None:
         yvals -= np.nanmean(yvals)

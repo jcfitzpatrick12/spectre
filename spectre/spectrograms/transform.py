@@ -241,19 +241,19 @@ def _time_elapsed(datetimes: np.ndarray) -> np.ndarray:
 
 # we assume that the spectrogram list is ORDERED chronologically
 # we assume there is no time overlap in any of the spectrograms in the list
-def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
+def join_spectrograms(spectrograms: list[Spectrogram]) -> Spectrogram:
 
     # check that the length of the list is non-zero
-    num_spectrograms = len(spectrogram_list)
+    num_spectrograms = len(spectrograms)
     if num_spectrograms == 0:
         raise ValueError(f"Input list of spectrograms is empty!")
     
     # extract the first element of the list, and use this as a reference for comparison
     # input validations.
-    reference_spectrogram = spectrogram_list[0] 
+    reference_spectrogram = spectrograms[0] 
 
     # perform checks on each spectrogram in teh list
-    for spectrogram in spectrogram_list:
+    for spectrogram in spectrograms:
         if not np.all(np.equal(spectrogram.frequencies, reference_spectrogram.frequencies)):
             raise ValueError(f"All spectrograms must have identical frequency ranges")
         if spectrogram.tag != reference_spectrogram.tag:
@@ -265,7 +265,7 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
 
 
     # build a list of the time array of each spectrogram in the list
-    conc_datetimes = np.concatenate([s.datetimes for s in spectrogram_list])
+    conc_datetimes = np.concatenate([s.datetimes for s in spectrograms])
     # find the total number of time stamps
     num_total_time_bins = len(conc_datetimes)
     # find the total number of frequency bins (we can safely now use the first)
@@ -274,7 +274,7 @@ def join_spectrograms(spectrogram_list: list[Spectrogram]) -> Spectrogram:
     transformed_dynamic_spectra = np.empty((num_total_freq_bins, num_total_time_bins))
 
     start_index = 0
-    for spectrogram in spectrogram_list:
+    for spectrogram in spectrograms:
         end_index = start_index + len(spectrogram.times)
         transformed_dynamic_spectra[:, start_index:end_index] = spectrogram.dynamic_spectra
         start_index = end_index

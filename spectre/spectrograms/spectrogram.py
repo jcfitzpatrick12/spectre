@@ -16,6 +16,7 @@ from spectre.spectrograms.array_operations import (
     find_closest_index,
     normalise_peak_intensity,
     compute_resolution,
+    compute_range,
     subtract_background,
 )
 from spectre.file_handlers.json.handlers import FitsConfigHandler
@@ -46,6 +47,8 @@ class Spectrogram:
         # set all dependent attributes initially to None to ensure a defined state for the class
         self.time_resolution: float = None
         self.frequency_resolution: float = None
+        self.time_range: float = None
+        self.frequency_range: float = None,
         self.spectrum_type: str = None
         self.chunk_start_time: str | None = None
         self.microsecond_correction: int = None
@@ -59,7 +62,10 @@ class Spectrogram:
 
         # directly compute the array resolutions
         self.time_resolution = compute_resolution(times)
+        self.time_range = compute_range(times)
+        
         self.frequency_resolution = compute_resolution(frequencies)
+        self.frequency_range = compute_range(frequencies)
 
         # set the spectrum type based on constructor input
         self.spectrum_type = spectrum_type

@@ -15,6 +15,7 @@ from watchdog.events import FileSystemEventHandler
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.file_handlers.json.handlers import CaptureConfigHandler
 from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.spectrograms.transform import join_spectrograms
 from spectre.spectrograms.transform import (
     time_average, 
     frequency_average
@@ -62,6 +63,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 size = current_size
                 time.sleep(0.5)
             except OSError as e:
+                self.flush_spectrogram() # flush the internally stored spectrogram
                 self.exception_queue.put(e)  # Capture the exception and propagate it
                 raise e
 
@@ -80,3 +82,23 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
             raise KeyError(f"Frequency resolution has not been specified in the capture config!")
         average_over = floor(frequency_resolution/spectrogram.frequency_resolution) if frequency_resolution > spectrogram.frequency_resolution else 1
         return frequency_average(spectrogram, average_over)
+    
+
+    def join_spectrogram(self, spectrogram: Spectrogram) -> None:
+        # if the spectrogram attribute is empty, define it
+        if self.spectrogram is None:
+            self.spectrogram = spectrogram
+            return
+        # otherwise, effectively append it  
+        else:
+            self.spectrogram = join_spectrograms([self.spectrogram, spectrogram])
+            if self.spectrogram.time_range > self.capture_config.get("joining_time"):
+                self.flush_spectrogram()
+    
+
+    def flush_spectrogram(self) -> None:
+        _LOGGER.info("Flushing spectrogram to file")
+        if self.spectrogram:
+            self.spectrogram.save()
+            _LOGGER.info("Flush successful, resetting state")
+            self.spectrogram = None

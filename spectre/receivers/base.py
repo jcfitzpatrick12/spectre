@@ -123,7 +123,7 @@ class BaseReceiver(ABC):
         # basic validation against the template
         capture_config_handler.validate_against_template(capture_config, 
                                                          self.get_template(), 
-                                                         ignore_keys=['receiver', 'mode', 'tag'])
+                                                         ignore_keys=["receiver", "mode", "tag"])
         # validate against receiver-specific constraints in the current mode
         self.validate(capture_config)
         # update the extra metadata
@@ -137,11 +137,11 @@ class BaseReceiver(ABC):
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
 
-        if capture_config['receiver'] != self.name:
-            raise InvalidReceiver(f"Capture config receiver mismatch for tag '{tag}'. Expected '{self.name}', got '{capture_config['receiver']}'")
+        if capture_config["receiver"] != self.name:
+            raise InvalidReceiver(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config["receiver"]}")
         
-        if capture_config['mode'] != self.mode:
-            raise InvalidModeError(f"Mode mismatch for tag '{tag}'. Expected '{self.mode}', got '{capture_config['mode']}'")
+        if capture_config["mode"] != self.mode:
+            raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config["mode"]}")
 
         self.validate(capture_config)
         return capture_config
@@ -174,15 +174,16 @@ class SPECTREReceiver(BaseReceiver):
                 "samp_rate": int, # [Hz]
                 "IF_gain": int, # [dB]
                 "RF_gain": int, # [dB]
-                'chunk_size': int, #  [s]
-                'time_resolution': float, # [s]
-                'frequency_resolution': float, # [Hz]
-                'window_type': str, # window type for STFFT
-                'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
-                'window_size': int, # number of samples in STFFT window
-                'STFFT_kwargs': dict, # keyword arguments for the scipy STFFT class
-                'chunk_key': str, # tag will map to the chunk with this key
-                'event_handler_key': str, # tag will map to event handler with this key during post processing
+                "chunk_size": int, #  [s]
+                "joining_time": int, # [s]
+                "time_resolution": float, # [s]
+                "frequency_resolution": float, # [Hz]
+                "window_type": str, # window type for STFFT
+                "window_kwargs": dict, # keyword arguments for window function, must be in order as in scipy documentation.
+                "window_size": int, # number of samples in STFFT window
+                "STFFT_kwargs": dict, # keyword arguments for the scipy STFFT class
+                "chunk_key": str, # tag will map to the chunk with this key
+                "event_handler_key": str, # tag will map to event handler with this key during post processing
             },
             "sweep": {
                 "min_freq": float, # [Hz]
@@ -193,15 +194,15 @@ class SPECTREReceiver(BaseReceiver):
                 "samp_rate": int, # [Hz]
                 "IF_gain": int, # [dB]
                 "RF_gain": int, # [dB]
-                'chunk_size': int, #  [s]
-                'time_resolution': float, # [s]
-                'frequency_resolution': float, # [Hz]
-                'window_type': str, # window type for STFFT
-                'window_kwargs': dict, # keyword arguments for window function, must be in order as in scipy documentation.
-                'window_size': int, # number of samples in STFFT window
-                'STFFT_kwargs': dict, # keyword arguments for the scipy STFFT class
-                'chunk_key': str, # tag will map to the chunk with this key
-                'event_handler_key': str, # tag will map to event handler with this key during post processing
+                "chunk_size": int, #  [s]
+                "time_resolution": float, # [s]
+                "frequency_resolution": float, # [Hz]
+                "window_type": str, # window type for STFFT
+                "window_kwargs": dict, # keyword arguments for window function, must be in order as in scipy documentation.
+                "window_size": int, # number of samples in STFFT window
+                "STFFT_kwargs": dict, # keyword arguments for the scipy STFFT class
+                "chunk_key": str, # tag will map to the chunk with this key
+                "event_handler_key": str, # tag will map to event handler with this key during post processing
             }
         }
         return
@@ -223,14 +224,14 @@ class SPECTREReceiver(BaseReceiver):
         samp_rate = capture_config["samp_rate"]
         IF_gain = capture_config["IF_gain"]
         RF_gain = capture_config["RF_gain"]
-        chunk_size = capture_config['chunk_size']
-        time_resolution = capture_config['time_resolution']
-        window_type = capture_config['window_type']
-        window_kwargs = capture_config['window_kwargs']
-        window_size = capture_config['window_size']
-        STFFT_kwargs = capture_config['STFFT_kwargs']
-        chunk_key = capture_config['chunk_key']
-        event_handler_key = capture_config[ 'event_handler_key']
+        chunk_size = capture_config["chunk_size"]
+        time_resolution = capture_config["time_resolution"]
+        window_type = capture_config["window_type"]
+        window_kwargs = capture_config["window_kwargs"]
+        window_size = capture_config["window_size"]
+        STFFT_kwargs = capture_config["STFFT_kwargs"]
+        chunk_key = capture_config["chunk_key"]
+        event_handler_key = capture_config[ "event_handler_key"]
 
         validators.validate_center_freq_strictly_positive(min_freq)
         validators.validate_center_freq_strictly_positive(max_freq)
@@ -276,19 +277,19 @@ class SPECTREReceiver(BaseReceiver):
     
 
     def _default_fixed_validator(self, capture_config: dict) -> None:
-        center_freq = capture_config['center_freq']
-        bandwidth = capture_config['bandwidth']
-        samp_rate = capture_config['samp_rate']
-        IF_gain = capture_config['IF_gain']
-        RF_gain = capture_config['RF_gain']
-        chunk_size = capture_config['chunk_size']
-        time_resolution = capture_config['time_resolution']
-        window_type = capture_config['window_type']
-        window_kwargs = capture_config['window_kwargs']
-        window_size = capture_config['window_size']
-        STFFT_kwargs = capture_config['STFFT_kwargs']
-        chunk_key = capture_config['chunk_key']
-        event_handler_key = capture_config['event_handler_key']
+        center_freq = capture_config["center_freq"]
+        bandwidth = capture_config["bandwidth"]
+        samp_rate = capture_config["samp_rate"]
+        IF_gain = capture_config["IF_gain"]
+        RF_gain = capture_config["RF_gain"]
+        chunk_size = capture_config["chunk_size"]
+        time_resolution = capture_config["time_resolution"]
+        window_type = capture_config["window_type"]
+        window_kwargs = capture_config["window_kwargs"]
+        window_size = capture_config["window_size"]
+        STFFT_kwargs = capture_config["STFFT_kwargs"]
+        chunk_key = capture_config["chunk_key"]
+        event_handler_key = capture_config["event_handler_key"]
 
         validators.validate_center_freq_strictly_positive(center_freq)
         validators.validate_samp_rate_strictly_positive(samp_rate)
@@ -334,17 +335,17 @@ class SDRPlayReceiver(SPECTREReceiver):
                                                   center_freq_lower_bound, 
                                                   center_freq_upper_bound)
 
-        validators.closed_confine_samp_rate(capture_config['samp_rate'], 
+        validators.closed_confine_samp_rate(capture_config["samp_rate"], 
                                             self.get_specification("samp_rate_lower_bound"), 
                                             self.get_specification("samp_rate_upper_bound"))
 
 
-        validators.closed_confine_bandwidth(capture_config['bandwidth'], 
+        validators.closed_confine_bandwidth(capture_config["bandwidth"], 
                                             self.get_specification("bandwidth_lower_bound"), 
                                             self.get_specification("bandwidth_upper_bound"))
 
-        validators.closed_upper_bound_IF_gain(capture_config['IF_gain'], 
+        validators.closed_upper_bound_IF_gain(capture_config["IF_gain"], 
                                               self.get_specification("IF_gain_upper_bound"))
         
-        validators.closed_upper_bound_RF_gain(capture_config['RF_gain'], 
+        validators.closed_upper_bound_RF_gain(capture_config["RF_gain"], 
                                               self.get_specification("RF_gain_upper_bound"))
