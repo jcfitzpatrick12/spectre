@@ -60,7 +60,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 _LOGGER.info(f"File is now stable: {file_path}")
                 break  # File is stable when the size hasn't changed
             size = current_size
-            time.sleep(0.5)
+            time.sleep(0.25)
 
 
 
