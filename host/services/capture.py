@@ -90,8 +90,12 @@ def _start_capture(receiver_name: str,
     from spectre.cfg import LOGS_DIR_PATH
     configure_root_logger(f"WORKER")
     _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
-    receiver = get_receiver(receiver_name, mode=mode)
-    receiver.start_capture(tags)
+    try:
+        receiver = get_receiver(receiver_name, mode=mode)
+        receiver.start_capture(tags)
+    except:
+        _LOGGER.error("An error has occured during capture", exc_info=True)
+        raise
 
 
 def _start_watcher(tags: List[str]) -> None:
