@@ -5,7 +5,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable, Any
 
-from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.receivers import validators
 from spectre.exceptions import InvalidModeError, InvalidReceiver
 

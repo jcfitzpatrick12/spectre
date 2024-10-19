@@ -9,7 +9,7 @@ from typing import List
 
 from spectre.receivers.factory import get_receiver
 from spectre.logging import log_service_call
-from spectre.file_handlers.json.handlers import (
+from spectre.file_handlers.json import (
     FitsConfigHandler,
     CaptureConfigHandler
 )

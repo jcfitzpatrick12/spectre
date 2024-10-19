@@ -19,7 +19,7 @@ from spectre.spectrograms.array_operations import (
     compute_range,
     subtract_background,
 )
-from spectre.file_handlers.json.handlers import FitsConfigHandler
+from spectre.file_handlers.json import FitsConfigHandler
 
 from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT

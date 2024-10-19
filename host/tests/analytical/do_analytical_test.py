@@ -6,7 +6,7 @@
 # import numpy as np
 # import typer
 
-# from spectre.file_handlers.json.handlers import CaptureConfigHandler
+# from spectre.file_handlers.json import CaptureConfigHandler
 # from spectre.chunks import Chunks
 # from spectre.spectrograms.analytical_factory import AnalyticalFactory
 # from spectre.spectrograms.spectrogram import Spectrogram

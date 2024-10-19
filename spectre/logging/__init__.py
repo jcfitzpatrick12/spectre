@@ -17,7 +17,7 @@ from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT, 
     get_logs_dir_path
 )
-from spectre.file_handlers.text.handlers import TextHandler
+from spectre.file_handlers.text import TextHandler
 from spectre.exceptions import LogNotFoundError
 
 _LOGGER = getLogger(__name__)

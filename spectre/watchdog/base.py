@@ -13,7 +13,7 @@ from math import floor
 from watchdog.events import FileSystemEventHandler
 
 from spectre.chunks.factory import get_chunk_from_tag
-from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms.transform import join_spectrograms
 from spectre.spectrograms.transform import (
@@ -61,7 +61,6 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
                 break  # File is stable when the size hasn't changed
             size = current_size
             time.sleep(0.25)
-
 
 
     def average_in_time(self, spectrogram: Spectrogram) -> Spectrogram:
