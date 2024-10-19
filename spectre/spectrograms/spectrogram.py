@@ -36,7 +36,6 @@ class Spectrogram:
                  chunk_start_time: str = None, # (optional) the datetime (as a string) assigned to the first spectrum in the spectrogram (floored second precision)
                  microsecond_correction: int = 0, # (optional) a correction to the chunk start time
                  spectrum_type: str = None, # (optional) string which denotes the type of the spectrogram
-                 background_spectrum: np.ndarray = None, # (optional) reference background spectrum, used to compute dB above background
                  background_interval: list = None): # (optional) specify an interval over which to compute the background spectrum
 
         # set the mandatory attributes
@@ -49,6 +48,8 @@ class Spectrogram:
         self.frequency_resolution: float = None
         self.time_range: float = None
         self.frequency_range: float = None,
+        self.num_times: int = None,
+        self.num_frequencies: int = None,
         self.spectrum_type: str = None
         self.chunk_start_time: str | None = None
         self.microsecond_correction: int = None
@@ -63,9 +64,11 @@ class Spectrogram:
         # directly compute the array resolutions
         self.time_resolution = compute_resolution(times)
         self.time_range = compute_range(times)
+        self.num_times = len(self.times)
         
         self.frequency_resolution = compute_resolution(frequencies)
         self.frequency_range = compute_range(frequencies)
+        self.num_frequencies = len(self.frequencies)
 
         # set the spectrum type based on constructor input
         self.spectrum_type = spectrum_type
@@ -76,8 +79,7 @@ class Spectrogram:
                                   microsecond_correction)
         
         # with the datetimes specified (if required), we can now update the background spectrum based on constructor inputs
-        self.assign_background(background_spectrum = background_spectrum,
-                               background_interval = background_interval)
+        self.assign_background(background_interval = background_interval)
         
         self._check_shapes()
         return
@@ -95,19 +97,10 @@ class Spectrogram:
 
 
     def assign_background(self,
-                          background_spectrum: np.ndarray | None = None,
                           background_interval: list | None = None) -> None:
-        
-        # first check if the background spectrum has been specified explictly
-        if not (background_spectrum is None):
-            # if it has, but the interval was also specified, raise an error (as we cannot use both)
-            if not (background_interval is None):
-                raise ValueError(f"Cannot specify both a background spectrum and background interval!")
-            # otherwise, set the background spectrum and proceed
-            self.background_spectrum = background_spectrum
 
         # if the background spectrum was not set explictly, check instead for the background interval
-        elif not (background_interval is None):
+        if not (background_interval is None):
             self.background_interval = background_interval
             # if the background interval is specified, we can set the background indices
             self._set_background_indices()
@@ -123,17 +116,7 @@ class Spectrogram:
         self._update_dynamic_spectra_as_dBb()
         return
     
-
-    def _set_background_spectrum_from_interval(self) -> None:
-        start_index, end_index = self.background_indices
-        self.background_spectrum = np.nanmean(self.dynamic_spectra[:, start_index:end_index+1], axis=-1)
-        return
     
-
-    def _set_background_spectrum_as_default(self) -> None:
-        self.background_spectrum = np.nanmean(self.dynamic_spectra, axis=-1)
-    
-
     def _set_background_indices(self) -> list[int]:
         if not isinstance(self.background_interval, list) or len(self.background_interval) != 2:
             raise ValueError("Background interval must be a list with exactly two elements")
@@ -161,6 +144,16 @@ class Spectrogram:
             raise TypeError(f"Unrecognized background interval type! Received {background_type}")
 
         return
+
+    def _set_background_spectrum_from_interval(self) -> None:
+        start_index, end_index = self.background_indices
+        self.background_spectrum = np.nanmean(self.dynamic_spectra[:, start_index:end_index+1], axis=-1)
+        return
+    
+
+    def _set_background_spectrum_as_default(self) -> None:
+        self.background_spectrum = np.nanmean(self.dynamic_spectra, axis=-1)
+    
 
     def _update_dynamic_spectra_as_dBb(self) -> None:
         # Create an artificial spectrogram where each spectrum is identically the background spectrum
@@ -219,64 +212,15 @@ class Spectrogram:
     def integrate_over_frequency(self, 
                                  correct_background: bool = False, 
                                  peak_normalise: bool = False):
-            
-        I = np.nansum(self.dynamic_spectra * self.frequencies[:, np.newaxis], axis=0) # integrate over frequency
+        
+        # integrate over frequency
+        I = np.trapz(self.dynamic_spectra, self.frequencies, axis=0)
 
         if correct_background:
             I = subtract_background(I, self.background_indices)
         if peak_normalise:
             I = normalise_peak_intensity(I)
         return I
-    
-
-    def quick_plot(self, 
-                time_type: str = "seconds", 
-                log_norm: bool = False, 
-                dBb: bool = False, 
-                vmin: int = -1, 
-                vmax: int = 14):
-        # Create a figure
-        fig, ax = plt.subplots(1)
-
-        # Set up the time axis
-        if time_type == "seconds":
-            times = self.times
-            ax.set_xlabel('Time [s]', size=15)
-        elif time_type == "datetimes":
-            if self.chunk_start_time is None:
-                raise ValueError('Cannot plot with time type "datetimes" if chunk start time is not set')
-            times = self.datetimes
-            ax.set_xlabel('Time [UTC]', size=15)
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-        else:
-            raise ValueError(f'Unexpected time type. Expected "seconds" or "datetimes", but received \"{time_type}\"')
-
-        if log_norm and dBb:
-            raise ValueError(f"Please specify either log_norm or dBb. Both is not supported")
-        
-        # Select the appropriate data and normalization
-        ds = self.dynamic_spectra_as_dBb if dBb else self.dynamic_spectra
-        norm = LogNorm(vmin=np.min(ds[ds > 0]), vmax=np.max(ds)) if log_norm else None
-
-        # Assign the y label
-        ax.set_ylabel('Frequency [MHz]', size=15)
-
-        # Format the x and y tick labels
-        ax.tick_params(axis='x', labelsize=15)
-        ax.tick_params(axis='y', labelsize=15)
-
-        # Plot the dynamic spectra
-        pcolor_plot = ax.pcolormesh(times, 
-                                    self.frequencies*1e-6, 
-                                    ds, 
-                                    vmin=vmin if dBb else None, 
-                                    vmax=vmax if dBb else None, 
-                                    norm=norm, 
-                                    cmap="gnuplot2")
-
-        # Display the plot
-        plt.show()
-
 
 
     def slice_at_time(self, 
@@ -361,6 +305,67 @@ class Spectrogram:
             time_slice = subtract_background(time_slice)
 
         return (frequency_of_slice, times, time_slice)
+    
+    def quick_plot(self, 
+                   time_type: str = "seconds", 
+                   log_norm: bool = False, 
+                   dBb: bool = False, 
+                   vmin: int = -1, 
+                   vmax: int = 14):
+        # Create a figure
+        fig, ax = plt.subplots(1)
+
+        # Set up the time axis
+        if time_type == "seconds":
+            times = self.times
+            ax.set_xlabel('Time [s]', size=15)
+        elif time_type == "datetimes":
+            if self.chunk_start_time is None:
+                raise ValueError('Cannot plot with time type "datetimes" if chunk start time is not set')
+            times = self.datetimes
+            ax.set_xlabel('Time [UTC]', size=15)
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        else:
+            raise ValueError(f'Unexpected time type. Expected "seconds" or "datetimes", but received \"{time_type}\"')
+
+        if log_norm and dBb:
+            raise ValueError(f"Please specify either log_norm or dBb. Both is not supported")
+        
+        # Select the appropriate data and normalization
+        ds = self.dynamic_spectra_as_dBb if dBb else self.dynamic_spectra
+        norm = LogNorm(vmin=np.min(ds[ds > 0]), vmax=np.max(ds)) if log_norm else None
+
+        # Assign the y label
+        ax.set_ylabel('Frequency [MHz]', size=15)
+
+        # Format the x and y tick labels
+        ax.tick_params(axis='x', labelsize=15)
+        ax.tick_params(axis='y', labelsize=15)
+
+        # Plot the dynamic spectra
+        pcolor_plot = ax.pcolormesh(times, 
+                                    self.frequencies*1e-6, 
+                                    ds, 
+                                    vmin=vmin if dBb else None, 
+                                    vmax=vmax if dBb else None, 
+                                    norm=norm, 
+                                    cmap="gnuplot2")
+
+        # Display the plot
+        plt.show()
+
+    def plot(self,
+             time_type: str = "seconds", # x-axis units
+             spectrogram: bool = False, # panel
+             log_norm: bool = False, 
+             dBb: bool = False, 
+             vmin: int = -1, 
+             vmax: int = 14,
+             integrate_over_frequency: bool = False,
+             slice_at_time: float | None = False,
+             slice_at_frequency: float | None = False,
+             ) -> None:
+        return
 
 
 def _seconds_of_day(dt: datetime) -> float:
