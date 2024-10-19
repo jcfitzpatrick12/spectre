@@ -34,9 +34,9 @@ class EventHandler(BaseEventHandler):
         spectrogram = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
 
         _LOGGER.info("Averaging spectrogram")
-        _LOGGER.info(f"Time resolution before averaging: {spectrogram.resolution}")
+        _LOGGER.info(f"Time resolution before averaging: {spectrogram.time_resolution}")
         spectrogram = self.average_in_time(spectrogram)
-        _LOGGER.info(f"Time resolution after averaging: {spectrogram.resolution}")
+        _LOGGER.info(f"Time resolution after averaging: {spectrogram.time_resolution}")
         spectrogram = self.average_in_frequency(spectrogram)
 
         _LOGGER.info("Joining spectrogram")
