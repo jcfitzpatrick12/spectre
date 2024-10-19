@@ -8,7 +8,7 @@ from typing import Any
 
 from spectre.file_handlers.base import BaseFileHandler
 from spectre.cfg import get_chunks_dir_path
-from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT

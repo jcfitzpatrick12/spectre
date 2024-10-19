@@ -94,13 +94,13 @@ def validate_STFFT_kwargs(STFFT_kwargs: dict):
 
 def validate_center_freq_strictly_positive(center_freq: float):
     if center_freq <= 0:
-        raise ValueError(f"Center frequency must be strictly positive. Received: {center_freq/1e6} [MHz]")
+        raise ValueError(f"Center frequency must be strictly positive. Received: {center_freq*1e-6} [MHz]")
     return
 
 
 def validate_bandwidth_strictly_positive(bandwidth: float) -> None:
     if bandwidth < 0:
-        raise ValueError(f"Bandwidth must be non-negative. Received: {bandwidth/1e6} [MHz]")
+        raise ValueError(f"Bandwidth must be non-negative. Received: {bandwidth*1e-6} [MHz]")
     return
 
 

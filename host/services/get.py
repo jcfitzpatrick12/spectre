@@ -23,7 +23,7 @@ from spectre.logging import (
     LogHandler,
     log_service_call
 )
-from spectre.file_handlers.json.handlers import (
+from spectre.file_handlers.json import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
@@ -146,7 +146,7 @@ def tags(year: int | None = None,
 
 @log_service_call(_LOGGER)
 def log_handler(pid: str | None = None,
-        file_name: str | None = None
+                file_name: str | None = None
 ) -> LogHandler:
     # Ensure that exactly one of --pid or --file-name is specified
     if not (bool(pid) ^ bool(file_name)):

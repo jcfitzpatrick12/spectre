@@ -56,13 +56,13 @@ class AnalyticalFactory:
         analytical_dynamic_spectra = np.ones(shape)
         analytical_dynamic_spectra = analytical_dynamic_spectra*spectral_slice[:, np.newaxis]   
 
-        time_seconds = np.array([tau*hop*(1/samp_rate) for tau in range(num_time_samples)])
+        times = np.array([tau*hop*(1/samp_rate) for tau in range(num_time_samples)])
 
-        freq_MHz = np.fft.fftfreq(num_frequency_samples, 1/samp_rate)*1e-6
-        freq_MHz = np.fft.fftshift(freq_MHz)
+        frequencies = np.fft.fftfreq(num_frequency_samples, 1/samp_rate)
+        frequencies = np.fft.fftshift(frequencies)
 
         return Spectrogram(analytical_dynamic_spectra,
-                           time_seconds,
-                           freq_MHz,
+                           times,
+                           frequencies,
                            'analytically-derived-spectrogram',
                            spectrum_type = "amplitude",)

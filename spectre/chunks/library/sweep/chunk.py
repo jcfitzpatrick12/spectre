@@ -75,18 +75,20 @@ class Chunk(SPECTREChunk):
         microsecond_correction = millisecond_correction * 1e3
   
         # and (essentially) perform the STFFT on the IQ samples
-        time_seconds, freq_MHz, dynamic_spectra = self._do_STFFT()
+        times, frequencies, dynamic_spectra = self._do_STFFT()
 
+        # explicit type casting
+        dynamic_spectra = np.array(dynamic_spectra, dtype='float32')
+        times = np.array(times, dtype='float32')
+        frequencies=np.array(frequencies, dtype='float32')
 
-        return Spectrogram(
-            dynamic_spectra=np.array(dynamic_spectra, dtype='float32'),
-            time_seconds=np.array(time_seconds, dtype='float32'),
-            freq_MHz=np.array(freq_MHz, dtype='float32'),
-            tag=self.tag,
-            chunk_start_time=chunk_start_time,
-            microsecond_correction=microsecond_correction,
-            spectrum_type="amplitude"
-        )
+        return Spectrogram(dynamic_spectra,
+                           times,
+                           frequencies,
+                           tag=self.tag,
+                           chunk_start_time=chunk_start_time,
+                           microsecond_correction=microsecond_correction,
+                           spectrum_type="amplitude")
 
 
     def _reconstruct_initial_sweep(self, previous_chunk: SPECTREChunk):
@@ -160,9 +162,9 @@ class Chunk(SPECTREChunk):
         total_samples_to_prepend = np.sum(prepend_num_samples)
         # we use this to infer the exact amount of time that elapsed during collection of the prepended samples
         sampling_interval = 1 / self.capture_config.get("samp_rate")
-        elapsed_seconds = sampling_interval * total_samples_to_prepend
+        elapsed_time = sampling_interval * total_samples_to_prepend
         # subtract this from the (millisecond corrected) chunk start time for the current chunk
-        corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds=millisecond_correction) - timedelta(seconds=elapsed_seconds)
+        corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds=millisecond_correction) - timedelta(seconds=elapsed_time)
         # return the chunk_start_time (i.e. formatted as a string, truncated to second precision), along with the millisecond correction in order to recover full accuracy
         return datetime.strftime(corrected_datetime, DEFAULT_DATETIME_FORMAT), corrected_datetime.microsecond / 1e3
 
@@ -182,9 +184,9 @@ class Chunk(SPECTREChunk):
         # thus assigning one (swept) spectrum to each sweep
         swept_dynamic_spectra = self._stitch_steps(averaged_stepped_spectra)
         # assign times to each of the swept spectrums
-        time_seconds = self._compute_time_seconds()
-        freq_MHz = self._compute_frequencies()
-        return time_seconds, freq_MHz, swept_dynamic_spectra
+        times = self._compute_times()
+        frequencies = self._compute_frequencies()
+        return times, frequencies, swept_dynamic_spectra
 
 
     def _validate_center_frequencies_ordering(self) -> None:
@@ -276,7 +278,7 @@ class Chunk(SPECTREChunk):
         return np.nanmean(stepped_spectra[..., 1:], axis=-1)
 
 
-    def _compute_time_seconds(self) -> np.ndarray:
+    def _compute_times(self) -> np.ndarray:
         """ we assign (by convention) the time of the midpoint sample in each sweep, to the swept spectrum for that sweep"""
         # initialise an (ordered) array to hold the sample indices we will assign to each swept spectrum
         assigned_sample_indices = []
@@ -302,7 +304,7 @@ class Chunk(SPECTREChunk):
 
     def _compute_frequencies(self) -> np.ndarray:
         # prime an empty array to hold the stitched frequency array
-        freq_MHz = np.empty(self.num_steps_per_sweep * self.window_size)
+        frequencies = np.empty(self.num_steps_per_sweep * self.window_size)
         # the steps cover identical frequencies in each sweep, regardless of which sweep
         # so we iterate over the frequency associated with each step,
         # and use this to map each spectral component in the swept spectrogram to it's corresponding physical frequency
@@ -310,9 +312,9 @@ class Chunk(SPECTREChunk):
             # populate the (stitched) frequency array with the physical frequency range covered by the current step
             lower_bound = i * self.window_size
             upper_bound = (i + 1) * self.window_size
-            freq_MHz[lower_bound:upper_bound] = (self.SFT.f + freq) / 1e6
+            frequencies[lower_bound:upper_bound] = (self.SFT.f + freq)
         # return the stitched frequency array
-        return freq_MHz
+        return frequencies
     
 
     def _stitch_steps(self, averaged_spectra: np.ndarray) -> np.ndarray:

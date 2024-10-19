@@ -8,6 +8,7 @@
     "IF_gain": -20,
     "RF_gain": 0,
     "chunk_size": 4,
+    "joining_time": 20,
     "time_resolution": 0.25,
     "frequency_resolution": 10000.0,
     "window_type": "blackman",

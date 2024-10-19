@@ -8,7 +8,7 @@ _LOGGER = getLogger(__name__)
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
 from spectre.logging import log_service_call
-from spectre.file_handlers.json.handlers import (
+from spectre.file_handlers.json import (
     FitsConfigHandler,
     CaptureConfigHandler
 )

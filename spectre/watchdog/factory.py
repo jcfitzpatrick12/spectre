@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from spectre.watchdog.event_handler_register import event_handler_map
-from spectre.file_handlers.json.handlers import CaptureConfigHandler
+from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.exceptions import EventHandlerNotFound
 
 def get_event_handler(event_handler_key: str):
