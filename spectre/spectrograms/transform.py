@@ -87,10 +87,6 @@ def frequency_chop(input_spectrogram: Spectrogram,
     # chop the spectrogram accordingly
     transformed_dynamic_spectra = input_spectrogram.dynamic_spectra[start_index:end_index+1, :]
     transformed_frequencies = input_spectrogram.frequencies[start_index:end_index+1]
-
-    # if the background spectrum is specified, chop identically in frequency
-    if not (input_spectrogram.background_spectrum is None):
-        transformed_background_spectrum = input_spectrogram.background_spectrum[start_index:end_index+1]
     
     # return the spectrogram instance
     return Spectrogram(transformed_dynamic_spectra,
@@ -100,8 +96,7 @@ def frequency_chop(input_spectrogram: Spectrogram,
                        chunk_start_time = input_spectrogram.chunk_start_time,
                        microsecond_correction = input_spectrogram.microsecond_correction,
                        spectrum_type = input_spectrogram.spectrum_type,
-                       background_spectrum = transformed_background_spectrum,
-                       background_interval = input_spectrogram.background_interval
+                       background_interval = None # reset the background interval
                        )
 
 
@@ -156,7 +151,6 @@ def time_chop(input_spectrogram: Spectrogram,
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
                        spectrum_type = input_spectrogram.spectrum_type,
-                       background_spectrum = None, # reset the background spectrum
                        background_interval = None # reset the background interval
                        )
 
@@ -200,10 +194,8 @@ def time_average(input_spectrogram: Spectrogram,
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
                        spectrum_type = input_spectrogram.spectrum_type,
-                       background_spectrum = None, # reset the background spectrum
-                       background_interval = None, # reset the background interval
+                       background_interval = None # reset the background interval
                        )
-
 
 def frequency_average(input_spectrogram: Spectrogram, 
                       average_over: int) -> Spectrogram:
@@ -217,7 +209,6 @@ def frequency_average(input_spectrogram: Spectrogram,
     # average the dynamic spectra array
     transformed_dynamic_spectra = _average_array(input_spectrogram.dynamic_spectra, average_over, axis=0)
     transformed_frequencies = _average_array(input_spectrogram.frequencies, average_over)
-    transformed_background_spectrum = _average_array(input_spectrogram.background_spectrum, average_over)
 
     return Spectrogram(transformed_dynamic_spectra, 
                        input_spectrogram.times, 
@@ -226,8 +217,7 @@ def frequency_average(input_spectrogram: Spectrogram,
                        chunk_start_time = input_spectrogram.chunk_start_time, 
                        microsecond_correction = input_spectrogram.microsecond_correction,
                        spectrum_type = input_spectrogram.spectrum_type,
-                       background_spectrum = transformed_background_spectrum, 
-                       background_interval = input_spectrogram.background_interval
+                       background_interval = None # reset the background interval
                        )
 
 
@@ -290,8 +280,6 @@ def join_spectrograms(spectrograms: list[Spectrogram]) -> Spectrogram:
                        chunk_start_time = reference_spectrogram.chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
                        spectrum_type = reference_spectrogram.spectrum_type,
-                       background_spectrum = None, # reset the background spectrum
-                       background_interval = None # reset the background interval
-                       )
+                       background_interval = None) # reset the background interval
 
 
