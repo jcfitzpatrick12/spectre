@@ -95,9 +95,7 @@ def frequency_chop(input_spectrogram: Spectrogram,
                        input_spectrogram.tag,
                        chunk_start_time = input_spectrogram.chunk_start_time,
                        microsecond_correction = input_spectrogram.microsecond_correction,
-                       spectrum_type = input_spectrogram.spectrum_type,
-                       background_interval = None # reset the background interval
-                       )
+                       spectrum_type = input_spectrogram.spectrum_type)
 
 
 def time_chop(input_spectrogram: Spectrogram, 
@@ -150,9 +148,7 @@ def time_chop(input_spectrogram: Spectrogram,
                        input_spectrogram.tag, 
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = input_spectrogram.spectrum_type,
-                       background_interval = None # reset the background interval
-                       )
+                       spectrum_type = input_spectrogram.spectrum_type)
 
 
 def time_average(input_spectrogram: Spectrogram, 
@@ -180,10 +176,10 @@ def time_average(input_spectrogram: Spectrogram,
     # then, averaged_t0 is the seconds elapsed between the input intial spectrum and the averaged intial spectrum
     averaged_t0 = float(transformed_times[0])
     # compute the updated chunk start time and the updated microsecond correction based on averaged_t0
-    updated_corrected_start_datetime = input_spectrogram.corrected_start_datetime + timedelta(seconds = averaged_t0)
+    corrected_start_datetime = input_spectrogram.datetimes[0] + timedelta(seconds = averaged_t0)
     # then, compute the transformed chunk start time and microsecond correction
-    transformed_chunk_start_time = updated_corrected_start_datetime.strftime(DEFAULT_DATETIME_FORMAT)
-    transformed_microsecond_correction = updated_corrected_start_datetime.microsecond
+    transformed_chunk_start_time = corrected_start_datetime.strftime(DEFAULT_DATETIME_FORMAT)
+    transformed_microsecond_correction = corrected_start_datetime.microsecond
 
     # finally, translate the averaged time seconds to begin at t=0 [s]
     transformed_times -= transformed_times[0]
@@ -193,9 +189,7 @@ def time_average(input_spectrogram: Spectrogram,
                        input_spectrogram.tag,
                        chunk_start_time = transformed_chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = input_spectrogram.spectrum_type,
-                       background_interval = None # reset the background interval
-                       )
+                       spectrum_type = input_spectrogram.spectrum_type)
 
 def frequency_average(input_spectrogram: Spectrogram, 
                       average_over: int) -> Spectrogram:
@@ -216,9 +210,7 @@ def frequency_average(input_spectrogram: Spectrogram,
                        input_spectrogram.tag,
                        chunk_start_time = input_spectrogram.chunk_start_time, 
                        microsecond_correction = input_spectrogram.microsecond_correction,
-                       spectrum_type = input_spectrogram.spectrum_type,
-                       background_interval = None # reset the background interval
-                       )
+                       spectrum_type = input_spectrogram.spectrum_type)
 
 
 def _time_elapsed(datetimes: np.ndarray) -> np.ndarray:
@@ -279,7 +271,5 @@ def join_spectrograms(spectrograms: list[Spectrogram]) -> Spectrogram:
                        reference_spectrogram.tag, 
                        chunk_start_time = reference_spectrogram.chunk_start_time,
                        microsecond_correction = transformed_microsecond_correction,
-                       spectrum_type = reference_spectrogram.spectrum_type,
-                       background_interval = None) # reset the background interval
-
+                       spectrum_type = reference_spectrogram.spectrum_type) 
 

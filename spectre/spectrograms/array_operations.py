@@ -34,8 +34,8 @@ def find_closest_index(
     return np.argmin(np.abs(array - target_value))
 
 
-def normalise_peak_intensity(yvals: np.ndarray) -> np.ndarray:
-    return yvals/np.nanmax(yvals)
+def normalise_peak_intensity(array: np.ndarray) -> np.ndarray:
+    return array/np.nanmax(array)
 
 
 def compute_resolution(array: np.ndarray) -> float:
@@ -62,10 +62,6 @@ def compute_range(array: np.ndarray) -> float:
     return array[-1] - array[0]
 
 
-def subtract_background(yvals: np.ndarray, background_indices: list | None) -> np.ndarray:
-    if background_indices is None:
-        yvals -= np.nanmean(yvals)
-    else:
-        yvals -= np.nanmean(yvals[background_indices[0]:
-                                  background_indices[1]])
-    return yvals
+def subtract_background(array: np.ndarray, start_index: int, end_index: int) -> np.ndarray:
+    array -= np.nanmean(array[start_index:end_index+1])
+    return array
