@@ -13,4 +13,5 @@ def get_receiver(receiver_name: str, mode: str = None) -> BaseReceiver:
         return Receiver(receiver_name, mode = mode)
     except KeyError:
         valid_receivers = list(receivers.keys())
-        raise ReceiverNotFoundError(f"No class found for the receiver: {receiver_name}. Please specify one of the following receivers {valid_receivers}")
+        raise ReceiverNotFoundError(f"No class found for the receiver: {receiver_name}. "
+                                    f"Please specify one of the following receivers {valid_receivers}")
