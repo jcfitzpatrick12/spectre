@@ -28,7 +28,7 @@ from spectre.cfg import (
 
 
 class tuner_1_sweep(gr.top_block):
-    def __init__(self, capture_config: dict):
+    def __init__(self, capture_config: dict[str, Any]):
         gr.top_block.__init__(self, "tuner-1-sweep", catch_exceptions=True)
 
         ##################################################
@@ -113,7 +113,7 @@ class tuner_1_sweep(gr.top_block):
 
 
 
-def main(capture_config: dict, top_block_cls=tuner_1_sweep, options=None):
+def main(capture_config: dict[str, Any], top_block_cls=tuner_1_sweep, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):
