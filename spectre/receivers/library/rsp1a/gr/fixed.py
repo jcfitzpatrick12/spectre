@@ -11,20 +11,20 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from gnuradio import gr
-from gnuradio.filter import firdes
-from gnuradio.fft import window
 import sys
 import signal
 from argparse import ArgumentParser
+from typing import Any
+
+from gnuradio import gr
+from gnuradio.filter import firdes
+from gnuradio.fft import window
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import sdrplay3
 from gnuradio import spectre
 
-from spectre.cfg import (
-    CHUNKS_DIR_PATH
-)
+from spectre.cfg import CHUNKS_DIR_PATH
 
 class fixed(gr.top_block):
 

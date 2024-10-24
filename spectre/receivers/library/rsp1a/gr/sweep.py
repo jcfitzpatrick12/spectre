@@ -8,20 +8,20 @@
 # Title: Not titled yet
 # GNU Radio version: 3.10.1.1
 
-from gnuradio import gr
-from gnuradio.filter import firdes
-from gnuradio.fft import window
 import sys
 import signal
 from argparse import ArgumentParser
+from typing import Any
+
+from gnuradio import gr
+from gnuradio.filter import firdes
+from gnuradio.fft import window
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import sdrplay3
 from gnuradio import spectre
 
-from spectre.cfg import (
-    CHUNKS_DIR_PATH
-)
+from spectre.cfg import CHUNKS_DIR_PATH
 
 
 class sweep(gr.top_block):
