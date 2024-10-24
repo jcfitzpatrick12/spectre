@@ -5,12 +5,11 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
+import os
+from typing import Optional
 from collections import OrderedDict
-from os import walk
-from os.path import splitext
 import warnings
 from datetime import datetime
-from typing import Iterator
 
 # dynamically import all chunks
 import spectre.chunks.library
@@ -23,115 +22,122 @@ from spectre.cfg import (
     get_chunks_dir_path
 )
 from spectre.exceptions import (
-    SpectrogramNotFoundError
+    SpectrogramNotFoundError,
+    ChunkNotFoundError
 )
 
 class Chunks:
     def __init__(self, 
-                 tag: str, 
-                 year: int = None, 
-                 month: int = None, 
-                 day: int = None):
-        self.tag: str = tag
-        self.year: int = year
-        self.month: int = month
-        self.day: int = day
+                 tag: str,
+                 year: Optional[int] = None, 
+                 month: Optional[int] = None, 
+                 day: Optional[int] = None):
+        self._tag = tag
+        self._Chunk = get_chunk_from_tag(tag)
+        self._chunk_map: dict[str, BaseChunk] = OrderedDict()
+        self.set_date(year, month, day)
 
-        # set the directory which holds the chunks (by default, we use the entire chunks directory)
-        self.chunks_dir_path = get_chunks_dir_path(year, month, day)
 
-        # extract the appropriate chunk class based on the input tag
-        self.Chunk = get_chunk_from_tag(tag)
+    @property
+    def year(self) -> int:
+        return self._year
 
-        self._set_chunk_map()
 
-        # internal attribute to assist in making Chunks iterable
-        self._current_index = 0
+    @property 
+    def month(self) -> int:
+        return self._month
+    
 
-    # setter for chunk map
-    def _set_chunk_map(self) -> None:
-        # chunk map is an ordered dictionary, with each chunk ordered chronologically based on the chunk start time
-        chunk_map = OrderedDict()
-        # each file within chunks will be an extension instance of a chunk
-        chunk_files = [f for (_, _, files) in walk(self.chunks_dir_path) for f in files]
+    @property
+    def day(self) -> int:
+        return self._day
+
+
+    @property
+    def chunks_dir_path(self) -> str:
+        return get_chunks_dir_path(self.year, self.month, self.day)
+    
+
+    @property 
+    def chunk_map(self) -> dict[str, BaseChunk]:
+        if not self._chunk_map:  # Check for empty dict
+            self._update_chunk_map()
+        return self._chunk_map
+    
+
+    @property
+    def chunk_list(self) -> list[BaseChunk]:
+        return list(self.chunk_map.values())
+    
+
+    @property
+    def num_chunks(self) -> int:
+        return len(self.chunk_list)
+    
+
+    @property
+    def chunk_names(self) -> list[str]:
+        return list(self.chunk_map.keys())
+
+
+
+    def set_date(self, 
+                 year: Optional[int],
+                 month: Optional[int],
+                 day: Optional[int]) -> None:
+        self._year = year
+        self._month = month
+        self._day = day
+        self._update_chunk_map()
+
+
+    def _update_chunk_map(self) -> None:
+        chunk_files = [f for (_, _, files) in os.walk(self.chunks_dir_path) for f in files]
         
-        # if there are no files at all
         if len(chunk_files) == 0:
             warning_message = "No chunks found, setting chunk map with empty dictionary."
             _LOGGER.warning(warning_message)
             warnings.warn(warning_message)
-            # set with an empty dictionary
-            self.chunk_map = chunk_map
-            # and proceed no further
             return
         
-        # for each chunk extension file
         for chunk_file in chunk_files:
-            # split the extension from the file name
-            file_name, _ = splitext(chunk_file)
-            # then from the file name split the chunk start time from the tag
+            file_name, _ = os.path.splitext(chunk_file)
             chunk_start_time, tag = file_name.split("_", 1)
-            # if the tag is equal to the user-defined tag, we will add that chunk to the chunk map
-            if tag == self.tag:
-                chunk_map[chunk_start_time] = self.Chunk(chunk_start_time, tag)
+            if tag == self._tag:
+                self._chunk_map[chunk_start_time] = self._Chunk(chunk_start_time, tag)
         
-        # with all chunks accounted for, sort chronologically (as a precautionary measure) and set the populated chunk map
-        self.chunk_map = OrderedDict(sorted(chunk_map.items()))
-        self._chunk_list = self.get_chunk_list()
+        self._chunk_map = OrderedDict(sorted(self._chunk_map.items()))
 
-    # an alias for _set_chunk_map
-    def update_chunk_map(self) -> None:
-        self._set_chunk_map()
-        return
+
+    def update(self) -> None:
+        """Public alias for setting chunk map"""
+        self._update_chunk_map()
     
 
-    # enable iterative chunks
     def __iter__(self):
-        self._current_index = 0
-        return self
-    
-    # enable iterative chunks
-    # calling like an iterable will iterate over each chunk chronologically
-    def __next__(self) -> BaseChunk:
-        if self._current_index < len(self._chunk_list):
-            chunk = self._chunk_list[self._current_index]
-            self._current_index += 1
-            return chunk
-        else:
-            raise StopIteration
-
-    # getter for the list of chunk start times (already sorted chronologically)
-    def get_chunk_start_time_list(self) -> list[str]:
-        return list(self.chunk_map.keys()) 
+        yield from self.chunk_list
 
 
-    # getter for the list of chunks (already sorted chronologically)
-    def get_chunk_list(self) -> list[BaseChunk]:
-        return list(self.chunk_map.values())
-
-
-    # get chunk by the chunk start time
     def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
         try:
             return self.chunk_map[chunk_start_time]
         except KeyError:
-            raise KeyError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
+            raise ChunkNotFoundError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
 
 
-    # get chunk by the index
     def get_chunk_by_index(self, chunk_index: int) -> BaseChunk:
-        # find the number of chunks
-        num_chunks = len(self.chunk_map) 
+        num_chunks = len(self.chunk_map)
+        if num_chunks == 0:
+            raise ChunkNotFoundError("No chunks are available")
         index = chunk_index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
-        return self._chunk_list[index]
+        return self.chunk_list[index]
 
 
     def get_index_by_chunk(self, chunk_to_match: BaseChunk) -> int:
         for i, chunk in enumerate(self):
             if chunk.chunk_start_time == chunk_to_match.chunk_start_time:
                 return i
-            
-        raise ValueError(f"No matching chunk found for chunk {chunk_to_match.chunk_name}")
+        raise ChunkNotFoundError(f"No matching chunk found for chunk {chunk_to_match.chunk_name}")
     
 
     def count_chunk_files(self, extension: str) -> int:
@@ -148,11 +154,9 @@ class Chunks:
             _LOGGER.warning(warning_message)
             warnings.warn(warning_message, RuntimeWarning)
 
-        # List to store spectrograms, which we will later stitch together
         spectrograms = []
-        # evaluate the total number of fits files
         num_fits_chunks = self.count_chunk_files("fits")
-        # Iterate through each chunk's start time and spectrogram data
+
         for i, chunk in enumerate(self):
             # skip chunks without fits files
             if not chunk.has_file("fits"):
@@ -173,18 +177,12 @@ class Chunks:
 
             # if the chunk overlaps with the input time range, then read the fits file
             if start_datetime <= upper_bound and lower_bound <= end_datetime:
-                # Read the spectrogram for this chunk
                 spectrogram = chunk.read_file("fits")
-
-                # Chop the spectrogram to fit within the requested time range
                 spectrogram = transform.time_chop(spectrogram, start_time, end_time)
-                
                 # if we have a non-empty spectrogram, append it to the list of spectrograms
                 if spectrogram:
-                    # Add the chopped spectrogram to the list
                     spectrograms.append(spectrogram)
 
-        # Join all the collected spectrograms into a single spectrogram
         if spectrograms:
             return transform.join_spectrograms(spectrograms)
         else:
