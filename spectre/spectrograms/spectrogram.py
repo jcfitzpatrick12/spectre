@@ -81,21 +81,11 @@ class Spectrogram:
         return self._dynamic_spectra
     
 
-    @dynamic_spectra.setter
-    def dynamic_spectra(self, value: np.ndarray) -> None:
-        raise AttributeError("The dynamic spectra is read-only and cannot be modified")
-    
-    
     @property
     def times(self) -> np.ndarray:
         return self._times
     
-
-    @times.setter
-    def times(self, value: np.ndarray) -> None:
-        raise AttributeError("Times are read-only and cannot be modified")
     
-
     @property
     def num_times(self) -> int:
         return len(self._times)
@@ -195,11 +185,11 @@ class Spectrogram:
         self._background_spectrum = None # reset cache
         self._start_background = start_background
         self._end_background = end_background
-        self._set_background_indices_from_interval()
+        self._update_background_indices_from_interval()
     
     
     
-    def _set_background_indices_from_interval(self) -> None:
+    def _update_background_indices_from_interval(self) -> None:
         start_background = datetime.strptime(self._start_background, DEFAULT_DATETIME_FORMAT)
         self._start_background_index = find_closest_index(start_background, 
                                                           self.datetimes, 
