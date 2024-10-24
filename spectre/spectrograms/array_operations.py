@@ -2,9 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import numpy as np
 from datetime import datetime
-from typing import Union, Sequence
+
+import numpy as np
 
 def find_closest_index(
     target_value: float | datetime, 

@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
+from typing import Optional
 from warnings import warn
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+
 import numpy as np
 from astropy.io import fits
-from datetime import datetime, timedelta
-from typing import Tuple, Optional
-from dataclasses import dataclass
 
 from spectre.spectrograms.array_operations import (
     find_closest_index,
@@ -41,15 +42,15 @@ class TimeCut:
 
 class Spectrogram:
     def __init__(self, 
-                dynamic_spectra: np.ndarray, # holds the spectrogram data
-                times: np.ndarray, # holds the time stamp [s] for each spectrum
-                frequencies: np.ndarray,  # physical frequencies [Hz] for each spectral component
-                tag: str,
-                chunk_start_time: Optional[str] = None, 
-                microsecond_correction: int = 0, 
-                spectrum_type: Optional[str] = None,
-                start_background: Optional[str] = None, 
-                end_background: Optional[str] = None): 
+                 dynamic_spectra: np.ndarray, # holds the spectrogram data
+                 times: np.ndarray, # holds the time stamp [s] for each spectrum
+                 frequencies: np.ndarray,  # physical frequencies [Hz] for each spectral component
+                 tag: str,
+                 chunk_start_time: Optional[str] = None, 
+                 microsecond_correction: int = 0, 
+                 spectrum_type: Optional[str] = None,
+                 start_background: Optional[str] = None, 
+                 end_background: Optional[str] = None): 
         
         # dynamic spectra
         self._dynamic_spectra = dynamic_spectra
@@ -186,7 +187,9 @@ class Spectrogram:
         return self._end_background
     
     
-    def set_background(self, start_background: str, end_background: str) -> None:
+    def set_background(self, 
+                       start_background: str, 
+                       end_background: str) -> None:
         """Public setter for start and end of the background"""
         self._dynamic_spectra_as_dBb = None # reset cache
         self._background_spectrum = None # reset cache
@@ -257,7 +260,6 @@ class Spectrogram:
         file_name = f"{self.chunk_start_time}_{self._tag}.fits"
         write_path = os.path.join(chunk_parent_path, file_name)
         _save_spectrogram(write_path, self, fits_config)
-        return
     
 
     def integrate_over_frequency(self, 
@@ -368,10 +370,10 @@ class Spectrogram:
                          self.spectrum_type)
     
 
-
 def _seconds_of_day(dt: datetime) -> float:
     start_of_day = datetime(dt.year, dt.month, dt.day)
     return (dt - start_of_day).total_seconds()
+
 
 # Function to create a FITS file with the specified structure
 def _save_spectrogram(write_path: str, 

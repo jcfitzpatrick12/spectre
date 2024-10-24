@@ -5,13 +5,9 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from spectre.spectrograms.array_operations import (
-    find_closest_index
-)
+from spectre.spectrograms.array_operations import find_closest_index
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.cfg import (
-    DEFAULT_DATETIME_FORMAT
-)
+from spectre.cfg import DEFAULT_DATETIME_FORMAT
 
 
 def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
