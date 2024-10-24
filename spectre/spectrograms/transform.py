@@ -103,11 +103,6 @@ def time_chop(input_spectrogram: Spectrogram,
               end_time: str, 
               time_format: str = DEFAULT_DATETIME_FORMAT) -> Spectrogram | None:
     
-
-    # spectre does not currently support time chop for non-datetime assigned spectrograms
-    if input_spectrogram.chunk_start_time is None:
-        raise ValueError(f"Input spectrogram is missing chunk start time. Time chop not yet supported for non-datetime assigned spectrograms")
-    
     # parse the strings as datetimes
     start_datetime = datetime.strptime(start_time, time_format)
     end_datetime = datetime.strptime(end_time, time_format)
