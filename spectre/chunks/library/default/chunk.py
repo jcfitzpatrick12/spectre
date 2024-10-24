@@ -18,14 +18,11 @@ from spectre.chunks.base import (
     SPECTREChunk, 
     ChunkFile
 )
-from spectre.exceptions import (
-    ChunkFileNotFoundError
-)
 
 @register_chunk('default')
 class Chunk(SPECTREChunk):
-    def __init__(self, chunk_start_time: str, tag: str):
-        super().__init__(chunk_start_time, tag) 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs) 
         
         self.add_file(BinChunk(self.chunk_parent_path, self.chunk_name))
         self.add_file(FitsChunk(self.chunk_parent_path, self.chunk_name))
@@ -154,6 +151,14 @@ class FitsChunk(ChunkFile):
         super().__init__(chunk_parent_path, chunk_name, "fits")
 
 
+    @property
+    def datetimes(self) -> np.ndarray:
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            bintable_data = hdulist[1].data
+            times = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]
+        
+
     def read(self) -> Spectrogram:
         with fits.open(self.file_path, mode='readonly') as hdulist:
             primary_hdu = self._get_primary_hdu(hdulist)
@@ -201,11 +206,4 @@ class FitsChunk(ChunkFile):
         frequencies_MHz = data['FREQUENCY'][0]
         frequencies = frequencies_MHz * 1e6 # convert to Hz
         return times, frequencies
-
-
-    def get_datetimes(self) -> np.ndarray:
-        with fits.open(self.file_path, mode='readonly') as hdulist:
-            bintable_data = hdulist[1].data
-            times = bintable_data['TIME'][0]
-            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]
 
