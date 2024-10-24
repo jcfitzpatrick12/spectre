@@ -14,16 +14,15 @@ from spectre.spectrograms.transform import join_spectrograms
 
 @register_event_handler("default")
 class EventHandler(BaseEventHandler):
-    def __init__(self, watcher, tag: str):
-        super().__init__(watcher, tag, "bin")
-        self.spectrogram: Spectrogram = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
     def process(self, file_path: str):
         _LOGGER.info(f"Processing: {file_path}")
         file_name = os.path.basename(file_path)
         chunk_start_time, _ = os.path.splitext(file_name)[0].split('_')
-        chunk = self.Chunk(chunk_start_time, self.tag)
+        chunk = self._Chunk(chunk_start_time, self._tag)
 
         _LOGGER.info("Creating spectrogram")
         spectrogram = chunk.build_spectrogram()
@@ -42,4 +41,3 @@ class EventHandler(BaseEventHandler):
         hdr_chunk = chunk.get_file('hdr')
         _LOGGER.info(f"Deleting {hdr_chunk.file_path}")
         hdr_chunk.delete(doublecheck_delete = False)
-        return
