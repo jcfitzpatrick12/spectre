@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 
 from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.receivers import validators
@@ -17,7 +17,7 @@ from spectre.exceptions import (
 
 
 class BaseReceiver(ABC):
-    def __init__(self, name: str, mode: str = None):
+    def __init__(self, name: str, mode: Optional[str] = None):
         self._name = name
         self._mode = mode
 
