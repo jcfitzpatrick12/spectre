@@ -5,8 +5,10 @@
 from spectre.file_handlers.base import BaseFileHandler
 
 class TextHandler(BaseFileHandler):
-    def __init__(self, parent_path: str, base_file_name: str, **kwargs):
-        super().__init__(parent_path, base_file_name, extension = "txt", **kwargs)
+    def __init__(self, *args, **kwargs):
+        if "extension" in kwargs:
+            raise ValueError("The 'extension' cannot be specified - it is fixed to 'txt'. Please use override_extension if required")
+        super().__init__(*args, extension = "txt", **kwargs)
         return 
     
     def read(self) -> dict:
