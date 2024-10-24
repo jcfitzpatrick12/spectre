@@ -172,8 +172,7 @@ class Chunks:
             # if there is no "next chunk" then we do have to read the file
             else:
                 fits_chunk = chunk.get_file("fits")
-                datetimes = fits_chunk.get_datetimes()
-                upper_bound = datetimes[-1]
+                upper_bound = fits_chunk.datetimes[-1]
 
             # if the chunk overlaps with the input time range, then read the fits file
             if start_datetime <= upper_bound and lower_bound <= end_datetime:
