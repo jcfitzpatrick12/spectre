@@ -79,47 +79,58 @@ class Spectrogram:
     def dynamic_spectra(self) -> np.ndarray:
         return self._dynamic_spectra
     
+
     @dynamic_spectra.setter
     def dynamic_spectra(self, value: np.ndarray) -> None:
         raise AttributeError("The dynamic spectra is read-only and cannot be modified")
+    
     
     @property
     def times(self) -> np.ndarray:
         return self._times
     
+
     @times.setter
     def times(self, value: np.ndarray) -> None:
         raise AttributeError("Times are read-only and cannot be modified")
     
+
     @property
     def num_times(self) -> int:
         return len(self._times)
     
+
     @property
     def time_resolution(self) -> float:
         return compute_resolution(self._times)
     
+
     @property
     def time_range(self) -> float:
         return compute_range(self._times)
     
+
     @property
     def datetimes(self) -> list[datetime]:
         if self._datetimes is None:
             self._datetimes = [self.chunk_start_datetime + timedelta(seconds=(t + self.microsecond_correction*1e-6)) for t in self._times]
         return self._datetimes
     
+
     @property
     def frequencies(self) -> np.ndarray:
         return self._frequencies
     
+
     @frequencies.setter
     def frequencies(self, value: np.ndarray) -> None:
         raise AttributeError("Frequencies are read-only and cannot be modified.")
     
+
     @property
     def num_frequencies(self) -> int:
         return len(self._frequencies)
+    
     
     @property
     def frequency_resolution(self) -> float:
