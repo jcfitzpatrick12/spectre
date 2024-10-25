@@ -196,8 +196,8 @@ class FitsConfigHandler(SPECTREConfigHandler):
     def __init__(self, tag: str, **kwargs):
         super().__init__(tag, "fits", **kwargs)
 
-    @classmethod
-    def get_template(cls) -> dict[str, Any]:
+    @property
+    def template(self) -> dict[str, Any]:
         return {
             "ORIGIN": str,
             "TELESCOP": str,
