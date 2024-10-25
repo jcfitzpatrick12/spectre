@@ -2,66 +2,91 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import matplotlib.pyplot as plt
 import numpy as np
+from typing import List, Optional, Tuple
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.plotting.factory import get_panel
 from spectre.plotting.base import BasePanel
 
 class PanelStack: 
-    def __init__(self, time_type: str):
-        self.time_type = time_type
-        self.panels = []
-        self.fig = None
-        self.axs = None
-        self.grouped_panels = None  # Store grouped panels
+    def __init__(self, 
+                 time_type: str,
+                 figsize: Tuple[int, int] = (10, 10)):
+        self._time_type = time_type
+        self._panels: List[BasePanel] = [] # no panels yet
+        self._figsize: Tuple[int, int] = figsize
+        self._fig: Figure = None
+        self._axs: np.ndarray[Axes] = None
 
 
-    def add_panel(self, panel_name: str, spectrogram: Spectrogram, **kwargs) -> None:
-        panel = get_panel(panel_name, spectrogram, self.time_type, **kwargs)
-        self.panels.append(panel)
-
-
-    def get_num_panels(self) -> int:
-        return len(self.panels)
-
-
-    def _group_panels_by_x_axis_type(self) -> dict[str, list[BasePanel]]:
-        grouped_panels = {}
-        for i, panel in enumerate(self.panels):
-            panel.index = i  # Track the panel's position for axis sharing
-            grouped_panels.setdefault(panel.x_axis_type, []).append(panel)
-        return grouped_panels
+    @property
+    def time_type(self) -> str:
+        return self._time_type
     
 
-    def _sort_panels_by_x_axis_type(self) -> None:
-        self.panels.sort(key=lambda panel: panel.x_axis_type)
+    @property
+    def panels(self) -> List[BasePanel]:
+        return sorted(self._panels, key=lambda panel: panel.x_axis_type)
+    
+
+    @property
+    def grouped_panels(self) -> dict[str, list[BasePanel]]:
+        _grouped_panels: dict[str, list[BasePanel]] = {}
+        for i, panel in enumerate(self.panels):
+            panel.index = i  # set the panel index
+            if panel.x_axis_type not in _grouped_panels:
+                _grouped_panels[panel.x_axis_type] = [panel]
+            else:
+                _grouped_panels[panel.x_axis_type].append(panel)
+        return _grouped_panels
+    
+
+    @property
+    def fig(self) -> Optional[Figure]:
+        return self._fig
+    
+
+    @property
+    def axs(self) -> Optional[np.ndarray[Axes]]:
+        return np.atleast_1d(self._axs)
+    
+
+    @property
+    def num_panels(self) -> int:
+        return len(self._panels)
 
 
-    def init_figure(self) -> None:
-        num_panels = self.get_num_panels()
-        self.fig, self.axs = plt.subplots(num_panels, 1, figsize=(10, 10), layout="constrained")
-        # Ensure axs is always an array, even if there is only one panel
-        self.axs = np.atleast_1d(self.axs)
+    def add_panel(self, 
+                  panel_name: str, 
+                  spectrogram: Spectrogram, 
+                  **kwargs) -> None:
+        panel = get_panel(panel_name, spectrogram, self._time_type, **kwargs)
+        self._panels.append(panel)
 
-        # Sort panels by x_axis_type and group them, storing result for future use
-        self._sort_panels_by_x_axis_type()
-        self.grouped_panels = self._group_panels_by_x_axis_type()
+
+    def _init_figure(self) -> None:
+        self._fig, self._axs = plt.subplots(self.num_panels, 
+                                            1, 
+                                            figsize=self._figsize, 
+                                            layout="constrained")
 
         # Share x-axis within each group
-        for group in self.grouped_panels.values():
-            if len(group) > 1:
-                for i in range(len(group) - 1):
-                    self.axs[group[i].index].sharex = self.axs[group[-1].index]
+        for panel_group in self.grouped_panels.values():
+            if len(panel_group) > 1:
+                last_panel = panel_group[-1]
+                for panel in panel_group:
+                    self.axs[panel.index].sharex = self.axs[last_panel.index]
 
 
     def show(self) -> None:
-        self.init_figure()
-
-        for i, panel in enumerate(self.panels):
-            ax = self.axs[i]
-            panel.draw(self.fig, ax)
+        self._init_figure()
+        for panel in self.panels:
+            ax = self.axs[panel.index]
+            panel.draw(self._fig, ax)
             panel.annotate_y_axis(ax) 
             # Annotate only the last panel in each group with the x-axis labels
             is_last_in_group = any(panel == group[-1] for group in self.grouped_panels.values())
