@@ -13,7 +13,7 @@ from scipy.signal import ShortTimeFFT, get_window
 
 from spectre.chunks.chunk_register import register_chunk
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.chunks.library.default.chunk import BinChunk, FitsChunk
+from spectre.chunks.library.fixed.chunk import BinChunk, FitsChunk
 from spectre.cfg import DEFAULT_DATETIME_FORMAT
 from spectre.chunks.base import SPECTREChunk, ChunkFile
 from spectre.exceptions import InvalidSweepMetadataError

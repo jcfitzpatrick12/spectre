@@ -352,9 +352,9 @@ class SPECTREReceiver(BaseReceiver):
                                    samp_rate)
         validators.validate_STFFT_kwargs(STFFT_kwargs)
         validators.validate_chunk_key(chunk_key, 
-                                      "default")
+                                      "fixed")
         validators.validate_event_handler_key(event_handler_key, 
-                                              "default")
+                                              "fixed")
         validators.validate_gain_is_negative(IF_gain)
         validators.validate_gain_is_negative(RF_gain)
     

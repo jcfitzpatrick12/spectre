@@ -10,7 +10,7 @@ import os
 from spectre.watchdog.base import BaseEventHandler
 from spectre.watchdog.event_handler_register import register_event_handler
 
-@register_event_handler("default")
+@register_event_handler("fixed")
 class EventHandler(BaseEventHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

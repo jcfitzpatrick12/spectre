@@ -102,8 +102,8 @@ class Receiver(SPECTREReceiver):
                                           chunk_size,
                                           samp_rate)
         validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "default")
-        validators.validate_event_handler_key(event_handler_key, "default")
+        validators.validate_chunk_key(chunk_key, "fixed")
+        validators.validate_event_handler_key(event_handler_key, "fixed")
 
         if time_resolution != 0:
             raise ValueError(f"Time resolution must be zero. Received: {time_resolution}")
