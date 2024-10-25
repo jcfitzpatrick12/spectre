@@ -19,7 +19,9 @@ class Watcher:
         self._exception_queue: Queue = Queue()  # A thread-safe queue for exceptions
 
         EventHandler = get_event_handler_from_tag(tag)
-        self._event_handler = EventHandler(tag, self._exception_queue)
+        self._event_handler = EventHandler(tag, 
+                                           self._exception_queue,
+                                           "bin")
 
 
     def start(self):
