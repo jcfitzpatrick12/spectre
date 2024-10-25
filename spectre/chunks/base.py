@@ -137,6 +137,6 @@ class SPECTREChunk(BaseChunk):
 
     @property
     def capture_config(self) -> dict[str, Any]:
-        if self.capture_config is None:
+        if self._capture_config is None:
             self._capture_config = self._capture_config_handler.read()
         return self._capture_config
