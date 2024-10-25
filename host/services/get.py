@@ -7,7 +7,7 @@ _LOGGER =  getLogger(__name__)
 
 from os import listdir, walk
 from os.path import splitext
-from typing import Any
+from typing import Any, Optional
 
 from spectre.receivers.factory import get_receiver
 from spectre.receivers.receiver_register import list_all_receiver_names
@@ -37,24 +37,24 @@ def callisto_instrument_codes(
 
 
 @log_service_call(_LOGGER)
-def log_handlers(process_type: str | None = None,
-                 year: int | None = None,
-                 month: int | None = None,
-                 day: int | None = None,
+def log_handlers(process_type: Optional[str] = None,
+                 year: Optional[int] = None,
+                 month: Optional[int] = None,
+                 day: Optional[int] = None,
 ) -> list[LogHandler]:
     log_handlers = LogHandlers(process_type,
                                year,
                                month,
                                day)
     
-    return log_handlers.get_log_handler_list()
+    return log_handlers.log_handler_list
 
 
 @log_service_call(_LOGGER)
-def log_file_names(process_type: str | None = None,
-                   year: int | None = None,
-                   month: int | None = None,
-                   day: int | None = None,
+def log_file_names(process_type: Optional[str] = None,
+                   year: Optional[int] = None,
+                   month: Optional[int] = None,
+                   day: Optional[int] = None,
 ) -> list[str]:
     log_handler_list = log_handlers(process_type, year, month, day)
     return [log_handler.file_name for log_handler in log_handler_list]
@@ -62,10 +62,10 @@ def log_file_names(process_type: str | None = None,
 
 @log_service_call(_LOGGER)
 def chunk_files(tag: str,
-                year: int | None = None,
-                month: int | None = None,
-                day: int | None = None,
-                extensions: list[str] | None = None,
+                year: Optional[int] = None,
+                month: Optional[int] = None,
+                day: Optional[int] = None,
+                extensions: Optional[list[str]] = None,
 ) -> list[ChunkFile]:
     if extensions is None:
         extensions = []
@@ -77,7 +77,7 @@ def chunk_files(tag: str,
     for chunk in chunks:
         # if no extensions are specified, look for ALL defined extensions for that chunk
         if not extensions:
-            extensions = chunk.get_extensions()
+            extensions = chunk.extensions
 
         for extension in extensions:
             if chunk.has_file(extension):
@@ -88,10 +88,10 @@ def chunk_files(tag: str,
 
 @log_service_call(_LOGGER)
 def chunk_file_names(tag: str,
-                     year: int | None = None,
-                     month: int | None = None,
-                     day: int | None = None,
-                     extensions: list[str] | None = None
+                     year: Optional[int] = None,
+                     month: Optional[int] = None,
+                     day: Optional[int] = None,
+                     extensions: Optional[list[str]] = None
 ) -> list[str]:
     chunk_file_list = chunk_files(tag, year, month, day, extensions)
     return [chunk_file.file_name for chunk_file in chunk_file_list]
@@ -114,7 +114,7 @@ def receiver_modes(receiver_name: str,
 def receiver_specifications(receiver_name: str,
 ) -> dict[str, Any]:
     receiver = get_receiver(receiver_name)
-    return receiver.get_specifications()
+    return receiver.specifications
 
 
 @log_service_call(_LOGGER)
@@ -130,9 +130,9 @@ def capture_config_names(
 
 
 @log_service_call(_LOGGER)
-def tags(year: int | None = None,
-         month: int | None = None,
-         day: int | None = None,
+def tags(year: Optional[int] = None,
+         month: Optional[int] = None,
+         day: Optional[int] = None,
 ) -> list[str]:
     chunks_dir_path = get_chunks_dir_path(year, month, day)
     chunk_files = [f for (_, _, files) in walk(chunks_dir_path) for f in files]
@@ -145,8 +145,8 @@ def tags(year: int | None = None,
 
 
 @log_service_call(_LOGGER)
-def log_handler(pid: str | None = None,
-                file_name: str | None = None
+def log_handler(pid: Optional[str] = None,
+                file_name: Optional[str] = None
 ) -> LogHandler:
     # Ensure that exactly one of --pid or --file-name is specified
     if not (bool(pid) ^ bool(file_name)):
@@ -160,7 +160,7 @@ def log_handler(pid: str | None = None,
 
 
 @log_service_call(_LOGGER)
-def fits_config_template(tag: str | None = None,
+def fits_config_template(tag: Optional[str] = None,
                          as_command: bool = False
 ) -> dict[str, Any] | str:
     if as_command:
@@ -176,7 +176,7 @@ def fits_config_template(tag: str | None = None,
 def capture_config_template(receiver_name: str,
                             mode: str,
                             as_command: bool = False,
-                            tag: str | None = None) -> dict[str, Any] | str:
+                            tag: Optional[str] = None) -> dict[str, Any] | str:
     
     receiver = get_receiver(receiver_name, mode = mode)
     if as_command:
@@ -184,7 +184,7 @@ def capture_config_template(receiver_name: str,
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
         return receiver.template_to_command(tag, as_string=True)
     else:
-        return receiver.get_template()
+        return receiver.template
 
 
 @log_service_call(_LOGGER)

@@ -6,10 +6,9 @@ import logging
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-import multiprocessing
-
 import time
-from typing import List
+from typing import List, Callable
+import multiprocessing
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
@@ -32,7 +31,7 @@ def _terminate_processes(processes: List[multiprocessing.Process]) -> None:
     _LOGGER.info("All processes successfully terminated")
 
 
-def start_process(target_func, 
+def start_process(target_func: Callable, 
                   args: tuple, 
                   process_name: str) -> multiprocessing.Process:
     _LOGGER.info(f"Starting {process_name} process..")
@@ -110,7 +109,8 @@ def _start_watcher(tags: List[str]) -> None:
 def start(receiver_name: str, 
           mode: str, 
           tags: List[str], 
-          seconds: int = 0, minutes: int = 0, 
+          seconds: int = 0, 
+          minutes: int = 0, 
           hours: int = 0, 
           force_restart: bool = False) -> None:
     if seconds == 0 and minutes == 0 and hours == 0:
