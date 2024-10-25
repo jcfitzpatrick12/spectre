@@ -15,11 +15,9 @@ class BaseFileHandler(ABC):
                  override_extension: Optional[str] = None):
         self._parent_path = parent_path
         self._base_file_name = base_file_name
-        print(extension, override_extension)
         self._extension = extension if (override_extension is None) else override_extension
-        self._file_name = base_file_name if (self._extension is None) else f"{base_file_name}.{extension}"
+        self._file_name = base_file_name if (self._extension is None) else f"{base_file_name}.{self._extension}"
         self._file_path = os.path.join(parent_path, self._file_name)
-        print(self._file_path)
         
     @abstractmethod
     def read(self) -> Any:
