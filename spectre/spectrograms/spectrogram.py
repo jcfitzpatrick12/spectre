@@ -241,7 +241,7 @@ class Spectrogram:
 
     def save(self) -> None:
         fits_config_handler = FitsConfigHandler(self._tag)
-        fits_config = fits_config_handler.read() if fits_config_handler.exists() else {}
+        fits_config = fits_config_handler.read() if fits_config_handler.exists else {}
 
         chunk_start_datetime = self.chunk_start_datetime
         chunk_parent_path = get_chunks_dir_path(year = chunk_start_datetime.year,
