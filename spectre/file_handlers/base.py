@@ -62,7 +62,7 @@ class BaseFileHandler(ABC):
     def delete(self, 
                doublecheck_delete = True) -> None:
         if not self.exists:
-            warn(f"{self._file_name} does not exist. No deletion taking place")
+            warn(f"{self._file_path} does not exist. No deletion taking place")
             return
         else:
             if doublecheck_delete:
