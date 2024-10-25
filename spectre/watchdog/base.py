@@ -48,7 +48,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
 
 
     def on_created(self, event):
-        if not event.is_directory and event.src_path.endswith(self.extension):
+        if not event.is_directory and event.src_path.endswith(self._extension):
             _LOGGER.info(f"Noticed: {event.src_path}")
             try:
                 self.wait_until_stable(event.src_path)
