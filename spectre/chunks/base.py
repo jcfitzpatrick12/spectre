@@ -24,6 +24,7 @@ class ChunkFile(BaseFileHandler):
                  extension: str, 
                  **kwargs):
         self._chunk_start_time, self._tag = chunk_name.split("_")
+        self._chunk_start_datetime: Optional[datetime] = None
         super().__init__(chunk_parent_path, 
                          chunk_name, 
                          extension = extension, 
@@ -37,7 +38,9 @@ class ChunkFile(BaseFileHandler):
 
     @property
     def chunk_start_datetime(self) -> datetime:
-        return datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        if self._chunk_start_datetime is None:
+            self._chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        return self._chunk_start_datetime
     
 
     @property
@@ -50,14 +53,14 @@ class BaseChunk:
     def __init__(self, 
                  chunk_start_time: str, 
                  tag: str):
-        self._chunk_start_time = chunk_start_time
-        self._tag = tag
-        self._chunk_files = {}
-        self._chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
-        self.chunk_parent_path = get_chunks_dir_path(year = self.chunk_start_datetime.year,
-                                                     month = self.chunk_start_datetime.month,
-                                                     day = self.chunk_start_datetime.day)
-        self._chunk_name = f"{self.chunk_start_time}_{self.tag}"
+        self._chunk_start_time: str = chunk_start_time
+        self._tag: str = tag
+        self._chunk_files: dict[str, ChunkFile] = {}
+        self._chunk_start_datetime: Optional[datetime] = None
+        self.chunk_parent_path: str = get_chunks_dir_path(year = self.chunk_start_datetime.year,
+                                                          month = self.chunk_start_datetime.month,
+                                                          day = self.chunk_start_datetime.day)
+        self._chunk_name: str = f"{self.chunk_start_time}_{self.tag}"
 
     @property
     def chunk_start_time(self) -> str:
@@ -66,7 +69,9 @@ class BaseChunk:
 
     @property
     def chunk_start_datetime(self) -> datetime:
-        return datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        if self._chunk_start_datetime is None:
+            self._chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        return self._chunk_start_datetime
     
 
     @property

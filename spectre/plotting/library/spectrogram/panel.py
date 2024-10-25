@@ -10,7 +10,7 @@ from spectre.plotting.base import BaseTimeSeriesPanel
 from spectre.plotting.panel_register import register_panel
 
 @register_panel("spectrogram")
-class SpectrogramPanel(BaseTimeSeriesPanel):
+class Panel(BaseTimeSeriesPanel):
     def __init__(self, 
                  *args, 
                  log_norm: bool = False,

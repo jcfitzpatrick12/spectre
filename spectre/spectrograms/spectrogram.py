@@ -64,6 +64,7 @@ class Spectrogram:
         # general metadata
         self._tag = tag
         self._chunk_start_time = chunk_start_time
+        self._chunk_start_datetime: Optional[datetime] = None # cache
         self._microsecond_correction = microsecond_correction
         self._spectrum_type = spectrum_type
 
@@ -154,7 +155,9 @@ class Spectrogram:
 
     @property
     def chunk_start_datetime(self) -> datetime:
-        return datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        if self._chunk_start_datetime is None:
+            self._chunk_start_datetime = datetime.strptime(self.chunk_start_time, DEFAULT_DATETIME_FORMAT)
+        return self._chunk_start_datetime
 
 
     @property
