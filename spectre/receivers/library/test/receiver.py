@@ -10,8 +10,8 @@ from spectre.receivers.library.test.gr import cosine_signal_1
 from spectre.receivers.library.test.gr import tagged_staircase
 from spectre.receivers import validators
 
-
 _TEST_RECEIVER_NAME = "test"
+
 @register_receiver(_TEST_RECEIVER_NAME)
 class Receiver(SPECTREReceiver):
     def __init__(self, **kwargs):
