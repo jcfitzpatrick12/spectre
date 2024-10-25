@@ -102,7 +102,7 @@ class BaseReceiver(ABC):
 
 
     @property
-    def mode_set(self) -> bool:
+    def mode_is_set(self) -> bool:
         return (self._mode is not None)
 
 
