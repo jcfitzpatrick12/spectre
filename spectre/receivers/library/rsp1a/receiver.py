@@ -9,12 +9,10 @@ from spectre.receivers.base import SDRPlayReceiver
 from spectre.receivers.library.rsp1a.gr import fixed, sweep
 from spectre.receivers import validators
 
-_RSP1A_NAME = "rsp1a"
-
-@register_receiver(_RSP1A_NAME)
+@register_receiver("rsp1a")
 class Receiver(SDRPlayReceiver):
-    def __init__(self, **kwargs):
-        super().__init__(_RSP1A_NAME, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
     def _set_capture_methods(self) -> None:

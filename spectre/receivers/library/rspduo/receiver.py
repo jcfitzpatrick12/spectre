@@ -8,12 +8,11 @@ from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SDRPlayReceiver
 from spectre.receivers.library.rspduo.gr import tuner_1_fixed, tuner_1_sweep
 
-_RSPDUO_NAME = "rspduo"
 
-@register_receiver(_RSPDUO_NAME)
+@register_receiver("rspduo")
 class Receiver(SDRPlayReceiver):
-    def __init__(self, **kwargs):
-        super().__init__("rspduo", **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
     def _set_capture_methods(self) -> None:
