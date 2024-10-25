@@ -69,6 +69,8 @@ def modes(
 def specifications(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
 ) -> None:
+    print(get.receiver_specifications(receiver_name))
+    exit()
     for k, v in get.receiver_specifications(receiver_name):
         typer.secho(f"{k}: {v}")
     raise typer.Exit()
