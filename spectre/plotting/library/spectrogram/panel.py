@@ -4,6 +4,8 @@
 
 import numpy as np
 from matplotlib.colors import LogNorm
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 from warnings import warn
 
 from spectre.plotting.base import BaseTimeSeriesPanel
@@ -19,40 +21,45 @@ class Panel(BaseTimeSeriesPanel):
                  vmax: float | None = 2,
                  cmap: str = "gnuplot2",
                  **kwargs):
-        self.log_norm = log_norm
-        self.dBb = dBb
-        self.vmin = vmin
-        self.vmax = vmax
-        self.cmap = cmap
+        self._log_norm = log_norm
+        self._dBb = dBb
+        self._vmin = vmin
+        self._vmax = vmax
+        self._cmap = cmap
         super().__init__(*args, **kwargs)
 
-    def draw(self, fig, ax):
+    def draw(self, 
+             fig: Figure, 
+             ax: Axes):
 
-        dynamic_spectra = self.spectrogram.dynamic_spectra_as_dBb if self.dBb else self.spectrogram.dynamic_spectra
+        dynamic_spectra = self._spectrogram.dynamic_spectra_as_dBb if self._dBb else self._spectrogram.dynamic_spectra
         norm = LogNorm(vmin=np.nanmin(dynamic_spectra[dynamic_spectra > 0]), 
-                       vmax=np.nanmax(dynamic_spectra)) if self.log_norm else None
+                       vmax=np.nanmax(dynamic_spectra)) if self._log_norm else None
         
 
         # Handle vmin/vmax and log_norm
-        if self.log_norm and (self.vmin or self.vmax):
+        if self._log_norm and (self._vmin or self._vmax):
             warn("vmin/vmax will be ignored while using log_norm.")
-            self.vmin = None 
-            self.vmax = None
+            self._vmin = None 
+            self._vmax = None
         
         # Plot the spectrogram with kwargs
         pcm = ax.pcolormesh(self.times, 
-                            self.spectrogram.frequencies * 1e-6, 
+                            self._spectrogram.frequencies * 1e-6, 
                             dynamic_spectra,
-                            vmin=self.vmin, 
-                            vmax=self.vmax,
+                            vmin=self._vmin, 
+                            vmax=self._vmax,
                             norm=norm, 
-                            cmap=self.cmap)
+                            cmap=self._cmap)
         
         # Add colorbar if dBb is used
-        if self.dBb:
-            cbar = fig.colorbar(pcm, ax=ax, ticks=np.linspace(self.vmin, self.vmax, 6, dtype=int))
+        if self._dBb:
+            cbar = fig.colorbar(pcm, 
+                                ax=ax, 
+                                ticks=np.linspace(self._vmin, self._vmax, 6, dtype=int))
             cbar.set_label('dBb')
 
-    def annotate_y_axis(self, ax):
+    def annotate_y_axis(self, 
+                        ax: Axes):
         ax.set_ylabel('Frequency [MHz]')
         return
