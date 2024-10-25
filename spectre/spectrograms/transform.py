@@ -4,6 +4,7 @@
 
 import numpy as np
 from datetime import datetime, timedelta
+from typing import Optional
 
 from spectre.spectrograms.array_operations import find_closest_index
 from spectre.spectrograms.spectrogram import Spectrogram
@@ -60,7 +61,7 @@ def _average_array(array: np.ndarray, average_over: int, axis=0) -> np.ndarray:
 
 def frequency_chop(input_spectrogram: Spectrogram, 
                    start_frequency: float | int, 
-                   end_frequency: float | int) -> Spectrogram:
+                   end_frequency: float | int) -> Optional[Spectrogram]:
     
     is_entirely_below_frequency_range = (start_frequency < input_spectrogram.frequencies[0] and end_frequency < input_spectrogram.frequencies[0])
     is_entirely_above_frequency_range = (start_frequency > input_spectrogram.frequencies[-1] and end_frequency > input_spectrogram.frequencies[-1])
@@ -97,7 +98,7 @@ def frequency_chop(input_spectrogram: Spectrogram,
 def time_chop(input_spectrogram: Spectrogram, 
               start_time: str, 
               end_time: str, 
-              time_format: str = DEFAULT_DATETIME_FORMAT) -> Spectrogram | None:
+              time_format: str = DEFAULT_DATETIME_FORMAT) -> Optional[Spectrogram]:
     
     # parse the strings as datetimes
     start_datetime = datetime.strptime(start_time, time_format)
