@@ -11,6 +11,8 @@ from dataclasses import dataclass
 import numpy as np
 from astropy.io import fits
 
+from spectre.file_handlers.json import FitsConfigHandler
+from spectre.cfg import DEFAULT_DATETIME_FORMAT, get_chunks_dir_path
 from spectre.spectrograms.array_operations import (
     find_closest_index,
     normalise_peak_intensity,
@@ -18,8 +20,6 @@ from spectre.spectrograms.array_operations import (
     compute_range,
     subtract_background,
 )
-from spectre.file_handlers.json import FitsConfigHandler
-from spectre.cfg import DEFAULT_DATETIME_FORMAT, get_chunks_dir_path
 
 @dataclass
 class FrequencyCut:
@@ -36,9 +36,6 @@ class TimeCut:
     cut: np.ndarray
     spectrum_type: str
     
-
-
-# -> a property without a setter is read only! Unless mutable ...
 
 class Spectrogram:
     def __init__(self, 

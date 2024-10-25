@@ -7,7 +7,7 @@ _LOGGER = getLogger(__name__)
 
 import os
 
-from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.chunks.base import BaseChunk
 from spectre.watchdog.base import BaseEventHandler
 from spectre.watchdog.event_handler_register import register_event_handler
 
@@ -16,7 +16,7 @@ class EventHandler(BaseEventHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.previous_chunk = None # cache for previous chunk
+        self.previous_chunk: BaseChunk = None # cache for previous chunk
         
 
     def process(self, file_path: str):

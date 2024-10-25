@@ -9,8 +9,6 @@ import os
 
 from spectre.watchdog.base import BaseEventHandler
 from spectre.watchdog.event_handler_register import register_event_handler
-from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.spectrograms.transform import join_spectrograms
 
 @register_event_handler("default")
 class EventHandler(BaseEventHandler):
