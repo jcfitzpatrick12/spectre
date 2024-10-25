@@ -35,6 +35,8 @@ class Chunks:
         self._tag = tag
         self._Chunk = get_chunk_from_tag(tag)
         self._chunk_map: dict[str, BaseChunk] = OrderedDict()
+        self._chunk_list: list[BaseChunk] = []
+        self._chunk_names: list[str] = []
         self.set_date(year, month, day)
 
 
@@ -60,25 +62,22 @@ class Chunks:
 
     @property 
     def chunk_map(self) -> dict[str, BaseChunk]:
-        if not self._chunk_map:  # Check for empty dict
-            self._update_chunk_map()
         return self._chunk_map
     
 
     @property
     def chunk_list(self) -> list[BaseChunk]:
-        return list(self.chunk_map.values())
-    
-
-    @property
-    def num_chunks(self) -> int:
-        return len(self.chunk_list)
+        return  self._chunk_list
     
 
     @property
     def chunk_names(self) -> list[str]:
-        return list(self.chunk_map.keys())
+        return self._chunk_names
 
+
+    @property
+    def num_chunks(self) -> int:
+        return len(self.chunk_list)
 
 
     def set_date(self, 
@@ -92,6 +91,10 @@ class Chunks:
 
 
     def _update_chunk_map(self) -> None:
+        self._chunk_map = OrderedDict() # reset cache
+        self._chunk_list = [] # reset cache
+        self._chunk_names = [] # reset cache
+
         chunk_files = [f for (_, _, files) in os.walk(self.chunks_dir_path) for f in files]
         
         if len(chunk_files) == 0:
@@ -107,6 +110,8 @@ class Chunks:
                 self._chunk_map[chunk_start_time] = self._Chunk(chunk_start_time, tag)
         
         self._chunk_map = OrderedDict(sorted(self._chunk_map.items()))
+        self._chunk_names = list(self._chunk_map.keys())
+        self._chunk_list = list(self._chunk_map.values())
 
 
     def update(self) -> None:
