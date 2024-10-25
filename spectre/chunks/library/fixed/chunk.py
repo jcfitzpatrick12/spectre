@@ -19,7 +19,7 @@ from spectre.chunks.base import (
     ChunkFile
 )
 
-@register_chunk('default')
+@register_chunk("fixed")
 class Chunk(SPECTREChunk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs) 
