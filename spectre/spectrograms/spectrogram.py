@@ -109,12 +109,7 @@ class Spectrogram:
     @property
     def frequencies(self) -> np.ndarray:
         return self._frequencies
-    
 
-    @frequencies.setter
-    def frequencies(self, value: np.ndarray) -> None:
-        raise AttributeError("Frequencies are read-only and cannot be modified.")
-    
 
     @property
     def num_frequencies(self) -> int:
@@ -177,30 +172,6 @@ class Spectrogram:
         return self._end_background
     
     
-    def set_background(self, 
-                       start_background: str, 
-                       end_background: str) -> None:
-        """Public setter for start and end of the background"""
-        self._dynamic_spectra_as_dBb = None # reset cache
-        self._background_spectrum = None # reset cache
-        self._start_background = start_background
-        self._end_background = end_background
-        self._update_background_indices_from_interval()
-    
-    
-    
-    def _update_background_indices_from_interval(self) -> None:
-        start_background = datetime.strptime(self._start_background, DEFAULT_DATETIME_FORMAT)
-        self._start_background_index = find_closest_index(start_background, 
-                                                          self.datetimes, 
-                                                          enforce_strict_bounds=False)
-        
-        end_background = datetime.strptime(self._end_background, DEFAULT_DATETIME_FORMAT)
-        self._end_background_index = find_closest_index(end_background, 
-                                                        self.datetimes, 
-                                                        enforce_strict_bounds=False)
-
-
     @property
     def background_spectrum(self) -> np.ndarray:
         if self._background_spectrum is None:
@@ -224,6 +195,31 @@ class Spectrogram:
                 else:
                     raise NotImplementedError(f"{self.spectrum_type} unrecognised, uncertain decibel conversion!")
         return self._dynamic_spectra_as_dBb  
+    
+    
+    def set_background(self, 
+                       start_background: str, 
+                       end_background: str) -> None:
+        """Public setter for start and end of the background"""
+        self._dynamic_spectra_as_dBb = None # reset cache
+        self._background_spectrum = None # reset cache
+        self._start_background = start_background
+        self._end_background = end_background
+        self._update_background_indices_from_interval()
+    
+    
+    
+    def _update_background_indices_from_interval(self) -> None:
+        start_background = datetime.strptime(self._start_background, DEFAULT_DATETIME_FORMAT)
+        self._start_background_index = find_closest_index(start_background, 
+                                                          self.datetimes, 
+                                                          enforce_strict_bounds=False)
+        
+        end_background = datetime.strptime(self._end_background, DEFAULT_DATETIME_FORMAT)
+        self._end_background_index = find_closest_index(end_background, 
+                                                        self.datetimes, 
+                                                        enforce_strict_bounds=False)
+
 
     def _check_shapes(self) -> None:
         num_spectrogram_dims = np.ndim(self._dynamic_spectra)
