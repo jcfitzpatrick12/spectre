@@ -3,3 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import spectre.plotting.library
+
+SMALL_FONT_SIZE = 18
+MEDIUM_FONT_SIZE = 21
+LARGE_FONT_SIZE = 24

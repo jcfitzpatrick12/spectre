@@ -8,28 +8,32 @@ from matplotlib.axes import Axes
 from spectre.plotting.base import BaseTimeSeriesPanel
 from spectre.plotting.panel_register import register_panel
 
-@register_panel("integral_over_frequency")
+INTEGRAL_OVER_FREQUENCY_PANEL_NAME = "integral_over_frequency"
+
+@register_panel(INTEGRAL_OVER_FREQUENCY_PANEL_NAME)
 class Panel(BaseTimeSeriesPanel):
     def __init__(self, 
                  *args, 
                  peak_normalise: bool = False,
                  background_subtract: bool = False,
-                 color: str = 'black',
+                 color: str = 'lime',
                  **kwargs):
+        super().__init__(*args, **kwargs)
         self._peak_normalise = peak_normalise
         self._background_subtract = background_subtract
         self._color = color
-        super().__init__(*args, **kwargs)
 
 
-    def draw(self, 
-             fig: Figure, 
-             ax: Axes):
+    def draw(self):
         I = self._spectrogram.integrate_over_frequency(correct_background = self._background_subtract,
                                                        peak_normalise = self._peak_normalise)
-        ax.step(self.times, I, where="mid", color = self._color)
-    
+        self.ax.step(self.times, I, where="mid", color = self._color)
+ 
 
-    def annotate_y_axis(self, 
-                        ax: Axes):
-        return
+    def annotate_y_axis(self):
+        return  
+
+
+    def _set_name(self) -> None:
+        self._name = INTEGRAL_OVER_FREQUENCY_PANEL_NAME
+    
