@@ -205,7 +205,7 @@ class Chunk(SPECTREChunk):
                                   *window_params), 
                                   self._window_size)
         self._samp_rate = self.capture_config.get("samp_rate")
-        self._SFT = ShortTimeFFT(self.window, fs=self._samp_rate, fft_mode="centered", **self.capture_config.get("STFFT_kwargs"))
+        self._SFT = ShortTimeFFT(self._window, fs=self._samp_rate, fft_mode="centered", **self.capture_config.get("STFFT_kwargs"))
         self._num_steps_per_sweep = self._compute_num_steps_per_sweep()
         self._num_full_sweeps = self._compute_num_full_sweeps()
         self._num_max_slices_in_step = self._compute_num_max_slices_in_step()
