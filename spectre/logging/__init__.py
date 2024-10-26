@@ -134,7 +134,7 @@ class LogHandlers:
         log_files = [f for (_, _, files) in os.walk(self.logs_dir_path) for f in files]
 
         if not log_files:
-            warning_message = "No logs found, setting log map to an empty dictionary."
+            warning_message = "No logs found, setting log map to an empty dictionary"
             _LOGGER.warning(warning_message)
             warnings.warn(warning_message)
             return
