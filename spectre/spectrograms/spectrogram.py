@@ -241,7 +241,7 @@ class Spectrogram:
 
     def save(self) -> None:
         fits_config_handler = FitsConfigHandler(self._tag)
-        fits_config = fits_config_handler.read() if fits_config_handler.exists else {}
+        fits_config = fits_config_handler.read() if fits_config_handler.exists  else {}
 
         chunk_start_datetime = self.chunk_start_datetime
         chunk_parent_path = get_chunks_dir_path(year = chunk_start_datetime.year,
@@ -280,7 +280,7 @@ class Spectrogram:
             at_time = datetime.strptime(at_time, DEFAULT_DATETIME_FORMAT)
             index_of_cut = find_closest_index(at_time, 
                                               self.datetimes, 
-                                              enforce_strict_bounds = False)
+                                              enforce_strict_bounds = True)
             time_of_cut = self.datetimes[index_of_cut]  
 
         if isinstance(at_time, float):
@@ -321,7 +321,7 @@ class Spectrogram:
         # and return it from the function as output too.
         index_of_cut = find_closest_index(at_frequency, 
                                           self._frequencies, 
-                                          enforce_strict_bounds = False)
+                                          enforce_strict_bounds = True)
         frequency_of_cut = self.frequencies[index_of_cut]
 
         if return_time_type == "datetimes":
