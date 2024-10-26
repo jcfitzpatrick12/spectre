@@ -63,6 +63,7 @@ def chunks(tag: str,
                 _LOGGER.info(f"File deleted: {chunk.get_file(extension).file_path}")
 
 
+@log_service_call(_LOGGER)
 def fits_config(tag: str,
 ) -> None:
     fits_config_handler = FitsConfigHandler(tag)
@@ -70,6 +71,7 @@ def fits_config(tag: str,
     _LOGGER.info(f"File deleted: {fits_config_handler.file_path}")
 
 
+@log_service_call(_LOGGER)
 def capture_config(tag: str,
 ) -> None:
     capture_config_handler = CaptureConfigHandler(tag)
