@@ -3,34 +3,35 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 
 from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.receivers import validators
-from spectre.exceptions import InvalidModeError, InvalidReceiver
+from spectre.exceptions import (
+    InvalidModeError, 
+    InvalidReceiverError,
+    TemplateNotFoundError,
+    ModeNotFoundError,
+    SpecificationNotFoundError
+)
 
 
 class BaseReceiver(ABC):
-    def __init__(self, name: str, mode: str = None):
-        self.name = name
+    def __init__(self, name: str, mode: Optional[str] = None):
+        self._name = name
+        self._mode = mode
 
-        self.capture_methods: dict[str, Callable] = None
+        self._capture_methods: dict[str, Callable] = None
         self._set_capture_methods()
 
-        self.templates: dict[str, dict[str, Any]] = None
+        self._templates: dict[str, dict[str, Any]] = None
         self._set_templates()
 
-        self.validators: dict[str, Callable] = None
+        self._validators: dict[str, Callable] = None
         self._set_validators()
 
-        self.valid_modes: list[str] = None
-        self._set_valid_modes()
-
-        self.specifications: dict[str, Any] = None
+        self._specifications: dict[str, Any] = None
         self._set_specifications()
-
-        if not mode is None:
-            self.set_mode(mode)
 
 
     @abstractmethod
@@ -42,7 +43,6 @@ class BaseReceiver(ABC):
     def _set_validators(self) -> None:
         pass
 
-
     @abstractmethod
     def _set_templates(self) -> None:
         pass
@@ -52,93 +52,130 @@ class BaseReceiver(ABC):
     def _set_specifications(self) -> None:
         pass
 
+    
+    @property
+    def name(self) -> str:
+        return self._name
+    
 
-    def get_specifications(self) -> dict[dict, Any]:
-        return self.specifications
+    @property
+    def capture_methods(self) -> dict[str, Callable]:
+        return self._capture_methods
     
-    
-    def get_specification(self, specification_key: str) -> Any:
-        try:
-            return self.specifications.get(specification_key)
-        except KeyError:
-            raise KeyError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
 
-    
-    # ensure that all receiver maps define the same modes for the receiver
-    def _set_valid_modes(self) -> None:
+    @property
+    def validators(self) -> dict[str, Callable]:
+        return self._validators
+
+
+    @property
+    def templates(self) -> dict[str, dict[str, Any]]:
+        return self._templates
+
+
+    @property
+    def specifications(self) -> dict[dict, Any]:
+        return self._specifications
+
+
+    @property
+    def valid_modes(self) -> None:
         capture_method_modes = list(self.capture_methods.keys())
         validator_modes = list(self.validators.keys())
         template_modes = list(self.templates.keys())
 
         if capture_method_modes == validator_modes == template_modes:
-            self.valid_modes = capture_method_modes
+            return capture_method_modes
         else:
-            raise KeyError(f"Mode key mismatch for the receiver {self.name}. Could not define valid modes")
+            raise InvalidModeError(f"Mode mismatch for the receiver {self.name}. Could not define valid modes")
 
-
-    def set_mode(self, mode: str) -> None:
-        if not mode in self.valid_modes:
-            raise InvalidModeError(f"{mode} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}")
-        self.mode = mode
-
-
-    def mode_set(self):
-        return (self.mode is not None)
+    @property
+    def mode(self) -> str:
+        return self._mode
     
-    
-    def get_capture_method(self) -> Callable:
+
+    @mode.setter
+    def mode(self, value: str) -> None:
+        if value not in self.valid_modes:
+            raise ModeNotFoundError(f"{value} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}")
+        self._mode = value
+
+
+    @property
+    def mode_is_set(self) -> bool:
+        return (self._mode is not None)
+
+
+    @property
+    def capture_method(self) -> Callable:
         return self.capture_methods.get(self.mode)
 
 
-    def get_validator(self) -> Callable:
+    @property
+    def validator(self) -> Callable:
         return self.validators.get(self.mode)
 
 
-    def get_template(self) -> dict[str, Any]:
+    @property
+    def template(self) -> dict[str, Any]:
         return self.templates.get(self.mode)
+    
+
+    def get_specification(self, 
+                          specification_key: str) -> Any:
+        try:
+            return self.specifications[specification_key]
+        except KeyError:
+            raise SpecificationNotFoundError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
 
 
-    def validate(self, capture_config: dict) -> None:
-        validator = self.get_validator()
-        validator(capture_config)
-        return
+
+    def validate(self, 
+                 capture_config: dict[str, Any]) -> None:
+        self.validator(capture_config)
 
 
-    def start_capture(self, tags: list[str]) -> None:
+    def start_capture(self, 
+                      tags: list[str]) -> None:
         capture_configs = [self.load_capture_config(tag) for tag in tags]
-        capture_method = self.get_capture_method()
-        capture_method(capture_configs)
-        return
+        self.capture_method(capture_configs)
 
 
-    def save_params_as_capture_config(self, tag: str, params: list[str], doublecheck_overwrite: bool = True) -> None:
+    def save_params_as_capture_config(self, 
+                                      tag: str, 
+                                      params: list[str], 
+                                      doublecheck_overwrite: bool = True) -> None:
         capture_config_handler = CaptureConfigHandler(tag)
-        template = self.get_template()
-        capture_config = capture_config_handler.type_cast_params(params, template) # type cast the params list according to the active template
+        capture_config = capture_config_handler.type_cast_params(params, self.template) # type cast the params list according to the active template
         self.save_capture_config(tag, capture_config, doublecheck_overwrite=doublecheck_overwrite)
 
 
-    def save_capture_config(self, tag: str, capture_config: dict, doublecheck_overwrite: bool = True) -> None:
+    def save_capture_config(self, 
+                            tag: str, 
+                            capture_config: dict[str, Any], 
+                            doublecheck_overwrite: bool = True) -> None:
         capture_config_handler = CaptureConfigHandler(tag)
         # basic validation against the template
         capture_config_handler.validate_against_template(capture_config, 
-                                                         self.get_template(), 
+                                                         self.template, 
                                                          ignore_keys=["receiver", "mode", "tag"])
         # validate against receiver-specific constraints in the current mode
         self.validate(capture_config)
         # update the extra metadata
-        capture_config.update({"receiver": self.name, "mode": self.mode, "tag": tag})
+        capture_config.update({"receiver": self.name, 
+                               "mode": self.mode, 
+                               "tag": tag})
         # and finally, save the validated capture config to a JSON
         capture_config_handler.save(capture_config, doublecheck_overwrite = doublecheck_overwrite)
-        return
 
 
-    def load_capture_config(self, tag: str) -> dict:
+    def load_capture_config(self, 
+                            tag: str) -> dict:
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
 
         if capture_config["receiver"] != self.name:
-            raise InvalidReceiver(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config['receiver']}")
+            raise InvalidReceiverError(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config['receiver']}")
         
         if capture_config["mode"] != self.mode:
             raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config['mode']}")
@@ -147,13 +184,14 @@ class BaseReceiver(ABC):
         return capture_config
 
 
-    def template_to_command(self, tag: str, as_string: bool = False) -> str:
+    def template_to_command(self, 
+                            tag: str, 
+                            as_string: bool = False) -> str:
         command_as_list = ["spectre", "create", "capture-config", 
                            "--tag", tag, 
                            "--receiver", self.name, 
                            "--mode", self.mode]
-        template = self.get_template()
-        for key, value in template.items():
+        for key, value in self.template.items():
             command_as_list.extend(["-p", f"{key}={value.__name__}"])
 
         return " ".join(command_as_list) if as_string else command_as_list
@@ -161,13 +199,20 @@ class BaseReceiver(ABC):
 
 # optional parent class which provides default templates and validators
 class SPECTREReceiver(BaseReceiver):
-    def __init__(self, receiver_name: str, mode: str = None):
+    def __init__(self, *args, **kwargs):
+        self._default_templates: dict[str, dict[str, Any]] = None
         self.__set_default_templates()
-        super().__init__(receiver_name, mode = mode)
-        return
+
+        super().__init__(*args, **kwargs)
     
+
+    @property
+    def default_templates(self) -> dict[str, dict[str, Any]]:
+        return self._default_templates
+    
+
     def __set_default_templates(self) -> None:
-        self.default_templates = {
+        self._default_templates = {
             "fixed": {
                 "center_freq": float, # [Hz]
                 "bandwidth": float, # [Hz]
@@ -206,17 +251,19 @@ class SPECTREReceiver(BaseReceiver):
                 "event_handler_key": str, # tag will map to event handler with this key during post processing
             }
         }
-        return
     
 
-    def _get_default_template(self, default_template_key: str) -> dict:
-        default_template = self.default_templates.get(default_template_key)
-        if default_template is None:
-            raise KeyError(f"No default template found with key {default_template_key}")
+    def _get_default_template(self, 
+                              default_template_key: str) -> dict:
+        try:
+            default_template = self.default_templates[default_template_key]
+        except KeyError:
+            raise TemplateNotFoundError(f"No default template found with key {default_template_key}")
         return default_template
     
 
-    def _default_sweep_validator(self, capture_config: dict) -> None:
+    def _default_sweep_validator(self, 
+                                 capture_config: dict[str, Any]) -> None:
         min_freq = capture_config["min_freq"]
         max_freq = capture_config["max_freq"]
         samples_per_step = capture_config["samples_per_step"]
@@ -274,10 +321,10 @@ class SPECTREReceiver(BaseReceiver):
             validators.validate_step_interval(samples_per_step, 
                                               samp_rate, 
                                               api_latency)
-        return
     
 
-    def _default_fixed_validator(self, capture_config: dict) -> None:
+    def _default_fixed_validator(self, 
+                                 capture_config: dict[str, Any]) -> None:
         center_freq = capture_config["center_freq"]
         bandwidth = capture_config["bandwidth"]
         samp_rate = capture_config["samp_rate"]
@@ -299,24 +346,26 @@ class SPECTREReceiver(BaseReceiver):
         validators.validate_chunk_size_strictly_positive(chunk_size)
         validators.validate_time_resolution(time_resolution, chunk_size) 
         validators.validate_window(window_type, 
-                                          window_kwargs, 
-                                          window_size,
-                                          chunk_size,
-                                          samp_rate)
+                                   window_kwargs, 
+                                   window_size,
+                                   chunk_size,
+                                   samp_rate)
         validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "default")
-        validators.validate_event_handler_key(event_handler_key, "default")
+        validators.validate_chunk_key(chunk_key, 
+                                      "fixed")
+        validators.validate_event_handler_key(event_handler_key, 
+                                              "fixed")
         validators.validate_gain_is_negative(IF_gain)
         validators.validate_gain_is_negative(RF_gain)
-        return
     
 
 # parent class for shared methods and attributes of SDRPlay receivers
 class SDRPlayReceiver(SPECTREReceiver):
-    def __init__(self, receiver_name: str, mode: str = None):
-        super().__init__(receiver_name, mode = mode)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def _sdrplay_validator(self, capture_config: dict) -> None:
+    def _sdrplay_validator(self, 
+                           capture_config: dict[str, Any]) -> None:
         # RSPduo specific validations in single tuner mode
         center_freq_lower_bound = self.get_specification("center_freq_lower_bound")
         center_freq_upper_bound = self.get_specification("center_freq_upper_bound")

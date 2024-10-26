@@ -2,27 +2,45 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import Callable, Any
+
 import numpy as np
 
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.exceptions import InvalidModeError
 
 class AnalyticalFactory:
-    def __init__(self,):
-        self.builder_methods = {
+    def __init__(self):
+        self._builders: dict[str, Callable] = {
             "cosine-signal-1": self.cosine_signal_1
         }
-        self.test_modes = list(self.builder_methods.keys())
+        self._test_modes = list(self.builders.keys())
 
-    def get_spectrogram(self, test_mode: str, shape: tuple, capture_config: dict) -> Spectrogram:
-        builder_method = self.builder_methods.get(test_mode)
-        if builder_method is None:
+
+    @property
+    def builders(self) -> dict[str, Callable]:
+        return self._builders
+    
+
+    @property
+    def test_modes(self) -> list[str]:
+        return self._test_modes
+    
+
+    def get_spectrogram(self, 
+                        test_mode: str, 
+                        shape: tuple, 
+                        capture_config: dict[str, Any]) -> Spectrogram:
+        try:
+            builder_method = self.builders[test_mode]
+        except KeyError:
             raise InvalidModeError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
         return builder_method(shape, capture_config)
     
+    
     def cosine_signal_1(self, 
                         shape: tuple,
-                        capture_config: dict) -> Spectrogram:
+                        capture_config: dict[str, Any]) -> Spectrogram:
         
         window_size = capture_config['window_size']
         samp_rate = capture_config['samp_rate'] 

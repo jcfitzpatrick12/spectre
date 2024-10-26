@@ -14,7 +14,7 @@ def register_receiver(receiver_name: str):
     return decorator
 
 # return a list of all receiver names
-def list_all_receiver_names():
+def list_all_receiver_names() -> list[str]:
     return list(receivers.keys())
 
 

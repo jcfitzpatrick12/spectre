@@ -12,8 +12,8 @@
         "hop": 512
     },
     "window_size": 256,
-    "event_handler_key": "default",
-    "chunk_key": "default",
+    "event_handler_key": "fixed",
+    "chunk_key": "fixed",
     "receiver": "test",
     "mode": "cosine-signal-1",
     "tag": "test-cosine-signal-1-example"

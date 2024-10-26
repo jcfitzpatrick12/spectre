@@ -2,36 +2,37 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import Any
+
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SPECTREReceiver
 from spectre.receivers.library.test.gr import cosine_signal_1
 from spectre.receivers.library.test.gr import tagged_staircase
 from spectre.receivers import validators
 
+
 @register_receiver("test")
 class Receiver(SPECTREReceiver):
-    def __init__(self, receiver_name: str, mode: str = None):
-        super().__init__(receiver_name, mode = mode)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
     def _set_capture_methods(self) -> None:
-        self.capture_methods = {
+        self._capture_methods = {
             "cosine-signal-1": self.__cosine_signal_1,
             "tagged-staircase": self.__tagged_staircase
         }
-        return
     
 
     def _set_validators(self) -> None:
-        self.validators = {
+        self._validators = {
             "cosine-signal-1": self.__cosine_signal_1_validator,
             "tagged-staircase": self.__tagged_staircase_validator
         }
-        return
     
 
     def _set_templates(self) -> None:
-        self.templates = {
+        self._templates = {
             "cosine-signal-1": {
                 'samp_rate': int, # [Hz]
                 'frequency': float, # [Hz]
@@ -62,26 +63,23 @@ class Receiver(SPECTREReceiver):
                 'event_handler_key': str, # tag will map to event handler with this key during post processing
             }
         }
-        return
     
     def _set_specifications(self) -> None:
-        self.specifications = {
+        self._specifications = {
         } 
 
 
-    def __cosine_signal_1(self, capture_configs: list) -> None:
+    def __cosine_signal_1(self, capture_configs: list[str, Any]) -> None:
         capture_config = capture_configs[0]
         cosine_signal_1.main(capture_config)
-        return
     
 
-    def __tagged_staircase(self, capture_configs: list) -> None:
+    def __tagged_staircase(self, capture_configs: list[str, Any]) -> None:
         capture_config = capture_configs[0]
         tagged_staircase.main(capture_config)
-        return
     
 
-    def __cosine_signal_1_validator(self, capture_config: dict) -> None:
+    def __cosine_signal_1_validator(self, capture_config: dict[str, Any]) -> None:
         # unpack the capture config
         samp_rate = capture_config["samp_rate"]
         frequency = capture_config["frequency"]
@@ -104,8 +102,8 @@ class Receiver(SPECTREReceiver):
                                           chunk_size,
                                           samp_rate)
         validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "default")
-        validators.validate_event_handler_key(event_handler_key, "default")
+        validators.validate_chunk_key(chunk_key, "fixed")
+        validators.validate_event_handler_key(event_handler_key, "fixed")
 
         if time_resolution != 0:
             raise ValueError(f"Time resolution must be zero. Received: {time_resolution}")
@@ -135,10 +133,9 @@ class Receiver(SPECTREReceiver):
     
         if amplitude <= 0:
             raise ValueError(f"amplitude must be strictly positive. Received: {amplitude}")
-        return
     
 
-    def __tagged_staircase_validator(self, capture_config: dict) -> None:
+    def __tagged_staircase_validator(self, capture_config: dict[str, Any]) -> None:
         samp_rate = capture_config["samp_rate"]
         min_samples_per_step = capture_config["min_samples_per_step"]
         max_samples_per_step = capture_config["max_samples_per_step"]
@@ -168,4 +165,3 @@ class Receiver(SPECTREReceiver):
             raise ValueError(f"step_increment must be strictly positive. Received: {step_increment}")
         if min_samples_per_step > max_samples_per_step:
             raise ValueError(f"min_samples_per_step cannot be greater than max_samples_per_step. Received: {min_samples_per_step} > {max_samples_per_step}")
-        return

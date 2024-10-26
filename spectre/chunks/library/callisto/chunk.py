@@ -11,12 +11,12 @@ from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
 from astropy.io.fits.hdu.hdulist import HDUList
 
+from spectre.chunks.chunk_register import register_chunk
+from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.chunks.base import (
     BaseChunk, 
     ChunkFile
 )
-from spectre.chunks.chunk_register import register_chunk
-from spectre.spectrograms.spectrogram import Spectrogram
 
 
 @register_chunk('callisto')
@@ -51,7 +51,15 @@ class FitsChunk(ChunkFile):
                         spectrum_type = spectrum_type)
             else:
                 raise NotImplementedError(f"SPECTRE does not currently support spectrum type with BUNITS {spectrum_type}")
-            
+
+
+    @property
+    def datetimes(self) -> np.ndarray:
+        with fits.open(self.file_path, mode='readonly') as hdulist:
+            bintable_data = hdulist[1].data
+            times = bintable_data['TIME'][0]
+            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]        
+
 
     def _get_primary_hdu(self, hdulist: HDUList) -> PrimaryHDU:
         return hdulist['PRIMARY']
@@ -89,12 +97,5 @@ class FitsChunk(ChunkFile):
         # conversion as per ADC specs [see email from C. Monstein]
         dB = (digits_floats / 255) * (2500 / 25)
         return 10 ** (dB / 10)
-
-
-    def get_datetimes(self) -> np.ndarray:
-        with fits.open(self.file_path, mode='readonly') as hdulist:
-            bintable_data = hdulist[1].data
-            times = bintable_data['TIME'][0]
-            return [self.chunk_start_datetime + timedelta(seconds=t) for t in times]
 
 

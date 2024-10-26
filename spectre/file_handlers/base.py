@@ -4,37 +4,64 @@
 
 import os
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
+from warnings import warn
 
 class BaseFileHandler(ABC):
     def __init__(self, 
                  parent_path: str, 
                  base_file_name: str, 
-                 extension: str = None,
-                 override_extension: str = None):
-        self.parent_path = parent_path
-        self.base_file_name = base_file_name
-        self.extension = extension if (override_extension is None) else override_extension
-        self.file_name = base_file_name if (self.extension is None) else f"{base_file_name}.{self.extension}"
-        self.file_path = os.path.join(self.parent_path, self.file_name)
-        
+                 extension: Optional[str] = None,
+                 override_extension: Optional[str] = None):
+        self._parent_path = parent_path
+        self._base_file_name = base_file_name
+        self._extension = extension if (override_extension is None) else override_extension
+        self._file_name = base_file_name if (self._extension is None) else f"{base_file_name}.{self._extension}"
+        self._file_path = os.path.join(parent_path, self._file_name)
         
     @abstractmethod
     def read(self) -> Any:
         pass
+ 
+
+    @property
+    def parent_path(self) -> str:
+        return self._parent_path
     
 
-    def make_parent_path(self) -> None:
-        os.makedirs(self.parent_path, exist_ok=True)
-        return    
+    @property
+    def base_file_name(self) -> str:
+        return self._base_file_name
+    
 
+    @property
+    def extension(self) -> str:
+        return self._extension
+    
 
+    @property
+    def file_name(self) -> str:
+        return self._file_name
+    
+
+    @property
+    def file_path(self) -> str:
+        return self._file_path
+    
+    
+    @property
     def exists(self) -> bool:
-        return os.path.exists(self.file_path) 
+        return os.path.exists(self._file_path) 
 
 
-    def delete(self, doublecheck_delete = True) -> None:
-        if not self.exists():
+    def make_parent_path(self) -> None:
+        os.makedirs(self.parent_path, exist_ok=True) 
+    
+
+    def delete(self, 
+               doublecheck_delete = True) -> None:
+        if not self.exists:
+            warn(f"{self._file_path} does not exist. No deletion taking place")
             return
         else:
             if doublecheck_delete:
@@ -48,7 +75,8 @@ class BaseFileHandler(ABC):
         return
 
 
-    def _doublecheck_action(self, action_message: str) -> None:
+    def _doublecheck_action(self, 
+                            action_message: str) -> None:
         proceed_with_action = False
         while not proceed_with_action:
             user_input = input(f"{action_message} [y/n]: ").strip().lower()

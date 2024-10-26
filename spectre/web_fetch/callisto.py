@@ -7,6 +7,7 @@ import subprocess
 import shutil
 import gzip
 from datetime import datetime
+from typing import Optional
 
 from spectre.cfg import (
     DEFAULT_DATETIME_FORMAT,
@@ -80,10 +81,10 @@ def download_callisto_data(instrument_code: str,
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
 
-def fetch_chunks(instrument_code: str | None, 
-                 year: int | None, 
-                 month: int | None, 
-                 day: int | None):
+def fetch_chunks(instrument_code: Optional[str], 
+                 year: Optional[int], 
+                 month: Optional[int], 
+                 day: Optional[int]):
 
 
     if (year is None) or (month is None) or (day is None):

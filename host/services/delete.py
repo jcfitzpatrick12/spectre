@@ -5,6 +5,8 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
+from typing import Optional
+
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
 from spectre.logging import log_service_call
@@ -15,10 +17,10 @@ from spectre.file_handlers.json import (
 
 
 @log_service_call(_LOGGER)
-def logs(process_type: str | None = None,
-         year: int | None = None,
-         month: int | None = None,
-         day: int | None = None,
+def logs(process_type: str = None,
+         year: Optional[int] = None,
+         month: Optional[int] = None,
+         day: Optional[int] = None,
          suppress_doublecheck: bool = False
 ) -> None:
     log_handlers = LogHandlers(process_type,
@@ -40,9 +42,9 @@ def logs(process_type: str | None = None,
 @log_service_call(_LOGGER)
 def chunks(tag: str,
            extensions: list[str],
-           year: int | None = None,
-           month: int | None = None,
-           day: int | None = None,
+           year: Optional[int] = None,
+           month: Optional[int] = None,
+           day: Optional[int] = None,
            suppress_doublecheck: bool = False
 ) -> None:
     chunks = Chunks(tag, 

@@ -12,25 +12,24 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import sys
+import signal
+from typing import Any
+
 from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import gr
 from gnuradio.filter import firdes
 from gnuradio.fft import window
-import sys
-import signal
-from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import spectre
 
-from spectre.cfg import (
-    CHUNKS_DIR_PATH
-)
+from spectre.cfg import CHUNKS_DIR_PATH
 
 class cosine_signal_1(gr.top_block):
 
-    def __init__(self, capture_config: dict):
+    def __init__(self, capture_config: dict[str, Any]):
         gr.top_block.__init__(self, "cosine-signal-1", catch_exceptions=True)
 
         ##################################################
@@ -63,7 +62,7 @@ class cosine_signal_1(gr.top_block):
         self.connect((self.blocks_throttle_0_1, 0), (self.blocks_float_to_complex_1, 1))
 
 
-def main(capture_config: dict, top_block_cls=cosine_signal_1, options=None):
+def main(capture_config: dict[str, Any], top_block_cls=cosine_signal_1, options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

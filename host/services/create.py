@@ -5,7 +5,7 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-from typing import List
+from typing import List, Optional
 
 from spectre.receivers.factory import get_receiver
 from spectre.file_handlers.json import FitsConfigHandler
@@ -14,7 +14,7 @@ from spectre.logging import log_service_call
 
 @log_service_call(_LOGGER)
 def fits_config(tag: str,
-                params: List[str] | None = None,
+                params: Optional[List[str]] = None,
 ) -> None:
     if params is None:
         params = []
@@ -27,7 +27,7 @@ def fits_config(tag: str,
 def capture_config(tag: str,
                    receiver_name: str,
                    mode: str,
-                   params: List[str] | None
+                   params: Optional[List[str]]
 ) -> None:
     if params is None:
         params = []

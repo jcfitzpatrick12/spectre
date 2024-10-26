@@ -2,27 +2,30 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Callable
-import logging
+
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 import os
+import logging
+from typing import Callable, Optional
 import warnings
 from collections import OrderedDict
 from datetime import datetime
-from logging import getLogger
-from os import walk
-from os.path import splitext
 
+from spectre.file_handlers.text import TextHandler
+from spectre.exceptions import LogNotFoundError
 from spectre.cfg import (
     LOGS_DIR_PATH, 
     DEFAULT_DATETIME_FORMAT, 
     get_logs_dir_path
 )
-from spectre.file_handlers.text import TextHandler
-from spectre.exceptions import LogNotFoundError
 
-_LOGGER = getLogger(__name__)
+PROCESS_TYPES = [
+    "USER", 
+    "WORKER"
+]
 
-PROCESS_TYPES = ["USER", "WORKER"]
 
 def validate_process_type(process_type: str) -> None:
     if process_type not in PROCESS_TYPES:
@@ -31,11 +34,10 @@ def validate_process_type(process_type: str) -> None:
 
 class LogHandler(TextHandler):
     def __init__(self, datetime_stamp: str, pid: str, process_type: str):
-        self.datetime_stamp = datetime_stamp
-        self.pid = pid
-        self.process_type = process_type
-
+        self._datetime_stamp = datetime_stamp
+        self._pid = pid
         validate_process_type(process_type)
+        self._process_type = process_type
 
         dt = datetime.strptime(datetime_stamp, DEFAULT_DATETIME_FORMAT)
         date_dir = os.path.join(dt.strftime("%Y"), dt.strftime("%m"), dt.strftime("%d"))
@@ -43,76 +45,123 @@ class LogHandler(TextHandler):
         base_file_name = f"{datetime_stamp}_{pid}_{process_type}"
 
         super().__init__(parent_path, base_file_name, override_extension="log")
+    
+
+    @property
+    def datetime_stamp(self) -> str:
+        return self._datetime_stamp
+    
+
+    @property
+    def pid(self) -> str:
+        return self._pid
+    
+
+    @property
+    def process_type(self) -> str:
+        return self._process_type
 
 
 class LogHandlers:
-    def __init__(self, process_type: str | None = None, year: int = None, month: int = None, day: int = None):
-        self.process_type = process_type
-        self.year = year
-        self.month = month
-        self.day = day
-
-        if self.process_type:
-            validate_process_type(process_type)
-
-
-        self.logs_dir_path = get_logs_dir_path(year, month, day)
-        self._set_log_handler_map()
-        self._current_index = 0
+    def __init__(self, 
+                 process_type: Optional[str] = None, 
+                 year: Optional[int] = None, 
+                 month: Optional[int] = None, 
+                 day: Optional[int] = None):
+        self._log_handler_map: dict[str, LogHandler] = OrderedDict()
+        self._process_type = process_type
+        self.set_date(year, month, day)
 
 
-    def _set_log_handler_map(self) -> None:
-        log_handler_map = OrderedDict()
-        log_files = [f for (_, _, files) in walk(self.logs_dir_path) for f in files]
+    @property
+    def process_type(self) -> str:
+        return self._process_type
+    
+
+    @property
+    def year(self) -> int:
+        return self._year
+
+
+    @property 
+    def month(self) -> int:
+        return self._month
+    
+
+    @property
+    def day(self) -> int:
+        return self._day
+
+
+    @property
+    def logs_dir_path(self) -> str:
+        return get_logs_dir_path(self.year, self.month, self.day)
+
+
+    @property 
+    def log_handler_map(self) -> dict[str, LogHandler]:
+        if not self._log_handler_map: # check for empty dictionary
+            self._update_log_handler_map()
+        return self._log_handler_map
+        
+
+    @property
+    def log_handler_list(self) -> list[LogHandler]:
+        return list(self.log_handler_map.values())
+
+
+    @property
+    def num_logs(self) -> int:
+        return len(self.log_handler_list) 
+
+
+    @property
+    def file_names(self) -> list[str]:
+        return list(self.log_handler_map.keys())
+
+
+    def set_date(self, 
+                 year: Optional[int],
+                 month: Optional[int],
+                 day: Optional[int]) -> None:
+        self._year = year
+        self._month = month
+        self._day = day
+        self._update_log_handler_map()
+
+
+    def _update_log_handler_map(self) -> None:
+        log_files = [f for (_, _, files) in os.walk(self.logs_dir_path) for f in files]
 
         if not log_files:
             warning_message = "No logs found, setting log map to an empty dictionary."
             _LOGGER.warning(warning_message)
             warnings.warn(warning_message)
-            self.log_handler_map = log_handler_map
-            self._log_handler_list = self.get_log_handler_list()
             return
 
         for log_file in log_files:
-            file_name, _ = splitext(log_file)
+            file_name, _ = os.path.splitext(log_file)
             log_start_time, pid, process_type = file_name.split("_")
 
             if self.process_type and process_type != self.process_type:
                 continue
 
-            log_handler_map[file_name] = LogHandler(log_start_time, pid, process_type)
+            self._log_handler_map[file_name] = LogHandler(log_start_time, pid, process_type)
 
-        self.log_handler_map = OrderedDict(sorted(log_handler_map.items()))
-        self._log_handler_list = self.get_log_handler_list()
+        self._log_handler_map = OrderedDict(sorted(self._log_handler_map.items()))
 
 
-    def update_chunk_map(self) -> None:
-        self._set_log_handler_map()
+    def update(self) -> None:
+        """Public alias for setting log handler map"""
+        self._update_log_handler_map()
 
 
     def __iter__(self):
-        self._current_index = 0
-        return self
+        yield from self.log_handler_list
 
 
-    def __next__(self) -> LogHandler:
-        if self._current_index < len(self._log_handler_list):
-            log_handler = self._log_handler_list[self._current_index]
-            self._current_index += 1
-            return log_handler
-        else:
-            raise StopIteration
-
-
-    def get_log_handler_list(self) -> list[LogHandler]:
-        return list(self.log_handler_map.values())
-
-
-    def get_log_file_name_list(self) -> list[str]:
-        return list(self.log_handler_map.keys())
-
-
-    def get_log_handler_from_file_name(self, file_name: str) -> LogHandler:
+    def get_log_handler_from_file_name(self, 
+                                       file_name: str) -> LogHandler:
         # auto strip the extension if present
         file_name, _ = os.path.splitext(file_name)
         try:
@@ -121,8 +170,9 @@ class LogHandlers:
             raise LogNotFoundError(f"Log handler for file name '{file_name}' not found in log map")
 
 
-    def get_log_handler_from_pid(self, pid: str) -> LogHandler:
-        for log_handler in self._log_handler_list:
+    def get_log_handler_from_pid(self, 
+                                 pid: str) -> LogHandler:
+        for log_handler in self.log_handler_list:
             if log_handler.pid == pid:
                 return log_handler
         raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")

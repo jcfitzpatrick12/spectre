@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-from typing import Any
+from typing import Any, Optional
 from abc import ABC
 import ast
 
@@ -16,9 +16,10 @@ from spectre.exceptions import (
 )
 
 class JsonHandler(BaseFileHandler):
-    def __init__(self, parent_path: str, base_file_name: str, **kwargs):
-        super().__init__(parent_path, base_file_name, extension = "json", **kwargs)
-        return 
+    def __init__(self, *args, **kwargs):
+        if "extension" in kwargs:
+            raise ValueError("The 'extension' cannot be specified - it is fixed to 'json'. Please use override_extension if required")
+        super().__init__(*args, extension = "json", **kwargs)
     
     
     def read(self) -> dict[str, Any]:
@@ -26,10 +27,12 @@ class JsonHandler(BaseFileHandler):
             return json.load(f)
         
 
-    def save(self, d: dict, doublecheck_overwrite: bool = True) -> None:
+    def save(self, 
+             d: dict, 
+             doublecheck_overwrite: bool = True) -> None:
         self.make_parent_path()
 
-        if self.exists() and doublecheck_overwrite:
+        if self.exists and doublecheck_overwrite:
             self.doublecheck_overwrite()
         
         with open(self.file_path, 'w') as file:
@@ -48,16 +51,29 @@ class JsonHandler(BaseFileHandler):
             raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
 
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
-        return
     
 
 class SPECTREConfigHandler(JsonHandler, ABC):
-    def __init__(self, tag: str, config_type: str, **kwargs):
+    def __init__(self, 
+                 tag: str, 
+                 config_type: str, 
+                 **kwargs):
         self._validate_tag(tag)
-        self.tag = tag
-        self.config_type = config_type
-        super().__init__(JSON_CONFIGS_DIR_PATH, f"{config_type}_config_{tag}", **kwargs)
+        self._tag = tag
+        self._config_type = config_type
+        super().__init__(JSON_CONFIGS_DIR_PATH, 
+                         f"{config_type}_config_{tag}", 
+                         **kwargs)
 
+    @property
+    def tag(self) -> str:
+        return self._tag
+    
+
+    @property
+    def config_type(self) -> str:
+        return self._config_type
+        
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
@@ -66,7 +82,8 @@ class SPECTREConfigHandler(JsonHandler, ABC):
             raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
 
-    def _params_list_to_string_valued_dict(self, params: list) -> dict[str, str]:
+    def _params_list_to_string_valued_dict(self, 
+                                           params: list) -> dict[str, str]:
         def _unpack(param: str) -> tuple:
             if not param or '=' not in param or param.startswith('=') or param.endswith('='):
                 raise ValueError(f'Invalid format: "{param}". Expected "KEY=VALUE".')
@@ -74,7 +91,9 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         return {k: v for k, v in map(_unpack, params)}
 
 
-    def _convert_types(self, d: dict[str, str], template: dict) -> dict[str, Any]:
+    def _convert_types(self, 
+                       d: dict[str, str], 
+                       template: dict) -> dict[str, Any]:
         def _convert_to_dict(v: str) -> dict:
             return ast.literal_eval(v)
         def _convert_to_bool(v: str) -> bool:
@@ -83,7 +102,6 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                 return True
             if v in ('false', '0', 'f', 'n', 'no'):
                 return False
-        
             raise ValueError(f'Cannot convert {v} to bool.')
         
         converted_dict = {}
@@ -111,7 +129,10 @@ class SPECTREConfigHandler(JsonHandler, ABC):
                          params: list[str], 
                          template: dict[str, type], 
                          validate_against_template: bool = True,
-                         ignore_keys: list = []) -> dict[str, Any]:
+                         ignore_keys: Optional[list] = None) -> dict[str, Any]:
+        if ignore_keys is None:
+            ignore_keys = []
+
         d = self._params_list_to_string_valued_dict(params)
         d = self._convert_types(d, template)
         if validate_against_template:
@@ -119,14 +140,23 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         return d
 
 
-    def validate_against_template(self, d: dict, template: dict, ignore_keys: list = []) -> None:
+    def validate_against_template(self, 
+                                  d: dict, 
+                                  template: dict, 
+                                  ignore_keys: Optional[list] = None) -> None:
+        if ignore_keys is None:
+            ignore_keys = []
         self._validate_keys(d, template, ignore_keys=ignore_keys)
         self._validate_types(d, template, ignore_keys=ignore_keys)
         return
     
 
-    def _validate_keys(self, input_dict: dict, template: dict, ignore_keys: list = []) -> None:
-
+    def _validate_keys(self, 
+                       input_dict: dict, 
+                       template: dict, 
+                       ignore_keys: Optional[list] = None) -> None:
+        if ignore_keys is None:
+            ignore_keys = []
         template_keys = set(template.keys())
         input_keys = set(input_dict.keys())
         ignore_keys = set(ignore_keys)
@@ -143,7 +173,13 @@ class SPECTREConfigHandler(JsonHandler, ABC):
             raise KeyError("Key errors found! " + " ".join(error_messages))
 
 
-    def _validate_types(self, d: dict, template: dict, ignore_keys: list = []) -> None:
+    def _validate_types(self, 
+                        d: dict, 
+                        template: dict, 
+                       ignore_keys: Optional[list] = None) -> None:
+        if ignore_keys is None:
+            ignore_keys = []
+            
         for k, v in d.items():
             if k in ignore_keys:
                 continue
@@ -160,8 +196,8 @@ class FitsConfigHandler(SPECTREConfigHandler):
     def __init__(self, tag: str, **kwargs):
         super().__init__(tag, "fits", **kwargs)
 
-    @classmethod
-    def get_template(cls) -> dict[str, Any]:
+    @property
+    def template(self) -> dict[str, Any]:
         return {
             "ORIGIN": str,
             "TELESCOP": str,
@@ -173,7 +209,9 @@ class FitsConfigHandler(SPECTREConfigHandler):
         }
 
 
-    def template_to_command(self, tag: str, as_string = False) -> str:
+    def template_to_command(self, 
+                            tag: str, 
+                            as_string: bool = False) -> list[str] | str:
         command_as_list = ["spectre", "create", "fits-config", "-t", tag]
         template = self.get_template()
         for key, value in template.items():
@@ -191,8 +229,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
                                    ) -> None:
         d = self.type_cast_params(params, self.get_template())
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
-        return
-    
+
     
 class CaptureConfigHandler(SPECTREConfigHandler):
     def __init__(self, tag: str, **kwargs):
