@@ -50,7 +50,7 @@ class Panel(BaseSpectrumPanel):
     def draw(self):
         for time, color in self.bind_to_colors():
             frequency_cut = self.frequency_cuts[time]
-            self.ax.step(self.frequencies, 
+            self.ax.step(self.frequencies*1e-6, # convert to MHz
                          frequency_cut.cut, 
                          where='mid', 
                          color = color)
