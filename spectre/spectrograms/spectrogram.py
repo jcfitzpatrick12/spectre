@@ -138,13 +138,6 @@ class Spectrogram:
         return self._chunk_start_time
     
 
-    @chunk_start_time.setter
-    def chunk_start_time(self, value: str) -> None:
-        # reset the datetimes cache
-        self._datetimes = None
-        self._chunk_start_time = value
-    
-
     @property
     def chunk_start_datetime(self) -> datetime:
         if self._chunk_start_datetime is None:
