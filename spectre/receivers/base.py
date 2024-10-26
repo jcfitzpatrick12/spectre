@@ -200,9 +200,11 @@ class BaseReceiver(ABC):
 # optional parent class which provides default templates and validators
 class SPECTREReceiver(BaseReceiver):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # make default templates available in _set_templates method
+        # by defining them before the parent constructor is called
         self._default_templates: dict[str, dict[str, Any]] = None
         self.__set_default_templates()
+        super().__init__(*args, **kwargs)
     
 
     @property
