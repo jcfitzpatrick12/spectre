@@ -67,10 +67,6 @@ class Panel(BaseTimeSeriesPanel):
         self.ax.set_ylabel('Frequency [MHz]')
         return
     
-    
-    def _set_name(self) -> None:
-        self._name = SPECTROGRAM_PANEL_NAME
-    
 
     def overlay_time_cuts(self, time_cuts_panel: TimeCutsPanel) -> None:
         for frequency, color in time_cuts_panel.bind_to_colors():

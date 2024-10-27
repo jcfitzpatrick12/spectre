@@ -66,9 +66,6 @@ class Panel(BaseTimeSeriesPanel):
             return # no y-axis label
         else:
             self.ax.set_ylabel(f'{self._spectrogram.spectrum_type.capitalize()}')
-    
-    def _set_name(self):
-        self._name = TIME_CUTS_PANEL_NAME
 
     
     def bind_to_colors(self):

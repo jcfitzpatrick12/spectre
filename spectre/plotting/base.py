@@ -18,15 +18,14 @@ FREQUENCY_X_AXIS = "frequency"
 
 class BasePanel(ABC):
     def __init__(self, 
+                 name: str,
                  spectrogram: Spectrogram, 
                  time_type: str = "seconds"):
+        self._name = name
         self._spectrogram = spectrogram
 
         self._validate_time_type(time_type)
         self._time_type = time_type
-
-        self._name: Optional[str] = None # defined by child classes
-        self._set_name()
 
         self._x_axis_type: Optional[str] = None
         self._set_x_axis_type()

@@ -33,7 +33,4 @@ class Panel(BaseTimeSeriesPanel):
     def annotate_y_axis(self):
         return  
 
-
-    def _set_name(self) -> None:
-        self._name = INTEGRAL_OVER_FREQUENCY_PANEL_NAME
     
