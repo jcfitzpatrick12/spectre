@@ -206,12 +206,12 @@ class Spectrogram:
         start_background = datetime.strptime(self._start_background, DEFAULT_DATETIME_FORMAT)
         self._start_background_index = find_closest_index(start_background, 
                                                           self.datetimes, 
-                                                          enforce_strict_bounds=False)
+                                                          enforce_strict_bounds=True)
         
         end_background = datetime.strptime(self._end_background, DEFAULT_DATETIME_FORMAT)
         self._end_background_index = find_closest_index(end_background, 
                                                         self.datetimes, 
-                                                        enforce_strict_bounds=False)
+                                                        enforce_strict_bounds=True)
 
 
     def _check_shapes(self) -> None:
