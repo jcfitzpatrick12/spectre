@@ -30,7 +30,8 @@ class PanelStack:
         self._time_type = time_type
         self._figsize: Tuple[int, int] = figsize
         
-        self._panels: List[BasePanel] = []
+        self._panels: list[BasePanel] = []
+        self._superimposed_panels: list[BasePanel] = []
         self._fig: Figure = None
         self._axs: np.ndarray[Axes] = None
 
@@ -73,6 +74,19 @@ class PanelStack:
         self._panels.append(panel)
 
 
+    def superimpose_panel(self,
+                          panel_name: str,
+                          spectrogram: Spectrogram,
+                          *args,
+                          **kwargs) -> None:
+        panel = get_panel(panel_name, 
+                          spectrogram, 
+                          self._time_type, 
+                          *args, 
+                          **kwargs)
+        self._superimposed_panels.append(panel)
+
+
     def _init_font_sizes(self) -> None:
         plt.style.use('dark_background')
         plt.rc('font', size=SMALL_FONT_SIZE)          # controls default text sizes
@@ -102,6 +116,19 @@ class PanelStack:
                 panel.ax.sharex(shared_axes[panel.x_axis_type])
 
 
+    def _superimpose_panels(self) -> None:
+        for superimposed_panel in self._superimposed_panels:
+            for panel in self._panels:
+                if panel.name == superimposed_panel.name:
+                    superimposed_panel.fig = self._fig
+                    superimposed_panel.ax = panel.ax
+                    superimposed_panel.draw()
+                    if superimposed_panel.name == TIME_CUTS_PANEL_NAME:
+                        self._overlay_time_cuts(superimposed_panel)
+                    if superimposed_panel.name == FREQUENCY_CUTS_PANEL_NAME:
+                        self._overlay_frequency_cuts(superimposed_panel)
+
+
     def _overlay_time_cuts(self, 
                            time_cuts_panel: TimeCutsPanel) -> None:
         """Finds any corresponding spectrogram panels and overlays cuts onto the panel"""
@@ -110,6 +137,7 @@ class PanelStack:
             if is_corresponding_panel:
                 spectrogram_panel: SpectrogramPanel = panel
                 spectrogram_panel.overlay_time_cuts(time_cuts_panel)
+                
 
 
     def _overlay_frequency_cuts(self, 
@@ -127,6 +155,7 @@ class PanelStack:
         self._init_font_sizes()
         self._init_figure()
         self._assign_axes_to_panels()
+        self._superimpose_panels()
         # find last panel through value overwrites per key (assumes self.panels is consistenly ordered)
         _last_panels = {panel.x_axis_type: panel for panel in self.panels}
         for panel in self.panels:

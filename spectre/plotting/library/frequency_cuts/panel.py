@@ -59,6 +59,8 @@ class Panel(BaseSpectrumPanel):
     def annotate_y_axis(self) -> None:
         if self._dBb:
             self.ax.set_ylabel('dBb')
+        elif self._peak_normalise:
+            return # no y-axis label
         else:
             self.ax.set_ylabel(f'{self._spectrogram.spectrum_type.capitalize()}')
     
