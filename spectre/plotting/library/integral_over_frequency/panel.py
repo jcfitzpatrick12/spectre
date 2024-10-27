@@ -31,6 +31,6 @@ class Panel(BaseTimeSeriesPanel):
  
 
     def annotate_y_axis(self):
-        return  
+        return # no y-axis label
 
     
