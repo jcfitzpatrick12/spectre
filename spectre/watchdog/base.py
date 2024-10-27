@@ -51,17 +51,17 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith(self._extension):
             _LOGGER.info(f"Noticed: {event.src_path}")
             try:
-                self.wait_until_stable(event.src_path)
+                self._wait_until_stable(event.src_path)
                 self.process(event.src_path)
             except Exception as e:
                 _LOGGER.error(f"An error has occured while processing {event.src_path}",
                               exc_info=True)
-                self.flush_spectrogram() # flush the internally stored spectrogram
+                self._flush_spectrogram() # flush the internally stored spectrogram
                 # Capture the exception and propagate it through the queue
                 self._exception_queue.put(e)
 
 
-    def wait_until_stable(self, file_path: str):
+    def _wait_until_stable(self, file_path: str):
         _LOGGER.info(f"Waiting for file stability: {file_path}")
         size = -1
         while True:
@@ -73,7 +73,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
             time.sleep(0.25)
 
 
-    def average_in_time(self, spectrogram: Spectrogram) -> Spectrogram:
+    def _average_in_time(self, spectrogram: Spectrogram) -> Spectrogram:
         requested_time_resolution = self._capture_config.get('time_resolution') # [s]
         if requested_time_resolution is None:
             raise KeyError(f"Time resolution has not been specified in the capture config!")
@@ -81,7 +81,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         return time_average(spectrogram, average_over)
     
     
-    def average_in_frequency(self, spectrogram: Spectrogram) -> Spectrogram:
+    def _average_in_frequency(self, spectrogram: Spectrogram) -> Spectrogram:
         frequency_resolution = self._capture_config.get('frequency_resolution') # [Hz]
         if frequency_resolution is None:
             raise KeyError(f"Frequency resolution has not been specified in the capture config!")
@@ -89,7 +89,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         return frequency_average(spectrogram, average_over)
     
 
-    def join_spectrogram(self, spectrogram: Spectrogram) -> None:
+    def _join_spectrogram(self, spectrogram: Spectrogram) -> None:
         # if the spectrogram attribute is empty, define it
         if self._spectrogram is None:
             self._spectrogram = spectrogram
@@ -98,10 +98,10 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         else:
             self._spectrogram = join_spectrograms([self._spectrogram, spectrogram])
             if self._spectrogram.time_range > self._capture_config.get("joining_time"):
-                self.flush_spectrogram()
+                self._flush_spectrogram()
     
 
-    def flush_spectrogram(self) -> None:
+    def _flush_spectrogram(self) -> None:
         if self._spectrogram:
             _LOGGER.info(f"Flushing spectrogram to file with chunk start time {self._spectrogram.chunk_start_time}")
             self._spectrogram.save()
