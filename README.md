@@ -10,7 +10,7 @@
 
 ## Gallery
 
-![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a SPECTRE spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
+![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a SPECTRE spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/spectrogram_comparison.png)
 
 ---
 
