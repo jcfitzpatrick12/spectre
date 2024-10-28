@@ -178,3 +178,7 @@ class BaseSpectrumPanel(BasePanel):
 
     def _set_x_axis_type(self):
         self._x_axis_type = FREQUENCY_X_AXIS
+
+
+class CutsPanel(BasePanel):
+    """Convenience parent class for cuts"""

@@ -7,13 +7,13 @@ from datetime import datetime
 
 from spectre.spectrograms.spectrogram import FrequencyCut
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.plotting.base import BaseSpectrumPanel
+from spectre.plotting.base import BaseSpectrumPanel, CutsPanel
 from spectre.plotting.panel_register import register_panel
 
 FREQUENCY_CUTS_PANEL_NAME = "frequency_cuts"
 
 @register_panel(FREQUENCY_CUTS_PANEL_NAME)
-class Panel(BaseSpectrumPanel):
+class Panel(BaseSpectrumPanel, CutsPanel):
     def __init__(self, 
                  name: str,
                  spectrogram: Spectrogram, 

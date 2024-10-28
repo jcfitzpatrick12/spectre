@@ -6,13 +6,13 @@ from typing import Optional
 
 from spectre.spectrograms.spectrogram import TimeCut
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.plotting.base import BaseTimeSeriesPanel
+from spectre.plotting.base import BaseTimeSeriesPanel, CutsPanel
 from spectre.plotting.panel_register import register_panel
 
 TIME_CUTS_PANEL_NAME = "time_cuts"
 
 @register_panel(TIME_CUTS_PANEL_NAME)
-class Panel(BaseTimeSeriesPanel):
+class Panel(BaseTimeSeriesPanel, CutsPanel):
     def __init__(self, 
                  name: str,
                  spectrogram: Spectrogram, 

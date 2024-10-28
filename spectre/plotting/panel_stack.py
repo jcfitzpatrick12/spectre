@@ -14,6 +14,7 @@ from spectre.plotting.factory import get_panel
 from spectre.plotting.library.time_cuts.panel import Panel as TimeCutsPanel
 from spectre.plotting.library.frequency_cuts.panel import Panel as FrequencyCutsPanel
 from spectre.plotting.library.spectrogram.panel import Panel as SpectrogramPanel
+from spectre.plotting.base import CutsPanel
 from spectre.plotting.format import DEFAULT_PANEL_FORMAT
 
 class PanelStack:
@@ -95,22 +96,22 @@ class PanelStack:
                 shared_axes[panel.x_axis_type] = panel.ax
 
 
+    def _overlay_cuts(self, cuts_panel: CutsPanel) -> None:
+        """Given a cuts panel, finds any corresponding spectrogram panels and adds the appropriate overlay"""
+        for panel in self.panels:
+            is_corresponding_panel = isinstance(panel, SpectrogramPanel) and (panel.tag == cuts_panel.tag)
+            if is_corresponding_panel:
+                panel.overlay_cuts(cuts_panel)
+
+
     def _overlay_superimposed_panels(self) -> None:
         for super_panel in self._superimposed_panels:
             for panel in self._panels:
                 if panel.name == super_panel.name: # find the matching panels via panel names
                     super_panel.ax, super_panel.fig = panel.ax, self._fig # and superimpose via axes sharing
                     super_panel.draw()
-                    if isinstance(super_panel, TimeCutsPanel) or isinstance(super_panel, FrequencyCutsPanel):
+                    if isinstance(super_panel, CutsPanel):
                         self._overlay_cuts(super_panel)
-
-
-    def _overlay_cuts(self, cuts_panel: TimeCutsPanel | FrequencyCutsPanel) -> None:
-        for panel in self.panels:
-            is_corresponding_panel = isinstance(panel, SpectrogramPanel) and (panel.tag == cuts_panel.tag)
-            if is_corresponding_panel:
-                panel.overlay_cuts(cuts_panel)
-
 
 
     def show(self) -> None:
@@ -125,7 +126,7 @@ class PanelStack:
                 panel.annotate_x_axis()
             else:
                 panel.hide_x_axis_labels()
-            if isinstance(panel, TimeCutsPanel) or isinstance(panel, FrequencyCutsPanel):
+            if isinstance(panel, CutsPanel):
                         self._overlay_cuts(panel)
 
 

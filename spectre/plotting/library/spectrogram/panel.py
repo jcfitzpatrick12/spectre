@@ -10,6 +10,7 @@ from warnings import warn
 
 from spectre.plotting.base import BaseTimeSeriesPanel
 from spectre.plotting.panel_register import register_panel
+from spectre.plotting.base import CutsPanel
 from spectre.plotting.library.time_cuts.panel import Panel as TimeCutsPanel
 from spectre.plotting.library.frequency_cuts.panel import Panel as FrequencyCutsPanel
 from spectre.plotting.format import DEFAULT_PANEL_FORMAT
@@ -68,7 +69,7 @@ class Panel(BaseTimeSeriesPanel):
         return
     
     
-    def overlay_cuts(self, cuts_panel: TimeCutsPanel | FrequencyCutsPanel) -> None:
+    def overlay_cuts(self, cuts_panel: CutsPanel) -> None:
         if isinstance(cuts_panel, TimeCutsPanel):
             self._overlay_time_cuts(cuts_panel)
         elif isinstance(cuts_panel, FrequencyCutsPanel):
@@ -81,6 +82,7 @@ class Panel(BaseTimeSeriesPanel):
                             color = color,
                             linewidth=DEFAULT_PANEL_FORMAT.line_width
                             )
+            
             
     def _overlay_frequency_cuts(self, frequency_cuts_panel: FrequencyCutsPanel) -> None:
         for time, color in frequency_cuts_panel.bind_to_colors():

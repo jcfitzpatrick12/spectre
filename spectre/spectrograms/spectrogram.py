@@ -22,19 +22,21 @@ from spectre.spectrograms.array_operations import (
 )
 
 @dataclass
-class FrequencyCut:
-    time: float | datetime
-    frequencies: np.ndarray
+class BaseCut:
     cut: np.ndarray
     spectrum_type: str
 
 
 @dataclass
-class TimeCut:
+class FrequencyCut(BaseCut):
+    time: float | datetime
+    frequencies: np.ndarray
+
+
+@dataclass
+class TimeCut(BaseCut):
     frequency: float
     times: np.ndarray
-    cut: np.ndarray
-    spectrum_type: str
     
 
 class Spectrogram:
