@@ -11,7 +11,7 @@ class DefaultFormats:
     large_size: int = 24
     line_width: int = 3
     style: str = "dark_background"
-    spectrogram_cmap: str = "gnuplot"
+    spectrogram_cmap: str = "gnuplot2"
     cuts_cmap: str = "winter"
     integral_over_frequency_color: str = "lime"
 
