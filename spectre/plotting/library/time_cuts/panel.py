@@ -14,6 +14,7 @@ TIME_CUTS_PANEL_NAME = "time_cuts"
 @register_panel(TIME_CUTS_PANEL_NAME)
 class Panel(BaseTimeSeriesPanel):
     def __init__(self, 
+                 name: str,
                  spectrogram: Spectrogram, 
                  time_type: str = "seconds",
                  *frequencies: list[float],
@@ -22,7 +23,7 @@ class Panel(BaseTimeSeriesPanel):
                  background_subtract: bool = False,
                  cmap: str = "Spectral",
                  **kwargs):
-        super().__init__(spectrogram, time_type, **kwargs)
+        super().__init__(name, spectrogram, time_type, **kwargs)
         self._frequencies = frequencies
         self._cmap = cmap
         self._dBb = dBb
@@ -62,11 +63,10 @@ class Panel(BaseTimeSeriesPanel):
     def annotate_y_axis(self) -> None:
         if self._dBb:
             self.ax.set_ylabel('dBb')
+        elif self._peak_normalise:
+            return # no y-axis label
         else:
             self.ax.set_ylabel(f'{self._spectrogram.spectrum_type.capitalize()}')
-    
-    def _set_name(self):
-        self._name = TIME_CUTS_PANEL_NAME
 
     
     def bind_to_colors(self):

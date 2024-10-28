@@ -14,7 +14,8 @@ def get_panel(panel_name: str,
               **kwargs) -> BasePanel:
     try:
         Panel = panels[panel_name]
-        return Panel(spectrogram, 
+        return Panel(panel_name,
+                     spectrogram, 
                      time_type,
                      *args, 
                      **kwargs)

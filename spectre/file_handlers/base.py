@@ -35,7 +35,7 @@ class BaseFileHandler(ABC):
     
 
     @property
-    def extension(self) -> str:
+    def extension(self) -> Optional[str]:
         return self._extension
     
 

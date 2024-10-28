@@ -15,14 +15,14 @@ FREQUENCY_CUTS_PANEL_NAME = "frequency_cuts"
 @register_panel(FREQUENCY_CUTS_PANEL_NAME)
 class Panel(BaseSpectrumPanel):
     def __init__(self, 
+                 name: str,
                  spectrogram: Spectrogram, 
-                 time_type: str = "seconds",
                  *times: list[float | str],
                  dBb: bool = False,
                  peak_normalise: bool = False,
                  cmap: str = "Spectral",
                  **kwargs):
-        super().__init__(spectrogram, time_type, **kwargs)
+        super().__init__(name, spectrogram, **kwargs)
         self._times = times
         self._cmap = cmap
         self._dBb = dBb
@@ -59,12 +59,10 @@ class Panel(BaseSpectrumPanel):
     def annotate_y_axis(self) -> None:
         if self._dBb:
             self.ax.set_ylabel('dBb')
+        elif self._peak_normalise:
+            return # no y-axis label
         else:
             self.ax.set_ylabel(f'{self._spectrogram.spectrum_type.capitalize()}')
-    
-
-    def _set_name(self):
-        self._name = FREQUENCY_CUTS_PANEL_NAME
 
     
     def bind_to_colors(self):

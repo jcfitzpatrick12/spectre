@@ -29,11 +29,11 @@ class EventHandler(BaseEventHandler):
         spectrogram = chunk.build_spectrogram(previous_chunk = self.previous_chunk)
 
         _LOGGER.info("Averaging spectrogram")
-        spectrogram = self.average_in_time(spectrogram)
-        spectrogram = self.average_in_frequency(spectrogram)
+        spectrogram = self._average_in_time(spectrogram)
+        spectrogram = self._average_in_frequency(spectrogram)
 
         _LOGGER.info("Joining spectrogram")
-        self.join_spectrogram(spectrogram)
+        self._join_spectrogram(spectrogram)
 
         # if the previous chunk has not yet been set, it means we were processing the first chunk
         # so we don't need to handle the previous chunk

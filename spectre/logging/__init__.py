@@ -79,17 +79,17 @@ class LogHandlers:
     
 
     @property
-    def year(self) -> int:
+    def year(self) -> Optional[int]:
         return self._year
 
 
     @property 
-    def month(self) -> int:
+    def month(self) -> Optional[int]:
         return self._month
     
 
     @property
-    def day(self) -> int:
+    def day(self) -> Optional[int]:
         return self._day
 
 
