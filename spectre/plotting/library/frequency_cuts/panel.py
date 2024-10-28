@@ -15,14 +15,14 @@ FREQUENCY_CUTS_PANEL_NAME = "frequency_cuts"
 @register_panel(FREQUENCY_CUTS_PANEL_NAME)
 class Panel(BaseSpectrumPanel):
     def __init__(self, 
+                 name: str,
                  spectrogram: Spectrogram, 
-                 time_type: str = "seconds",
                  *times: list[float | str],
                  dBb: bool = False,
                  peak_normalise: bool = False,
                  cmap: str = "Spectral",
                  **kwargs):
-        super().__init__(spectrogram, time_type, **kwargs)
+        super().__init__(name, spectrogram, **kwargs)
         self._times = times
         self._cmap = cmap
         self._dBb = dBb

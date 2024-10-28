@@ -14,6 +14,7 @@ TIME_CUTS_PANEL_NAME = "time_cuts"
 @register_panel(TIME_CUTS_PANEL_NAME)
 class Panel(BaseTimeSeriesPanel):
     def __init__(self, 
+                 name: str,
                  spectrogram: Spectrogram, 
                  time_type: str = "seconds",
                  *frequencies: list[float],
@@ -22,7 +23,7 @@ class Panel(BaseTimeSeriesPanel):
                  background_subtract: bool = False,
                  cmap: str = "Spectral",
                  **kwargs):
-        super().__init__(spectrogram, time_type, **kwargs)
+        super().__init__(name, spectrogram, time_type, **kwargs)
         self._frequencies = frequencies
         self._cmap = cmap
         self._dBb = dBb

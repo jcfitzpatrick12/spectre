@@ -12,9 +12,9 @@ from spectre.plotting.base import BaseTimeSeriesPanel
 from spectre.plotting.panel_register import register_panel
 from spectre.plotting.library.time_cuts.panel import Panel as TimeCutsPanel
 from spectre.plotting.library.frequency_cuts.panel import Panel as FrequencyCutsPanel
+from spectre.plotting.format import DEFAULT_PANEL_FORMAT
 
 SPECTROGRAM_PANEL_NAME = "spectrogram"
-LINE_WIDTH = 3
 
 @register_panel(SPECTROGRAM_PANEL_NAME)
 class Panel(BaseTimeSeriesPanel):
@@ -67,17 +67,24 @@ class Panel(BaseTimeSeriesPanel):
         self.ax.set_ylabel('Frequency [MHz]')
         return
     
+    
+    def overlay_cuts(self, cuts_panel: TimeCutsPanel | FrequencyCutsPanel) -> None:
+        if isinstance(cuts_panel, TimeCutsPanel):
+            self._overlay_time_cuts(cuts_panel)
+        elif isinstance(cuts_panel, FrequencyCutsPanel):
+            self._overlay_frequency_cuts(cuts_panel)
 
-    def overlay_time_cuts(self, time_cuts_panel: TimeCutsPanel) -> None:
+
+    def _overlay_time_cuts(self, time_cuts_panel: TimeCutsPanel) -> None:
         for frequency, color in time_cuts_panel.bind_to_colors():
             self.ax.axhline(frequency*1e-6, # convert to MHz
                             color = color,
-                            linewidth=3
+                            linewidth=DEFAULT_PANEL_FORMAT.line_width
                             )
             
-    def overlay_frequency_cuts(self, frequency_cuts_panel: FrequencyCutsPanel) -> None:
+    def _overlay_frequency_cuts(self, frequency_cuts_panel: FrequencyCutsPanel) -> None:
         for time, color in frequency_cuts_panel.bind_to_colors():
             self.ax.axvline(time,
                             color = color,
-                            linewidth=3
+                            linewidth=DEFAULT_PANEL_FORMAT.line_width
                             )

@@ -54,11 +54,6 @@ class BasePanel(ABC):
         """ Required to allow for axes sharing in the stack"""
         pass
 
-    
-    @abstractmethod
-    def _set_name(self):
-        pass
-
 
     @property
     def spectrogram(self) -> Spectrogram:
