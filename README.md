@@ -10,8 +10,6 @@
 
 ![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a SPECTRE spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
 
----
-
 # spectre-host
 
 ## Introduction
@@ -89,9 +87,6 @@ Now inside the container, check everything's up and running:
 ```spectre -v ```
 
 With the installation verified, you can freely use the suite of `spectre` CLI commands to create configuration files and capture data. You can exit the container using ```exit```
-
-
----
 
 # spectre-client
 
