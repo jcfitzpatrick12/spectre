@@ -32,6 +32,7 @@ class BasePanel(ABC):
 
         self._ax: Optional[Axes] = None # defined while stacking
         self._fig: Optional[Figure] = None # defined while stacking
+        self._identifier: Optional[str] = None # defined if specified by the user
 
 
     @abstractmethod
@@ -112,6 +113,15 @@ class BasePanel(ABC):
         if self._x_axis_type is None:
             raise AttributeError(f"x-axis type has not been defined for this panel")
         return self._x_axis_type
+    
+    @property
+    def identifier(self) -> Optional[str]:
+        return self._identifier
+    
+    
+    @identifier.setter
+    def identifier(self, value: str) -> None:
+        self._identifier = value
 
 
     def _validate_time_type(self, 
@@ -178,3 +188,7 @@ class BaseSpectrumPanel(BasePanel):
 
     def _set_x_axis_type(self):
         self._x_axis_type = FREQUENCY_X_AXIS
+
+
+class CutsPanel(BasePanel):
+    """Convenience parent class for cuts"""

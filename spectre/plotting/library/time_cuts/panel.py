@@ -6,13 +6,14 @@ from typing import Optional
 
 from spectre.spectrograms.spectrogram import TimeCut
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.plotting.base import BaseTimeSeriesPanel
+from spectre.plotting.base import BaseTimeSeriesPanel, CutsPanel
+from spectre.plotting.format import DEFAULT_FORMATS
 from spectre.plotting.panel_register import register_panel
 
 TIME_CUTS_PANEL_NAME = "time_cuts"
 
 @register_panel(TIME_CUTS_PANEL_NAME)
-class Panel(BaseTimeSeriesPanel):
+class Panel(BaseTimeSeriesPanel, CutsPanel):
     def __init__(self, 
                  name: str,
                  spectrogram: Spectrogram, 
@@ -21,7 +22,7 @@ class Panel(BaseTimeSeriesPanel):
                  dBb: bool = False,
                  peak_normalise: bool = False,
                  background_subtract: bool = False,
-                 cmap: str = "Spectral",
+                 cmap: str = DEFAULT_FORMATS.cuts_cmap,
                  **kwargs):
         super().__init__(name, spectrogram, time_type, **kwargs)
         self._frequencies = frequencies

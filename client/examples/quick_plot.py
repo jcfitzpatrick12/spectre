@@ -31,7 +31,7 @@ def main():
     start_time, end_time = "2024-10-03T12:19:30", "2024-10-03T12:25:00" # [UT]
     start_background, end_background = "2024-10-03T12:19:31", "2024-10-03T12:19:35" # [UT]
     lower_frequency, upper_frequency = 120e6, 150e6 # [Hz]
-    cut_at = 124e6 # [Hz]
+    cut_at_frequency = 124e6 # [Hz]
 
     spectrogram = get_spectrogram("RSP1A-sweeper", 
                                    start_time,
@@ -59,19 +59,41 @@ def main():
     panel_stack.add_panel("spectrogram", egypt_spectrogram, 
                           dBb=True, vmin=0, vmax=13)
     
+    
     panel_stack.add_panel("spectrogram", spectrogram, 
                           dBb=True, vmin=0, vmax=2)
     
+
     panel_stack.add_panel("time_cuts", spectrogram, 
-                          cut_at,
+                          124e6, # [Hz]
+                          identifier = "cut_1",
                           peak_normalise = True,
+                          cmap = "spring",
                           background_subtract = True)
 
+
     panel_stack.superimpose_panel("time_cuts", egypt_spectrogram, 
-                                  cut_at,
+                                  124e6, # [Hz]
+                                  identifier="cut_1",
                                   peak_normalise=True,
                                   background_subtract = True,
                                   cmap = "summer")
+    
+
+    panel_stack.add_panel("time_cuts", spectrogram, 
+                          135e6, # [Hz]
+                          identifier = "cut_2",
+                          peak_normalise = True,
+                          cmap = "autumn",
+                          background_subtract = True)
+
+
+    panel_stack.superimpose_panel("time_cuts", egypt_spectrogram, 
+                                  135e6, # [Hz]
+                                  identifier="cut_2",
+                                  peak_normalise=True,
+                                  background_subtract = True,
+                                  cmap = "winter")
     
     panel_stack.show()
 
