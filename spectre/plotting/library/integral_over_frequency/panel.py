@@ -2,11 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from matplotlib.figure import Figure
-from matplotlib.axes import Axes
-
 from spectre.plotting.base import BaseTimeSeriesPanel
 from spectre.plotting.panel_register import register_panel
+from spectre.plotting.format import DEFAULT_FORMATS
 
 INTEGRAL_OVER_FREQUENCY_PANEL_NAME = "integral_over_frequency"
 
@@ -16,7 +14,7 @@ class Panel(BaseTimeSeriesPanel):
                  *args, 
                  peak_normalise: bool = False,
                  background_subtract: bool = False,
-                 color: str = 'lime',
+                 color: str = DEFAULT_FORMATS.integral_over_frequency_color,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self._peak_normalise = peak_normalise

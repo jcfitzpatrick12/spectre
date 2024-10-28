@@ -13,7 +13,7 @@ from spectre.plotting.panel_register import register_panel
 from spectre.plotting.base import CutsPanel
 from spectre.plotting.library.time_cuts.panel import Panel as TimeCutsPanel
 from spectre.plotting.library.frequency_cuts.panel import Panel as FrequencyCutsPanel
-from spectre.plotting.format import DEFAULT_PANEL_FORMAT
+from spectre.plotting.format import DEFAULT_FORMATS
 
 SPECTROGRAM_PANEL_NAME = "spectrogram"
 
@@ -25,7 +25,7 @@ class Panel(BaseTimeSeriesPanel):
                  dBb: bool = False,
                  vmin: float | None = -1,
                  vmax: float | None = 2,
-                 cmap: str = "gnuplot2",
+                 cmap: str = DEFAULT_FORMATS.spectrogram_cmap,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self._log_norm = log_norm
@@ -80,7 +80,7 @@ class Panel(BaseTimeSeriesPanel):
         for frequency, color in time_cuts_panel.bind_to_colors():
             self.ax.axhline(frequency*1e-6, # convert to MHz
                             color = color,
-                            linewidth=DEFAULT_PANEL_FORMAT.line_width
+                            linewidth=DEFAULT_FORMATS.line_width
                             )
             
             
@@ -88,5 +88,5 @@ class Panel(BaseTimeSeriesPanel):
         for time, color in frequency_cuts_panel.bind_to_colors():
             self.ax.axvline(time,
                             color = color,
-                            linewidth=DEFAULT_PANEL_FORMAT.line_width
+                            linewidth=DEFAULT_FORMATS.line_width
                             )

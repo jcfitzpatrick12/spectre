@@ -9,6 +9,7 @@ from spectre.spectrograms.spectrogram import FrequencyCut
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.plotting.base import BaseSpectrumPanel, CutsPanel
 from spectre.plotting.panel_register import register_panel
+from spectre.plotting.format import DEFAULT_FORMATS
 
 FREQUENCY_CUTS_PANEL_NAME = "frequency_cuts"
 
@@ -20,7 +21,7 @@ class Panel(BaseSpectrumPanel, CutsPanel):
                  *times: list[float | str],
                  dBb: bool = False,
                  peak_normalise: bool = False,
-                 cmap: str = "Spectral",
+                 cmap: str = DEFAULT_FORMATS.cuts_cmap,
                  **kwargs):
         super().__init__(name, spectrogram, **kwargs)
         self._times = times

@@ -15,7 +15,7 @@ from spectre.plotting.library.time_cuts.panel import Panel as TimeCutsPanel
 from spectre.plotting.library.frequency_cuts.panel import Panel as FrequencyCutsPanel
 from spectre.plotting.library.spectrogram.panel import Panel as SpectrogramPanel
 from spectre.plotting.base import CutsPanel
-from spectre.plotting.format import DEFAULT_PANEL_FORMAT
+from spectre.plotting.format import DEFAULT_FORMATS
 
 class PanelStack:
     def __init__(self, time_type: str, figsize: Tuple[int, int] = (10, 10)):
@@ -71,14 +71,14 @@ class PanelStack:
 
 
     def _init_plot_style(self) -> None:
-        plt.style.use(DEFAULT_PANEL_FORMAT.style)
-        plt.rc('font', size=DEFAULT_PANEL_FORMAT.small_size)
-        plt.rc('axes', titlesize=DEFAULT_PANEL_FORMAT.medium_size, 
-                       labelsize=DEFAULT_PANEL_FORMAT.medium_size)
-        plt.rc('xtick', labelsize=DEFAULT_PANEL_FORMAT.small_size)
-        plt.rc('ytick', labelsize=DEFAULT_PANEL_FORMAT.small_size)
-        plt.rc('legend', fontsize=DEFAULT_PANEL_FORMAT.small_size)
-        plt.rc('figure', titlesize=DEFAULT_PANEL_FORMAT.large_size)
+        plt.style.use(DEFAULT_FORMATS.style)
+        plt.rc('font', size=DEFAULT_FORMATS.small_size)
+        plt.rc('axes', titlesize=DEFAULT_FORMATS.medium_size, 
+                       labelsize=DEFAULT_FORMATS.medium_size)
+        plt.rc('xtick', labelsize=DEFAULT_FORMATS.small_size)
+        plt.rc('ytick', labelsize=DEFAULT_FORMATS.small_size)
+        plt.rc('legend', fontsize=DEFAULT_FORMATS.small_size)
+        plt.rc('figure', titlesize=DEFAULT_FORMATS.large_size)
 
 
     def _create_figure_and_axes(self) -> None:

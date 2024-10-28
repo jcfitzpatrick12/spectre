@@ -5,12 +5,15 @@
 from dataclasses import dataclass
 
 @dataclass
-class PanelFormat:
+class DefaultFormats:
     small_size: int = 18
     medium_size: int = 21
     large_size: int = 24
     line_width: int = 3
     style: str = "dark_background"
+    spectrogram_cmap: str = "gnuplot"
+    cuts_cmap: str = "winter"
+    integral_over_frequency_color: str = "lime"
 
 
-DEFAULT_PANEL_FORMAT = PanelFormat()
+DEFAULT_FORMATS = DefaultFormats()
