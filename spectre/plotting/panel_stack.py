@@ -52,21 +52,35 @@ class PanelStack:
         return len(self._panels)
 
 
-    def add_panel(self, panel_name: str, spectrogram: Spectrogram, *args, **kwargs) -> None:
+    def add_panel(self, 
+                  panel_name: str, 
+                  spectrogram: Spectrogram,
+                  *args, 
+                  identifier: Optional[str] = None,
+                  **kwargs) -> None:
         panel = get_panel(panel_name, 
                           spectrogram, 
                           self._time_type, 
                           *args, 
                           **kwargs)
+        if identifier: 
+            panel.identifier = identifier
         self._panels.append(panel)
 
 
-    def superimpose_panel(self, panel_name: str, spectrogram: Spectrogram, *args, **kwargs) -> None:
+    def superimpose_panel(self, 
+                          panel_name: str, 
+                          spectrogram: Spectrogram, 
+                          *args, 
+                          identifier: Optional[str] = None,
+                          **kwargs) -> None:
         panel = get_panel(panel_name, 
                           spectrogram, 
                           self._time_type, 
                           *args, 
                           **kwargs)
+        if identifier:
+            panel.identifier = identifier
         self._superimposed_panels.append(panel)
 
 
@@ -107,7 +121,7 @@ class PanelStack:
     def _overlay_superimposed_panels(self) -> None:
         for super_panel in self._superimposed_panels:
             for panel in self._panels:
-                if panel.name == super_panel.name: # find the matching panels via panel names
+                if panel.name == super_panel.name and (panel.identifier == super_panel.identifier): # find the matching panels via panel names
                     super_panel.ax, super_panel.fig = panel.ax, self._fig # and superimpose via axes sharing
                     super_panel.draw()
                     if isinstance(super_panel, CutsPanel):
