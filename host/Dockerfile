@@ -32,7 +32,7 @@ RUN apt-get update -y && \
     # cmake is required for installing OOT modules for gnuradio
     cmake=3.22.1-1ubuntu1.22.04.2 \
     gnuradio=3.10.1.1-2  \
-    python3-pip=22.0.2+dfsg-1ubuntu0.4 \
+    python3-pip=22.0.2+dfsg-1 \
     cron=3.0pl1-137ubuntu3 \
     wget=1.21.2-2ubuntu1 \
     vim && rm -rf /var/lib/apt/lists/*
