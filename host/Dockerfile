@@ -2,8 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Use an Ubuntu image
-FROM ubuntu:22.04
+# Use an Ubuntu image (exact version of 22.04)
+FROM ubuntu@sha256:3d1556a8a18cf5307b121e0a98e93f1ddf1f3f8e092f1fddfd941254785b95d7
 
 # -------------------------------------------------- # 
 # Setting environment variables ...                  #
@@ -32,10 +32,11 @@ RUN apt-get update -y && \
     # cmake is required for installing OOT modules for gnuradio
     cmake=3.22.1-1ubuntu1.22.04.2 \
     gnuradio=3.10.1.1-2  \
-    python3-pip=22.0.2+dfsg-1 \
+    python3-pip=22.0.2+dfsg-1ubuntu0.5 \
     cron=3.0pl1-137ubuntu3 \
-    wget=1.21.2-2ubuntu1 \
-    vim && rm -rf /var/lib/apt/lists/*
+    wget=1.21.2-2ubuntu1.1 \
+    vim=2:8.2.3995-1ubuntu2.19 \ 
+    && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------------------------- # 
 # Installing GNU Radio OOT modules ...               #
