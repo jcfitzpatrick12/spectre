@@ -123,14 +123,16 @@ class Chunks:
         yield from self.chunk_list
 
 
-    def get_chunk_by_chunk_start_time(self, chunk_start_time: str) -> BaseChunk:
+    def get_chunk_by_chunk_start_time(self, 
+                                      chunk_start_time: str) -> BaseChunk:
         try:
             return self.chunk_map[chunk_start_time]
         except KeyError:
             raise ChunkNotFoundError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
 
 
-    def get_chunk_by_index(self, chunk_index: int) -> BaseChunk:
+    def get_chunk_by_index(self, 
+                           chunk_index: int) -> BaseChunk:
         num_chunks = len(self.chunk_map)
         if num_chunks == 0:
             raise ChunkNotFoundError("No chunks are available")
@@ -138,18 +140,22 @@ class Chunks:
         return self.chunk_list[index]
 
 
-    def get_index_by_chunk(self, chunk_to_match: BaseChunk) -> int:
+    def get_index_by_chunk(self, 
+                           chunk_to_match: BaseChunk) -> int:
         for i, chunk in enumerate(self):
             if chunk.chunk_start_time == chunk_to_match.chunk_start_time:
                 return i
         raise ChunkNotFoundError(f"No matching chunk found for chunk {chunk_to_match.chunk_name}")
     
 
-    def count_chunk_files(self, extension: str) -> int:
+    def count_chunk_files(self, 
+                          extension: str) -> int:
         return sum(1 for chunk_file in self if chunk_file.has_file(extension))
 
 
-    def get_spectrogram_from_range(self, start_time: str, end_time: str) -> Spectrogram:
+    def get_spectrogram_from_range(self, 
+                                   start_time: str, 
+                                   end_time: str) -> Spectrogram:
         # Convert input strings to datetime objects
         start_datetime = datetime.strptime(start_time, DEFAULT_DATETIME_FORMAT)
         end_datetime = datetime.strptime(end_time, DEFAULT_DATETIME_FORMAT)
