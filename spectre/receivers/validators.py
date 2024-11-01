@@ -166,7 +166,7 @@ def _compute_num_steps_per_sweep(min_freq: float,
                                  max_freq: float,
                                  samp_rate: int,
                                  freq_step: float) -> int:
-     floor((max_freq - min_freq + samp_rate/2) / freq_step)
+     return floor((max_freq - min_freq + samp_rate/2) / freq_step)
 
 
 def validate_num_steps_per_sweep(min_freq: float, 
