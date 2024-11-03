@@ -7,7 +7,8 @@ from typing import List
 
 from host.services import update
 from host.cli import (
-    TAG_HELP
+    TAG_HELP,
+    FORCE_UPDATE_HELP
 )
 
 app = typer.Typer()
@@ -15,8 +16,11 @@ app = typer.Typer()
 @app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+                   force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
 ) -> None:
-    update.capture_config(tag, params)
+    update.capture_config(tag, 
+                          params, 
+                          force = force)
     typer.secho(f"The capture-config for tag \"{tag}\" has been successfully updated", fg=typer.colors.GREEN)
     raise typer.Exit()
 
@@ -24,7 +28,10 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 @app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
+                force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
 ) -> None:
-    update.fits_config(tag, params)
+    update.fits_config(tag, 
+                       params,
+                       force)
     typer.secho(f"The fits-config for tag \"{tag}\" has been successfully updated", fg=typer.colors.GREEN)
     raise typer.Exit()
