@@ -23,6 +23,7 @@ MONTH_HELP = "Month of the year (numeric)"
 YEAR_HELP = "Year (numeric)"
 
 FORCE_RESTART_HELP = "If a worker process stops unexpectedly, terminate all subprocesses and restart the capture session"
+FORCE_UPDATE_HELP = "Force configuration files update if chunks exist under the given tag"
 PARAMS_HELP = "Pass arbitrary key-value pairs"
 PROCESS_TYPE_HELP = f"Processes may be one of {PROCESS_TYPES}"
 

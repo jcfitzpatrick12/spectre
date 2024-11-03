@@ -8,17 +8,42 @@ _LOGGER = getLogger(__name__)
 from typing import List
 
 from spectre.receivers.factory import get_receiver
+from spectre.chunks import Chunks
 from spectre.logging import log_service_call
+from spectre.exceptions import ChunkExistsError
 from spectre.file_handlers.json import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
 
+def _has_chunks(tag: str) -> bool:
+    """ Returns true if any files exist under the input tag. """
+    chunks = Chunks(tag)
+    return len(chunks.chunk_list)
+
+
+def _caution_update(tag: str,
+                    force: bool) -> None:
+    """ """
+    if _has_chunks(tag):
+        if force:
+            _LOGGER.warning(f"Chunks exist under the tag {tag}, forcing update")
+            return
+        else:
+            error_message = (f"Chunks exist under the tag {tag}. "
+                             f"It is recommended to create a new tag for any configuration file updates. " 
+                             f"Override this functionality with --force. "
+                             f"Aborting update")
+            _LOGGER.error(error_message)
+            raise ChunkExistsError(error_message)
+
 
 @log_service_call(_LOGGER)
 def capture_config(tag: str,
-                   params: List[str]
-) -> None:
+                   params: List[str],
+                   force: bool = False,
+) -> None: 
+    _caution_update(tag, force)
     # extract the current capture config saved (which will be type cast!)
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
@@ -44,8 +69,10 @@ def capture_config(tag: str,
 
 @log_service_call(_LOGGER)
 def fits_config(tag: str,
-                params: List[str]
+                params: List[str],
+                force: bool = False,
 ) -> None:
+    _caution_update(tag, force)
     fits_config_handler = FitsConfigHandler(tag)
     fits_config = fits_config_handler.read()
     d = fits_config_handler.type_cast_params(params,
