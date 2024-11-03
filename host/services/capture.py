@@ -7,7 +7,7 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 import time
-from typing import List, Callable
+from typing import List, Callable, Tuple
 import multiprocessing
 
 from spectre.receivers.factory import get_receiver
@@ -35,7 +35,10 @@ def start_process(target_func: Callable,
                   args: tuple, 
                   process_name: str) -> multiprocessing.Process:
     _LOGGER.info(f"Starting {process_name} process..")
-    process = multiprocessing.Process(target=target_func, args=args, name=process_name, daemon=True)
+    process = multiprocessing.Process(target=target_func, 
+                                      args=args, 
+                                      name=process_name, 
+                                      daemon=True)
     process.start()
     time.sleep(1)  # Allow the process to initialize
 
@@ -85,9 +88,13 @@ def _monitor_processes(process_infos: List[tuple],
 
 def _start_capture(receiver_name: str, 
                    mode: str, 
-                   tags: List[str]) -> None:
-    from spectre.cfg import LOGS_DIR_PATH
-    configure_root_logger(f"WORKER")
+                   tags: List[str],
+                   do_logging: bool,
+                   logging_level: int = logging.INFO,
+                   ) -> None:
+    if do_logging:  
+        configure_root_logger(f"WORKER", 
+                              level = logging_level)
     _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
     try:
         receiver = get_receiver(receiver_name, mode=mode)
@@ -97,12 +104,28 @@ def _start_capture(receiver_name: str,
         raise
 
 
-def _start_watcher(tags: List[str]) -> None:
-    configure_root_logger(f"WORKER") #  start worker log
+def _start_watcher(tags: List[str],
+                   do_logging: bool = False,
+                   logging_level: int = logging.INFO) -> None:
+    if do_logging:
+        configure_root_logger(f"WORKER", level = logging_level) #  start worker log
     _LOGGER.info(f"Starting watcher with tags {tags}")
     for tag in tags:
         watcher = Watcher(tag)
         watcher.start()
+
+
+def _get_user_root_logger_state() -> Tuple[bool, int]:
+    """ Get the state of the users root logger """
+    user_root_logger = getLogger() # no name implies returning of the root logger
+    if user_root_logger.handlers:
+        is_logging = True
+        level = user_root_logger.level
+        return is_logging, level
+    else:
+        is_logging = False
+        level = None
+        return (is_logging, level)
 
 
 @log_service_call(_LOGGER)
@@ -113,10 +136,24 @@ def start(receiver_name: str,
           minutes: int = 0, 
           hours: int = 0, 
           force_restart: bool = False) -> None:
+    
     if seconds == 0 and minutes == 0 and hours == 0:
         raise ValueError(f"Session duration must be specified")
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
-    capture_process = start_process(_start_capture, (receiver_name, mode, tags), "capture")
+
+    # evaluate the user root logger state, so we can propagate it to the worker processes
+    do_logging, logging_level = _get_user_root_logger_state()
+
+    capture_args = (
+        receiver_name,
+        mode,
+        tags,
+        do_logging,
+        logging_level
+    )
+    capture_process = start_process(_start_capture, 
+                                    capture_args, 
+                                    "capture")
     _monitor_processes([(capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
 
 
@@ -128,11 +165,33 @@ def session(receiver_name: str,
             seconds: int = 0, 
             minutes: int = 0, 
             hours: int = 0) -> None:
+    
     if seconds == 0 and minutes == 0 and hours == 0:
         raise ValueError(f"Session duration must be specified")
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
-    watcher_process = start_process(_start_watcher, (tags,), "watcher")
-    capture_process = start_process(_start_capture, (receiver_name, mode, tags), "capture")
+
+    # evaluate the user root logger state, so we can propagate it to the worker processes
+    do_logging, logging_level = _get_user_root_logger_state()
+
+    watcher_args = (
+        tags,
+        do_logging,
+        logging_level
+    )
+    watcher_process = start_process(_start_watcher, 
+                                    watcher_args, 
+                                    "watcher")
+    
+    capture_args = (
+        receiver_name,
+        mode,
+        tags,
+        do_logging,
+        logging_level
+    )
+    capture_process = start_process(_start_capture, 
+                                    capture_args, 
+                                    "capture")
 
     if not watcher_process.is_alive() or not capture_process.is_alive():
         _terminate_processes([watcher_process, capture_process])
