@@ -235,7 +235,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
     
     def read(self) -> None:
         try:
-            super().read()
+            return super().read()
         except FileNotFoundError as e:
             raise FitsConfigNotFoundError((
                 f"A fits config could not be found with tag {self.tag}. " 
@@ -249,7 +249,7 @@ class CaptureConfigHandler(SPECTREConfigHandler):
 
     def read(self) -> None:
         try:
-            super().read()
+            return super().read()
         except FileNotFoundError as e:
             raise CaptureConfigNotFoundError((
                 f"A capture config could not be found with tag {self.tag}. " 
