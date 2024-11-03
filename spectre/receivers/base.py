@@ -19,7 +19,6 @@ from spectre.exceptions import (
 class BaseReceiver(ABC):
     def __init__(self, name: str, mode: Optional[str] = None):
         self._name = name
-        self._mode = mode
 
         self._capture_methods: dict[str, Callable] = None
         self._set_capture_methods()
@@ -32,6 +31,9 @@ class BaseReceiver(ABC):
 
         self._specifications: dict[str, Any] = None
         self._set_specifications()
+
+        self.mode = mode
+
 
 
     @abstractmethod
@@ -95,9 +97,10 @@ class BaseReceiver(ABC):
     
 
     @mode.setter
-    def mode(self, value: str) -> None:
-        if value not in self.valid_modes:
-            raise ModeNotFoundError(f"{value} is not a defined mode for the receiver {self.name}. Expected one of {self.valid_modes}")
+    def mode(self, value: Optional[str]) -> None:
+        if (value is not None) and value not in self.valid_modes:
+            raise ModeNotFoundError((f"{value} is not a defined mode for the receiver {self.name}. "
+                                     f"Expected one of {self.valid_modes}"))
         self._mode = value
 
 
