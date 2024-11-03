@@ -12,7 +12,9 @@ from spectre.cfg import (
     JSON_CONFIGS_DIR_PATH
 )
 from spectre.exceptions import (
-    InvalidTagError
+    InvalidTagError,
+    CaptureConfigNotFoundError,
+    FitsConfigNotFoundError
 )
 
 class JsonHandler(BaseFileHandler):
@@ -231,6 +233,25 @@ class FitsConfigHandler(SPECTREConfigHandler):
         self.save(d, doublecheck_overwrite=doublecheck_overwrite)
 
     
+    def read(self) -> None:
+        try:
+            super().read()
+        except FileNotFoundError as e:
+            raise FitsConfigNotFoundError((
+                f"A fits config could not be found with tag {self.tag}. " 
+                f"Received the following error: {e}"
+            ))
+
+    
 class CaptureConfigHandler(SPECTREConfigHandler):
     def __init__(self, tag: str, **kwargs):
         super().__init__(tag, "capture", **kwargs)
+
+    def read(self) -> None:
+        try:
+            super().read()
+        except FileNotFoundError as e:
+            raise CaptureConfigNotFoundError((
+                f"A capture config could not be found with tag {self.tag}. " 
+                f"Received the following error: {e}"
+            ))
