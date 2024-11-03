@@ -108,17 +108,17 @@ class BaseReceiver(ABC):
 
     @property
     def capture_method(self) -> Callable:
-        return self.capture_methods.get(self.mode)
+        return self.capture_methods[self.mode]
 
 
     @property
     def validator(self) -> Callable:
-        return self.validators.get(self.mode)
+        return self.validators[self.mode]
 
 
     @property
     def template(self) -> dict[str, Any]:
-        return self.templates.get(self.mode)
+        return self.templates[self.mode]
     
 
     def get_specification(self, 
