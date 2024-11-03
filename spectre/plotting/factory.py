@@ -12,14 +12,15 @@ def get_panel(panel_name: str,
               time_type: str,
               *args, 
               **kwargs) -> BasePanel:
-    try:
-        Panel = panels[panel_name]
-        return Panel(panel_name,
-                     spectrogram, 
-                     time_type,
-                     *args, 
-                     **kwargs)
-    except KeyError:
+   
+    Panel = panels.get(panel_name)
+    if Panel is None:
         valid_panels = list(panels.keys())
         raise PanelNotFoundError(f"Could not find panel with name {panel_name}. "
                                  f"Expected one of {valid_panels}")
+    
+    return Panel(panel_name,
+                    spectrogram, 
+                    time_type,
+                    *args, 
+                    **kwargs)

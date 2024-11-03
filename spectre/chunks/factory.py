@@ -10,13 +10,11 @@ from spectre.exceptions import ChunkNotFoundError
 
 
 def get_chunk(chunk_key: str) -> BaseChunk:
-    try:
-        Chunk = chunk_map[chunk_key]
-        return Chunk
-    except KeyError:
+    Chunk = chunk_map.get(chunk_key)
+    if Chunk is None:
         valid_chunk_keys = list(chunk_map.keys())
         raise ChunkNotFoundError(f"No chunk found for the chunk key: {chunk_key}. Valid chunk keys are: {valid_chunk_keys}")
-
+    return Chunk
 
 def get_chunk_from_tag(tag: str) -> BaseChunk:
     # if we are dealing with a callisto chunk, the chunk key is equal to the tag
