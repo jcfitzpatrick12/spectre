@@ -38,6 +38,7 @@ class Receiver(SPECTREReceiver):
                 'frequency': float, # [Hz]
                 'amplitude': float, # unitless
                 'chunk_size': int, # [s]
+                'joining_time': int, # [s]
                 'time_resolution': float, # [s]
                 'frequency_resolution': float, # [Hz]
                 'window_type': str, # the window type for the STFFT
@@ -53,6 +54,7 @@ class Receiver(SPECTREReceiver):
                 'max_samples_per_step': int, # the size of the largest step (in samples)
                 'step_increment': int, # the "height" of each step, in terms of the tagged staircase output.
                 'chunk_size': int, # [s]
+                'joining_time': int, # [s]
                 'time_resolution': float, # [s]
                 'frequency_resolution': float, # [Hz]
                 'window_type': str, # the window type for the STFFT
