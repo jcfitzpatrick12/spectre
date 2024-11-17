@@ -67,12 +67,10 @@ class BaseFileHandler(ABC):
             if doublecheck_delete:
                 self.doublecheck_delete()
             os.remove(self.file_path)
-        return
     
 
     def cat(self) -> None:
         print(self.read())
-        return
 
 
     def _doublecheck_action(self, 
