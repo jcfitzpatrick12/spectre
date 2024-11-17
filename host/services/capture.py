@@ -197,6 +197,8 @@ def session(receiver_name: str,
         _terminate_processes([watcher_process, capture_process])
         return
 
-    _monitor_processes([(watcher_process, _start_watcher, (tags,)),
-                        (capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
+    _monitor_processes([(watcher_process, _start_watcher, watcher_args),
+                        (capture_process, _start_capture, capture_args)], 
+                        total_runtime, 
+                        force_restart)
     
