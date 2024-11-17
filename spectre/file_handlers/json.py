@@ -18,10 +18,15 @@ from spectre.exceptions import (
 )
 
 class JsonHandler(BaseFileHandler):
-    def __init__(self, *args, **kwargs):
-        if "extension" in kwargs:
-            raise ValueError("The 'extension' cannot be specified - it is fixed to 'json'. Please use override_extension if required")
-        super().__init__(*args, extension = "json", **kwargs)
+    def __init__(self, 
+                 parent_path: str, 
+                 base_file_name: str,
+                 extension: str = "json",
+                 **kwargs):
+        super().__init__(parent_path, 
+                         base_file_name, 
+                         extension,
+                         **kwargs)
     
     
     def read(self) -> dict[str, Any]:
@@ -195,8 +200,12 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
 class FitsConfigHandler(SPECTREConfigHandler):
-    def __init__(self, tag: str, **kwargs):
-        super().__init__(tag, "fits", **kwargs)
+    def __init__(self, 
+                 tag: str, 
+                 **kwargs):
+        super().__init__(tag, 
+                         "fits", 
+                         **kwargs)
 
     @property
     def template(self) -> dict[str, Any]:
@@ -244,8 +253,12 @@ class FitsConfigHandler(SPECTREConfigHandler):
 
     
 class CaptureConfigHandler(SPECTREConfigHandler):
-    def __init__(self, tag: str, **kwargs):
-        super().__init__(tag, "capture", **kwargs)
+    def __init__(self, 
+                 tag: str, 
+                 **kwargs):
+        super().__init__(tag, 
+                         "capture", 
+                         **kwargs)
 
     def read(self) -> None:
         try:
