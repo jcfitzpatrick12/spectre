@@ -100,7 +100,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
     def _convert_types(self, 
                        d: dict[str, str], 
-                       template: dict) -> dict[str, Any]:
+                       template: dict[str, type]) -> dict[str, Any]:
         def _convert_to_dict(v: str) -> dict:
             return ast.literal_eval(v)
         def _convert_to_bool(v: str) -> bool:
@@ -148,8 +148,8 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
     def validate_against_template(self, 
-                                  d: dict, 
-                                  template: dict, 
+                                  d: dict[str, Any], 
+                                  template: dict[str, type], 
                                   ignore_keys: Optional[list] = None) -> None:
         if ignore_keys is None:
             ignore_keys = []
@@ -159,8 +159,8 @@ class SPECTREConfigHandler(JsonHandler, ABC):
     
 
     def _validate_keys(self, 
-                       input_dict: dict, 
-                       template: dict, 
+                       input_dict: dict[str, Any], 
+                       template: dict[str, type], 
                        ignore_keys: Optional[list] = None) -> None:
         if ignore_keys is None:
             ignore_keys = []
@@ -181,8 +181,8 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
     def _validate_types(self, 
-                        d: dict, 
-                        template: dict, 
+                        d: dict[str, Any], 
+                        template: dict[str, type], 
                        ignore_keys: Optional[list] = None) -> None:
         if ignore_keys is None:
             ignore_keys = []
