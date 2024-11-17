@@ -13,8 +13,6 @@ FROM ubuntu@sha256:3d1556a8a18cf5307b121e0a98e93f1ddf1f3f8e092f1fddfd941254785b9
 ARG DEBIAN_FRONTEND=noninteractive
 #Set SPECTREHOST as the parent directory of the package
 ENV SPECTRE_DIR_PATH=/home/spectre
-#add spectre to the python path so we can import modules properly
-ENV PYTHONPATH="${SPECTRE_DIR_PATH}:${PYTHONPATH}"
 
 
 # -------------------------------------------------- # 
