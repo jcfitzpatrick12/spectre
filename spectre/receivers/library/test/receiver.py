@@ -95,17 +95,17 @@ class Receiver(SPECTREReceiver):
         time_resolution = capture_config["time_resolution"]
         frequency_resolution = capture_config["frequency_resolution"]
 
-        validators.validate_samp_rate_strictly_positive(samp_rate)
-        validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_time_resolution(time_resolution, chunk_size) 
-        validators.validate_window(window_type, 
+        validators.samp_rate_strictly_positive(samp_rate)
+        validators.chunk_size_strictly_positive(chunk_size)
+        validators.time_resolution(time_resolution, chunk_size) 
+        validators.window(window_type, 
                                           {}, 
                                           window_size,
                                           chunk_size,
                                           samp_rate)
-        validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "fixed")
-        validators.validate_event_handler_key(event_handler_key, "fixed")
+        validators.STFFT_kwargs(STFFT_kwargs)
+        validators.chunk_key(chunk_key, "fixed")
+        validators.event_handler_key(event_handler_key, "fixed")
 
         if time_resolution != 0:
             raise ValueError(f"Time resolution must be zero. Received: {time_resolution}")
@@ -151,13 +151,13 @@ class Receiver(SPECTREReceiver):
         event_handler_key = capture_config["event_handler_key"]
         time_resolution = capture_config["time_resolution"]
 
-        validators.validate_samp_rate_strictly_positive(samp_rate)
-        validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_time_resolution(time_resolution, chunk_size)
-        validators.validate_window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
-        validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "sweep")
-        validators.validate_event_handler_key(event_handler_key, "sweep")
+        validators.samp_rate_strictly_positive(samp_rate)
+        validators.chunk_size_strictly_positive(chunk_size)
+        validators.time_resolution(time_resolution, chunk_size)
+        validators.window(window_type, window_kwargs, window_size, chunk_size, samp_rate)
+        validators.STFFT_kwargs(STFFT_kwargs)
+        validators.chunk_key(chunk_key, "sweep")
+        validators.event_handler_key(event_handler_key, "sweep")
 
         if min_samples_per_step <= 0:
             raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")

@@ -44,7 +44,7 @@ class LogHandler(TextHandler):
         parent_path = os.path.join(LOGS_DIR_PATH, date_dir)
         base_file_name = f"{datetime_stamp}_{pid}_{process_type}"
 
-        super().__init__(parent_path, base_file_name, override_extension="log")
+        super().__init__(parent_path, base_file_name, extension = "log")
     
 
     @property

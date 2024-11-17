@@ -11,13 +11,11 @@ class BaseFileHandler(ABC):
     def __init__(self, 
                  parent_path: str, 
                  base_file_name: str, 
-                 extension: Optional[str] = None,
-                 override_extension: Optional[str] = None):
+                 extension: Optional[str] = None):
         self._parent_path = parent_path
         self._base_file_name = base_file_name
-        self._extension = extension if (override_extension is None) else override_extension
-        self._file_name = base_file_name if (self._extension is None) else f"{base_file_name}.{self._extension}"
-        self._file_path = os.path.join(parent_path, self._file_name)
+        self._extension = extension
+
         
     @abstractmethod
     def read(self) -> Any:
@@ -41,17 +39,17 @@ class BaseFileHandler(ABC):
 
     @property
     def file_name(self) -> str:
-        return self._file_name
+        return self._base_file_name if (self._extension is None) else f"{self._base_file_name}.{self._extension}"
     
 
     @property
     def file_path(self) -> str:
-        return self._file_path
+        return os.path.join(self._parent_path, self.file_name)
     
     
     @property
     def exists(self) -> bool:
-        return os.path.exists(self._file_path) 
+        return os.path.exists(self.file_path) 
 
 
     def make_parent_path(self) -> None:
@@ -61,18 +59,16 @@ class BaseFileHandler(ABC):
     def delete(self, 
                doublecheck_delete = True) -> None:
         if not self.exists:
-            warn(f"{self._file_path} does not exist. No deletion taking place")
+            warn(f"{self.file_path} does not exist. No deletion taking place")
             return
         else:
             if doublecheck_delete:
                 self.doublecheck_delete()
             os.remove(self.file_path)
-        return
     
 
     def cat(self) -> None:
         print(self.read())
-        return
 
 
     def _doublecheck_action(self, 

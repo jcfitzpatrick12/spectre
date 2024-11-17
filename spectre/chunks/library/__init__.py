@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from spectre.dynamic_imports.library import import_target_modules
+from spectre.dynamic_imports import import_target_modules
 
 import_target_modules(__file__, __name__, "chunk")
 

@@ -285,44 +285,44 @@ class SPECTREReceiver(BaseReceiver):
         chunk_key = capture_config["chunk_key"]
         event_handler_key = capture_config[ "event_handler_key"]
 
-        validators.validate_center_freq_strictly_positive(min_freq)
-        validators.validate_center_freq_strictly_positive(max_freq)
-        validators.validate_samp_rate_strictly_positive(samp_rate)
-        validators.validate_bandwidth_strictly_positive(bandwidth)
-        validators.validate_nyquist_criterion(samp_rate, 
+        validators.center_freq_strictly_positive(min_freq)
+        validators.center_freq_strictly_positive(max_freq)
+        validators.samp_rate_strictly_positive(samp_rate)
+        validators.bandwidth_strictly_positive(bandwidth)
+        validators.nyquist_criterion(samp_rate, 
                                               bandwidth)
-        validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_time_resolution(time_resolution, 
+        validators.chunk_size_strictly_positive(chunk_size)
+        validators.time_resolution(time_resolution, 
                                              chunk_size) 
-        validators.validate_window(window_type, 
+        validators.window(window_type, 
                                    window_kwargs, 
                                    window_size,
                                    chunk_size,
                                    samp_rate)
-        validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, "sweep")
-        validators.validate_event_handler_key(event_handler_key, "sweep")
-        validators.validate_gain_is_negative(IF_gain)
-        validators.validate_gain_is_negative(RF_gain)
-        validators.validate_num_steps_per_sweep(min_freq, 
+        validators.STFFT_kwargs(STFFT_kwargs)
+        validators.chunk_key(chunk_key, "sweep")
+        validators.event_handler_key(event_handler_key, "sweep")
+        validators.gain_is_negative(IF_gain)
+        validators.gain_is_negative(RF_gain)
+        validators.num_steps_per_sweep(min_freq, 
                                                 max_freq, 
                                                 samp_rate, 
                                                 freq_step)
-        validators.validate_sweep_interval(min_freq, 
+        validators.sweep_interval(min_freq, 
                                            max_freq, 
                                            samp_rate, 
                                            freq_step,
                                            samples_per_step,
                                            chunk_size)
-        validators.validate_non_overlapping_steps(freq_step, 
+        validators.non_overlapping_steps(freq_step, 
                                                   samp_rate)
-        validators.validate_num_samples_per_step(samples_per_step, 
+        validators.num_samples_per_step(samples_per_step, 
                                                  window_size)
 
         # if the api latency is defined, raise a warning if the step interval is of the same order
         api_latency = self.specifications.get("api_latency")
         if api_latency:
-            validators.validate_step_interval(samples_per_step, 
+            validators.step_interval(samples_per_step, 
                                               samp_rate, 
                                               api_latency)
     
@@ -343,24 +343,24 @@ class SPECTREReceiver(BaseReceiver):
         chunk_key = capture_config["chunk_key"]
         event_handler_key = capture_config["event_handler_key"]
 
-        validators.validate_center_freq_strictly_positive(center_freq)
-        validators.validate_samp_rate_strictly_positive(samp_rate)
-        validators.validate_bandwidth_strictly_positive(bandwidth)
-        validators.validate_nyquist_criterion(samp_rate, bandwidth)
-        validators.validate_chunk_size_strictly_positive(chunk_size)
-        validators.validate_time_resolution(time_resolution, chunk_size) 
-        validators.validate_window(window_type, 
+        validators.center_freq_strictly_positive(center_freq)
+        validators.samp_rate_strictly_positive(samp_rate)
+        validators.bandwidth_strictly_positive(bandwidth)
+        validators.nyquist_criterion(samp_rate, bandwidth)
+        validators.chunk_size_strictly_positive(chunk_size)
+        validators.time_resolution(time_resolution, chunk_size) 
+        validators.window(window_type, 
                                    window_kwargs, 
                                    window_size,
                                    chunk_size,
                                    samp_rate)
-        validators.validate_STFFT_kwargs(STFFT_kwargs)
-        validators.validate_chunk_key(chunk_key, 
+        validators.STFFT_kwargs(STFFT_kwargs)
+        validators.chunk_key(chunk_key, 
                                       "fixed")
-        validators.validate_event_handler_key(event_handler_key, 
+        validators.event_handler_key(event_handler_key, 
                                               "fixed")
-        validators.validate_gain_is_negative(IF_gain)
-        validators.validate_gain_is_negative(RF_gain)
+        validators.gain_is_negative(IF_gain)
+        validators.gain_is_negative(RF_gain)
     
 
 # parent class for shared methods and attributes of SDRPlay receivers
