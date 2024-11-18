@@ -102,7 +102,7 @@ class PanelStack:
     def _assign_axes(self) -> None:
         shared_axes = {}
         for i, panel in enumerate(self.panels):
-            panel.ax = self._axs[i]
+            panel.ax = self.axs[i]
             panel.fig = self._fig
             if panel.x_axis_type in shared_axes:
                 panel.ax.sharex(shared_axes[panel.x_axis_type])
