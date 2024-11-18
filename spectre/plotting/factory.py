@@ -20,7 +20,7 @@ def get_panel(panel_name: str,
                                  f"Expected one of {valid_panels}")
     
     return Panel(panel_name,
-                    spectrogram, 
-                    time_type,
-                    *args, 
-                    **kwargs)
+                 spectrogram, 
+                 time_type,
+                 *args, 
+                 **kwargs)
