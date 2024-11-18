@@ -2,11 +2,10 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from logging import getLogger
-_LOGGER = getLogger(__name__)
-
-from datetime import datetime, timedelta
-from typing import Tuple, Optional
+from typing import Tuple
+from typing import Optional
+from datetime import timedelta
+from dataclasses import dataclass
 
 import numpy as np
 from scipy.signal import ShortTimeFFT, get_window
@@ -19,7 +18,6 @@ from spectre.chunks.base import SPECTREChunk, ChunkFile
 from spectre.exceptions import InvalidSweepMetadataError
 
 
-
 @register_chunk('sweep')
 class Chunk(SPECTREChunk):
     def __init__(self, chunk_start_time, tag):
@@ -29,162 +27,131 @@ class Chunk(SPECTREChunk):
         self.add_file(FitsChunk(self.chunk_parent_path, self.chunk_name))
         self.add_file(HdrChunk(self.chunk_parent_path, self.chunk_name))
 
-        # initialise attributes which are used by build_spectrogram and its helper methods
-        self._window: Optional[np.ndarray] = None
-        self._SFT: Optional[ShortTimeFFT] = None
-        self._num_steps_per_sweep: Optional[int] = None 
-        self._num_full_sweeps: Optional[int] = None
-        self._window_size: Optional[int] = None
-        self._samp_rate: Optional[float] = None
-        self._sweep_metadata: Optional[Tuple[np.ndarray, np.ndarray]] = None 
-        self._center_frequencies: Optional[np.ndarray] = None
-        self._num_samples: Optional[np.ndarray] = None
-        self._prep_sweep_metadata: Optional[Tuple[np.ndarray, np.ndarray]] = None
-        self._prep_center_frequencies: Optional[np.ndarray] = None
-        self._prep_num_samples: Optional[np.ndarray] = None
-        self._sweep_IQ_data: Optional[np.ndarray] = None
-        self._prep_sweep_IQ_data: Optional[np.ndarray] = None
-
 
     def build_spectrogram(self, previous_chunk: Optional[SPECTREChunk] = None) -> Spectrogram:
-        # read the (raw) swept IQ data
-        self._sweep_IQ_data = self.read_file("bin")
-        # read the millisecond correction and sweep metadata
-        millisecond_correction, self._sweep_metadata = self.read_file("hdr")
+        IQ_data = self.read_file("bin")
+        millisecond_correction, sweep_metadata = self.read_file("hdr")
 
-        # if the previous chunk is specified, it is indicating we need to reconstruct the initial sweep
         if previous_chunk:
-            self.__reconstruct_initial_sweep(previous_chunk)
-            # since we have prepended the initial sweep, we need to correct the chunk start time and millisecond correction of the spectrogram
-            # (since the prepended samples occured *before* the start of the current chunk instance)
-            chunk_start_time, millisecond_correction = self.__get_corrected_timing(millisecond_correction)
+            IQ_data, sweep_metadata, num_samples_prepended = self.__prepend_initial_sweep(previous_chunk,
+                                                                                          IQ_data,
+                                                                                          *sweep_metadata)
+            
+            chunk_start_time, millisecond_correction = self.__correct_timing(millisecond_correction,
+                                                                             num_samples_prepended)
         else:
-            # otherwise we can simply use the chunk start time for the current chunk
-            chunk_start_time = self._chunk_start_time
+            chunk_start_time = self.chunk_start_time
 
-        # unpack the sweep metadata attributes explictly 
-        (self._center_frequencies, self._num_samples) = self._sweep_metadata
-
-        # convert the millisecond correction to a microsecond correction
         microsecond_correction = millisecond_correction * 1e3
-  
-        # and (essentially) perform the STFFT on the IQ samples
-        times, frequencies, dynamic_spectra = self.__do_STFFT()
 
-        # explicit type casting
-        dynamic_spectra = np.array(dynamic_spectra, dtype='float32')
-        times = np.array(times, dtype='float32')
-        frequencies=np.array(frequencies, dtype='float32')
-
+        times, frequencies, dynamic_spectra = self.__do_STFFT(IQ_data, 
+                                                              *sweep_metadata)
+        
         return Spectrogram(dynamic_spectra,
                            times,
                            frequencies,
-                           tag=self._tag,
-                           chunk_start_time=chunk_start_time,
-                           microsecond_correction=microsecond_correction,
+                           self.tag,
+                           chunk_start_time,
+                           microsecond_correction,
                            spectrum_type="amplitude")
-
-
-    def __reconstruct_initial_sweep(self, previous_chunk: SPECTREChunk):
-        # extract the swept IQ samples, and sweep metadata for the final sweep of the previous chunk
-        # and set as attributes
-        self._prep_sweep_IQ_data, self._prep_sweep_metadata = self.__get_final_sweep_previous_chunk(previous_chunk)
-        # use these (now defined) attributes and prepend to the existing sweep data
-        self.__prepend_sweep_IQ_data()
-        self.__prepend_sweep_metadata()
-
-
-    def __get_final_sweep_previous_chunk(self, previous_chunk: SPECTREChunk) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
-        # read the entirety of the raw IQ data from the previous chunk
-        prev_sweep_IQ_data = previous_chunk.read_file("bin")
-        # read the sweep metadata from the header of the previous chunk (ignoring the millisecond correction)
-        _, (prev_center_freqs, prev_num_samples) = previous_chunk.read_file("hdr")
-        # extract the (step) index of the start step of the final sweep 
-        # [0] since center_freqs is a 1D array, [-1] since we are looking for the LAST of the smallest steps
-        final_sweep_start_step_index = np.where(prev_center_freqs == np.min(prev_center_freqs))[0][-1]
-        # use this to isolate the data corresponding to the final sweep
-        final_center_freqs = prev_center_freqs[final_sweep_start_step_index:]
+    
+    def __get_final_sweep(self,
+                          previous_chunk: SPECTREChunk) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+        # unpack the data from the previous chunk
+        prev_IQ_data = previous_chunk.read_file("bin")
+        _, (prev_center_frequencies, prev_num_samples) = previous_chunk.read_file("hdr")
+        # find the step index from the last sweep
+        # [0] since the return of np.where is a 1 element Tuple, 
+        # containing a list of step indices corresponding to the smallest center frequencies
+        # [-1] since we want the final step index, where the center frequency is minimised
+        final_sweep_start_step_index = np.where(prev_center_frequencies == np.min(prev_center_frequencies))[0][-1]
+        # isolate the final sweep
+        final_center_frequencies = prev_center_frequencies[final_sweep_start_step_index:]
         final_num_samples = prev_num_samples[final_sweep_start_step_index:]
-        final_sweep_IQ_data = prev_sweep_IQ_data[-np.sum(final_num_samples):]
+        final_sweep_IQ_data = prev_IQ_data[-np.sum(final_num_samples):]
 
         # sanity check on the number of samples in the final sweep
-        expected_num_samples = np.sum(final_num_samples)
-        actual_num_samples = len(final_sweep_IQ_data) 
-        if actual_num_samples != expected_num_samples:
-            raise ValueError(f"Unexpected error! Mismatch in sample count for the final sweep data. Expected {expected_num_samples} based on sweep metadata, but extracting {actual_num_samples} in the final sweep")
-
-        # return the data for the final sweep as required
-        return final_sweep_IQ_data, (final_center_freqs, final_num_samples)
+        if len(final_sweep_IQ_data) != np.sum(final_num_samples):
+            raise ValueError((f"Unexpected error! Mismatch in sample count for the final sweep data."
+                              f"Expected {np.sum(final_num_samples)} based on sweep metadata, but found "
+                              f" {len(final_sweep_IQ_data)} IQ samples in the final sweep"))
+        return final_sweep_IQ_data, (final_center_frequencies, final_num_samples)
 
 
-    def __prepend_sweep_IQ_data(self) -> None:
-        # simple concatenation for the IQ_data
-        self._sweep_IQ_data = np.concatenate((self._prep_sweep_IQ_data, self._sweep_IQ_data))
+    def __prepend_IQ_data(self,
+                          prev_IQ_data: np.ndarray,
+                          IQ_data: np.ndarray) -> np.ndarray:
+        """ Prepend the IQ samples from the final sweep of the previous chunk. """
+        return np.concatenate((prev_IQ_data, IQ_data))
     
 
-    def __prepend_sweep_metadata(self) -> Tuple[np.ndarray, np.ndarray]:
-        # first unpack the metadata from the final sweep of the previous chunk
-        prepend_center_frequencies, prepend_num_samples = self._prep_sweep_metadata
-        # and then that from the current chunk
-        center_frequencies, num_samples = self._sweep_metadata
-
-        # if the final step from the previous chunk has bled over to the first step current chunk
-        # then the frequency of the final step of the previous chunk is equal to the frequency of the first step in the current chunk
-        # here, we need to be careful about how we prepend the data, to avoid duplicate adjacent frequencies in the center frequency array, describing the same step.
-        if prepend_center_frequencies[-1] == center_frequencies[0]:
+    def __prepend_center_frequencies(self,
+                                     prev_center_frequencies: np.ndarray,
+                                     center_frequencies: np.ndarray,
+                                     final_sweep_spans_two_chunks: bool)-> np.ndarray:
+        """ Prepend the center frequencies from the final sweep of the previous chunk """
+        # in the case that the sweep has bled across chunks,
+        # do not permit identical neighbours in the center frequency array
+        if final_sweep_spans_two_chunks:
             # truncate the final frequency to prepend (as it already exists in the array we are appending to in this case)
-            prepend_center_frequencies = prepend_center_frequencies[:-1]
-            # ensure the number of samples from the step in the previous chunk are accounted for
-            num_samples[0] += prepend_num_samples[-1]
-            # and truncate as required
-            prepend_num_samples = prepend_num_samples[:-1]
-
-        # now perform a basic concatenation
-        center_frequencies = np.concatenate((prepend_center_frequencies, center_frequencies))
-        num_samples = np.concatenate((prepend_num_samples, num_samples))
-        # and can set the attribute, now fully prepended
-        self._sweep_metadata = (center_frequencies, num_samples)
+            prev_center_frequencies = prev_center_frequencies[:-1]
+        return np.concatenate((prev_center_frequencies, center_frequencies))
     
 
-    def __get_corrected_timing(self, millisecond_correction: int) -> Tuple[str, int]:
-        # extract the number of samples per step that we prepended for the final sweep of the previous chunk
-        _, prepend_num_samples = self._prep_sweep_metadata
-        # and compute the total number of samples that we prepended
-        total_samples_to_prepend = np.sum(prepend_num_samples)
-        # we use this to infer the exact amount of time that elapsed during collection of the prepended samples
+    def __prepend_num_samples(self,
+                              prev_num_samples: np.ndarray,
+                              num_samples: np.ndarray,
+                              final_sweep_spans_two_chunks: bool) -> np.ndarray:
+        """ Prepend the number of samles from the final sweep of the previous chunk """
+        if final_sweep_spans_two_chunks:
+            # ensure the number of samples from the final step in the previous chunk are accounted for
+            num_samples[0] += prev_num_samples[-1]
+            # and truncate as required
+            prev_num_samples = prev_num_samples[:-1]
+        return np.concatenate((prev_num_samples, num_samples))
+    
+
+    def __prepend_initial_sweep(self,
+                                previous_chunk: SPECTREChunk,
+                                IQ_data: np.ndarray,
+                                center_frequencies: np.ndarray,
+                                num_samples: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """ 
+        Prepend relevant data from the final sweep of the previous chunk. 
+        Also keep a note of the number of IQ samples we prepended (such that we can correct the timing later)
+        """
+        prev_IQ_data, (prev_center_frequencies, prev_num_samples) = self.__get_final_sweep(previous_chunk)
+        IQ_data = self.__prepend_IQ_data(prev_IQ_data,
+                                         IQ_data)
+        
+        # if the final sweep of the previous sweep has bled through to the current chunk
+        final_sweep_spans_two_chunks = prev_center_frequencies[-1] == center_frequencies[0]
+        center_frequencies = self.__prepend_center_frequencies(prev_center_frequencies,
+                                                               center_frequencies,
+                                                               final_sweep_spans_two_chunks)
+        num_samples = self.__prepend_num_samples(prev_num_samples,
+                                                 num_samples,
+                                                 final_sweep_spans_two_chunks)
+        
+        num_samples_prepended = prev_num_samples[-1]
+        return IQ_data, (center_frequencies, num_samples), num_samples_prepended
+
+
+    def __correct_timing(self,
+                         millisecond_correction: int,
+                         num_samples_prepended: int):
+        """ Correct this chunks start time based on the number of samples we prepended. """
         sampling_interval = 1 / self.capture_config.get("samp_rate")
-        elapsed_time = sampling_interval * total_samples_to_prepend
-        # subtract this from the (millisecond corrected) chunk start time for the current chunk
-        corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds=millisecond_correction) - timedelta(seconds=elapsed_time)
-        # return the chunk_start_time (i.e. formatted as a string, truncated to second precision), along with the millisecond correction in order to recover full accuracy
-        return datetime.strftime(corrected_datetime, DEFAULT_DATETIME_FORMAT), corrected_datetime.microsecond / 1e3
+        elapsed_time = num_samples_prepended * sampling_interval
+        corrected_datetime = self.chunk_start_datetime + timedelta(milliseconds = millisecond_correction) - timedelta(seconds = elapsed_time)
+        return corrected_datetime.strftime(DEFAULT_DATETIME_FORMAT), corrected_datetime.microsecond / 1e3
 
 
-    def __do_STFFT(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        # first ensure the sweep metadata for the current chunk is well-defined (specifically, that the tags were well-ordered)
-        self.__validate_center_frequencies_ordering()
-        # set the attributes used to define the swept STFFT procedure
-        self.__initialize_STFFT_params()
-        # create the stepped spectrogram
-        stepped_dynamic_spectra = self.__compute_stepped_dynamic_spectra()
-        # average totally in time the slices for each spectrogram
-        # so that now each step has been assigned a single spectrum
-        averaged_stepped_spectra = self.__average_over_steps(stepped_dynamic_spectra)
-        # create the swept dynamic spectra by assuming that each step is time coincident
-        # and stitching the spectrums for each step in a sweep into a single spectrum
-        # thus assigning one (swept) spectrum to each sweep
-        swept_dynamic_spectra = self.__stitch_steps(averaged_stepped_spectra)
-        # assign times to each of the swept spectrums
-        times = self.__compute_times()
-        frequencies = self.__compute_frequencies()
-        return times, frequencies, swept_dynamic_spectra
-
-
-    def __validate_center_frequencies_ordering(self) -> None:
-        # Extract the smallest step of each sweep
-        min_frequency = np.min(self._center_frequencies)
-        # Compute the differences between each step
-        diffs = np.diff(self._center_frequencies)
+    def __validate_center_frequencies_ordering(self,
+                                               center_frequencies) -> None:
+        """ Check that the center frequencies are well-ordered in the detached header. """
+        min_frequency = np.min(center_frequencies)
+        diffs = np.diff(center_frequencies)
         # Extract the expected difference between each step within a sweep. 
         # By default, if the "freq_step" key in the capture config is undefined, we assume the frequency step is equal to the sampling rate
         # This is a hard-coded workaround since the tagged-staircase block is currently hard-coded to jump in (modelled) frequency by 
@@ -193,146 +160,209 @@ class Chunk(SPECTREChunk):
         # Validate frequency steps
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
-            if (diff != freq_step) and (self._center_frequencies[i + 1] != min_frequency):
+            if (diff != freq_step) and (center_frequencies[i + 1] != min_frequency):
                 raise InvalidSweepMetadataError(f"Unordered center frequencies detected")
+    
 
-
-    def __initialize_STFFT_params(self):
+    def __get_SFT(self) -> ShortTimeFFT:
         window_type = self.capture_config.get("window_type")
         window_params = self.capture_config.get("window_kwargs").values()
-        self._window_size = self.capture_config.get("window_size")
-        self._window = get_window((window_type, 
-                                  *window_params), 
-                                  self._window_size)
-        self._samp_rate = self.capture_config.get("samp_rate")
-        self._SFT = ShortTimeFFT(self._window, fs=self._samp_rate, fft_mode="centered", **self.capture_config.get("STFFT_kwargs"))
-        self._num_steps_per_sweep = self.__compute_num_steps_per_sweep()
-        self._num_full_sweeps = self.__compute_num_full_sweeps()
-        self._num_max_slices_in_step = self.__compute_num_max_slices_in_step()
+        window_size = self.capture_config.get("window_size")
+        window = get_window((window_type, 
+                             *window_params), 
+                             window_size)
+        samp_rate = self.capture_config.get("samp_rate")
+        return ShortTimeFFT(window, 
+                            fs=samp_rate, 
+                            fft_mode="centered", 
+                            **self.capture_config.get("STFFT_kwargs"))
+    
 
-
-    def __compute_num_steps_per_sweep(self) -> int:
-        # we expect that the number of steps within each full sweep is consistent
-        # so, we find the (step) indices corresponding to the minimum frequencies
-        min_freq_indices = np.where(self._center_frequencies == np.min(self._center_frequencies))[0]
+    def __compute_num_steps_per_sweep(self,
+                                      center_frequencies: np.ndarray) -> int:
+        """ Compute the (ensured constant) number of steps in each sweep. """
+        # find the (step) indices corresponding to the minimum frequencies
+        min_freq_indices = np.where(center_frequencies == np.min(center_frequencies))[0]
         # then, we evaluate the number of steps that has occured between them via np.diff over the indices
         unique_num_steps_per_sweep = np.unique(np.diff(min_freq_indices))
         # we expect that the difference is always the same, so that the result of np.unique has a single element
         if len(unique_num_steps_per_sweep) != 1:
-            raise InvalidSweepMetadataError("Irregular step count per sweep, expected a consistent number of steps per sweep")
-        # finally, we return the ensured unique element
+            raise InvalidSweepMetadataError(("Irregular step count per sweep, "
+                                             "expected a consistent number of steps per sweep"))
         return int(unique_num_steps_per_sweep[0])
+    
+
+    def __compute_num_full_sweeps(self,
+                                  center_frequencies: np.ndarray) -> int:
+        """
+        Since the number of each samples in each step is variable, we only know a sweep is complete
+        when there is a sweep after it. So we can define the total number of *full* sweeps as the number of 
+        (freq_max, freq_min) pairs in center_frequencies. It is only at an instance of (freq_max, freq_min) pair 
+        in center frequencies that the frequency decreases, so, we can compute the number of full sweeps by 
+        counting the numbers of negative values in np.diff(center_frequencies)
+        """
+        return len(np.where(np.diff(center_frequencies) < 0)[0])
 
 
-    def __compute_num_full_sweeps(self) -> int:
-        # Since the number of each samples in each step is variable, we only know a sweep is complete
-        # when there is a sweep after it. So we can define the total number of *full* sweeps as the number of 
-        # (freq_max, freq_min) pairs in center_frequencies. It is only at an instance of (freq_max, freq_min) pair 
-        # in center frequencies that the frequency decreases, so, we can compute the number of full sweeps by 
-        # counting the numbers of negative values in np.diff(center_frequencies)
-        return len(np.where(np.diff(self._center_frequencies) < 0)[0])
+    def __compute_num_max_slices_in_step(self,
+                                         SFT: ShortTimeFFT,
+                                         num_samples: np.ndarray) -> int:
+        '''
+        Use scipy's SFT to compute the max number of slices in all steps
+        effectively, we compute the number of slices in the largest step 
+        based on the window we defined on the capture config.
 
+        This value will be used to pad the stepped spectrogram array.
+        '''
+        return SFT.upper_border_begin(np.max(num_samples))[1]
 
-    def __compute_num_max_slices_in_step(self) -> int:
-        # use scipy's SFT to compute the max number of slices in all steps
-        # effectively, we compute the number of slices in the largest step based on the window we defined on the capture config
-        return self._SFT.upper_border_begin(np.max(self._num_samples))[1]
-
-
-    def __compute_stepped_dynamic_spectra(self) -> np.ndarray:
-        # prime an array to hold the stepped dynamic spectra
-        stepped_dynamic_spectra_shape = (self._num_full_sweeps, self._num_steps_per_sweep, self._window_size, self._num_max_slices_in_step)
-        stepped_dynamic_spectra = np.full(stepped_dynamic_spectra_shape, np.nan)
-
+    def __fill_stepped_dynamic_spectra(self,
+                                       stepped_dynamic_spectra: np.ndarray,
+                                       IQ_data: np.ndarray,
+                                       num_samples: np.ndarray,
+                                       num_full_sweeps: int,
+                                       num_steps_per_sweep: int,
+                                       SFT: ShortTimeFFT) -> None:
         # global_step_index will hold the step index over all sweeps (doesn't reset each sweep)
         # start_sample_index will hold the index of the first sample in the step
         global_step_index, start_sample_index = 0, 0
-        for sweep_index in range(self._num_full_sweeps):
-            for step_index in range(self._num_steps_per_sweep):
+        for sweep_index in range(num_full_sweeps):
+            for step_index in range(num_steps_per_sweep):
                 # extract how many samples are in the current step from the metadata
-                end_sample_index = start_sample_index + self._num_samples[global_step_index]
+                end_sample_index = start_sample_index + num_samples[global_step_index]
                 # compute the number of slices in the current step based on the window we defined on the capture config
-                num_slices = self._SFT.upper_border_begin(self._num_samples[global_step_index])[1]
+                num_slices = SFT.upper_border_begin(num_samples[global_step_index])[1]
                 # perform a short time fast fourier transform on the step
-                complex_spectra = self._SFT.stft(self._sweep_IQ_data[start_sample_index:end_sample_index], p0=0, p1=num_slices)
+                complex_spectra = SFT.stft(IQ_data[start_sample_index:end_sample_index], p0=0, p1=num_slices)
                 # and pack the absolute values into the stepped spectrogram where the step slot is padded to the maximum size for ease of processing later)
                 stepped_dynamic_spectra[sweep_index, step_index, :, :num_slices] = np.abs(complex_spectra)
                 # reassign the start_sample_index for the next step
                 start_sample_index = end_sample_index
                 # and increment the global step index
                 global_step_index += 1
-        return stepped_dynamic_spectra
-
-    def __average_over_steps(self, stepped_spectra: np.ndarray) -> np.ndarray:
-        # average the spectrums in each step totally in time to assign one spectrum per step
-        return np.nanmean(stepped_spectra[..., 1:], axis=-1)
-
-
-    def __compute_times(self) -> np.ndarray:
-        """ we assign (by convention) the time of the midpoint sample in each sweep, to the swept spectrum for that sweep"""
-        # initialise an (ordered) array to hold the sample indices we will assign to each swept spectrum
-        assigned_sample_indices = []
-        # initialise a variable which will hold the cumulative samples in all previous sweeps
-        # since naturally we haven't started yet at this point in the code, it's now zero!
-        cumulative_samples = 0
-        # iterate through each sweep
-        for sweep_index in range(self._num_full_sweeps):
-            # find the step index for the min step in the sweep
-            start_step = sweep_index * self._num_steps_per_sweep
-            # find the step index for the max step in the sweep
-            end_step = (sweep_index + 1) * self._num_steps_per_sweep
-            # assign (by convention) the midpoint sample in that sweep to the swept spectrum
-            midpoint_sample = cumulative_samples + np.sum(self._num_samples[start_step:end_step]) // 2
-            # append the midpoint sample as the assigned sample for the current sweep
-            assigned_sample_indices.append(midpoint_sample)
-            # add to the cumulative samples how many samples there were in the current sweep we just processed
-            cumulative_samples += np.sum(self._num_samples[start_step:end_step])
         
-        # convert the sample indices to seconds by using the sampling interval (the assumed time elapsed between samples)
-        return np.array(assigned_sample_indices) * (1 / self._samp_rate)
 
-
-    def __compute_frequencies(self) -> np.ndarray:
-        # prime an empty array to hold the stitched frequency array
-        frequencies = np.empty(self._num_steps_per_sweep * self._window_size)
-        # the steps cover identical frequencies in each sweep, regardless of which sweep
-        # so we iterate over the frequency associated with each step,
-        # and use this to map each spectral component in the swept spectrogram to it's corresponding physical frequency
-        for i, freq in enumerate(np.unique(self._center_frequencies)):
-            # populate the (stitched) frequency array with the physical frequency range covered by the current step
-            lower_bound = i * self._window_size
-            upper_bound = (i + 1) * self._window_size
-            frequencies[lower_bound:upper_bound] = (self._SFT.f + freq)
-        # return the stitched frequency array
-        return frequencies
+    def __fill_frequencies(self,
+                           frequencies: np.ndarray,
+                           center_frequencies: np.ndarray,
+                           base_band_frequencies: np.ndarray,
+                           window_size: int) -> None:
+        '''
+        The steps cover identical baseband frequencies. So, we use the center frequencies 
+        array to assign a physical frequency to each spectral component.
+        '''
+        for i, center_frequency in enumerate(np.unique(center_frequencies)):
+            lower_bound = i * window_size
+            upper_bound = (i + 1) * window_size
+            frequencies[lower_bound:upper_bound] = (base_band_frequencies + center_frequency)
     
 
-    def __stitch_steps(self, averaged_spectra: np.ndarray) -> np.ndarray:
-        # numpy magic to stitch together the steps (and assume time coincidence of the spectrums assigned to each step within a sweep)
-        return averaged_spectra.reshape((self._num_full_sweeps, -1)).T
+    def __fill_times(self,
+                     times: np.ndarray,
+                     num_samples: np.ndarray,
+                     num_full_sweeps: int,
+                     num_steps_per_sweep: int) -> None:
+        """ we assign (by convention) the time of the midpoint sample in each sweep, to the swept spectrum for that sweep"""
 
+        sampling_interval = 1 / self.capture_config.get("samp_rate")
+        cumulative_samples = 0
+        for sweep_index in range(num_full_sweeps):
+            # find the total number of samples across the sweep
+            start_step = sweep_index * num_steps_per_sweep
+            end_step = (sweep_index + 1) * num_steps_per_sweep
+            num_samples_in_sweep = np.sum(num_samples[start_step:end_step])
+            
+            # compute the midpoint sample in the sweep
+            midpoint_sample = cumulative_samples + num_samples_in_sweep // 2
+
+            # update cumulative samples
+            cumulative_samples += num_samples_in_sweep
+
+            # assign a physical time to the spectrum for this sweep
+            times[sweep_index] = midpoint_sample * sampling_interval
+    
+    
+    def __average_over_steps(self, 
+                             stepped_dynamic_spectra: np.ndarray) -> None:
+        ''' Average the spectrums in each step totally in time to assign one spectrum per step '''
+        return np.nanmean(stepped_dynamic_spectra[..., 1:], axis=-1)
+    
+
+    def __stitch_steps(self,
+                       stepped_dynamic_spectra: np.ndarray,
+                       num_full_sweeps: int) -> np.ndarray:
+        return stepped_dynamic_spectra.reshape((num_full_sweeps, -1)).T
+    
+
+    def __do_STFFT(self,
+                   IQ_data: np.ndarray,
+                   center_frequencies: np.ndarray,
+                   num_samples: np.ndarray):
+        self.__validate_center_frequencies_ordering(center_frequencies)
+
+        SFT = self.__get_SFT()
+        window_size = len(SFT.win)
+
+        num_steps_per_sweep = self.__compute_num_steps_per_sweep(center_frequencies)
+        num_full_sweeps = self.__compute_num_full_sweeps(center_frequencies)
+        num_max_slices_in_step = self.__compute_num_max_slices_in_step(SFT,
+                                                                       num_samples)
+        
+        stepped_dynamic_spectra_shape = (num_full_sweeps, 
+                                         num_steps_per_sweep, 
+                                         window_size, 
+                                         num_max_slices_in_step)
+        stepped_dynamic_spectra = np.full(stepped_dynamic_spectra_shape, np.nan)
+
+        
+        frequencies = np.empty(num_steps_per_sweep * window_size)
+        times = np.empty(num_full_sweeps)
+
+        self.__fill_stepped_dynamic_spectra(stepped_dynamic_spectra,
+                                            IQ_data,
+                                            num_samples,
+                                            num_full_sweeps,
+                                            num_steps_per_sweep,
+                                            SFT)
+        
+        self.__fill_frequencies(frequencies,
+                                center_frequencies,
+                                SFT.f,
+                                window_size)
+        
+        self.__fill_times(times,
+                          num_samples,
+                          num_full_sweeps,
+                          num_steps_per_sweep)
+
+        averaged_spectra = self.__average_over_steps(stepped_dynamic_spectra)
+        dynamic_spectra = self.__stitch_steps(averaged_spectra,
+                                              num_full_sweeps)
+
+        return times, frequencies, dynamic_spectra
+    
 
 class HdrChunk(ChunkFile):
     def __init__(self, chunk_parent_path: str, chunk_name: str):
         super().__init__(chunk_parent_path, chunk_name, "hdr")
 
     def read(self) -> Tuple[int, np.ndarray, np.ndarray]:
-        hdr_contents = self.read_file_contents()
+        hdr_contents = self._read_file_contents()
         millisecond_correction = self._get_millisecond_correction(hdr_contents)
         center_frequencies = self._get_center_frequencies(hdr_contents)
         num_samples = self._get_num_samples(hdr_contents)
-        self._validate_frequencies_and_samples(center_frequencies, num_samples)
+        self._validate_frequencies_and_samples(center_frequencies, 
+                                               num_samples)
         return millisecond_correction, (center_frequencies, num_samples)
         
 
-    def read_file_contents(self) -> np.ndarray:
-        # Reads the contents of the .hdr file into a numpy array
+    def _read_file_contents(self) -> np.ndarray:
         with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
 
 
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
-        # Extracts and returns the millisecond correction from the file contents 
+        ''' Millisecond correction is an integral quantity, but stored in the detached header as a 32-bit float.'''
         millisecond_correction_as_float = float(hdr_contents[0])
 
         if not millisecond_correction_as_float.is_integer():
@@ -342,12 +372,20 @@ class HdrChunk(ChunkFile):
 
 
     def _get_center_frequencies(self, hdr_contents: np.ndarray) -> np.ndarray:
-        # Extracts center frequencies from the file contents
+        ''' 
+        Detached header contents are stored in (center_freq_i, num_samples_at_center_freq_i) pairs
+        Return only a list of center frequencies, by skipping over file contents in twos.
+        '''
         return hdr_contents[1::2]
 
 
     def _get_num_samples(self, hdr_contents: np.ndarray) -> np.ndarray:
-        # Extracts the number of samples per frequency from the file contents
+        ''' 
+        Detached header contents are stored in (center_freq_i, num_samples_at_center_freq_i) pairs
+        Return only the number of samples at each center frequency, by skipping over file contents in twos.
+        Number of samples is an integral quantity, but stored in the detached header as a 32-bit float.
+        Types are checked before return.
+        '''
         num_samples_as_float = hdr_contents[2::2]
         if not all(num_samples_as_float == num_samples_as_float.astype(int)):
             raise InvalidSweepMetadataError("Number of samples per frequency is expected to describe an integer")
