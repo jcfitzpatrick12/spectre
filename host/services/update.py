@@ -17,14 +17,14 @@ from spectre.file_handlers.json import (
 )
 
 def _has_chunks(tag: str) -> bool:
-    """ Returns true if any files exist under the input tag. """
+    """Returns true if any files exist under the input tag. """
     chunks = Chunks(tag)
     return len(chunks.chunk_list)
 
 
 def _caution_update(tag: str,
                     force: bool) -> None:
-    """ """
+    """"""
     if _has_chunks(tag):
         if force:
             _LOGGER.warning(f"Chunks exist under the tag {tag}, forcing update")
