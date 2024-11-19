@@ -130,6 +130,7 @@ class SPECTREChunk(BaseChunk):
 
     @abstractmethod
     def build_spectrogram(self) -> Spectrogram:
+        """Create a spectrogram object derived from chunk files for this chunk."""
         pass
 
 

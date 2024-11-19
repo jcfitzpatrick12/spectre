@@ -29,7 +29,7 @@ class Chunk(SPECTREChunk):
 
 
     def build_spectrogram(self) -> Spectrogram:
-
+        """Create a spectrogram by performing a Short Time FFT on the IQ samples for this chunk."""
         IQ_data = self.read_file("bin")
         millisecond_correction = self.read_file("hdr")
 
@@ -54,9 +54,7 @@ class Chunk(SPECTREChunk):
 
     def __do_STFFT(self, 
                    IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        '''
-        For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
-        '''
+        """For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html"""
 
         # set p0=0, since by convention in the STFFT docs, p=0 corresponds to the slice centred at t=0
         p0=0
