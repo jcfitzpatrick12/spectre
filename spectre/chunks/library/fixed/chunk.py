@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from typing import Tuple
 import numpy as np
 
-from scipy.signal import ShortTimeFFT, get_window
 from astropy.io import fits
 from astropy.io.fits.hdu.image import PrimaryHDU
 from astropy.io.fits.hdu.table import BinTableHDU
@@ -30,19 +29,16 @@ class Chunk(SPECTREChunk):
 
 
     def build_spectrogram(self) -> Spectrogram:
-        # fetch the raw IQ sample receiver output from the binary file
+        """Create a spectrogram by performing a Short Time FFT on the IQ samples for this chunk."""
         IQ_data = self.read_file("bin")
-        # and the millisecond correction from the accompanying header file
         millisecond_correction = self.read_file("hdr")
-        # convert the millisecond correction to microseconds (for Python datetime support)
-        microsecond_correction = millisecond_correction * 1000
 
+        # units conversion
+        microsecond_correction = millisecond_correction * 1e3
 
-        # do the short time fft
         times, frequencies, dynamic_spectra = self.__do_STFFT(IQ_data)
 
-
-        # convert all arrays to the standard type
+        # explicitly type cast data arrays to 32-bit floats
         times = np.array(times, dtype = 'float32')
         frequencies = np.array(frequencies, dtype = 'float32')
         dynamic_spectra = np.array(dynamic_spectra, dtype = 'float32')
@@ -53,53 +49,36 @@ class Chunk(SPECTREChunk):
                            self.tag, 
                            chunk_start_time = self.chunk_start_time, 
                            microsecond_correction = microsecond_correction,
-                           spectrum_type="amplitude")
+                           spectrum_type = "amplitude")
 
-    
-    def __fetch_window(self) -> np.ndarray:
-        # fetch the window params and get the appropriate window
-        window_type = self.capture_config.get('window_type')
-        window_kwargs = self.capture_config.get('window_kwargs')
-        ## note the implementation ignores the keys by necessity, due to the scipy implementation of get_window
-        window_params = (window_type, *window_kwargs.values())
-        window_size = self.capture_config.get('window_size')
-        return get_window(window_params, window_size)
 
-    
-
-    def __do_STFFT(self, IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        '''
-        For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html
-        '''
-        # fetch the window
-        w = self.__fetch_window()
-        # find the number of samples 
-        num_samples = len(IQ_data)
-        # fetch the sample rate
-        samp_rate = self.capture_config.get('samp_rate')
-        # fetch the STFFT kwargs
-        STFFT_kwargs = self.capture_config.get('STFFT_kwargs')
-
-        # perform the short time FFT (specifying explicately keywords centered)
-        SFT = ShortTimeFFT(w, fs=samp_rate, fft_mode='centered', **STFFT_kwargs)
+    def __do_STFFT(self, 
+                   IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html"""
 
         # set p0=0, since by convention in the STFFT docs, p=0 corresponds to the slice centred at t=0
         p0=0
-        # set p1=p_ub, the index of the first slice where the "midpoint" of the window is still inside the signal
-        p_ub = SFT.upper_border_begin(num_samples)[1]
-        p1=p_ub
+
+        # set p1 to the index of the first slice where the "midpoint" of the window is still inside the signal
+        num_samples = len(IQ_data)
+        p1 = self.SFT.upper_border_begin(num_samples)[1]
         
-        signal_spectra = SFT.stft(IQ_data, p0=p0, p1=p1)  # perform the STFT (no scaling)
-        # take the magnitude of the output
-        dynamic_spectra = np.abs(signal_spectra)
+        # compute a ShortTimeFFT on the IQ samples
+        complex_spectra = self.SFT.stft(IQ_data, 
+                                        p0 = p0, 
+                                        p1 = p1) 
+        
+        # compute the magnitude of each spectral component
+        dynamic_spectra = np.abs(complex_spectra)
 
-        # build the time array
-        times = SFT.t(num_samples, p0=0, p1=p1)
 
-        # fetch the center_freq (if not specified, defaults to zero)
-        center_freq = self.capture_config.get('center_freq', 0)
-        # build the frequency array
-        frequencies = SFT.f + center_freq # Hz
+        # assign a physical time to each spectrum
+        times = self.SFT.t(num_samples, 
+                           p0 = 0, 
+                           p1 = p1)
+
+        # assign physical frequencies to each spectral component
+        frequencies = self.SFT.f + self.capture_config.get('center_freq') 
 
         return times, frequencies, dynamic_spectra
 
@@ -125,17 +104,14 @@ class HdrChunk(ChunkFile):
 
 
     def _extract_contents(self) -> np.ndarray:
-        # Reads the contents of the .hdr file into a NumPy array 
         with open(self.file_path, "rb") as fh:
             return np.fromfile(fh, dtype=np.float32)
 
 
     def _get_millisecond_correction(self, hdr_contents: np.ndarray) -> int:
-        # Validates that the header file contains exactly one element 
         if len(hdr_contents) != 1:
             raise ValueError(f"Expected exactly one integer in the header, but received header contents: {hdr_contents}")
         
-        # Extracts and returns the millisecond correction from the file contents 
         millisecond_correction_as_float = float(hdr_contents[0])
 
         if not millisecond_correction_as_float.is_integer():

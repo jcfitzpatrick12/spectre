@@ -123,7 +123,7 @@ class Chunks:
         yield from self.chunk_list
 
 
-    def get_chunk_by_chunk_start_time(self, 
+    def _get_chunk_by_chunk_start_time(self, 
                                       chunk_start_time: str) -> BaseChunk:
         try:
             return self.chunk_map[chunk_start_time]
@@ -131,13 +131,20 @@ class Chunks:
             raise ChunkNotFoundError(f"Chunk with chunk start time {chunk_start_time} could not be found within {self.chunks_dir_path}")
 
 
-    def get_chunk_by_index(self, 
+    def _get_chunk_by_index(self, 
                            chunk_index: int) -> BaseChunk:
         num_chunks = len(self.chunk_map)
         if num_chunks == 0:
             raise ChunkNotFoundError("No chunks are available")
         index = chunk_index % num_chunks  # Use modulo to make the index wrap around. Allows the user to iterate over all the chunks via index cyclically.
         return self.chunk_list[index]
+
+
+    def __getitem__(self, subscript: str | int):
+        if isinstance(subscript, str):
+            return self._get_chunk_by_chunk_start_time(subscript)
+        elif isinstance(subscript, int):
+            return self._get_chunk_by_index(subscript)
 
 
     def get_index_by_chunk(self, 
@@ -178,7 +185,7 @@ class Chunks:
             # this assumes that the chunks are non-overlapping (reasonable assumption)
             lower_bound = chunk.chunk_start_datetime
             if i < num_fits_chunks:
-                next_chunk = self.get_chunk_by_index(i + 1)
+                next_chunk = self[i + 1]
                 upper_bound = next_chunk.chunk_start_datetime
             # if there is no "next chunk" then we do have to read the file
             else:

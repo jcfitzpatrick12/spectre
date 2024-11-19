@@ -52,7 +52,7 @@ class BasePanel(ABC):
 
     @abstractmethod
     def _set_x_axis_type(self):
-        """ Required to allow for axes sharing in the stack"""
+        """Required to allow for axes sharing in the stack"""
         pass
 
 
