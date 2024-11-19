@@ -9,7 +9,7 @@ from spectre.plotting.panel_stack import PanelStack
 def get_spectrogram(tag: str,
                     start_time: str, 
                     end_time: str):
-    """ Read fits files and return the corresponding spectrogram """
+    """Read fits files and return the corresponding spectrogram """
     chunks = Chunks(tag)
     return chunks.get_spectrogram_from_range(start_time, end_time)
 
