@@ -217,9 +217,6 @@ class BaseReceiver(ABC):
 # optional parent class which provides default templates and validators
 class SPECTREReceiver(BaseReceiver):
     def __init__(self, *args, **kwargs):
-        # make default templates available in _set_templates method
-        # by defining them before the parent constructor is called
-        self._default_type_templates: dict[str, dict[str, Any]] = None
         self.__set_default_type_templates()
         super().__init__(*args, **kwargs)
     
@@ -274,7 +271,7 @@ class SPECTREReceiver(BaseReceiver):
     def _get_default_type_template(self, 
                                    mode: str) -> dict:
         default_type_template = self.default_type_templates[mode]
-        if default_type_template:
+        if default_type_template is None:
             raise TemplateNotFoundError(f"No default template found for the mode {mode}")
         return default_type_template
     
