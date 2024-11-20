@@ -18,6 +18,7 @@ class Panel(BaseSpectrumPanel, CutsPanel):
     def __init__(self, 
                  name: str,
                  spectrogram: Spectrogram, 
+                 time_type: str = "seconds",
                  *times: list[float | str],
                  dBb: bool = False,
                  peak_normalise: bool = False,
