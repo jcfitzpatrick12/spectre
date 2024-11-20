@@ -272,11 +272,14 @@ class Spectrogram:
                                               enforce_strict_bounds = True)
             time_of_cut = self.datetimes[index_of_cut]  
 
-        if isinstance(at_time, float):
+        elif isinstance(at_time, (float, int)):
             index_of_cut = find_closest_index(at_time, 
                                               self._times, 
                                               enforce_strict_bounds = True)
             time_of_cut = self.times[index_of_cut]
+        
+        else:
+            raise ValueError(f"Type of at_time is unsupported: {type(at_time)}")
         
         if dBb:
             ds = self.dynamic_spectra_as_dBb

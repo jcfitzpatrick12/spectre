@@ -116,7 +116,7 @@ def _start_watcher(tags: List[str],
 
 
 def _get_user_root_logger_state() -> Tuple[bool, int]:
-    """ Get the state of the users root logger """
+    """Get the state of the users root logger """
     user_root_logger = getLogger() # no name implies returning of the root logger
     if user_root_logger.handlers:
         is_logging = True

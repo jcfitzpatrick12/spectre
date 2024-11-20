@@ -24,7 +24,10 @@ class Panel(BaseSpectrumPanel, CutsPanel):
                  peak_normalise: bool = False,
                  cmap: str = DEFAULT_FORMATS.cuts_cmap,
                  **kwargs):
-        super().__init__(name, spectrogram, **kwargs)
+        super().__init__(name, 
+                         spectrogram, 
+                         time_type, 
+                         **kwargs)
         self._times = times
         self._cmap = cmap
         self._dBb = dBb
