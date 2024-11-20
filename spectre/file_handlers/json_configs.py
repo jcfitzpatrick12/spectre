@@ -6,7 +6,7 @@ from typing import Any, Optional, Type
 from abc import ABC
 import ast
 
-from file_handlers.json import JsonHandler
+from spectre.file_handlers.json import JsonHandler
 from spectre.cfg import JSON_CONFIGS_DIR_PATH
 from spectre.exceptions import (
     InvalidTagError,
