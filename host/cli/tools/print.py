@@ -44,7 +44,7 @@ def fits_config_type_template(
 
 
 @app.command()
-def capture_config_template(
+def type_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
     mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
     as_command: bool = typer.Option(False, "--as-command", help=AS_COMMAND_HELP),
