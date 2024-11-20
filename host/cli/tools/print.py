@@ -30,15 +30,15 @@ def log(
 
 
 @app.command()
-def fits_config_template(
+def fits_config_type_template(
     tag: str = typer.Option(None, "--tag", "-t", help=TAG_HELP),
     as_command: bool = typer.Option(False, "--as-command", help=AS_COMMAND_HELP)
 ) -> None:
-    template = get.fits_config_template(tag, as_command)
+    type_template = get.fits_config_type_template(tag, as_command)
     if as_command:
-        typer.secho(template)
+        typer.secho(type_template)
     else:
-        for k,v in template.items():
+        for k,v in type_template.items():
             typer.secho(f"{k}: {v.__name__}")
     typer.Exit()
 
@@ -50,11 +50,14 @@ def capture_config_template(
     as_command: bool = typer.Option(False, "--as-command", help=AS_COMMAND_HELP),
     tag: str = typer.Option(None, "--tag", "-t", help=TAG_HELP)
 ) -> None: 
-    template = get.capture_config_template(receiver_name, mode, as_command, tag)
+    type_template = get.type_template(receiver_name, 
+                                 mode, 
+                                 as_command, 
+                                 tag)
     if as_command:
-        typer.secho(template)
+        typer.secho(type_template)
     else:
-        for k,v in template.items():
+        for k,v in type_template.items():
             typer.secho(f"{k}: {v.__name__}")
     typer.Exit()
 
