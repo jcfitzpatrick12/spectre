@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import numpy as np
 from astropy.io import fits
 
-from spectre.file_handlers.json import FitsConfigHandler
+from spectre.file_handlers.json_configs import FitsConfigHandler
 from spectre.cfg import DEFAULT_DATETIME_FORMAT, get_chunks_dir_path
 from spectre.spectrograms.array_operations import (
     find_closest_index,

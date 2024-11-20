@@ -11,20 +11,22 @@ from spectre.receivers.factory import get_receiver
 from spectre.chunks import Chunks
 from spectre.logging import log_service_call
 from spectre.exceptions import ChunkExistsError
-from spectre.file_handlers.json import (
+from spectre.file_handlers.json_configs import (
     FitsConfigHandler,
-    CaptureConfigHandler
+    CaptureConfigHandler,
+    type_cast_params,
+    validate_against_type_template
 )
 
 def _has_chunks(tag: str) -> bool:
-    """Returns true if any files exist under the input tag. """
+    """Returns True if any files exist under the input tag."""
     chunks = Chunks(tag)
-    return len(chunks.chunk_list)
+    return (len(chunks.chunk_list) > 0)
 
 
 def _caution_update(tag: str,
                     force: bool) -> None:
-    """"""
+    """Caution the user if chunks exist under the input tag."""
     if _has_chunks(tag):
         if force:
             _LOGGER.warning(f"Chunks exist under the tag {tag}, forcing update")
@@ -44,26 +46,22 @@ def capture_config(tag: str,
                    force: bool = False,
 ) -> None: 
     _caution_update(tag, force)
-    # extract the current capture config saved (which will be type cast!)
+
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
 
-    # find the receiver and the mode of the capture config
     receiver_name = capture_config.get("receiver")
     mode = capture_config.get("mode")
-
-    # and use them to instantiate a receiver
     receiver = get_receiver(receiver_name, mode)
-    # fetch the corresponding template so we can type cast the params list
-    # convert the params to update (passed in via --param arguments) into a string valued dict
-    d = capture_config_handler.type_cast_params(params, 
-                                                receiver.template, 
-                                                validate_against_template=False, # don't validate against the template
-                                                ignore_keys=['receiver', 'mode', 'tag'])
-    # update the key values as per the params dict
+
+    d = type_cast_params(params, 
+                         receiver.type_template)
     capture_config.update(d)
-    # save the updated capture config
-    receiver.save_capture_config(tag, capture_config, doublecheck_overwrite=False)
+
+    receiver.save_capture_config(capture_config, 
+                                 tag, 
+                                 doublecheck_overwrite=False)
+
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated")
 
 
@@ -75,10 +73,14 @@ def fits_config(tag: str,
     _caution_update(tag, force)
     fits_config_handler = FitsConfigHandler(tag)
     fits_config = fits_config_handler.read()
-    d = fits_config_handler.type_cast_params(params,
-                                             fits_config_handler.template,
-                                             validate_against_template=False)
+
+    d = type_cast_params(params,
+                         fits_config_handler.template)
     fits_config.update(d)
-    fits_config_handler.validate_against_template(fits_config, fits_config_handler.template)
-    fits_config_handler.save(fits_config, doublecheck_overwrite=False)
+    
+    validate_against_type_template(fits_config, fits_config_handler.template)
+
+    fits_config_handler.save(fits_config, 
+                             doublecheck_overwrite = False)
+
     _LOGGER.info(f"Fits config for tag: {tag} has been successfully updated")

@@ -4,7 +4,7 @@
 
 from spectre.watchdog.event_handler_register import event_handler_map
 from spectre.watchdog.base import BaseEventHandler
-from spectre.file_handlers.json import CaptureConfigHandler
+from spectre.file_handlers.json_configs import CaptureConfigHandler
 from spectre.exceptions import EventHandlerNotFoundError
 
 def get_event_handler(event_handler_key: str) -> BaseEventHandler:

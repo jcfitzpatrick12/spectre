@@ -31,8 +31,8 @@ class Receiver(SPECTREReceiver):
         }
     
 
-    def _set_templates(self) -> None:
-        self._templates = {
+    def _set_type_templates(self) -> None:
+        self._type_templates = {
             "cosine-signal-1": {
                 'samp_rate': int, # [Hz]
                 'frequency': float, # [Hz]

@@ -23,7 +23,7 @@ from spectre.logging import (
     LogHandler,
     log_service_call
 )
-from spectre.file_handlers.json import (
+from spectre.file_handlers.json_configs import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
