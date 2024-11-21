@@ -78,7 +78,7 @@ class Chunk(SPECTREChunk):
                            p1 = p1)
 
         # assign physical frequencies to each spectral component
-        frequencies = self.SFT.f + self.capture_config.get('center_freq') 
+        frequencies = self.SFT.f + self.capture_config.get('center_freq', 0.0) 
 
         return times, frequencies, dynamic_spectra
 
