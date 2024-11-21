@@ -125,7 +125,7 @@ class BaseReceiver(ABC):
 
     @property
     def type_template(self) -> dict[str, Any]:
-        return self.type_template[self.mode]
+        return self._type_templates[self.mode]
     
 
     def get_specification(self, 
