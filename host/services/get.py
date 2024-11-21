@@ -163,14 +163,14 @@ def log_handler(pid: Optional[str] = None,
 def fits_config_type_template(tag: Optional[str] = None,
                               as_command: bool = False
 ) -> dict[str, Any] | str:
+    fits_config_handler = FitsConfigHandler(tag)
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
-        fits_config_handler = FitsConfigHandler(tag)
         return fits_config_handler.get_create_fits_config_cmd(tag, 
                                                               as_string = True)
     else:
-        return FitsConfigHandler.type_template
+        return fits_config_handler.type_template
 
 
 @log_service_call(_LOGGER)
