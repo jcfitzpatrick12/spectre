@@ -50,7 +50,7 @@ def _convert_to_bool(v: str) -> bool:
     raise ValueError(f'Cannot convert {v} to bool.')
     
 
-def convert_string_to_type(value: str, 
+def _convert_string_to_type(value: str, 
                            target_type: Type) -> Any:
     """Cast a string as the target type."""
     if target_type == bool:
@@ -69,7 +69,7 @@ def _type_cast_string_dict(d: dict[str, str],
         if target_type is None:
             raise KeyError(f'Key "{key}" not found in type template. Expected keys: {list(type_template.keys())}')
         try:
-            casted_d[key] = convert_string_to_type(value, target_type)
+            casted_d[key] = _convert_string_to_type(value, target_type)
         except ValueError:
             raise ValueError(f'Failed to convert key "{key}" with value "{value}" to {target_type.__name__}.')
     return casted_d
