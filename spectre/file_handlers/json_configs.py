@@ -172,25 +172,23 @@ class SPECTREConfigHandler(JsonHandler, ABC):
 
 
 class FitsConfigHandler(SPECTREConfigHandler):
+
+    type_template = {
+        "ORIGIN": str,
+        "TELESCOP": str,
+        "INSTRUME": str,
+        "OBJECT": str,
+        "OBS_LAT": float,
+        "OBS_LONG": float,
+        "OBS_ALT": float
+    }
+
     def __init__(self, 
                  tag: str, 
                  **kwargs):
         super().__init__(tag, 
                          "fits", 
                          **kwargs)
-
-    @property
-    def type_template(self) -> dict[str, Any]:
-        return {
-            "ORIGIN": str,
-            "TELESCOP": str,
-            "INSTRUME": str,
-            "OBJECT": str,
-            "OBS_LAT": float,
-            "OBS_LONG": float,
-            "OBS_ALT": float
-        }
-
 
     def get_create_fits_config_cmd(self, 
                                    tag: str, 
