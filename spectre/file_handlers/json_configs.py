@@ -134,11 +134,10 @@ def validate_against_type_template(d: dict[str, Any],
 
 def type_cast_params(params: list[str], 
                      type_template: dict[str, type]) -> dict[str, Any]:
-
     d = _params_to_string_dict(params)
-    d = _type_cast_string_dict(d, 
-                               type_template)
-    return d
+    return _type_cast_string_dict(d, 
+                                  type_template)
+
 
 
 class SPECTREConfigHandler(JsonHandler, ABC):
