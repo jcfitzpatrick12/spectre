@@ -5,8 +5,12 @@
 from abc import ABC, abstractmethod
 from typing import Callable, Any, Optional
 
-from spectre.file_handlers.json import CaptureConfigHandler
 from spectre.receivers import validators
+from spectre.file_handlers.json_configs import (
+    CaptureConfigHandler,
+    validate_against_type_template,
+    type_cast_params
+)
 from spectre.exceptions import (
     InvalidModeError, 
     InvalidReceiverError,
@@ -23,8 +27,8 @@ class BaseReceiver(ABC):
         self._capture_methods: dict[str, Callable] = None
         self._set_capture_methods()
 
-        self._templates: dict[str, dict[str, Any]] = None
-        self._set_templates()
+        self._type_templates: dict[str, dict[str, Any]] = None
+        self._set_type_templates()
 
         self._validators: dict[str, Callable] = None
         self._set_validators()
@@ -46,7 +50,7 @@ class BaseReceiver(ABC):
         pass
 
     @abstractmethod
-    def _set_templates(self) -> None:
+    def _set_type_templates(self) -> None:
         pass
 
 
@@ -71,8 +75,8 @@ class BaseReceiver(ABC):
 
 
     @property
-    def templates(self) -> dict[str, dict[str, Any]]:
-        return self._templates
+    def type_templates(self) -> dict[str, dict[str, Any]]:
+        return self._type_templates
 
 
     @property
@@ -84,9 +88,9 @@ class BaseReceiver(ABC):
     def valid_modes(self) -> None:
         capture_method_modes = list(self.capture_methods.keys())
         validator_modes = list(self.validators.keys())
-        template_modes = list(self.templates.keys())
+        type_template_modes = list(self.type_templates.keys())
 
-        if capture_method_modes == validator_modes == template_modes:
+        if capture_method_modes == validator_modes == type_template_modes:
             return capture_method_modes
         else:
             raise InvalidModeError(f"Mode mismatch for the receiver {self.name}. Could not define valid modes")
@@ -120,8 +124,8 @@ class BaseReceiver(ABC):
 
 
     @property
-    def template(self) -> dict[str, Any]:
-        return self.templates[self.mode]
+    def type_template(self) -> dict[str, Any]:
+        return self._type_templates[self.mode]
     
 
     def get_specification(self, 
@@ -133,9 +137,15 @@ class BaseReceiver(ABC):
 
 
 
-    def validate(self, 
-                 capture_config: dict[str, Any]) -> None:
+    def validate_capture_config(self, 
+                                capture_config: dict[str, Any]) -> None:
+        # validate against the active type template
+        validate_against_type_template(capture_config, 
+                                       self.type_template, 
+                                       ignore_keys=["receiver", "mode", "tag"])
+        # validate against receiver-specific constraints
         self.validator(capture_config)
+
 
 
     def start_capture(self, 
@@ -144,36 +154,39 @@ class BaseReceiver(ABC):
         self.capture_method(capture_configs)
 
 
-    def save_params_as_capture_config(self, 
-                                      tag: str, 
-                                      params: list[str], 
-                                      doublecheck_overwrite: bool = True) -> None:
-        capture_config_handler = CaptureConfigHandler(tag)
-        capture_config = capture_config_handler.type_cast_params(params, self.template) # type cast the params list according to the active template
-        self.save_capture_config(tag, capture_config, doublecheck_overwrite=doublecheck_overwrite)
+    def save_params(self, 
+                    params: list[str],  
+                    tag: str, 
+                    doublecheck_overwrite: bool = True) -> None:
+        capture_config = type_cast_params(params, 
+                                          self.type_template)
+        
+        validate_against_type_template(capture_config,
+                                       self.type_template)
+        self.save_capture_config(capture_config, 
+                                 tag, 
+                                 doublecheck_overwrite=doublecheck_overwrite)
 
 
     def save_capture_config(self, 
+                            capture_config: dict[str, Any],
                             tag: str, 
-                            capture_config: dict[str, Any], 
                             doublecheck_overwrite: bool = True) -> None:
-        capture_config_handler = CaptureConfigHandler(tag)
-        # basic validation against the template
-        capture_config_handler.validate_against_template(capture_config, 
-                                                         self.template, 
-                                                         ignore_keys=["receiver", "mode", "tag"])
-        # validate against receiver-specific constraints in the current mode
-        self.validate(capture_config)
-        # update the extra metadata
+        
+        self.validate_capture_config(capture_config)
+
         capture_config.update({"receiver": self.name, 
                                "mode": self.mode, 
                                "tag": tag})
-        # and finally, save the validated capture config to a JSON
-        capture_config_handler.save(capture_config, doublecheck_overwrite = doublecheck_overwrite)
+        
+        capture_config_handler = CaptureConfigHandler(tag)
+        capture_config_handler.save(capture_config, 
+                                    doublecheck_overwrite = doublecheck_overwrite)
 
 
     def load_capture_config(self, 
                             tag: str) -> dict:
+        
         capture_config_handler = CaptureConfigHandler(tag)
         capture_config = capture_config_handler.read()
 
@@ -182,19 +195,20 @@ class BaseReceiver(ABC):
         
         if capture_config["mode"] != self.mode:
             raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config['mode']}")
-
-        self.validate(capture_config)
+        
+        self.validate_capture_config(capture_config)
         return capture_config
 
 
-    def template_to_command(self, 
-                            tag: str, 
-                            as_string: bool = False) -> str:
+    def get_create_capture_config_cmd(self, 
+                                      tag: str, 
+                                      as_string: bool = False) -> str:
+        """Get a command which can be used to create a capture config with the SPECTRE CLI."""
         command_as_list = ["spectre", "create", "capture-config", 
                            "--tag", tag, 
                            "--receiver", self.name, 
                            "--mode", self.mode]
-        for key, value in self.template.items():
+        for key, value in self.type_template.items():
             command_as_list.extend(["-p", f"{key}={value.__name__}"])
 
         return " ".join(command_as_list) if as_string else command_as_list
@@ -203,20 +217,17 @@ class BaseReceiver(ABC):
 # optional parent class which provides default templates and validators
 class SPECTREReceiver(BaseReceiver):
     def __init__(self, *args, **kwargs):
-        # make default templates available in _set_templates method
-        # by defining them before the parent constructor is called
-        self._default_templates: dict[str, dict[str, Any]] = None
-        self.__set_default_templates()
+        self.__set_default_type_templates()
         super().__init__(*args, **kwargs)
     
 
     @property
-    def default_templates(self) -> dict[str, dict[str, Any]]:
-        return self._default_templates
+    def default_type_templates(self) -> dict[str, dict[str, Any]]:
+        return self._default_type_templates
     
 
-    def __set_default_templates(self) -> None:
-        self._default_templates = {
+    def __set_default_type_templates(self) -> None:
+        self._default_type_templates = {
             "fixed": {
                 "center_freq": float, # [Hz]
                 "bandwidth": float, # [Hz]
@@ -257,13 +268,12 @@ class SPECTREReceiver(BaseReceiver):
         }
     
 
-    def _get_default_template(self, 
-                              default_template_key: str) -> dict:
-        try:
-            default_template = self.default_templates[default_template_key]
-        except KeyError:
-            raise TemplateNotFoundError(f"No default template found with key {default_template_key}")
-        return default_template
+    def _get_default_type_template(self, 
+                                   mode: str) -> dict:
+        default_type_template = self.default_type_templates[mode]
+        if default_type_template is None:
+            raise TemplateNotFoundError(f"No default template found for the mode {mode}")
+        return default_type_template
     
 
     def _default_sweep_validator(self, 

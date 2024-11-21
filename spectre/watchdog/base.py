@@ -16,7 +16,7 @@ from watchdog.events import FileSystemEventHandler
 
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.chunks.base import BaseChunk
-from spectre.file_handlers.json import CaptureConfigHandler
+from spectre.file_handlers.json_configs import CaptureConfigHandler
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms.transform import join_spectrograms
 from spectre.spectrograms.transform import (

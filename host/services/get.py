@@ -23,7 +23,7 @@ from spectre.logging import (
     LogHandler,
     log_service_call
 )
-from spectre.file_handlers.json import (
+from spectre.file_handlers.json_configs import (
     FitsConfigHandler,
     CaptureConfigHandler
 )
@@ -160,31 +160,33 @@ def log_handler(pid: Optional[str] = None,
 
 
 @log_service_call(_LOGGER)
-def fits_config_template(tag: Optional[str] = None,
-                         as_command: bool = False
+def fits_config_type_template(tag: Optional[str] = None,
+                              as_command: bool = False
 ) -> dict[str, Any] | str:
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
         fits_config_handler = FitsConfigHandler(tag)
-        return fits_config_handler.template_to_command(tag, as_string=True)
+        return fits_config_handler.get_create_fits_config_cmd(tag, 
+                                                              as_string = True)
     else:
-        return FitsConfigHandler.get_template()
+        return FitsConfigHandler.type_template
 
 
 @log_service_call(_LOGGER)
-def capture_config_template(receiver_name: str,
-                            mode: str,
-                            as_command: bool = False,
-                            tag: Optional[str] = None) -> dict[str, Any] | str:
+def type_template(receiver_name: str,
+                  mode: str,
+                  as_command: bool = False,
+                  tag: Optional[str] = None) -> dict[str, Any] | str:
     
-    receiver = get_receiver(receiver_name, mode = mode)
+    receiver = get_receiver(receiver_name, 
+                            mode = mode)
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
-        return receiver.template_to_command(tag, as_string=True)
+        return receiver.get_create_capture_config_cmd(tag, as_string=True)
     else:
-        return receiver.template
+        return receiver.type_template
 
 
 @log_service_call(_LOGGER)

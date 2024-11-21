@@ -31,12 +31,10 @@ class Receiver(SDRPlayReceiver):
         return
     
 
-    def _set_templates(self) -> None:
-        default_fixed_template = self._get_default_template("fixed")
-        default_sweep_template = self._get_default_template("sweep")
-        self._templates = {
-            "fixed": default_fixed_template,
-            "sweep": default_sweep_template
+    def _set_type_templates(self) -> None:
+        self._type_templates = {
+            "fixed": self._get_default_type_template("fixed"),
+            "sweep": self._get_default_type_template("sweep")
         }
 
 
