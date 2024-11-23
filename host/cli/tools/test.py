@@ -38,12 +38,12 @@ def _pretty_print_test_results(file_name: str,
 
 
 @app.command()
-def end_to_end(
+def analytically(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     absolute_tolerance: float = typer.Option(1e-3, "--atol", "--absolute-tolerance", help=ABSOLUTE_TOLERANCE_HELP),
     per_spectrum: bool = typer.Option(False, "--per-spectrum", help=PER_SPECTRUM_HELP),
 ) -> None:
-    results_per_chunk = test.end_to_end(tag, absolute_tolerance)
+    results_per_chunk = test.analytically(tag, absolute_tolerance)
 
     for file_name, test_results in results_per_chunk.items():
         _pretty_print_test_results(file_name, 

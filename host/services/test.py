@@ -77,7 +77,7 @@ def validate_analytically(spectrogram: Spectrogram,
 
 
 @log_service_call(_LOGGER)
-def end_to_end(
+def analytically(
     tag: str,
     absolute_tolerance: float
 ) -> dict[str, TestResults]:
