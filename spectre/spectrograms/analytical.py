@@ -10,18 +10,11 @@ from spectre.file_handlers.json_configs import CaptureConfigHandler
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.exceptions import ModeNotFoundError
 
-
-def add_builder(test_mode: str):
-    def decorator(func: Callable):
-        def wrapper(self, *args, **kwargs):
-            self.builders[test_mode] = func
-            return func(*args, **kwargs)
-        return wrapper
-    return decorator
-
 class _AnalyticalFactory:
     def __init__(self):
-        self._builders: dict[str, Callable] = {}
+        self._builders: dict[str, Callable] = {
+            "cosine-signal-1": self.cosine_signal_1
+        }
         self._test_modes = list(self.builders.keys())
 
 
@@ -37,19 +30,24 @@ class _AnalyticalFactory:
 
     def get_spectrogram(self, 
                         test_mode: str, 
-                        spectrogram_shape: tuple, 
+                        num_spectrums: int, 
                         capture_config: dict[str, Any]) -> Spectrogram:
+        """Get an analytical spectrogram based on a test receiver capture config.
+        
+        The anaytically derived spectrogram should be able to be fully determined
+        by parameters in the corresponding capture-config and the number of spectrums
+        in the output spectrogram.
+        """
         builder_method = self.builders.get(test_mode)
         if builder_method is None:
             raise ModeNotFoundError(f"Test mode not found. Expected one of {self.test_modes}, but received {test_mode}")
-        return builder_method(spectrogram_shape, capture_config)
+        return builder_method(num_spectrums, 
+                              capture_config)
     
 
-    @add_builder("cosine_signal_1")
     def cosine_signal_1(self, 
-                        spectrogram_shape: tuple,
+                        num_spectrums: int,
                         capture_config: dict[str, Any]) -> Spectrogram:
-
         # retrieve the parameters in the capture config which are required 
         # to build the analytical spectrogram.
         window_size = capture_config['window_size']
@@ -57,15 +55,6 @@ class _AnalyticalFactory:
         amplitude = capture_config['amplitude'] 
         frequency = capture_config['frequency']
         hop = capture_config['STFFT_kwargs']['hop']
-
-        # get the requested shape of the output spectrogram
-        num_frequencies = spectrogram_shape[0]
-        num_times = spectrogram_shape[1]
-
-        # ensure it is consistent with the capture config
-        if window_size != num_frequencies:
-            raise ValueError((f"Expected the number of frequencies to be the same as the window size. "
-                              f"Got {num_frequencies}, but the window size is {window_size}"))
 
         # a defines the ratio of the sampling rate to the frequency of the synthetic signal
         a = int(samp_rate / frequency)
@@ -77,7 +66,7 @@ class _AnalyticalFactory:
         # for the case of cosine-signal-1, the spectrogram
         # should be constant in time so we will build one spectrum, 
         # then use that to populate the spectrogram.
-        spectrum = np.empty(num_frequencies)
+        spectrum = np.empty(window_size)
         derived_spectral_amplitude = amplitude * window_size / 2
         spectrum[p] = derived_spectral_amplitude
         spectrum[window_size - p] = derived_spectral_amplitude
@@ -87,18 +76,17 @@ class _AnalyticalFactory:
         # ordered frequency array (-ve -> +ve for increasing indices from 0 -> N-1)
         spectrum= np.fft.fftshift(spectrum)
 
-        
         # fill the analytical spectra identically with the common derived
         # spectrum.
-        analytical_dynamic_spectra = np.empty(spectrogram_shape)
+        analytical_dynamic_spectra = np.empty(window_size, num_spectrums)
         analytical_dynamic_spectra = analytical_dynamic_spectra*spectrum[:, np.newaxis]   
 
         # assign physical times to each of the spectrum
         sampling_interval = ( 1 / samp_rate )
-        times = np.array([tau*hop*sampling_interval for tau in range(num_times)])
+        times = np.array([tau*hop*sampling_interval for tau in range(num_spectrums)])
 
         # assign physical frequencies to each spectrum
-        frequencies = np.fft.fftfreq(num_frequencies, sampling_interval)
+        frequencies = np.fft.fftfreq(window_size, sampling_interval)
         frequencies = np.fft.fftshift(frequencies)
 
         return Spectrogram(analytical_dynamic_spectra,
@@ -109,11 +97,11 @@ class _AnalyticalFactory:
 
 
 def get_analytical_spectrogram(test_mode: str,
-                               spectrogram_shape: Tuple[int, int, int],
+                               num_spectrums: int,
                                capture_config: dict[str, Any]) -> Spectrogram:
     factory = _AnalyticalFactory()
     return factory.get_spectrogram(test_mode, 
-                                   spectrogram_shape,
+                                   num_spectrums,
                                    capture_config)
 
 
@@ -129,9 +117,9 @@ def validate_analytically(spectrogram: Spectrogram,
     if receiver_name != "test":
         raise ValueError(f"Expected a capture config created by a test receiver, but found {receiver_name}")
     
-    # build the analyticaly derived solution
+    # build the corresponding analytical spectrogram
     analytical_spectrogram = get_analytical_spectrogram(test_mode,
-                                                        spectrogram.dynamic_spectra.shape,
+                                                        spectrogram.num_spectrums,
                                                         capture_config)
     
     # compare results
