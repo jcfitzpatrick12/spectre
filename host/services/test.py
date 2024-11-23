@@ -81,12 +81,6 @@ def analytical(
     tag: str,
     absolute_tolerance: float
 ) -> dict[str, TestResults]:
-    """Do an end-to-end using the test receiver.
-    
-    Generates spectrograms for a time defined by the user.
-    For all those created, compares to the corresponding 
-    analytically derived solution.
-    """
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
     
