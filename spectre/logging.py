@@ -14,7 +14,6 @@ from collections import OrderedDict
 from datetime import datetime
 
 from spectre.file_handlers.text import TextHandler
-from spectre.exceptions import LogNotFoundError
 from spectre.cfg import (
     LOGS_DIR_PATH, 
     DEFAULT_DATETIME_FORMAT, 
@@ -167,7 +166,7 @@ class LogHandlers:
         try:
             return self.log_handler_map[file_name]
         except KeyError:
-            raise LogNotFoundError(f"Log handler for file name '{file_name}' not found in log map")
+            raise FileNotFoundError(f"Log handler for file name '{file_name}' not found in log map")
 
 
     def get_log_handler_from_pid(self, 
@@ -175,7 +174,7 @@ class LogHandlers:
         for log_handler in self.log_handler_list:
             if log_handler.pid == pid:
                 return log_handler
-        raise LogNotFoundError(f"Log handler for PID '{pid}' not found in log map")
+        raise FileNotFoundError(f"Log handler for PID '{pid}' not found in log map")
 
 
 def configure_root_logger(process_type: str, 

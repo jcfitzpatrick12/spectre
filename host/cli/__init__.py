@@ -12,7 +12,6 @@ RECEIVER_NAME_HELP = "The name of the receiver"
 MODE_HELP = "The operating mode for the receiver"
 
 TAG_HELP = "The capture config tag"
-TAGS_HELP = "The capture config tags"
 
 SECONDS_HELP = "Seconds component of the session duration"
 MINUTES_HELP = "Minutes component of the session duration"
@@ -36,3 +35,5 @@ FILE_NAME_HELP = "File name (specified without extension)"
 AS_COMMAND_HELP = "Output is expressed as a runnable command"
 
 INSTRUMENT_CODE_HELP = "The case-sensitive CALLISTO instrument code"
+ABSOLUTE_TOLERANCE_HELP = "The value of the 'atol' keyword argument for np.isclose"
+PER_SPECTRUM_HELP = "Show validated status per spectrum."

@@ -6,7 +6,7 @@ from typing import Optional
 
 from spectre.receivers.receiver_register import receivers
 from spectre.receivers.base import BaseReceiver
-from spectre.exceptions import ReceiverNotFoundError, ModeNotFoundError
+from spectre.exceptions import ReceiverNotFoundError
 
 # used to fetch an instance of the receiver class
 def get_receiver(receiver_name: str, mode: Optional[str] = None) -> BaseReceiver:

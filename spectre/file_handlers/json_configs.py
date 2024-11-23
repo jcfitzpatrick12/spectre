@@ -2,16 +2,14 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, Tuple
 from abc import ABC
 import ast
 
 from spectre.file_handlers.json import JsonHandler
 from spectre.cfg import JSON_CONFIGS_DIR_PATH
 from spectre.exceptions import (
-    InvalidTagError,
-    CaptureConfigNotFoundError,
-    FitsConfigNotFoundError
+    InvalidTagError
 )
 
 
@@ -148,6 +146,8 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         self._validate_tag(tag)
         self._tag = tag
         self._config_type = config_type
+
+        self._capture_config = None # cache
         super().__init__(JSON_CONFIGS_DIR_PATH, 
                          f"{config_type}_config_{tag}", 
                          **kwargs)
@@ -161,6 +161,13 @@ class SPECTREConfigHandler(JsonHandler, ABC):
     @property
     def config_type(self) -> str:
         return self._config_type
+    
+
+    @property
+    def capture_config(self) -> dict[str, Any]:
+        if self._capture_config is None:
+            self._capture_config = self.read()
+        return self._capture_config
         
 
     def _validate_tag(self, tag: str) -> None:
@@ -216,7 +223,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
         try:
             return super().read()
         except FileNotFoundError as e:
-            raise FitsConfigNotFoundError((
+            raise FileNotFoundError((
                 f"A fits config could not be found with tag {self.tag}. " 
                 f"Received the following error: {e}"
             ))
@@ -235,7 +242,20 @@ class CaptureConfigHandler(SPECTREConfigHandler):
         try:
             return super().read()
         except FileNotFoundError as e:
-            raise CaptureConfigNotFoundError((
+            raise FileNotFoundError((
                 f"A capture config could not be found with tag {self.tag}. " 
                 f"Received the following error: {e}"
             ))
+        
+
+    def get_receiver_metadata(self) -> Tuple[str, str]:
+        capture_config = self.read()
+        receiver_name, mode = capture_config.get("receiver"), capture_config.get("mode")
+
+        if receiver_name is None:
+            raise ValueError("Invalid capture config! Receiver name is not specified.")
+    
+        if mode is None:
+            raise ValueError("Invalid capture config! Receiver mode is not specified.")
+        
+        return receiver_name, mode

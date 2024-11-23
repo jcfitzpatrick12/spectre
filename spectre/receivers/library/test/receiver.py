@@ -72,13 +72,11 @@ class Receiver(SPECTREReceiver):
         } 
 
 
-    def __cosine_signal_1(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __cosine_signal_1(self, capture_config: dict[str, Any]) -> None:
         cosine_signal_1.main(capture_config)
     
 
-    def __tagged_staircase(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __tagged_staircase(self, capture_config: list[str, Any]) -> None:
         tagged_staircase.main(capture_config)
     
 

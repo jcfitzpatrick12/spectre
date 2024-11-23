@@ -90,15 +90,13 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
     
 
     def _join_spectrogram(self, spectrogram: Spectrogram) -> None:
-        # if the spectrogram attribute is empty, define it
         if self._spectrogram is None:
             self._spectrogram = spectrogram
-            return
-        # otherwise, effectively append it  
         else:
             self._spectrogram = join_spectrograms([self._spectrogram, spectrogram])
-            if self._spectrogram.time_range > self._capture_config.get("joining_time"):
-                self._flush_spectrogram()
+
+        if self._spectrogram.time_range >= self._capture_config.get("joining_time"):
+            self._flush_spectrogram()
     
 
     def _flush_spectrogram(self) -> None:
