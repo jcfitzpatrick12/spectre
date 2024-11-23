@@ -8,7 +8,7 @@ git clone https://github.com/jcfitzpatrick12/gr-spectre.git
 # cd into the cloned repo
 cd gr-spectre
 # Checkout a specific branch
-# git checkout sweep-logic
+# git checkout <branch name>
 # Checkout a specific commit within the branch
 # git checkout <commit hash>
 # Build the OOT module

@@ -40,13 +40,18 @@ class tagged_staircase(gr.top_block):
         samp_rate = capture_config['samp_rate']
         min_samples_per_step = capture_config['min_samples_per_step']
         max_samples_per_step = capture_config['max_samples_per_step']
+        freq_step = capture_config['freq_step']
         chunk_size = capture_config['chunk_size']
         is_sweeping = True
 
         ##################################################
         # Blocks
         ##################################################
-        self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, max_samples_per_step, step_increment, samp_rate)
+        self.spectre_tagged_staircase_0 = spectre.tagged_staircase(min_samples_per_step, 
+                                                                   max_samples_per_step, 
+                                                                   freq_step,
+                                                                   step_increment, 
+                                                                   samp_rate)
         self.spectre_batched_file_sink_0 = spectre.batched_file_sink(CHUNKS_DIR_PATH,
                                                                      tag, 
                                                                      chunk_size, 
