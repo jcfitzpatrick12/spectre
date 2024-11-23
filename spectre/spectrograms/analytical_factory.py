@@ -31,9 +31,8 @@ class AnalyticalFactory:
                         test_mode: str, 
                         shape: tuple, 
                         capture_config: dict[str, Any]) -> Spectrogram:
-        try:
-            builder_method = self.builders[test_mode]
-        except KeyError:
+        builder_method = self.builders.get(test_mode)
+        if builder_method is None:
             raise InvalidModeError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
         return builder_method(shape, capture_config)
     

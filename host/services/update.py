@@ -10,7 +10,6 @@ from typing import List
 from spectre.receivers.factory import get_receiver
 from spectre.chunks import Chunks
 from spectre.logging import log_service_call
-from spectre.exceptions import ChunkExistsError
 from spectre.file_handlers.json_configs import (
     FitsConfigHandler,
     CaptureConfigHandler,
@@ -37,7 +36,7 @@ def _caution_update(tag: str,
                              f"Override this functionality with --force. "
                              f"Aborting update")
             _LOGGER.error(error_message)
-            raise ChunkExistsError(error_message)
+            raise FileExistsError(error_message)
 
 
 @log_service_call(_LOGGER)

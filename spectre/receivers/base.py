@@ -12,8 +12,6 @@ from spectre.file_handlers.json_configs import (
     type_cast_params
 )
 from spectre.exceptions import (
-    InvalidModeError, 
-    InvalidReceiverError,
     TemplateNotFoundError,
     ModeNotFoundError,
     SpecificationNotFoundError
@@ -93,7 +91,7 @@ class BaseReceiver(ABC):
         if capture_method_modes == validator_modes == type_template_modes:
             return capture_method_modes
         else:
-            raise InvalidModeError(f"Mode mismatch for the receiver {self.name}. Could not define valid modes")
+            raise ValueError(f"Mode mismatch for the receiver {self.name}. Could not define valid modes")
 
     @property
     def mode(self) -> str:
@@ -130,10 +128,10 @@ class BaseReceiver(ABC):
 
     def get_specification(self, 
                           specification_key: str) -> Any:
-        try:
-            return self.specifications[specification_key]
-        except KeyError:
-            raise SpecificationNotFoundError(f"Invalid specification key '{specification_key}'. Valid modes are: {self.specifications.keys()}")
+        specification = self.specifications.get(specification_key)
+        if specification is None:
+            expected_specifications = list(self.specifications.keys())
+            raise SpecificationNotFoundError(f"Invalid specification '{specification_key}'. Expected one of {expected_specifications}")
 
 
 
@@ -191,10 +189,10 @@ class BaseReceiver(ABC):
         capture_config = capture_config_handler.read()
 
         if capture_config["receiver"] != self.name:
-            raise InvalidReceiverError(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config['receiver']}")
+            raise ValueError(f"Capture config receiver mismatch for tag {tag}. Expected {self.name}, got {capture_config['receiver']}")
         
         if capture_config["mode"] != self.mode:
-            raise InvalidModeError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config['mode']}")
+            raise ValueError(f"Mode mismatch for the tag {tag}. Expected {self.mode}, got {capture_config['mode']}")
         
         self.validate_capture_config(capture_config)
         return capture_config
