@@ -97,7 +97,7 @@ def end_to_end(
             chunk_file = chunk.get_file("fits")
             spectrogram = chunk_file.read()
             results_per_chunk[chunk_file.file_name] = validate_analytically(spectrogram, 
-                                                                                   capture_config,
-                                                                                   absolute_tolerance)
+                                                                            capture_config,
+                                                                            absolute_tolerance)
 
     return results_per_chunk
