@@ -116,15 +116,15 @@ class Receiver(SPECTREReceiver):
         
         # check that the sample rate is an integer multiple of the underlying signal frequency
         if samp_rate % frequency != 0:
-            raise ValueError("samp_rate must be some integer multiple of frequency")
+            raise ValueError("The sampling rate must be some integer multiple of frequency")
 
         a = samp_rate/frequency
         if a < 2:
-            raise ValueError(f"The ratio samp_rate/frequency must be a natural number greater than two.  Received: {a}")
+            raise ValueError(f"The ratio of sampling rate over frequency must be a natural number greater than two.  Received: {a}")
         
         # ensuring the window type is rectangular
         if window_type != "boxcar":
-            raise ValueError(f"Window type must be \"boxcar\". Received: {window_type}")
+            raise ValueError(f"The window type must be \"boxcar\". Received: {window_type}")
         
         # analytical requirement
         # if p is the number of sampled cycles, we can find that p = window_size / a
@@ -135,7 +135,7 @@ class Receiver(SPECTREReceiver):
     
     
         if amplitude <= 0:
-            raise ValueError(f"amplitude must be strictly positive. Received: {amplitude}")
+            raise ValueError(f"The amplitude must be strictly positive. Received: {amplitude}")
     
 
     def __tagged_staircase_validator(self, capture_config: dict[str, Any]) -> None:
@@ -162,13 +162,13 @@ class Receiver(SPECTREReceiver):
         validators.event_handler_key(event_handler_key, "sweep")
 
         if freq_step != samp_rate:
-            raise ValueError(f"freq-step must be equal to samp_rate")
+            raise ValueError(f"The frequency step must be equal to the sampling rate.")
         
         if min_samples_per_step <= 0:
-            raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")
+            raise ValueError(f"Minimum samples per step must be strictly positive. Received: {min_samples_per_step}")
         if max_samples_per_step <= 0:
-            raise ValueError(f"max_samples_per_step must be strictly positive. Received: {max_samples_per_step}")
+            raise ValueError(f"Maximum samples per step must be strictly positive. Received: {max_samples_per_step}")
         if step_increment <= 0:
-            raise ValueError(f"step_increment must be strictly positive. Received: {step_increment}")
+            raise ValueError(f"Step increment must be strictly positive. Received: {step_increment}")
         if min_samples_per_step > max_samples_per_step:
-            raise ValueError(f"min_samples_per_step cannot be greater than max_samples_per_step. Received: {min_samples_per_step} > {max_samples_per_step}")
+            raise ValueError(f"Minimum samples per step cannot be greater than the maximum samples per step. Received: {min_samples_per_step} > {max_samples_per_step}")
