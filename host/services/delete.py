@@ -40,12 +40,12 @@ def logs(process_type: str = None,
 
 
 @log_call(_LOGGER)
-def chunks(tag: str,
-           extensions: list[str],
-           year: Optional[int] = None,
-           month: Optional[int] = None,
-           day: Optional[int] = None,
-           suppress_doublecheck: bool = False
+def chunk_files(tag: str,
+                extensions: list[str],
+                year: Optional[int] = None,
+                month: Optional[int] = None,
+                day: Optional[int] = None,
+                suppress_doublecheck: bool = False
 ) -> None:
     chunks = Chunks(tag, 
                     year=year, 

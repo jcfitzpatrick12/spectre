@@ -34,19 +34,19 @@ def logs(
 
 
 @app.command()
-def chunks(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-           extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
-           year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-           month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-           day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-           suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help=SUPPRESS_DOUBLECHECK_HELP)
+def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+                extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
+                year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
+                month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
+                day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+                suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help=SUPPRESS_DOUBLECHECK_HELP)
 ) -> None:
-    delete.chunks(tag,
-                  extensions,
-                  year,
-                  month,
-                  day,
-                  suppress_doublecheck)
+    delete.chunk_files(tag,
+                       extensions,
+                       year,
+                       month,
+                       day,
+                       suppress_doublecheck)
     raise typer.Exit()
 
 
