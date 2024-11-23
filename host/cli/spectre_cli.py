@@ -15,6 +15,7 @@ from host.cli.tools.delete import app as delete_app
 from host.cli.tools.capture import app as capture_app
 from host.cli.tools.update import app as update_app
 from host.cli.tools.web_fetch import app as web_fetch_app
+from host.cli.tools.test import app as test_app
 
 from spectre.logging import configure_root_logger
 
@@ -28,6 +29,7 @@ app.add_typer(delete_app, name='delete')
 app.add_typer(capture_app, name='capture')
 app.add_typer(update_app, name='update')
 app.add_typer(web_fetch_app, name='web-fetch')
+app.add_type(test_app, name='test')
 
 
 def _version_callback(value: bool) -> None:
