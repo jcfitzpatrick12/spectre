@@ -78,7 +78,7 @@ class _AnalyticalFactory:
 
         # fill the analytical spectra identically with the common derived
         # spectrum.
-        analytical_dynamic_spectra = np.zeros((window_size, num_spectrums))
+        analytical_dynamic_spectra = np.ones((window_size, num_spectrums))
         analytical_dynamic_spectra = analytical_dynamic_spectra*spectrum[:, np.newaxis]   
 
         # assign physical times to each of the spectrum
@@ -103,34 +103,3 @@ def get_analytical_spectrogram(test_mode: str,
     return factory.get_spectrogram(test_mode, 
                                    num_spectrums,
                                    capture_config)
-
-
-def _close_enough(ar: np.ndarray, ar_comparison: np.ndarray) -> bool:
-    return np.all(np.isclose(ar, ar_comparison, atol=1e-4))
-
-
-def validate_analytically(spectrogram: Spectrogram,
-                          capture_config: dict) -> None:
-    
-    # check that capture config was created by a test receiver
-    receiver_name, test_mode = capture_config["receiver"], capture_config["mode"]
-    if receiver_name != "test":
-        raise ValueError(f"Expected a capture config created by a test receiver, but found {receiver_name}")
-    
-    # build the corresponding analytical spectrogram
-    analytical_spectrogram = get_analytical_spectrogram(test_mode,
-                                                        spectrogram.num_spectrums,
-                                                        capture_config)
-    
-    # compare results
-    if not _close_enough(analytical_spectrogram.dynamic_spectra, 
-                         spectrogram.dynamic_spectra):
-        raise ValueError(f"Analytical validation has failed! Mismatch in dynamic spectra.")
-    
-    if not _close_enough(analytical_spectrogram.times,
-                         spectrogram.times):
-        raise ValueError(f"Analytical validation has failed! Mismatch in times.")
-    
-    if not _close_enough(analytical_spectrogram.frequencies,
-                         spectrogram.frequencies):
-        raise ValueError(f"Analytical validation has failed! Mismatch in frequencies.")
