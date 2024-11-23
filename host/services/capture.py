@@ -73,6 +73,8 @@ def _monitor_processes(process_infos: List[tuple],
                     _LOGGER.error(f"Process {process.name} unexpectedly exited")
                     if force_restart:
                         _terminate_processes([p[0] for p in process_infos])
+                        # sleep for one second to give processes time to die properly.
+                        time.sleep(1)
                         process_infos = _restart_all_processes(process_infos)
                     else:
                         _terminate_processes([p[0] for p in process_infos])
