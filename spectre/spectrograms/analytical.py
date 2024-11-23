@@ -66,7 +66,7 @@ class _AnalyticalFactory:
         # for the case of cosine-signal-1, the spectrogram
         # should be constant in time so we will build one spectrum, 
         # then use that to populate the spectrogram.
-        spectrum = np.empty(window_size)
+        spectrum = np.zeros(window_size)
         derived_spectral_amplitude = amplitude * window_size / 2
         spectrum[p] = derived_spectral_amplitude
         spectrum[window_size - p] = derived_spectral_amplitude
@@ -78,7 +78,7 @@ class _AnalyticalFactory:
 
         # fill the analytical spectra identically with the common derived
         # spectrum.
-        analytical_dynamic_spectra = np.empty(window_size, num_spectrums)
+        analytical_dynamic_spectra = np.zeros((window_size, num_spectrums))
         analytical_dynamic_spectra = analytical_dynamic_spectra*spectrum[:, np.newaxis]   
 
         # assign physical times to each of the spectrum
