@@ -29,7 +29,7 @@ app.add_typer(delete_app, name='delete')
 app.add_typer(capture_app, name='capture')
 app.add_typer(update_app, name='update')
 app.add_typer(web_fetch_app, name='web-fetch')
-app.add_type(test_app, name='test')
+app.add_typer(test_app, name='test')
 
 
 def _version_callback(value: bool) -> None:
