@@ -20,17 +20,13 @@ app = typer.Typer()
 
 
 @app.command()
-def session(receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
-            mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
-            tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
+def session(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
             hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
             force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
-    capture.session(receiver_name,
-                    mode,
-                    tags,
+    capture.session(tags,
                     seconds = seconds,
                     minutes = minutes,
                     hours = hours,
@@ -39,17 +35,13 @@ def session(receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECE
 
 
 @app.command()
-def start(receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
-          mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
-          tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
+def start(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
           seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
           minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
           hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
           force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
-    capture.start(receiver_name,
-                  mode,
-                  tags,
+    capture.start(tags,
                   seconds = seconds,
                   minutes = minutes,
                   hours = hours,

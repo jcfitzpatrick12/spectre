@@ -12,6 +12,7 @@ import multiprocessing
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
+from spectre.file_handlers.json_configs import CaptureConfigHandler
 from spectre.logging import (
     configure_root_logger, 
     log_service_call
@@ -86,12 +87,16 @@ def _monitor_processes(process_infos: List[tuple],
         _terminate_processes([p[0] for p in process_infos])
 
 
-def _start_capture(receiver_name: str, 
-                   mode: str, 
-                   tags: List[str],
+def _start_capture(tags: List[str],
                    do_logging: bool,
                    logging_level: int = logging.INFO,
                    ) -> None:
+    
+    # load the receiver and mode from the capture config file
+    first_tag = tags[0]
+    capture_config_handler = CaptureConfigHandler(first_tag)
+    receiver_name, mode = capture_config_handler.get_receiver_metadata()
+
     if do_logging:  
         configure_root_logger(f"WORKER", 
                               level = logging_level)
@@ -129,9 +134,7 @@ def _get_user_root_logger_state() -> Tuple[bool, int]:
 
 
 @log_service_call(_LOGGER)
-def start(receiver_name: str, 
-          mode: str, 
-          tags: List[str], 
+def start(tags: List[str], 
           seconds: int = 0, 
           minutes: int = 0, 
           hours: int = 0, 
@@ -145,8 +148,6 @@ def start(receiver_name: str,
     do_logging, logging_level = _get_user_root_logger_state()
 
     capture_args = (
-        receiver_name,
-        mode,
         tags,
         do_logging,
         logging_level
@@ -154,13 +155,11 @@ def start(receiver_name: str,
     capture_process = start_process(_start_capture, 
                                     capture_args, 
                                     "capture")
-    _monitor_processes([(capture_process, _start_capture, (receiver_name, mode, tags))], total_runtime, force_restart)
+    _monitor_processes([(capture_process, _start_capture, capture_args)], total_runtime, force_restart)
 
 
 @log_service_call(_LOGGER)
-def session(receiver_name: str,
-            mode: str, 
-            tags: List[str], 
+def session(tags: List[str], 
             force_restart: bool = False, 
             seconds: int = 0, 
             minutes: int = 0, 
@@ -181,10 +180,8 @@ def session(receiver_name: str,
     watcher_process = start_process(_start_watcher, 
                                     watcher_args, 
                                     "watcher")
-    
+
     capture_args = (
-        receiver_name,
-        mode,
         tags,
         do_logging,
         logging_level
