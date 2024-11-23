@@ -12,7 +12,6 @@ RECEIVER_NAME_HELP = "The name of the receiver"
 MODE_HELP = "The operating mode for the receiver"
 
 TAG_HELP = "The capture config tag"
-TAGS_HELP = "The capture config tags"
 
 SECONDS_HELP = "Seconds component of the session duration"
 MINUTES_HELP = "Minutes component of the session duration"

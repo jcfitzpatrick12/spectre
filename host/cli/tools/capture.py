@@ -9,7 +9,7 @@ from host.services import capture
 from host.cli import (
     RECEIVER_NAME_HELP,
     MODE_HELP,
-    TAGS_HELP,
+    TAG_HELP,
     SECONDS_HELP,
     MINUTES_HELP,
     HOURS_HELP,
@@ -20,7 +20,7 @@ app = typer.Typer()
 
 
 @app.command()
-def session(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
+def session(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
             hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
@@ -35,7 +35,7 @@ def session(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
 
 
 @app.command()
-def start(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAGS_HELP),
+def start(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAG_HELP),
           seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
           minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
           hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
