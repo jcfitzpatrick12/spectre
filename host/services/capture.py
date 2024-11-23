@@ -88,8 +88,9 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
                 if not wrapper.process.is_alive():
                     _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited")
                     if force_restart:
-                        time.sleep(1)  # Allow processes to terminate cleanly
-                        wrapper.restart()
+                        # restart all processes
+                        for wrapper in process_wrappers:
+                            wrapper.restart()
                     else:
                         _terminate_processes(process_wrappers)
                         return
