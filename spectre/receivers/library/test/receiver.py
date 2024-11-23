@@ -162,13 +162,16 @@ class Receiver(SPECTREReceiver):
         validators.event_handler_key(event_handler_key, "sweep")
 
         if freq_step != samp_rate:
-            raise ValueError(f"The frequency step must be equal to the sampling rate.")
+            raise ValueError(f"The frequency step must be equal to the sampling rate")
         
         if min_samples_per_step <= 0:
             raise ValueError(f"Minimum samples per step must be strictly positive. Received: {min_samples_per_step}")
+        
         if max_samples_per_step <= 0:
             raise ValueError(f"Maximum samples per step must be strictly positive. Received: {max_samples_per_step}")
+        
         if step_increment <= 0:
             raise ValueError(f"Step increment must be strictly positive. Received: {step_increment}")
+        
         if min_samples_per_step > max_samples_per_step:
             raise ValueError(f"Minimum samples per step cannot be greater than the maximum samples per step. Received: {min_samples_per_step} > {max_samples_per_step}")
