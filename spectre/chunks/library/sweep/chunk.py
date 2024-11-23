@@ -177,10 +177,7 @@ class Chunk(SPECTREChunk):
         min_frequency = np.min(center_frequencies)
         diffs = np.diff(center_frequencies)
         # Extract the expected difference between each step within a sweep. 
-        # By default, if the "freq_step" key in the capture config is undefined, we assume the frequency step is equal to the sampling rate
-        # This is a hard-coded workaround since the tagged-staircase block is currently hard-coded to jump in (modelled) frequency by 
-        # the sampling rate [Hz] at each defined step. This will be remediated in the future.
-        freq_step = self.capture_config.get("freq_step") if ("freq_step" in self.capture_config) else self.self.capture_config.get("samp_rate")
+        freq_step = self.capture_config.get("freq_step")
         # Validate frequency steps
         for i, diff in enumerate(diffs):
             # steps should either increase by freq_step or drop to the minimum
