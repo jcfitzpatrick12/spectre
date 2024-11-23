@@ -2,6 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import Any
+
 import logging
 from logging import getLogger
 _LOGGER = getLogger(__name__)
@@ -18,81 +20,112 @@ from spectre.logging import (
     log_service_call
 )
 
-# Utility functions
+from typing import Any, Callable, Tuple, List
+import logging
+import multiprocessing
+import time
+
+_LOGGER = logging.getLogger(__name__)
+
+
+class _ProcessWrapper:
+    """Encapsulates a process and its callable information."""
+    def __init__(self,
+                 process: multiprocessing.Process,
+                 target_func: Callable,
+                 target_func_args: Tuple[Any, ...]):
+        self._process = process
+        self._target_func = target_func
+        self._target_func_args = target_func_args
+
+
+    @property
+    def process(self) -> multiprocessing.Process:
+        return self._process
+    
+
+    @staticmethod
+    def start(target: Callable, 
+              args: Tuple[Any, ...], 
+              name: str) -> '_ProcessWrapper':
+        """Start a new process."""
+        _LOGGER.info(f"Starting {name} process...")
+        process = multiprocessing.Process(target=target, 
+                                          args=args,  
+                                          name=name, 
+                                          daemon=True)
+        process.start()
+        return _ProcessWrapper(process, 
+                               target, 
+                               args)
+    
+
+    def restart(self) -> None:
+        """Restart the encapsulated process."""
+        if self._process.is_alive():
+            # forcibly stop if it is still alive
+            self._process.terminate()
+            self._process.join()
+        self._process = multiprocessing.Process(target=self._target_func, 
+                                                args=self._target_func_args, 
+                                                name=self.process.name, 
+                                                daemon=True)
+        self._process.start()
+
+
+def _terminate_processes(process_wrappers: List[_ProcessWrapper]) -> None:
+    """Terminate all given processes."""
+    _LOGGER.info("Terminating processes...")
+    for wrapper in process_wrappers:
+        if wrapper.process.is_alive():
+            wrapper.process.terminate()
+            wrapper.process.join()
+    _LOGGER.info("All processes successfully terminated.")
+
+
+def _monitor_processes(process_wrappers: List[_ProcessWrapper], 
+                       total_runtime: float, 
+                       force_restart: bool) -> None:
+    """Monitor and restart processes if necessary."""
+    _LOGGER.info("Monitoring processes...")
+    start_time = time.time()
+
+    try:
+        while time.time() - start_time < total_runtime:
+            for wrapper in process_wrappers:
+                if not wrapper.process.is_alive():
+                    _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited.")
+                    if force_restart:
+                        time.sleep(1)  # Allow processes to terminate cleanly
+                        for wrapper in process_wrappers:
+                            wrapper.restart()
+                    else:
+                        _terminate_processes(process_wrappers)
+                        return
+            time.sleep(1)  # Poll every second
+        _LOGGER.info("Session duration reached.")
+        _terminate_processes(process_wrappers)
+    except KeyboardInterrupt:
+        _LOGGER.info("Keyboard interrupt detected. Terminating processes.")
+        _terminate_processes(process_wrappers)
+
+
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
+    """Calculate total runtime in seconds."""
     return seconds + (minutes * 60) + (hours * 3600)
 
 
-def _terminate_processes(processes: List[multiprocessing.Process]) -> None:
-    _LOGGER.info("Terminating processes..")
-    for p in processes:
-        if p.is_alive():
-            p.terminate()
-            p.join()
-    _LOGGER.info("All processes successfully terminated")
-
-
-def start_process(target_func: Callable, 
-                  args: tuple, 
-                  process_name: str) -> multiprocessing.Process:
-    _LOGGER.info(f"Starting {process_name} process..")
-    process = multiprocessing.Process(target=target_func, 
-                                      args=args, 
-                                      name=process_name, 
-                                      daemon=True)
-    process.start()
-    time.sleep(1)  # Allow the process to initialize
-
-    if process.is_alive():
-        _LOGGER.info(f"{process_name.capitalize()} process started successfully")
-    else:
-        _LOGGER.error(f"{process_name.capitalize()} process failed to start")
-        process.terminate()
-    return process
-
-
-def _restart_all_processes(process_infos: List[tuple]) -> List[tuple]:
-    _LOGGER.info("Restarting all processes..")
-    new_process_infos = []
-    for process, target_func, args in process_infos:
-        new_process = start_process(target_func, args, process.name)
-        new_process_infos.append((new_process, target_func, args))
-    _LOGGER.info("Processes successfully restarted")
-    return new_process_infos
-
-
-def _monitor_processes(process_infos: List[tuple], 
-                       total_runtime: float, 
-                       force_restart: bool) -> None:
-    _LOGGER.info("Monitoring processes... ")
-    start_time = time.time()
-    try:
-        while time.time() - start_time < total_runtime:
-            for process, _, _ in process_infos:
-                if not process.is_alive():
-                    _LOGGER.error(f"Process {process.name} unexpectedly exited")
-                    if force_restart:
-                        _terminate_processes([p[0] for p in process_infos])
-                        # sleep for one second to give processes time to die properly.
-                        time.sleep(1)
-                        process_infos = _restart_all_processes(process_infos)
-                    else:
-                        _terminate_processes([p[0] for p in process_infos])
-                        return
-
-            time.sleep(1)  # Poll every 1 second
-        _LOGGER.info("Session duration reached")
-        _terminate_processes([p[0] for p in process_infos])
-
-    except KeyboardInterrupt:
-        _LOGGER.info("Keyboard Interrupt detected. Terminating processes")
-        _terminate_processes([p[0] for p in process_infos])
+def _get_user_root_logger_state() -> Tuple[bool, int]:
+    """Check the state of the user's root logger."""
+    root_logger = logging.getLogger()
+    if root_logger.handlers:
+        return True, root_logger.level
+    return False, logging.NOTSET
 
 
 def _start_capture(tag: str,
                    do_logging: bool,
-                   logging_level: int = logging.INFO,
-                   ) -> None:
+                   logging_level: int = logging.INFO) -> None:
     
     # load the receiver and mode from the capture config file
     capture_config_handler = CaptureConfigHandler(tag)
@@ -101,13 +134,12 @@ def _start_capture(tag: str,
     if do_logging:  
         configure_root_logger(f"WORKER", 
                               level = logging_level)
-    _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tag: {tag}")
-    try:
-        receiver = get_receiver(receiver_name, mode=mode)
-        receiver.start_capture(tag)
-    except:
-        _LOGGER.error("An error has occured during capture", exc_info=True)
-        raise
+    _LOGGER.info((f"Starting capture with the receiver: {receiver_name} "
+                  f"operating in mode: {mode} "
+                  f"with tag: {tag}"))
+
+    receiver = get_receiver(receiver_name, mode=mode)
+    receiver.start_capture(tag)
 
 
 def _start_watcher(tag: str,
@@ -120,29 +152,17 @@ def _start_watcher(tag: str,
     watcher.start()
 
 
-def _get_user_root_logger_state() -> Tuple[bool, int]:
-    """Get the state of the users root logger """
-    user_root_logger = getLogger() # no name implies returning of the root logger
-    if user_root_logger.handlers:
-        is_logging = True
-        level = user_root_logger.level
-        return is_logging, level
-    else:
-        is_logging = False
-        level = None
-        return (is_logging, level)
-
-
 @log_service_call(_LOGGER)
 def start(tag: str, 
           seconds: int = 0, 
           minutes: int = 0, 
           hours: int = 0, 
           force_restart: bool = False) -> None:
-    
-    if seconds == 0 and minutes == 0 and hours == 0:
+
+    total_runtime = _calculate_total_runtime(seconds, minutes, hours) 
+
+    if total_runtime == 0:
         raise ValueError(f"Session duration must be specified")
-    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
     do_logging, logging_level = _get_user_root_logger_state()
@@ -152,10 +172,12 @@ def start(tag: str,
         do_logging,
         logging_level
     )
-    capture_process = start_process(_start_capture, 
-                                    capture_args, 
-                                    "capture")
-    _monitor_processes([(capture_process, _start_capture, capture_args)], total_runtime, force_restart)
+    capture_process = _ProcessWrapper.start(_start_capture, 
+                                            capture_args, 
+                                            "capture")
+    _monitor_processes([capture_process], 
+                       total_runtime, 
+                       force_restart)
 
 
 @log_service_call(_LOGGER)
@@ -177,25 +199,24 @@ def session(tag: str,
         do_logging,
         logging_level
     )
-    watcher_process = start_process(_start_watcher, 
-                                    watcher_args, 
-                                    "watcher")
+    watcher_process = _ProcessWrapper.start(_start_watcher, 
+                                            watcher_args, 
+                                            "watcher")
 
     capture_args = (
         tag,
         do_logging,
         logging_level
     )
-    capture_process = start_process(_start_capture, 
-                                    capture_args, 
-                                    "capture")
+    capture_process = _ProcessWrapper.start(_start_capture, 
+                                            capture_args, 
+                                            "capture")
 
-    if not watcher_process.is_alive() or not capture_process.is_alive():
+    if not watcher_process.process.is_alive() or not capture_process.process.is_alive():
         _terminate_processes([watcher_process, capture_process])
         return
 
-    _monitor_processes([(watcher_process, _start_watcher, watcher_args),
-                        (capture_process, _start_capture, capture_args)], 
+    _monitor_processes([watcher_process, capture_process], 
                         total_runtime, 
                         force_restart)
     
