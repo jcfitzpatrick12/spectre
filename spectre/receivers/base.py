@@ -305,36 +305,36 @@ class SPECTREReceiver(BaseReceiver):
         validators.time_resolution(time_resolution, 
                                              chunk_size) 
         validators.window(window_type, 
-                                   window_kwargs, 
-                                   window_size,
-                                   chunk_size,
-                                   samp_rate)
+                          window_kwargs, 
+                          window_size,
+                          chunk_size,
+                          samp_rate)
         validators.STFFT_kwargs(STFFT_kwargs)
         validators.chunk_key(chunk_key, "sweep")
         validators.event_handler_key(event_handler_key, "sweep")
         validators.gain_is_negative(IF_gain)
         validators.gain_is_negative(RF_gain)
         validators.num_steps_per_sweep(min_freq, 
-                                                max_freq, 
-                                                samp_rate, 
-                                                freq_step)
+                                       max_freq, 
+                                       samp_rate, 
+                                       freq_step)
         validators.sweep_interval(min_freq, 
-                                           max_freq, 
-                                           samp_rate, 
-                                           freq_step,
-                                           samples_per_step,
-                                           chunk_size)
+                                  max_freq, 
+                                  samp_rate, 
+                                  freq_step,
+                                  samples_per_step,
+                                  chunk_size)
         validators.non_overlapping_steps(freq_step, 
-                                                  samp_rate)
+                                         samp_rate)
         validators.num_samples_per_step(samples_per_step, 
-                                                 window_size)
+                                        window_size)
 
         # if the api latency is defined, raise a warning if the step interval is of the same order
         api_latency = self.specifications.get("api_latency")
         if api_latency:
             validators.step_interval(samples_per_step, 
-                                              samp_rate, 
-                                              api_latency)
+                                     samp_rate, 
+                                     api_latency)
     
 
     def _default_fixed_validator(self, 
@@ -360,15 +360,15 @@ class SPECTREReceiver(BaseReceiver):
         validators.chunk_size_strictly_positive(chunk_size)
         validators.time_resolution(time_resolution, chunk_size) 
         validators.window(window_type, 
-                                   window_kwargs, 
-                                   window_size,
-                                   chunk_size,
-                                   samp_rate)
+                          window_kwargs, 
+                          window_size,
+                          chunk_size,
+                          samp_rate)
         validators.STFFT_kwargs(STFFT_kwargs)
         validators.chunk_key(chunk_key, 
-                                      "fixed")
+                             "fixed")
         validators.event_handler_key(event_handler_key, 
-                                              "fixed")
+                                     "fixed")
         validators.gain_is_negative(IF_gain)
         validators.gain_is_negative(RF_gain)
     

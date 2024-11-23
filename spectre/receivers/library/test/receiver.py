@@ -50,9 +50,10 @@ class Receiver(SPECTREReceiver):
             },
             "tagged-staircase": {
                 'samp_rate': int, # [Hz]
-                'min_samples_per_step': int, # the size of the smallest step (in samples)
-                'max_samples_per_step': int, # the size of the largest step (in samples)
-                'step_increment': int, # the "height" of each step, in terms of the tagged staircase output.
+                'min_samples_per_step': int, # [samples]
+                'max_samples_per_step': int, # [samples]
+                'freq_step': float, # [Hz]
+                'step_increment': int, # [samples]
                 'chunk_size': int, # [s]
                 'joining_time': int, # [s]
                 'time_resolution': float, # [s]
@@ -141,6 +142,7 @@ class Receiver(SPECTREReceiver):
         samp_rate = capture_config["samp_rate"]
         min_samples_per_step = capture_config["min_samples_per_step"]
         max_samples_per_step = capture_config["max_samples_per_step"]
+        freq_step = capture_config["freq_step"]
         step_increment = capture_config["step_increment"]
         chunk_size = capture_config["chunk_size"]
         window_type = capture_config["window_type"]
@@ -159,6 +161,9 @@ class Receiver(SPECTREReceiver):
         validators.chunk_key(chunk_key, "sweep")
         validators.event_handler_key(event_handler_key, "sweep")
 
+        if freq_step != samp_rate:
+            raise ValueError(f"freq-step must be equal to samp_rate")
+        
         if min_samples_per_step <= 0:
             raise ValueError(f"min_samples_per_step must be strictly positive. Received: {min_samples_per_step}")
         if max_samples_per_step <= 0:
