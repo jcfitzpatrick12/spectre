@@ -58,8 +58,8 @@ class _ProcessWrapper:
             # forcibly stop if it is still alive
             self._process.terminate()
             self._process.join()
-            # a moment of respite
-            time.sleep(1)
+        # a moment of respite
+        time.sleep(1)
         self._process = multiprocessing.Process(target=self._target_func, 
                                                 args=self._target_func_args, 
                                                 name=self.process.name, 
