@@ -70,7 +70,7 @@ class Spectrogram:
         self._start_background = start_background
         self._end_background = end_background
         self._start_background_index = 0 # by default
-        self._end_background_index = self.num_spectrums # by default
+        self._end_background_index = self.num_times # by default
         self._check_shapes()
 
 
@@ -85,7 +85,7 @@ class Spectrogram:
     
     
     @property
-    def num_spectrums(self) -> int:
+    def num_times(self) -> int:
         return len(self._times)
     
 
@@ -224,8 +224,8 @@ class Spectrogram:
         if dynamic_spectra_shape[0] != self.num_frequencies:
             raise ValueError(f"Mismatch in number of frequency bins: Expected {self.num_frequencies}, but got {dynamic_spectra_shape[0]}")
         
-        if dynamic_spectra_shape[1] != self.num_spectrums:
-            raise ValueError(f"Mismatch in number of time bins: Expected {self.num_spectrums}, but got {dynamic_spectra_shape[1]}")
+        if dynamic_spectra_shape[1] != self.num_times:
+            raise ValueError(f"Mismatch in number of time bins: Expected {self.num_times}, but got {dynamic_spectra_shape[1]}")
         
 
     def save(self) -> None:

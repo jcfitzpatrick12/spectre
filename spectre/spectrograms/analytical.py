@@ -29,15 +29,19 @@ class _AnalyticalFactory:
     
 
     def get_spectrogram(self, 
-                        test_mode: str, 
                         num_spectrums: int, 
                         capture_config: dict[str, Any]) -> Spectrogram:
         """Get an analytical spectrogram based on a test receiver capture config.
         
         The anaytically derived spectrogram should be able to be fully determined
         by parameters in the corresponding capture-config and the number of spectrums
-        in the output spectrogram.
+        in the output spectrogram (i.e.)
         """
+        receiver_name, test_mode = capture_config['receiver'], capture_config['mode']
+
+        if receiver_name != "test":
+            raise ValueError(f"Input capture config must correspond to the test receiver")
+        
         builder_method = self.builders.get(test_mode)
         if builder_method is None:
             raise ModeNotFoundError(f"Test mode not found. Expected one of {self.test_modes}, but received {test_mode}")
@@ -96,10 +100,9 @@ class _AnalyticalFactory:
                            spectrum_type = "amplitude")
 
 
-def get_analytical_spectrogram(test_mode: str,
-                               num_spectrums: int,
+def get_analytical_spectrogram(num_spectrums: int,
                                capture_config: dict[str, Any]) -> Spectrogram:
+    
     factory = _AnalyticalFactory()
-    return factory.get_spectrogram(test_mode, 
-                                   num_spectrums,
+    return factory.get_spectrogram(num_spectrums,
                                    capture_config)
