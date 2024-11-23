@@ -38,14 +38,13 @@ def validate_analytically(spectrogram: Spectrogram,
                                                         spectrogram.num_spectrums,
                                                         capture_config)
 
-    print(analytical_spectrogram.times)
-    print(spectrogram.times)
-    exit()
+
     # # compare results
-    # if not _close_enough(analytical_spectrogram.times,
-    #                      spectrogram.times):
-    #     raise ValueError(f"Analytical validation has failed! Mismatch in times.")
+    if not _close_enough(analytical_spectrogram.times,
+                         spectrogram.times):
+        raise ValueError(f"Analytical validation has failed! Mismatch in times.")
     
+    exit()
     # if not _close_enough(analytical_spectrogram.frequencies,
     #                      spectrogram.frequencies):
     #     raise ValueError(f"Analytical validation has failed! Mismatch in frequencies.")
