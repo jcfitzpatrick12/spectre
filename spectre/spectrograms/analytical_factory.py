@@ -7,7 +7,7 @@ from typing import Callable, Any
 import numpy as np
 
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.exceptions import InvalidModeError
+from spectre.exceptions import ModeNotFoundError
 
 class AnalyticalFactory:
     def __init__(self):
@@ -33,7 +33,7 @@ class AnalyticalFactory:
                         capture_config: dict[str, Any]) -> Spectrogram:
         builder_method = self.builders.get(test_mode)
         if builder_method is None:
-            raise InvalidModeError(f"Invalid test mode. Expected one of {self.test_modes}, but received {test_mode}")
+            raise ModeNotFoundError(f"Test mode not found. Expected one of {self.test_modes}, but received {test_mode}")
         return builder_method(shape, capture_config)
     
     
