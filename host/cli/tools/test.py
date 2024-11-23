@@ -17,13 +17,6 @@ app = typer.Typer()
 
 
 @app.command()
-def end_to_end(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-               seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
-               minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
-               hours: int = typer.Option(0, "--hours", help=HOURS_HELP)
-) -> None:
-    test.end_to_end(tag,
-                    seconds = seconds,
-                    minutes = minutes,
-                    hours = hours)
+def end_to_end(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP)) -> None:
+    test.end_to_end(tag)
     raise typer.Exit()
