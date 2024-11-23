@@ -8,10 +8,10 @@ _LOGGER = getLogger(__name__)
 from typing import Optional
 
 from spectre.web_fetch.callisto import fetch_chunks
-from spectre.logging import log_service_call
+from spectre.logging import log_call
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def callisto(
     instrument_code: str,
     year: Optional[int] = None,

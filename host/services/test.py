@@ -8,7 +8,7 @@ _LOGGER =  getLogger(__name__)
 import numpy as np
 from dataclasses import dataclass
 
-from spectre.logging import log_service_call
+from spectre.logging import log_call
 from spectre.chunks import Chunks
 from spectre.spectrograms.analytical import get_analytical_spectrogram
 from spectre.spectrograms.spectrogram import Spectrogram
@@ -76,7 +76,7 @@ def validate_analytically(spectrogram: Spectrogram,
     return test_results
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def analytical(
     tag: str,
     absolute_tolerance: float

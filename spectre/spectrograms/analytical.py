@@ -34,8 +34,8 @@ class _AnalyticalFactory:
         """Get an analytical spectrogram based on a test receiver capture config.
         
         The anaytically derived spectrogram should be able to be fully determined
-        by parameters in the corresponding capture-config and the number of spectrums
-        in the output spectrogram (i.e.)
+        by parameters in the corresponding capture config and the number of spectrums
+        in the output spectrogram.
         """
         receiver_name, test_mode = capture_config['receiver'], capture_config['mode']
 
@@ -99,6 +99,12 @@ class _AnalyticalFactory:
                            'analytically-derived-spectrogram',
                            spectrum_type = "amplitude")
 
+    def tagged_staircase(self,
+                         num_spectrums: int,
+                         capture_config: dict) -> Spectrogram:
+        window_size = capture_config['window_size']
+        return
+    
 
 def get_analytical_spectrogram(num_spectrums: int,
                                capture_config: dict[str, Any]) -> Spectrogram:

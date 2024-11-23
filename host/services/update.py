@@ -9,7 +9,7 @@ from typing import List
 
 from spectre.receivers.factory import get_receiver
 from spectre.chunks import Chunks
-from spectre.logging import log_service_call
+from spectre.logging import log_call
 from spectre.file_handlers.json_configs import (
     FitsConfigHandler,
     CaptureConfigHandler,
@@ -39,7 +39,7 @@ def _caution_update(tag: str,
             raise FileExistsError(error_message)
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def capture_config(tag: str,
                    params: List[str],
                    force: bool = False,
@@ -64,7 +64,7 @@ def capture_config(tag: str,
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated")
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def fits_config(tag: str,
                 params: List[str],
                 force: bool = False,

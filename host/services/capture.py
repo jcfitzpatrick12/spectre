@@ -16,7 +16,7 @@ from spectre.watchdog.watcher import Watcher
 from spectre.file_handlers.json_configs import CaptureConfigHandler
 from spectre.logging import (
     configure_root_logger, 
-    log_service_call
+    log_call
 )
 
 class _ProcessWrapper:
@@ -148,7 +148,7 @@ def _start_watcher(tag: str,
     watcher.start()
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def start(tag: str, 
           seconds: int = 0, 
           minutes: int = 0, 
@@ -175,7 +175,7 @@ def start(tag: str,
                        force_restart)
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def session(tag: str, 
             force_restart: bool = False, 
             seconds: int = 0, 
