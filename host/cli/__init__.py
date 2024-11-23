@@ -35,3 +35,5 @@ FILE_NAME_HELP = "File name (specified without extension)"
 AS_COMMAND_HELP = "Output is expressed as a runnable command"
 
 INSTRUMENT_CODE_HELP = "The case-sensitive CALLISTO instrument code"
+ABSOLUTE_TOLERANCE_HELP = "The value of the 'atol' keyword argument for np.isclose"
+PER_SPECTRUM_HELP = "Show validated status per spectrum."
