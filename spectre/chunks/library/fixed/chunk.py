@@ -30,13 +30,13 @@ class Chunk(SPECTREChunk):
 
     def build_spectrogram(self) -> Spectrogram:
         """Create a spectrogram by performing a Short Time FFT on the IQ samples for this chunk."""
-        IQ_data = self.read_file("bin")
+        iq_data = self.read_file("bin")
         millisecond_correction = self.read_file("hdr")
 
         # units conversion
         microsecond_correction = millisecond_correction * 1e3
 
-        times, frequencies, dynamic_spectra = self.__do_STFFT(IQ_data)
+        times, frequencies, dynamic_spectra = self.__do_STFFT(iq_data)
 
         # explicitly type cast data arrays to 32-bit floats
         times = np.array(times, dtype = 'float32')
@@ -53,18 +53,18 @@ class Chunk(SPECTREChunk):
 
 
     def __do_STFFT(self, 
-                   IQ_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                   iq_data: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """For reference: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.ShortTimeFFT.html"""
 
         # set p0=0, since by convention in the STFFT docs, p=0 corresponds to the slice centred at t=0
         p0=0
 
         # set p1 to the index of the first slice where the "midpoint" of the window is still inside the signal
-        num_samples = len(IQ_data)
+        num_samples = len(iq_data)
         p1 = self.SFT.upper_border_begin(num_samples)[1]
         
         # compute a ShortTimeFFT on the IQ samples
-        complex_spectra = self.SFT.stft(IQ_data, 
+        complex_spectra = self.SFT.stft(iq_data, 
                                         p0 = p0, 
                                         p1 = p1) 
         
