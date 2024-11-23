@@ -50,13 +50,11 @@ class Receiver(SDRPlayReceiver):
         }
 
 
-    def __tuner_1_fixed(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __tuner_1_fixed(self, capture_config: dict[str, Any]) -> None:
         tuner_1_fixed.main(capture_config)
     
 
-    def __tuner_1_sweep(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __tuner_1_sweep(self, capture_config: dict[str, Any]) -> None:
         tuner_1_sweep.main(capture_config)
     
 

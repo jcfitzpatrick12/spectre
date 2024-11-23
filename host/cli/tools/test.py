@@ -17,12 +17,12 @@ app = typer.Typer()
 
 
 @app.command()
-def session(tags: List[str] = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
             hours: int = typer.Option(0, "--hours", help=HOURS_HELP)
 ) -> None:
-    test.end_to_end(tags,
+    test.end_to_end(tag,
                     seconds = seconds,
                     minutes = minutes,
                     hours = hours)

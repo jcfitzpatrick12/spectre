@@ -52,13 +52,11 @@ class Receiver(SDRPlayReceiver):
         }
 
 
-    def __fixed(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __fixed(self, capture_config: dict[str, Any]) -> None:
         fixed.main(capture_config)
     
     
-    def __sweep(self, capture_configs: list[str, Any]) -> None:
-        capture_config = capture_configs[0]
+    def __sweep(self, capture_config: dict[str, Any]) -> None:
         sweep.main(capture_config)
     
 

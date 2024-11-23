@@ -13,7 +13,7 @@ from spectre.file_handlers.json_configs import CaptureConfigHandler
 
 @log_service_call(_LOGGER)
 def end_to_end(
-    tags: str,
+    tag: str,
     seconds: int = 0,
     minutes: int = 0,
     hours: int = 0,
@@ -24,12 +24,8 @@ def end_to_end(
     For all those created, compares to the corresponding 
     analytically derived solution.
     """
-
-    num_tags = len(tags)
-    if num_tags != 1:
-        raise ValueError(f"Expected one tag! Got {num_tags}")
     
-    capture_config_handler = CaptureConfigHandler(tags[0])
+    capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
 
     receiver_name = capture_config['receiver']
@@ -42,7 +38,7 @@ def end_to_end(
     # generate spectrograms 
     capture.session(receiver_name,
                     mode,
-                    tags,
+                    tag,
                     seconds = seconds,
                     minutes = minutes,
                     hours = hours)

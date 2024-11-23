@@ -149,9 +149,9 @@ class BaseReceiver(ABC):
 
 
     def start_capture(self, 
-                      tags: list[str]) -> None:
-        capture_configs = [self.load_capture_config(tag) for tag in tags]
-        self.capture_method(capture_configs)
+                      tag: str) -> None:
+        capture_config = self.load_capture_config(tag)
+        self.capture_method(capture_config)
 
 
     def save_params(self, 

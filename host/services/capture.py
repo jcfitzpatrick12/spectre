@@ -87,37 +87,35 @@ def _monitor_processes(process_infos: List[tuple],
         _terminate_processes([p[0] for p in process_infos])
 
 
-def _start_capture(tags: List[str],
+def _start_capture(tag: str,
                    do_logging: bool,
                    logging_level: int = logging.INFO,
                    ) -> None:
     
     # load the receiver and mode from the capture config file
-    first_tag = tags[0]
-    capture_config_handler = CaptureConfigHandler(first_tag)
+    capture_config_handler = CaptureConfigHandler(tag)
     receiver_name, mode = capture_config_handler.get_receiver_metadata()
 
     if do_logging:  
         configure_root_logger(f"WORKER", 
                               level = logging_level)
-    _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tags: {tags}")
+    _LOGGER.info(f"Starting capture with the receiver: {receiver_name} operating in mode: {mode} with tag: {tag}")
     try:
         receiver = get_receiver(receiver_name, mode=mode)
-        receiver.start_capture(tags)
+        receiver.start_capture(tag)
     except:
         _LOGGER.error("An error has occured during capture", exc_info=True)
         raise
 
 
-def _start_watcher(tags: List[str],
+def _start_watcher(tag: str,
                    do_logging: bool = False,
                    logging_level: int = logging.INFO) -> None:
     if do_logging:
         configure_root_logger(f"WORKER", level = logging_level) #  start worker log
-    _LOGGER.info(f"Starting watcher with tags {tags}")
-    for tag in tags:
-        watcher = Watcher(tag)
-        watcher.start()
+    _LOGGER.info(f"Starting watcher with tag: {tag}")
+    watcher = Watcher(tag)
+    watcher.start()
 
 
 def _get_user_root_logger_state() -> Tuple[bool, int]:
@@ -134,7 +132,7 @@ def _get_user_root_logger_state() -> Tuple[bool, int]:
 
 
 @log_service_call(_LOGGER)
-def start(tags: List[str], 
+def start(tag: str, 
           seconds: int = 0, 
           minutes: int = 0, 
           hours: int = 0, 
@@ -148,7 +146,7 @@ def start(tags: List[str],
     do_logging, logging_level = _get_user_root_logger_state()
 
     capture_args = (
-        tags,
+        tag,
         do_logging,
         logging_level
     )
@@ -159,7 +157,7 @@ def start(tags: List[str],
 
 
 @log_service_call(_LOGGER)
-def session(tags: List[str], 
+def session(tag: str, 
             force_restart: bool = False, 
             seconds: int = 0, 
             minutes: int = 0, 
@@ -173,7 +171,7 @@ def session(tags: List[str],
     do_logging, logging_level = _get_user_root_logger_state()
 
     watcher_args = (
-        tags,
+        tag,
         do_logging,
         logging_level
     )
@@ -182,7 +180,7 @@ def session(tags: List[str],
                                     "watcher")
 
     capture_args = (
-        tags,
+        tag,
         do_logging,
         logging_level
     )
