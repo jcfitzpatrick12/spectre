@@ -2,12 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
-
 import logging
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
+from typing import Any
 import time
 from typing import List, Callable, Tuple
 import multiprocessing
@@ -19,14 +18,6 @@ from spectre.logging import (
     configure_root_logger, 
     log_service_call
 )
-
-from typing import Any, Callable, Tuple, List
-import logging
-import multiprocessing
-import time
-
-_LOGGER = logging.getLogger(__name__)
-
 
 class _ProcessWrapper:
     """Encapsulates a process and its callable information."""
@@ -97,8 +88,7 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
                     _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited.")
                     if force_restart:
                         time.sleep(1)  # Allow processes to terminate cleanly
-                        for wrapper in process_wrappers:
-                            wrapper.restart()
+                        wrapper.restart()
                     else:
                         _terminate_processes(process_wrappers)
                         return
@@ -112,6 +102,8 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
 
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
     """Calculate total runtime in seconds."""
+    if seconds == 0 and minutes == 0 and hours == 0:
+        raise ValueError(f"Session duration must be specified")
     return seconds + (minutes * 60) + (hours * 3600)
 
 
@@ -161,9 +153,6 @@ def start(tag: str,
 
     total_runtime = _calculate_total_runtime(seconds, minutes, hours) 
 
-    if total_runtime == 0:
-        raise ValueError(f"Session duration must be specified")
-
     # evaluate the user root logger state, so we can propagate it to the worker processes
     do_logging, logging_level = _get_user_root_logger_state()
 
@@ -187,8 +176,6 @@ def session(tag: str,
             minutes: int = 0, 
             hours: int = 0) -> None:
     
-    if seconds == 0 and minutes == 0 and hours == 0:
-        raise ValueError(f"Session duration must be specified")
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
@@ -211,10 +198,6 @@ def session(tag: str,
     capture_process = _ProcessWrapper.start(_start_capture, 
                                             capture_args, 
                                             "capture")
-
-    if not watcher_process.process.is_alive() or not capture_process.process.is_alive():
-        _terminate_processes([watcher_process, capture_process])
-        return
 
     _monitor_processes([watcher_process, capture_process], 
                         total_runtime, 
