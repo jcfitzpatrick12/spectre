@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-import numpy as np
 
 from host.services import test
 from host.cli import (
@@ -14,29 +13,28 @@ from host.cli import (
 
 app = typer.Typer()
 
+
 def _pretty_print_test_results(file_name: str, 
                                test_results: test.TestResults, 
                                per_spectrum: bool) -> None:
+    """Print test results with appropriate formatting and colours."""
+    
+    def print_colored(label: str, value: bool) -> None:
+        typer.secho(f"{label}: {'PASS' if value else 'FAIL'}", fg="green" if value else "red")
 
-    def print_colored(label: str, 
-                      value: bool) -> None:
-        """Prints a label and its boolean value with appropriate color"""
-        color = "green" if value else "red"
-        typer.secho(f"{label}: {'PASS' if value else 'FAIL'}", fg=color)
+    def print_spectrum_results():
+        typer.secho("\nPer spectrum results:" if per_spectrum else "\nSummary:")
+        if per_spectrum:
+            for time, is_valid in test_results.spectrum_validated.items():
+                typer.secho(f"  Time {time:.3f} [s]: {'PASS' if is_valid else 'FAIL'}", fg="green" if is_valid else "red")
+        else:
+            typer.secho(f"  Validated spectrums: {test_results.num_validated_spectrums}", fg="green")
+            typer.secho(f"  Invalid spectrums: {test_results.num_invalid_spectrums}", fg="red")
 
     typer.secho(f"\nTest results for {file_name}:", bold=True)
     print_colored("Times validated", test_results.times_validated)
     print_colored("Frequencies validated", test_results.frequencies_validated)
-
-    if per_spectrum:
-        typer.secho("\nPer spectrum results:")
-        for time, is_valid in test_results.spectrum_validated.items():
-            color = "green" if is_valid else "red"
-            typer.secho(f"  Time {time:.3f}: {'PASS' if is_valid else 'FAIL'}", fg=color)
-    else:
-        typer.secho("\nSummary:")
-        typer.secho(f"  Validated spectrums: {test_results.num_validated_spectrums}", fg="green")
-        typer.secho(f"  Invalid spectrums: {test_results.num_invalid_spectrums}", fg="red")
+    print_spectrum_results()
 
 
 @app.command()
