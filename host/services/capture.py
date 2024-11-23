@@ -20,7 +20,7 @@ from spectre.logging import (
 )
 
 class _ProcessWrapper:
-    """Encapsulates a process and its callable information."""
+    """Encapsulates a process and its callable information"""
     def __init__(self,
                  process: multiprocessing.Process,
                  target_func: Callable,
@@ -39,8 +39,8 @@ class _ProcessWrapper:
     def start(target: Callable, 
               args: Tuple[Any, ...], 
               name: str) -> '_ProcessWrapper':
-        """Start a new process."""
-        _LOGGER.info(f"Starting {name} process...")
+        """Start a new process"""
+        _LOGGER.info(f"Starting {name} process..")
         process = multiprocessing.Process(target=target, 
                                           args=args,  
                                           name=name, 
@@ -52,7 +52,8 @@ class _ProcessWrapper:
     
 
     def restart(self) -> None:
-        """Restart the encapsulated process."""
+        """Restart the encapsulated process"""
+        _LOGGER.info(f"Restarting {self._process.name} process")
         if self._process.is_alive():
             # forcibly stop if it is still alive
             self._process.terminate()
@@ -65,13 +66,13 @@ class _ProcessWrapper:
 
 
 def _terminate_processes(process_wrappers: List[_ProcessWrapper]) -> None:
-    """Terminate all given processes."""
+    """Terminate all given processes"""
     _LOGGER.info("Terminating processes...")
     for wrapper in process_wrappers:
         if wrapper.process.is_alive():
             wrapper.process.terminate()
             wrapper.process.join()
-    _LOGGER.info("All processes successfully terminated.")
+    _LOGGER.info("All processes successfully terminated")
 
 
 def _monitor_processes(process_wrappers: List[_ProcessWrapper], 
@@ -85,7 +86,7 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
         while time.time() - start_time < total_runtime:
             for wrapper in process_wrappers:
                 if not wrapper.process.is_alive():
-                    _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited.")
+                    _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited")
                     if force_restart:
                         time.sleep(1)  # Allow processes to terminate cleanly
                         wrapper.restart()
@@ -93,22 +94,22 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
                         _terminate_processes(process_wrappers)
                         return
             time.sleep(1)  # Poll every second
-        _LOGGER.info("Session duration reached.")
+        _LOGGER.info("Session duration reached")
         _terminate_processes(process_wrappers)
     except KeyboardInterrupt:
-        _LOGGER.info("Keyboard interrupt detected. Terminating processes.")
+        _LOGGER.info("Keyboard interrupt detected. Terminating processes")
         _terminate_processes(process_wrappers)
 
 
 def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
-    """Calculate total runtime in seconds."""
+    """Calculate total runtime in seconds"""
     if seconds == 0 and minutes == 0 and hours == 0:
         raise ValueError(f"Session duration must be specified")
     return seconds + (minutes * 60) + (hours * 3600)
 
 
 def _get_user_root_logger_state() -> Tuple[bool, int]:
-    """Check the state of the user's root logger."""
+    """Check the state of the user's root logger"""
     root_logger = logging.getLogger()
     if root_logger.handlers:
         return True, root_logger.level
@@ -151,7 +152,9 @@ def start(tag: str,
           hours: int = 0, 
           force_restart: bool = False) -> None:
 
-    total_runtime = _calculate_total_runtime(seconds, minutes, hours) 
+    total_runtime = _calculate_total_runtime(seconds, 
+                                             minutes, 
+                                             hours) 
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
     do_logging, logging_level = _get_user_root_logger_state()
