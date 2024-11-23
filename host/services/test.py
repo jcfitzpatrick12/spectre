@@ -14,8 +14,7 @@ from spectre.chunks import Chunks
 from spectre.spectrograms.analytical import validate_analytically
 from spectre.file_handlers.json_configs import CaptureConfigHandler
 
-def _validate_analytically(tag: str,
-                           capture_config: dict[str, Any]) -> None:
+def _validate_analytically(tag: str) -> None:
     capture_config_handler = CaptureConfigHandler(tag)
     capture_config = capture_config_handler.read()
 
