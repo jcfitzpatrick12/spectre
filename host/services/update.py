@@ -56,7 +56,7 @@ def capture_config(tag: str,
                          receiver.type_template)
     capture_config.update(d)
 
-    receiver.save_capture_config(capture_config, 
+    receiver.save_capture_config(capture_config.dict, 
                                  tag, 
                                  doublecheck_overwrite=False)
 
@@ -77,7 +77,7 @@ def fits_config(tag: str,
     
     validate_against_type_template(fits_config, fits_config.type_template)
 
-    fits_config.save(fits_config, 
+    fits_config.save(fits_config.dict, 
                      doublecheck_overwrite = False)
 
     _LOGGER.info(f"Fits config for tag: {tag} has been successfully updated")
