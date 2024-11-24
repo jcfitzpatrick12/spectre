@@ -4,7 +4,7 @@
 
 from datetime import datetime
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Optional
 
 from scipy.signal import ShortTimeFFT, get_window
 

@@ -2,13 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
-
-from spectre.receivers.receiver_register import register_receiver
+from spectre.receivers import validators
 from spectre.receivers.base import SPECTREReceiver
+from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.library.test.gr import cosine_signal_1
 from spectre.receivers.library.test.gr import tagged_staircase
-from spectre.receivers import validators
 from spectre.file_handlers.configs import CaptureConfig
 
 

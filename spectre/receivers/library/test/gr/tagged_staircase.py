@@ -30,11 +30,12 @@ from spectre.file_handlers.configs import CaptureConfig
 
 class tagged_staircase(gr.top_block):
 
-    def __init__(self, capture_config: CaptureConfig):
+    def __init__(self, 
+                 capture_config: CaptureConfig):
         gr.top_block.__init__(self, "tagged-staircase", catch_exceptions=True)
 
         ##################################################
-        # Variables
+        # Unpack capture config
         ##################################################
         tag = capture_config['tag']
         step_increment = capture_config['step_increment']
@@ -73,7 +74,9 @@ class tagged_staircase(gr.top_block):
 
 
 
-def main(capture_config: CaptureConfig, top_block_cls=tagged_staircase, options=None):
+def main(capture_config: CaptureConfig, 
+         top_block_cls=tagged_staircase, 
+         options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

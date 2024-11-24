@@ -30,7 +30,8 @@ from spectre.file_handlers.configs import CaptureConfig
 
 class cosine_signal_1(gr.top_block):
 
-    def __init__(self, capture_config: CaptureConfig):
+    def __init__(self, 
+                 capture_config: CaptureConfig):
         gr.top_block.__init__(self, "cosine-signal-1", catch_exceptions=True)
 
         ##################################################
@@ -63,7 +64,9 @@ class cosine_signal_1(gr.top_block):
         self.connect((self.blocks_throttle_0_1, 0), (self.blocks_float_to_complex_1, 1))
 
 
-def main(capture_config: CaptureConfig, top_block_cls=cosine_signal_1, options=None):
+def main(capture_config: CaptureConfig, 
+         top_block_cls=cosine_signal_1, 
+         options=None):
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

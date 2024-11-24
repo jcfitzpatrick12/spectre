@@ -8,9 +8,7 @@ import ast
 
 from spectre.file_handlers.json import JsonHandler
 from spectre.cfg import JSON_CONFIGS_DIR_PATH
-from spectre.exceptions import (
-    InvalidTagError
-)
+from spectre.exceptions import InvalidTagError
 
 
 def _unpack_param(param: str) -> list[str, str]:

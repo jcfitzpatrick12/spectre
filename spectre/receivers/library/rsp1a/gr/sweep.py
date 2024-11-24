@@ -26,11 +26,12 @@ from spectre.file_handlers.configs import CaptureConfig
 
 
 class sweep(gr.top_block):
-    def __init__(self, capture_config: CaptureConfig):
+    def __init__(self, 
+                 capture_config: CaptureConfig):
         gr.top_block.__init__(self, "sweep", catch_exceptions=True)
 
         ##################################################
-        # Variables
+        # Unpack capture config
         ##################################################
         samp_rate = capture_config['samp_rate']
         bandwidth = capture_config['bandwidth']
@@ -104,7 +105,10 @@ class sweep(gr.top_block):
 
 
 
-def main(capture_config: CaptureConfig, top_block_cls=sweep, options=None):
+def main(capture_config: CaptureConfig, 
+         top_block_cls=sweep, 
+         options=None):
+    
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):

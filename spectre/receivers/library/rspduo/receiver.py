@@ -2,10 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
-
-from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SDRPlayReceiver
+from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.library.rspduo.gr import tuner_1_fixed, tuner_1_sweep
 from spectre.file_handlers.configs import CaptureConfig
 

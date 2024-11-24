@@ -34,17 +34,3 @@ class JsonHandler(BaseFileHandler):
         
         with open(self.file_path, 'w') as file:
             json.dump(d, file, indent=4)
-
-
-    def update_key_value(self, 
-                         key: str, 
-                         value: Any, 
-                         doublecheck_overwrite: bool = True) -> None:
-        d = self.read() 
-        try: 
-            d[key] = value
-        except KeyError:
-            valid_keys = list(d.keys())
-            raise KeyError(f"Key '{key}' not found. expected one of '{valid_keys}'")
-
-        self.save(d, doublecheck_overwrite=doublecheck_overwrite)

@@ -29,7 +29,8 @@ from spectre.file_handlers.configs import CaptureConfig
 
 class fixed(gr.top_block):
 
-    def __init__(self, capture_config: CaptureConfig):
+    def __init__(self, 
+                 capture_config: CaptureConfig):
         gr.top_block.__init__(self, "fixed", catch_exceptions=True)
 
         ##################################################
@@ -82,7 +83,10 @@ class fixed(gr.top_block):
 
 
 
-def main(capture_config: CaptureConfig, top_block_cls=fixed, options=None):
+def main(capture_config: CaptureConfig, 
+         top_block_cls=fixed, 
+         options=None):
+    
     tb = top_block_cls(capture_config)
 
     def sig_handler(sig=None, frame=None):
