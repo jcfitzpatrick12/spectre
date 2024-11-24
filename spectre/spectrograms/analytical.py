@@ -106,23 +106,23 @@ class _AnalyticalFactory:
         # Create the analytical spectrum, constant in time.
         spectrum = np.zeros(window_size * num_steps)
         for i in range(num_steps):
-            spectrum[i * window_size] = window_size * i
-        spectrum = np.fft.fftshift(spectrum)
+            spectrum[int(window_size/2) + i*window_size] = window_size * i
 
         # Populate the spectrogram with identical spectra.
         analytical_dynamic_spectra = np.ones((window_size * num_steps, num_spectrums)) * spectrum[:, np.newaxis]
 
         # Compute time and frequency arrays.
+        total_samples = sum(num_samples)
         midpoint_sample = sum(num_samples) // 2
         sampling_interval = 1 / samp_rate
-        times = np.arange(num_spectrums) * midpoint_sample * sampling_interval
+        times = np.array([ midpoint_sample + (i * total_samples) for i in range(num_spectrums) ]) * sampling_interval
 
-        baseband_frequencies = np.fft.fftfreq(window_size, sampling_interval)
-        frequencies = np.empty(window_size * num_steps)
+        baseband_frequencies = np.fft.fftshift(np.fft.fftfreq(window_size, sampling_interval))
+        frequencies = np.empty((window_size * num_steps))
         for i in range(num_steps):
             lower_bound = i * window_size
             upper_bound = (i + 1) * window_size
-            frequencies[lower_bound:upper_bound] = baseband_frequencies + samp_rate * i
+            frequencies[lower_bound:upper_bound] = baseband_frequencies + (samp_rate / 2) * (samp_rate * i)
 
         # Return the spectrogram.
         return Spectrogram(analytical_dynamic_spectra,
