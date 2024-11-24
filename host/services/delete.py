@@ -9,14 +9,14 @@ from typing import Optional
 
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
-from spectre.logging import log_service_call
-from spectre.file_handlers.json_configs import (
-    FitsConfigHandler,
-    CaptureConfigHandler
+from spectre.logging import log_call
+from spectre.file_handlers.configs import (
+    FitsConfig,
+    CaptureConfig
 )
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def logs(process_type: str = None,
          year: Optional[int] = None,
          month: Optional[int] = None,
@@ -39,13 +39,13 @@ def logs(process_type: str = None,
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
 
 
-@log_service_call(_LOGGER)
-def chunks(tag: str,
-           extensions: list[str],
-           year: Optional[int] = None,
-           month: Optional[int] = None,
-           day: Optional[int] = None,
-           suppress_doublecheck: bool = False
+@log_call(_LOGGER)
+def chunk_files(tag: str,
+                extensions: list[str],
+                year: Optional[int] = None,
+                month: Optional[int] = None,
+                day: Optional[int] = None,
+                suppress_doublecheck: bool = False
 ) -> None:
     chunks = Chunks(tag, 
                     year=year, 
@@ -63,17 +63,17 @@ def chunks(tag: str,
                 _LOGGER.info(f"File deleted: {chunk.get_file(extension).file_path}")
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def fits_config(tag: str,
 ) -> None:
-    fits_config_handler = FitsConfigHandler(tag)
-    fits_config_handler.delete()
-    _LOGGER.info(f"File deleted: {fits_config_handler.file_path}")
+    fits_config = FitsConfig(tag)
+    fits_config.delete()
+    _LOGGER.info(f"File deleted: {fits_config.file_path}")
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def capture_config(tag: str,
 ) -> None:
-    capture_config_handler = CaptureConfigHandler(tag)
-    capture_config_handler.delete()
-    _LOGGER.info(f"File deleted: {capture_config_handler.file_path}")
+    capture_config = CaptureConfig(tag)
+    capture_config.delete()
+    _LOGGER.info(f"File deleted: {capture_config.file_path}")

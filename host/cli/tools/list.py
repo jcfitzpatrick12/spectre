@@ -37,7 +37,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 
 
 @app.command()
-def chunks(
+def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
@@ -46,7 +46,7 @@ def chunks(
 ) -> None:
     for chunk_file_name in get.chunk_file_names(tag, year, month, day, extensions):
         typer.secho(chunk_file_name)
-    typer.Exit()
+    raise typer.Exit()
 
 
 @app.command()
@@ -54,7 +54,7 @@ def receivers(
 ) -> None:
     for receiver_name in get.receiver_names():
         typer.secho(receiver_name)
-
+    raise typer.Exit()
 
 @app.command()
 def modes(

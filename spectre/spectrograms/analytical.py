@@ -2,18 +2,43 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Callable, Any, Tuple
+from typing import Callable
+from dataclasses import dataclass
 
 import numpy as np
 
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.spectrograms.spectrogram import Spectrogram
+from spectre.spectrograms.array_operations import is_close
 from spectre.exceptions import ModeNotFoundError
+
+
+
+@dataclass
+class TestResults:
+    # Whether the times array matches analytically
+    times_validated: bool = False  
+    # Whether the frequencies array matches analytically
+    frequencies_validated: bool = False  
+    # Maps each time to whether the corresponding spectrum matched analytically
+    spectrum_validated: dict[float, bool] = None
+
+    @property
+    def num_validated_spectrums(self) -> int:
+        """Counts the number of validated spectrums."""
+        return sum(is_validated for is_validated in self.spectrum_validated.values())
+
+    @property
+    def num_invalid_spectrums(self) -> int:
+        """Counts the number of spectrums that are not validated."""
+        return len(self.spectrum_validated) - self.num_validated_spectrums
+
 
 class _AnalyticalFactory:
     def __init__(self):
         self._builders: dict[str, Callable] = {
-            "cosine-signal-1": self.cosine_signal_1
+            "cosine-signal-1": self.cosine_signal_1,
+            "tagged-staircase": self.tagged_staircase
         }
         self._test_modes = list(self.builders.keys())
 
@@ -30,12 +55,12 @@ class _AnalyticalFactory:
 
     def get_spectrogram(self, 
                         num_spectrums: int, 
-                        capture_config: dict[str, Any]) -> Spectrogram:
+                        capture_config: CaptureConfig) -> Spectrogram:
         """Get an analytical spectrogram based on a test receiver capture config.
         
         The anaytically derived spectrogram should be able to be fully determined
-        by parameters in the corresponding capture-config and the number of spectrums
-        in the output spectrogram (i.e.)
+        by parameters in the corresponding capture config and the number of spectrums
+        in the output spectrogram.
         """
         receiver_name, test_mode = capture_config['receiver'], capture_config['mode']
 
@@ -51,58 +76,130 @@ class _AnalyticalFactory:
 
     def cosine_signal_1(self, 
                         num_spectrums: int,
-                        capture_config: dict[str, Any]) -> Spectrogram:
-        # retrieve the parameters in the capture config which are required 
-        # to build the analytical spectrogram.
+                        capture_config: CaptureConfig) -> Spectrogram:
+        # Extract necessary parameters from the capture configuration.
         window_size = capture_config['window_size']
-        samp_rate = capture_config['samp_rate'] 
-        amplitude = capture_config['amplitude'] 
+        samp_rate = capture_config['samp_rate']
+        amplitude = capture_config['amplitude']
         frequency = capture_config['frequency']
         hop = capture_config['STFFT_kwargs']['hop']
 
-        # a defines the ratio of the sampling rate to the frequency of the synthetic signal
+        # Calculate derived parameters a (sampling rate ratio) and p (sampled periods).
         a = int(samp_rate / frequency)
-
-        # p is effectively the "number of sampled periods"
-        # which can be found equal to the ratio of window_size to a
         p = int(window_size / a)
 
-        # for the case of cosine-signal-1, the spectrogram
-        # should be constant in time so we will build one spectrum, 
-        # then use that to populate the spectrogram.
+        # Create the analytical spectrum, which is constant in time.
         spectrum = np.zeros(window_size)
-        derived_spectral_amplitude = amplitude * window_size / 2
-        spectrum[p] = derived_spectral_amplitude
-        spectrum[window_size - p] = derived_spectral_amplitude
+        spectral_amplitude = amplitude * window_size / 2
+        spectrum[p] = spectral_amplitude
+        spectrum[window_size - p] = spectral_amplitude
 
-        # analytical solution is derived for 0 <= k <= N-1 DFT summation indexing
-        # so, we need to fftshift the array to align the slices to the naturally
-        # ordered frequency array (-ve -> +ve for increasing indices from 0 -> N-1)
-        spectrum= np.fft.fftshift(spectrum)
+        # Align spectrum to naturally ordered frequency array.
+        spectrum = np.fft.fftshift(spectrum)
 
-        # fill the analytical spectra identically with the common derived
-        # spectrum.
-        analytical_dynamic_spectra = np.ones((window_size, num_spectrums))
-        analytical_dynamic_spectra = analytical_dynamic_spectra*spectrum[:, np.newaxis]   
+        # Populate the spectrogram with identical spectra.
+        analytical_dynamic_spectra = np.ones((window_size, num_spectrums)) * spectrum[:, np.newaxis]
 
-        # assign physical times to each of the spectrum
-        sampling_interval = ( 1 / samp_rate )
-        times = np.array([tau*hop*sampling_interval for tau in range(num_spectrums)])
+        # Compute time array.
+        sampling_interval = 1 / samp_rate
+        times = np.arange(num_spectrums) * hop * sampling_interval
 
-        # assign physical frequencies to each spectrum
-        frequencies = np.fft.fftfreq(window_size, sampling_interval)
-        frequencies = np.fft.fftshift(frequencies)
+        # compute the frequency array.
+        frequencies = np.fft.fftshift(np.fft.fftfreq(window_size, sampling_interval))
 
+        # Return the spectrogram.
         return Spectrogram(analytical_dynamic_spectra,
                            times,
                            frequencies,
                            'analytically-derived-spectrogram',
-                           spectrum_type = "amplitude")
+                           spectrum_type="amplitude")
 
+
+    def tagged_staircase(self, 
+                        num_spectrums: int,
+                        capture_config: CaptureConfig) -> Spectrogram:
+        # Extract necessary parameters from the capture configuration.
+        window_size = capture_config['window_size']
+        min_samples_per_step = capture_config['min_samples_per_step']
+        max_samples_per_step = capture_config['max_samples_per_step']
+        step_increment = capture_config['step_increment']
+        samp_rate = capture_config['samp_rate']
+
+        # Calculate step sizes and derived parameters.
+        num_samples_per_step = np.arange(min_samples_per_step, max_samples_per_step + 1, step_increment)
+        num_steps = len(num_samples_per_step)
+
+        # Create the analytical spectrum, constant in time.
+        spectrum = np.zeros(window_size * num_steps)
+        step_count = 0
+        for i in range(num_steps):
+            step_count += 1
+            spectral_amplitude = window_size * step_count
+            spectrum[int(window_size/2) + i*window_size] = spectral_amplitude
+
+        # Populate the spectrogram with identical spectra.
+        analytical_dynamic_spectra = np.ones((window_size * num_steps, num_spectrums)) * spectrum[:, np.newaxis]
+
+        # Compute time array
+        num_samples_per_sweep = sum(num_samples_per_step)
+        midpoint_sample = sum(num_samples_per_step) // 2
+        sampling_interval = 1 / samp_rate
+        # compute the sample index we are "assigning" to each spectrum
+        # and multiply by the sampling interval to get the equivalent physical time
+        times = np.array([ midpoint_sample + (i * num_samples_per_sweep) for i in range(num_spectrums) ]) * sampling_interval
+
+        # Compute the frequency array
+        baseband_frequencies = np.fft.fftshift(np.fft.fftfreq(window_size, sampling_interval))
+        frequencies = np.empty((window_size * num_steps))
+        for i in range(num_steps):
+            lower_bound = i * window_size
+            upper_bound = (i + 1) * window_size
+            frequencies[lower_bound:upper_bound] = baseband_frequencies + (samp_rate / 2) + (samp_rate * i)
+
+        # Return the spectrogram.
+        return Spectrogram(analytical_dynamic_spectra,
+                           times,
+                           frequencies,
+                           'analytically-derived-spectrogram',
+                           spectrum_type="amplitude")
+    
 
 def get_analytical_spectrogram(num_spectrums: int,
-                               capture_config: dict[str, Any]) -> Spectrogram:
+                               capture_config: CaptureConfig) -> Spectrogram:
     
     factory = _AnalyticalFactory()
     return factory.get_spectrogram(num_spectrums,
                                    capture_config)
+
+
+def validate_analytically(spectrogram: Spectrogram,
+                          capture_config: CaptureConfig,
+                          absolute_tolerance: float) -> TestResults:
+
+    analytical_spectrogram = get_analytical_spectrogram(spectrogram.num_times,
+                                                        capture_config)
+
+
+    test_results = TestResults()
+
+    if is_close(analytical_spectrogram.times,
+                spectrogram.times,
+                absolute_tolerance):
+        test_results.times_validated = True
+
+
+    if is_close(analytical_spectrogram.frequencies,
+                spectrogram.frequencies,
+                absolute_tolerance):
+        test_results.frequencies_validated = True
+
+    test_results.spectrum_validated = {}
+    for i in range(spectrogram.num_times):
+        time = spectrogram.times[i]
+        analytical_spectrum = analytical_spectrogram.dynamic_spectra[:, i]
+        spectrum = spectrogram.dynamic_spectra[:, i]
+        test_results.spectrum_validated[time] = is_close(analytical_spectrum, 
+                                                         spectrum,
+                                                         absolute_tolerance)
+
+    return test_results

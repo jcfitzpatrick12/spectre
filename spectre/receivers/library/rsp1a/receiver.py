@@ -2,12 +2,10 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
-
-from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SDRPlayReceiver
+from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.library.rsp1a.gr import fixed, sweep
-from spectre.receivers import validators
+from spectre.file_handlers.configs import CaptureConfig
 
 @register_receiver("rsp1a")
 class Receiver(SDRPlayReceiver):
@@ -52,19 +50,19 @@ class Receiver(SDRPlayReceiver):
         }
 
 
-    def __fixed(self, capture_config: dict[str, Any]) -> None:
+    def __fixed(self, capture_config: CaptureConfig) -> None:
         fixed.main(capture_config)
     
     
-    def __sweep(self, capture_config: dict[str, Any]) -> None:
+    def __sweep(self, capture_config: CaptureConfig) -> None:
         sweep.main(capture_config)
     
 
-    def __fixed_validator(self, capture_config: dict[str, Any]) -> None:
+    def __fixed_validator(self, capture_config: CaptureConfig) -> None:
         self._default_fixed_validator(capture_config)
         self._sdrplay_validator(capture_config)
     
 
-    def __sweep_validator(self, capture_config: dict[str, Any]) -> None:
+    def __sweep_validator(self, capture_config: CaptureConfig) -> None:
         self._default_sweep_validator(capture_config)
         self._sdrplay_validator(capture_config)

@@ -11,7 +11,7 @@ export PYTHONPATH="${SPECTRE_DIR_PATH}:${PYTHONPATH}"
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # start the capture session
-spectre --log capture session --receiver RSP1A --mode sweep --tag RSP1A-sweeper --hours 8 --force-restart
+spectre --log capture session --tag RSP1A-sweeper --hours 8 --force-restart
 # deletes all remnant bin and hdr chunk files in all chunks subdirectories
-spectre --log delete chunks --tag RSP1A-sweeper --extension bin --extension hdr --suppress-doublecheck
+spectre --log delete chunk-files --tag RSP1A-sweeper --extension bin --extension hdr --suppress-doublecheck
 

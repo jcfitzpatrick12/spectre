@@ -30,14 +30,12 @@ def closed_confine_center_freq(center_freq: float,
         raise ValueError(f"Center frequency must be between {center_freq_lower_bound*1e-3} [kHz] and {center_freq_upper_bound*1e-9} [GHz]. Received {center_freq*1e-6} [MHz]")
     
 
-
 def closed_confine_samp_rate(samp_rate: int, 
                              samp_rate_lower_bound: int, 
                              samp_rate_upper_bound: int) -> None:
     if not (samp_rate_lower_bound <= samp_rate <= samp_rate_upper_bound):
         raise ValueError(f"Sampling rate must be between {samp_rate_lower_bound*1e-6} [MHz] and {samp_rate_upper_bound*1e-6} [MHz]. Received {samp_rate*1e-6} [MHz]")
     
-
 
 def closed_confine_bandwidth(bandwidth: float, 
                              bandwidth_lower_bound: float, 
@@ -46,7 +44,6 @@ def closed_confine_bandwidth(bandwidth: float,
         raise ValueError(f"Bandwidth must be between {bandwidth_lower_bound*1e-3} [kHz] and {bandwidth_upper_bound*1e-6} [MHz]. Received {bandwidth*1e-6} [MHz]")
     
     
-
 def is_power_of_two(n):
     return (n != 0) and (n & (n-1) == 0)
 
@@ -72,7 +69,6 @@ def window(window_type: str,
         raise Exception(f"An error has occurred while validating the window. Received: {str(e)}")
     
 
-
 def STFFT_kwargs(STFFT_kwargs: dict):
     if len(STFFT_kwargs) == 0:
         raise ValueError("STFFT kwargs cannot be empty")
@@ -90,18 +86,15 @@ def STFFT_kwargs(STFFT_kwargs: dict):
         raise ValueError(f"\"hop\" must be strictly positive. Received: {hop_value}")
     
     
-
 def center_freq_strictly_positive(center_freq: float):
     if center_freq <= 0:
         raise ValueError(f"Center frequency must be strictly positive. Received: {center_freq*1e-6} [MHz]")
     
 
-
 def bandwidth_strictly_positive(bandwidth: float) -> None:
     if bandwidth < 0:
         raise ValueError(f"Bandwidth must be non-negative. Received: {bandwidth*1e-6} [MHz]")
     
-
 
 def nyquist_criterion(samp_rate: int, 
                       bandwidth: float) -> None:
@@ -109,18 +102,15 @@ def nyquist_criterion(samp_rate: int,
         raise ValueError("Sample rate must be greater than or equal to the bandwidth")
     
 
-
 def samp_rate_strictly_positive(samp_rate: int) -> None:
     if samp_rate < 0:
         raise ValueError(f"Sample rate must be strictly positive. Received: {samp_rate} [Hz]")
     
 
-
 def chunk_size_strictly_positive(chunk_size: int) -> None:
     if chunk_size <= 0:
         raise ValueError(f"Chunk size must be strictly positive. Received: {chunk_size} [s]")
     
-
 
 def time_resolution(time_resolution: float, 
                     chunk_size: int) -> None:
@@ -131,7 +121,6 @@ def time_resolution(time_resolution: float,
         raise ValueError("Time resolution must be less than or equal to chunk size")
     
 
-
 def frequency_resolution(frequency_resolution: float,
                          bandwidth: float = None) -> None:
     if frequency_resolution < 0:
@@ -141,13 +130,11 @@ def frequency_resolution(frequency_resolution: float,
         raise ValueError(f"Frequency resolution must be less than the bandwidth. Received frequency resolution to be {frequency_resolution} [Hz], with bandwidth {bandwidth} [Hz]")
     
 
-
 def chunk_key(chunk_key: str, 
               expected_chunk_key: str) -> None:
     if chunk_key != expected_chunk_key:
         raise ValueError(f"Expected \"{expected_chunk_key}\" for the chunk_key, received: {chunk_key}")
     
-
 
 def event_handler_key(event_handler_key: str, 
                       expected_event_handler_key: str) -> None:
@@ -155,12 +142,10 @@ def event_handler_key(event_handler_key: str,
         raise ValueError(f"Expected \"{expected_event_handler_key}\" for the event_handler_key, received: {event_handler_key}")
     
 
-
 def gain_is_negative(gain: float) -> None:
     if gain > 0:
         raise ValueError(f"Gain must be non-positive. Received {gain} [dB]")
     
-
 
 def _compute_num_steps_per_sweep(min_freq: float, 
                                  max_freq: float,
@@ -181,7 +166,6 @@ def num_steps_per_sweep(min_freq: float,
         raise ValueError(f"We need strictly greater than one sample per step. Computed: {num_steps_per_sweep}")
     
 
-
 def sweep_interval(min_freq: float, 
                   max_freq: float, 
                   samp_rate: int, 
@@ -198,20 +182,17 @@ def sweep_interval(min_freq: float,
         raise ValueError(f"Sweep interval must be less than the chunk size. Computed sweep interval: {sweep_interval} [s] is greater than the given chunk size {chunk_size} [s]")
     
 
-
 def num_samples_per_step(samples_per_step: int, 
                          window_size: int) -> None:
     if window_size >= samples_per_step:
         raise ValueError(f"Window size must be strictly less than the number of samples per step. Received window size {window_size} [samples], which is more than or equal to the number of samples per step {samples_per_step}")
     
 
-
 def non_overlapping_steps(freq_step: float, 
                           samp_rate: int) -> None:
     if freq_step < samp_rate:
         raise NotImplementedError(f"SPECTRE does not yet support spectral steps overlapping in frequency. Received frequency step {freq_step/1e6} [MHz] which is less than the sample rate {samp_rate/1e6} [MHz]")
     
-
 
 def step_interval(samples_per_step: int, 
                   samp_rate: int, 

@@ -2,9 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from logging import getLogger
-_LOGGER = getLogger(__name__)
-
 import typer
 
 from host.services import get

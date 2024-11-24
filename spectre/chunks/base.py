@@ -4,13 +4,13 @@
 
 from datetime import datetime
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Optional
 
 from scipy.signal import ShortTimeFFT, get_window
 
 from spectre.file_handlers.base import BaseFileHandler
 from spectre.cfg import get_chunks_dir_path
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.cfg import DEFAULT_DATETIME_FORMAT
 from spectre.exceptions import ChunkFileNotFoundError
@@ -124,7 +124,7 @@ class SPECTREChunk(BaseChunk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._capture_config = None # cache
+        self._capture_config = CaptureConfig(self._tag)
         self._SFT = None # cache
 
 
@@ -135,9 +135,7 @@ class SPECTREChunk(BaseChunk):
 
 
     @property
-    def capture_config(self) -> dict[str, Any]:
-        if self._capture_config is None:
-            self._capture_config = self.__get_capture_config()
+    def capture_config(self) -> CaptureConfig:
         return self._capture_config
     
 
@@ -146,11 +144,6 @@ class SPECTREChunk(BaseChunk):
         if self._SFT is None:
             self._SFT = self.__get_SFT_instance()
         return self._SFT
-    
-
-    def __get_capture_config(self) -> dict[str, Any]:
-        capture_config_handler = CaptureConfigHandler(self._tag)
-        return capture_config_handler.read()
     
 
     def __get_SFT_instance(self) -> ShortTimeFFT:

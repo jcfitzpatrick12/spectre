@@ -26,13 +26,17 @@ PROCESS_TYPES = [
 ]
 
 
-def validate_process_type(process_type: str) -> None:
+def validate_process_type(process_type: str
+) -> None:
     if process_type not in PROCESS_TYPES:
         raise ValueError(f"Invalid process type: {process_type}. Expected one of {PROCESS_TYPES}")
 
 
 class LogHandler(TextHandler):
-    def __init__(self, datetime_stamp: str, pid: str, process_type: str):
+    def __init__(self, 
+                 datetime_stamp: str, 
+                 pid: str, 
+                 process_type: str):
         self._datetime_stamp = datetime_stamp
         self._pid = pid
         validate_process_type(process_type)
@@ -178,7 +182,8 @@ class LogHandlers:
 
 
 def configure_root_logger(process_type: str, 
-                          level: int = logging.INFO) -> LogHandler:
+                          level: int = logging.INFO
+) -> LogHandler:
     system_datetime = datetime.now()
     datetime_stamp = system_datetime.strftime(DEFAULT_DATETIME_FORMAT)
     pid = os.getpid()
@@ -202,14 +207,15 @@ def configure_root_logger(process_type: str,
     return log_handler
 
 # Logger must be passed in to preserve context of the service function
-def log_service_call(logger: logging.Logger) -> Callable:
+def log_call(logger: logging.Logger
+) -> Callable:
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             try:
-                logger.info(f"Calling the service function: {func.__name__}")
+                logger.info(f"Calling the function: {func.__name__}")
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.error(f"An error occurred while calling the service function: {func.__name__}",
+                logger.error(f"An error occurred while calling the function: {func.__name__}",
                               exc_info=True)
                 raise
         return wrapper

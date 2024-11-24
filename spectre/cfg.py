@@ -10,15 +10,18 @@ if SPECTRE_DIR_PATH is None:
 
 CHUNKS_DIR_PATH = os.environ.get("SPECTRE_CHUNKS_DIR_PATH", 
                                  os.path.join(SPECTRE_DIR_PATH, 'chunks'))
-os.makedirs(CHUNKS_DIR_PATH, exist_ok=True)
+os.makedirs(CHUNKS_DIR_PATH, 
+            exist_ok=True)
 
 LOGS_DIR_PATH = os.environ.get("SPECTRE_LOGS_DIR_PATH",
                                os.path.join(SPECTRE_DIR_PATH, 'logs'))
-os.makedirs(LOGS_DIR_PATH, exist_ok=True)
+os.makedirs(LOGS_DIR_PATH, 
+            exist_ok=True)
 
 JSON_CONFIGS_DIR_PATH = os.environ.get("SPECTRE_JSON_CONFIGS_DIR_PATH",
                                        os.path.join(SPECTRE_DIR_PATH, "json_configs"))
-os.makedirs(JSON_CONFIGS_DIR_PATH, exist_ok=True)
+os.makedirs(JSON_CONFIGS_DIR_PATH, 
+            exist_ok=True)
 
 DEFAULT_TIME_FORMAT = "%H:%M:%S"
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
@@ -81,7 +84,8 @@ CALLISTO_INSTRUMENT_CODES = [
 ]
 
 def _get_date_based_dir_path(base_dir: str, year: int = None, 
-                             month: int = None, day: int = None) -> str:
+                             month: int = None, day: int = None
+) -> str:
     if day and not (year and month):
         raise ValueError("A day requires both a month and a year")
     if month and not year:
@@ -98,9 +102,15 @@ def _get_date_based_dir_path(base_dir: str, year: int = None,
     return os.path.join(base_dir, *date_dir_components)
 
 
-def get_chunks_dir_path(year: int = None, month: int = None, day: int = None) -> str:
+def get_chunks_dir_path(year: int = None, 
+                        month: int = None, 
+                        day: int = None
+) -> str:
     return _get_date_based_dir_path(CHUNKS_DIR_PATH, year, month, day)
 
 
-def get_logs_dir_path(year: int = None, month: int = None, day: int = None) -> str:
+def get_logs_dir_path(year: int = None, 
+                      month: int = None, 
+                      day: int = None
+) -> str:
     return _get_date_based_dir_path(LOGS_DIR_PATH, year, month, day)

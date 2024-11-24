@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-from typing import Optional
+from typing import Optional, Any
 from warnings import warn
 from datetime import datetime, timedelta
 from dataclasses import dataclass
@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import numpy as np
 from astropy.io import fits
 
-from spectre.file_handlers.json_configs import FitsConfigHandler
+from spectre.file_handlers.configs import FitsConfig
 from spectre.cfg import DEFAULT_DATETIME_FORMAT, get_chunks_dir_path
 from spectre.spectrograms.array_operations import (
     find_closest_index,
@@ -229,8 +229,8 @@ class Spectrogram:
         
 
     def save(self) -> None:
-        fits_config_handler = FitsConfigHandler(self._tag)
-        fits_config = fits_config_handler.read() if fits_config_handler.exists  else {}
+        fits_config = FitsConfig(self._tag)
+        fits_config = fits_config if fits_config.exists else {}
 
         chunk_start_datetime = self.chunk_start_datetime
         chunk_parent_path = get_chunks_dir_path(year = chunk_start_datetime.year,
@@ -360,7 +360,7 @@ def _seconds_of_day(dt: datetime) -> float:
 # Function to create a FITS file with the specified structure
 def _save_spectrogram(write_path: str, 
                       spectrogram: Spectrogram, 
-                      fits_config: dict) -> None:
+                      fits_config: FitsConfig | dict[str, Any]) -> None:
     if spectrogram.chunk_start_time is None:
         raise ValueError(f"Spectrogram must have a defined chunk_start_time. Received {spectrogram.chunk_start_time}")
     

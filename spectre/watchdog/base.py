@@ -16,7 +16,7 @@ from watchdog.events import FileSystemEventHandler
 
 from spectre.chunks.factory import get_chunk_from_tag
 from spectre.chunks.base import BaseChunk
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.spectrograms.transform import join_spectrograms
 from spectre.spectrograms.transform import (
@@ -33,8 +33,7 @@ class BaseEventHandler(ABC, FileSystemEventHandler):
         self._tag = tag
         self._Chunk = get_chunk_from_tag(tag)
 
-        capture_config_handler = CaptureConfigHandler(tag)
-        self._capture_config = capture_config_handler.read()
+        self._capture_config = CaptureConfig(tag)
 
         self._extension = extension
         self._exception_queue = exception_queue  # Queue to propagate exceptions

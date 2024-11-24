@@ -8,9 +8,7 @@ import ast
 
 from spectre.file_handlers.json import JsonHandler
 from spectre.cfg import JSON_CONFIGS_DIR_PATH
-from spectre.exceptions import (
-    InvalidTagError
-)
+from spectre.exceptions import InvalidTagError
 
 
 def _unpack_param(param: str) -> list[str, str]:
@@ -138,7 +136,7 @@ def type_cast_params(params: list[str],
 
 
 
-class SPECTREConfigHandler(JsonHandler, ABC):
+class SPECTREConfig(JsonHandler, ABC):
     def __init__(self, 
                  tag: str, 
                  config_type: str, 
@@ -147,7 +145,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         self._tag = tag
         self._config_type = config_type
 
-        self._capture_config = None # cache
+        self._dict = None # cache
         super().__init__(JSON_CONFIGS_DIR_PATH, 
                          f"{config_type}_config_{tag}", 
                          **kwargs)
@@ -164,11 +162,11 @@ class SPECTREConfigHandler(JsonHandler, ABC):
     
 
     @property
-    def capture_config(self) -> dict[str, Any]:
-        if self._capture_config is None:
-            self._capture_config = self.read()
-        return self._capture_config
-        
+    def dict(self) -> dict[str, Any]:
+        if self._dict is None:
+            self._dict = self.read()
+        return self._dict
+    
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
@@ -176,8 +174,38 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         if "callisto" in tag:
             raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
+    
+    def __getitem__(self, 
+                    key: str) -> Any:
+        return self.dict[key]
+    
 
-class FitsConfigHandler(SPECTREConfigHandler):
+    def get(self, 
+            *args, 
+            **kwargs) -> Any:
+        return self.dict.get(*args, 
+                             **kwargs)
+    
+    
+    def update(self, 
+               *args, 
+               **kwargs) -> None:
+        self.dict.update(*args, **kwargs)
+
+    
+    def items(self):
+        return self.dict.items()
+    
+    
+    def keys(self):
+        return self.dict.keys()
+    
+    
+    def values(self):
+        return self.dict.values()
+
+
+class FitsConfig(SPECTREConfig):
 
     type_template = {
         "ORIGIN": str,
@@ -217,40 +245,20 @@ class FitsConfigHandler(SPECTREConfigHandler):
                              self.type_template)
         self.save(d, 
                   doublecheck_overwrite = doublecheck_overwrite)
-
-    
-    def read(self) -> None:
-        try:
-            return super().read()
-        except FileNotFoundError as e:
-            raise FileNotFoundError((
-                f"A fits config could not be found with tag {self.tag}. " 
-                f"Received the following error: {e}"
-            ))
         
-
     
-class CaptureConfigHandler(SPECTREConfigHandler):
+class CaptureConfig(SPECTREConfig):
     def __init__(self, 
                  tag: str, 
                  **kwargs):
         super().__init__(tag, 
                          "capture", 
                          **kwargs)
-
-    def read(self) -> None:
-        try:
-            return super().read()
-        except FileNotFoundError as e:
-            raise FileNotFoundError((
-                f"A capture config could not be found with tag {self.tag}. " 
-                f"Received the following error: {e}"
-            ))
         
 
     def get_receiver_metadata(self) -> Tuple[str, str]:
-        capture_config = self.read()
-        receiver_name, mode = capture_config.get("receiver"), capture_config.get("mode")
+
+        receiver_name, mode = self.get("receiver"), self.get("mode")
 
         if receiver_name is None:
             raise ValueError("Invalid capture config! Receiver name is not specified.")

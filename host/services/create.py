@@ -8,22 +8,22 @@ _LOGGER = getLogger(__name__)
 from typing import List, Optional
 
 from spectre.receivers.factory import get_receiver
-from spectre.file_handlers.json_configs import FitsConfigHandler
-from spectre.logging import log_service_call
+from spectre.file_handlers.configs import FitsConfig
+from spectre.logging import log_call
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def fits_config(tag: str,
                 params: Optional[List[str]] = None,
 ) -> None:
     if params is None:
         params = []
-    fits_config_handler = FitsConfigHandler(tag)
-    fits_config_handler.save_params(params)
+    fits_config = FitsConfig(tag)
+    fits_config.save_params(params)
     _LOGGER.info(f"The fits-config for tag: {tag} has been created")
 
 
-@log_service_call(_LOGGER)
+@log_call(_LOGGER)
 def capture_config(tag: str,
                    receiver_name: str,
                    mode: str,
