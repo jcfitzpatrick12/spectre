@@ -132,7 +132,7 @@ class BaseReceiver(ABC):
         if specification is None:
             expected_specifications = list(self.specifications.keys())
             raise SpecificationNotFoundError(f"Invalid specification '{specification_key}'. Expected one of {expected_specifications}")
-
+        return specification
 
 
     def validate_capture_config(self, 
@@ -384,10 +384,13 @@ class SDRPlayReceiver(SPECTREReceiver):
         center_freq = capture_config.get("center_freq")
         min_freq = capture_config.get("min_freq")
         max_freq = capture_config.get("max_freq")
+
         if center_freq:
+            print("Outside")
             validators.closed_confine_center_freq(center_freq, 
                                                   center_freq_lower_bound, 
                                                   center_freq_upper_bound)
+            
         if min_freq:
             validators.closed_confine_center_freq(min_freq, 
                                                   center_freq_lower_bound, 
