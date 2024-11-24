@@ -177,16 +177,22 @@ class SPECTREConfig(JsonHandler, ABC):
             raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
     
-    def __getitem__(self, subscript: str | int) -> Any:
-        return self.dict[subscript]
+    def __getitem__(self, 
+                    key: str) -> Any:
+        return self.dict[key]
     
 
-    def get(self, key: str) -> Any:
-        return self.dict.get(key)
+    def get(self, 
+            *args, 
+            **kwargs) -> Any:
+        return self.dict.get(*args, 
+                             **kwargs)
     
     
-    def update(self, d: dict) -> None:
-        self.dict.update(d)
+    def update(self, 
+               *args, 
+               **kwargs) -> None:
+        self.dict.update(*args, **kwargs)
 
     
     def items(self):
