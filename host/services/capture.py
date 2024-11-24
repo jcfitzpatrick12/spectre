@@ -79,7 +79,8 @@ def _terminate_processes(process_wrappers: List[_ProcessWrapper]) -> None:
 
 def _monitor_processes(process_wrappers: List[_ProcessWrapper], 
                        total_runtime: float, 
-                       force_restart: bool) -> None:
+                       force_restart: bool
+) -> None:
     """Monitor and restart processes if necessary."""
     _LOGGER.info("Monitoring processes...")
     start_time = time.time()
@@ -104,14 +105,18 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
         _terminate_processes(process_wrappers)
 
 
-def _calculate_total_runtime(seconds: int = 0, minutes: int = 0, hours: int = 0) -> float:
+def _calculate_total_runtime(seconds: int = 0, 
+                             minutes: int = 0, 
+                             hours: int = 0
+) -> float:
     """Calculate total runtime in seconds"""
     if seconds == 0 and minutes == 0 and hours == 0:
         raise ValueError(f"Session duration must be specified")
     return seconds + (minutes * 60) + (hours * 3600)
 
 
-def _get_user_root_logger_state() -> Tuple[bool, int]:
+def _get_user_root_logger_state(
+) -> Tuple[bool, int]:
     """Check the state of the user's root logger"""
     root_logger = logging.getLogger()
     if root_logger.handlers:
@@ -121,7 +126,8 @@ def _get_user_root_logger_state() -> Tuple[bool, int]:
 
 def _start_capture(tag: str,
                    do_logging: bool,
-                   logging_level: int = logging.INFO) -> None:
+                   logging_level: int = logging.INFO
+) -> None:
     
     # load the receiver and mode from the capture config file
     capture_config = CaptureConfig(tag)
@@ -140,7 +146,8 @@ def _start_capture(tag: str,
 
 def _start_watcher(tag: str,
                    do_logging: bool = False,
-                   logging_level: int = logging.INFO) -> None:
+                   logging_level: int = logging.INFO
+) -> None:
     if do_logging:
         configure_root_logger(f"WORKER", level = logging_level) #  start worker log
     _LOGGER.info(f"Starting watcher with tag: {tag}")
@@ -153,7 +160,8 @@ def start(tag: str,
           seconds: int = 0, 
           minutes: int = 0, 
           hours: int = 0, 
-          force_restart: bool = False) -> None:
+          force_restart: bool = False
+) -> None:
 
     total_runtime = _calculate_total_runtime(seconds, 
                                              minutes, 
@@ -180,7 +188,8 @@ def session(tag: str,
             force_restart: bool = False, 
             seconds: int = 0, 
             minutes: int = 0, 
-            hours: int = 0) -> None:
+            hours: int = 0
+) -> None:
     
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
