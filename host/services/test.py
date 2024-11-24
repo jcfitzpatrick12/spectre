@@ -54,14 +54,14 @@ def validate_analytically(spectrogram: Spectrogram,
     test_results = TestResults()
 
     if _close_enough(analytical_spectrogram.times,
-                         spectrogram.times,
-                         absolute_tolerance):
+                     spectrogram.times,
+                     absolute_tolerance):
         test_results.times_validated = True
 
 
     if _close_enough(analytical_spectrogram.frequencies,
-                         spectrogram.frequencies,
-                         absolute_tolerance):
+                     spectrogram.frequencies,
+                     absolute_tolerance):
         test_results.frequencies_validated = True
 
     test_results.spectrum_validated = {}
@@ -70,8 +70,8 @@ def validate_analytically(spectrogram: Spectrogram,
         analytical_spectrum = analytical_spectrogram.dynamic_spectra[:, i]
         spectrum = spectrogram.dynamic_spectra[:, i]
         test_results.spectrum_validated[time] = _close_enough(analytical_spectrum, 
-                                                               spectrum,
-                                                               absolute_tolerance)
+                                                              spectrum,
+                                                              absolute_tolerance)
 
     return test_results
 
