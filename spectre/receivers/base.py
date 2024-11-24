@@ -156,12 +156,13 @@ class BaseReceiver(ABC):
                     params: list[str],  
                     tag: str, 
                     doublecheck_overwrite: bool = True) -> None:
-        capture_config = type_cast_params(params, 
-                                          self.type_template)
+        d = type_cast_params(params, 
+                             self.type_template)
         
-        validate_against_type_template(capture_config,
+        validate_against_type_template(d,
                                        self.type_template)
-        self.save_capture_config(capture_config, 
+        
+        self.save_capture_config(d, 
                                  tag, 
                                  doublecheck_overwrite=doublecheck_overwrite)
 
@@ -171,7 +172,7 @@ class BaseReceiver(ABC):
                             tag: str, 
                             doublecheck_overwrite: bool = True) -> None:
         
-        self.validate_capture_config(capture_config)
+        self.validate_capture_config(d)
 
         d.update({"receiver": self.name, 
                   "mode": self.mode, 
