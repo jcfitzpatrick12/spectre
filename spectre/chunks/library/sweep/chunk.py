@@ -251,13 +251,13 @@ class Chunk(SPECTREChunk):
     def __fill_frequencies(self,
                            frequencies: np.ndarray,
                            center_frequencies: np.ndarray,
-                           base_band_frequencies: np.ndarray,
+                           baseband_frequencies: np.ndarray,
                            window_size: int) -> None:
         """Assign physical frequencies to each of the swept spectral components."""
         for i, center_frequency in enumerate(np.unique(center_frequencies)):
             lower_bound = i * window_size
             upper_bound = (i + 1) * window_size
-            frequencies[lower_bound:upper_bound] = (base_band_frequencies + center_frequency)
+            frequencies[lower_bound:upper_bound] = (baseband_frequencies + center_frequency)
     
 
     def __fill_times(self,
