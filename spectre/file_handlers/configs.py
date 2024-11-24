@@ -167,9 +167,16 @@ class SPECTREConfig(JsonHandler, ABC):
     def dict(self) -> dict[str, Any]:
         if self._dict is None:
             self._dict = self.read()
-        return self._data
+        return self._dict
+    
 
+    def _validate_tag(self, tag: str) -> None:
+        if "_" in tag:
+            raise InvalidTagError(f"Tags cannot contain an underscore. Received {tag}")
+        if "callisto" in tag:
+            raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
+    
     def __getitem__(self, subscript: str | int) -> Any:
         return self.dict[subscript]
     
@@ -181,13 +188,17 @@ class SPECTREConfig(JsonHandler, ABC):
     def update(self, d: dict) -> None:
         self._dict.update(d)
 
-
-    def _validate_tag(self, tag: str) -> None:
-        if "_" in tag:
-            raise InvalidTagError(f"Tags cannot contain an underscore. Received {tag}")
-        if "callisto" in tag:
-            raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
-
+    
+    def items(self):
+        return self._dict.items()
+    
+    
+    def keys(self):
+        return self._dict.keys()
+    
+    
+    def values(self):
+        return self._dict.values()
 
 class FitsConfig(SPECTREConfig):
 
