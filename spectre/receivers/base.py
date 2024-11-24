@@ -386,7 +386,6 @@ class SDRPlayReceiver(SPECTREReceiver):
         max_freq = capture_config.get("max_freq")
 
         if center_freq:
-            print("Outside")
             validators.closed_confine_center_freq(center_freq, 
                                                   center_freq_lower_bound, 
                                                   center_freq_upper_bound)
