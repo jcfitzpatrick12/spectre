@@ -90,9 +90,9 @@ class _AnalyticalFactory:
 
         # Create the analytical spectrum, which is constant in time.
         spectrum = np.zeros(window_size)
-        derived_spectral_amplitude = amplitude * window_size / 2
-        spectrum[p] = derived_spectral_amplitude
-        spectrum[window_size - p] = derived_spectral_amplitude
+        spectral_amplitude = amplitude * window_size / 2
+        spectrum[p] = spectral_amplitude
+        spectrum[window_size - p] = spectral_amplitude
 
         # Align spectrum to naturally ordered frequency array.
         spectrum = np.fft.fftshift(spectrum)
@@ -131,8 +131,11 @@ class _AnalyticalFactory:
 
         # Create the analytical spectrum, constant in time.
         spectrum = np.zeros(window_size * num_steps)
+        step_count = 0
         for i in range(num_steps):
-            spectrum[int(window_size/2) + i*window_size] = window_size * i
+            step_count += 1
+            spectral_amplitude = window_size * step_count
+            spectrum[int(window_size/2) + i*window_size] = spectral_amplitude
 
         # Populate the spectrogram with identical spectra.
         analytical_dynamic_spectra = np.ones((window_size * num_steps, num_spectrums)) * spectrum[:, np.newaxis]
