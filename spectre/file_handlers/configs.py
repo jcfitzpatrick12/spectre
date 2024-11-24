@@ -186,19 +186,20 @@ class SPECTREConfig(JsonHandler, ABC):
     
     
     def update(self, d: dict) -> None:
-        self._dict.update(d)
+        self.dict.update(d)
 
     
     def items(self):
-        return self._dict.items()
+        return self.dict.items()
     
     
     def keys(self):
-        return self._dict.keys()
+        return self.dict.keys()
     
     
     def values(self):
-        return self._dict.values()
+        return self.dict.values()
+
 
 class FitsConfig(SPECTREConfig):
 
@@ -240,18 +241,7 @@ class FitsConfig(SPECTREConfig):
                              self.type_template)
         self.save(d, 
                   doublecheck_overwrite = doublecheck_overwrite)
-
-    
-    def read(self) -> None:
-        try:
-            return super().read()
-        except FileNotFoundError as e:
-            raise FileNotFoundError((
-                f"A fits config could not be found with tag {self.tag}. " 
-                f"Received the following error: {e}"
-            ))
         
-
     
 class CaptureConfig(SPECTREConfig):
     def __init__(self, 
@@ -260,15 +250,6 @@ class CaptureConfig(SPECTREConfig):
         super().__init__(tag, 
                          "capture", 
                          **kwargs)
-
-    def read(self) -> None:
-        try:
-            return super().read()
-        except FileNotFoundError as e:
-            raise FileNotFoundError((
-                f"A capture config could not be found with tag {self.tag}. " 
-                f"Received the following error: {e}"
-            ))
         
 
     def get_receiver_metadata(self) -> Tuple[str, str]:
