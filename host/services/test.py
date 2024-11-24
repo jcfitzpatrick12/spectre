@@ -12,7 +12,7 @@ from spectre.logging import log_call
 from spectre.chunks import Chunks
 from spectre.spectrograms.analytical import get_analytical_spectrogram
 from spectre.spectrograms.spectrogram import Spectrogram
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 
 @dataclass
 class TestResults:
@@ -44,7 +44,7 @@ def _close_enough(ar: np.ndarray,
 
 
 def validate_analytically(spectrogram: Spectrogram,
-                          capture_config: dict,
+                          capture_config: CaptureConfig,
                           absolute_tolerance: float) -> TestResults:
 
     analytical_spectrogram = get_analytical_spectrogram(spectrogram.num_times,
@@ -81,8 +81,7 @@ def analytical(
     tag: str,
     absolute_tolerance: float
 ) -> dict[str, TestResults]:
-    capture_config_handler = CaptureConfigHandler(tag)
-    capture_config = capture_config_handler.read()
+    capture_config = CaptureConfig(tag)
     
     results_per_chunk = {}
     chunks = Chunks(tag)

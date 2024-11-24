@@ -138,7 +138,7 @@ def type_cast_params(params: list[str],
 
 
 
-class SPECTREConfigHandler(JsonHandler, ABC):
+class SPECTREConfig(JsonHandler, ABC):
     def __init__(self, 
                  tag: str, 
                  config_type: str, 
@@ -147,7 +147,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
         self._tag = tag
         self._config_type = config_type
 
-        self._capture_config = None # cache
+        self._dict = None # cache
         super().__init__(JSON_CONFIGS_DIR_PATH, 
                          f"{config_type}_config_{tag}", 
                          **kwargs)
@@ -164,11 +164,23 @@ class SPECTREConfigHandler(JsonHandler, ABC):
     
 
     @property
-    def capture_config(self) -> dict[str, Any]:
-        if self._capture_config is None:
-            self._capture_config = self.read()
-        return self._capture_config
-        
+    def dict(self) -> dict[str, Any]:
+        if self._dict is None:
+            self._dict = self.read()
+        return self._data
+
+
+    def __getitem__(self, subscript: str | int) -> Any:
+        return self.dict[subscript]
+    
+
+    def get(self, key: str) -> Any:
+        return self.dict.get(key)
+    
+    
+    def update(self, d: dict) -> None:
+        self._dict.update(d)
+
 
     def _validate_tag(self, tag: str) -> None:
         if "_" in tag:
@@ -177,7 +189,7 @@ class SPECTREConfigHandler(JsonHandler, ABC):
             raise InvalidTagError(f'"callisto" cannot be a substring in a native tag. Received "{tag}"')
 
 
-class FitsConfigHandler(SPECTREConfigHandler):
+class FitsConfig(SPECTREConfig):
 
     type_template = {
         "ORIGIN": str,
@@ -230,7 +242,7 @@ class FitsConfigHandler(SPECTREConfigHandler):
         
 
     
-class CaptureConfigHandler(SPECTREConfigHandler):
+class CaptureConfig(SPECTREConfig):
     def __init__(self, 
                  tag: str, 
                  **kwargs):
@@ -249,8 +261,8 @@ class CaptureConfigHandler(SPECTREConfigHandler):
         
 
     def get_receiver_metadata(self) -> Tuple[str, str]:
-        capture_config = self.read()
-        receiver_name, mode = capture_config.get("receiver"), capture_config.get("mode")
+
+        receiver_name, mode = self.get("receiver"), self.get("mode")
 
         if receiver_name is None:
             raise ValueError("Invalid capture config! Receiver name is not specified.")

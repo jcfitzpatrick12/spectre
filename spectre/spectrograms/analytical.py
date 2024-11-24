@@ -6,7 +6,7 @@ from typing import Callable, Any, Tuple
 
 import numpy as np
 
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.spectrograms.spectrogram import Spectrogram
 from spectre.exceptions import ModeNotFoundError
 
@@ -31,7 +31,7 @@ class _AnalyticalFactory:
 
     def get_spectrogram(self, 
                         num_spectrums: int, 
-                        capture_config: dict[str, Any]) -> Spectrogram:
+                        capture_config: CaptureConfig) -> Spectrogram:
         """Get an analytical spectrogram based on a test receiver capture config.
         
         The anaytically derived spectrogram should be able to be fully determined
@@ -52,7 +52,7 @@ class _AnalyticalFactory:
 
     def cosine_signal_1(self, 
                         num_spectrums: int,
-                        capture_config: dict[str, Any]) -> Spectrogram:
+                        capture_config: CaptureConfig) -> Spectrogram:
         # Extract necessary parameters from the capture configuration.
         window_size = capture_config['window_size']
         samp_rate = capture_config['samp_rate']
@@ -91,7 +91,7 @@ class _AnalyticalFactory:
 
     def tagged_staircase(self, 
                         num_spectrums: int,
-                        capture_config: dict) -> Spectrogram:
+                        capture_config: CaptureConfig) -> Spectrogram:
         # Extract necessary parameters from the capture configuration.
         window_size = capture_config['window_size']
         min_samples_per_step = capture_config['min_samples_per_step']
@@ -133,7 +133,7 @@ class _AnalyticalFactory:
     
 
 def get_analytical_spectrogram(num_spectrums: int,
-                               capture_config: dict[str, Any]) -> Spectrogram:
+                               capture_config: CaptureConfig) -> Spectrogram:
     
     factory = _AnalyticalFactory()
     return factory.get_spectrogram(num_spectrums,

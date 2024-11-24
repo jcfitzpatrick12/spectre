@@ -9,6 +9,7 @@ from spectre.receivers.base import SPECTREReceiver
 from spectre.receivers.library.test.gr import cosine_signal_1
 from spectre.receivers.library.test.gr import tagged_staircase
 from spectre.receivers import validators
+from spectre.file_handlers.configs import CaptureConfig
 
 
 @register_receiver("test")
@@ -72,15 +73,15 @@ class Receiver(SPECTREReceiver):
         } 
 
 
-    def __cosine_signal_1(self, capture_config: dict[str, Any]) -> None:
+    def __cosine_signal_1(self, capture_config: CaptureConfig) -> None:
         cosine_signal_1.main(capture_config)
     
 
-    def __tagged_staircase(self, capture_config: list[str, Any]) -> None:
+    def __tagged_staircase(self, capture_config: CaptureConfig) -> None:
         tagged_staircase.main(capture_config)
     
 
-    def __cosine_signal_1_validator(self, capture_config: dict[str, Any]) -> None:
+    def __cosine_signal_1_validator(self, capture_config: CaptureConfig) -> None:
         # unpack the capture config
         samp_rate = capture_config["samp_rate"]
         frequency = capture_config["frequency"]
@@ -136,7 +137,7 @@ class Receiver(SPECTREReceiver):
             raise ValueError(f"The amplitude must be strictly positive. Received: {amplitude}")
     
 
-    def __tagged_staircase_validator(self, capture_config: dict[str, Any]) -> None:
+    def __tagged_staircase_validator(self, capture_config: CaptureConfig) -> None:
         samp_rate = capture_config["samp_rate"]
         min_samples_per_step = capture_config["min_samples_per_step"]
         max_samples_per_step = capture_config["max_samples_per_step"]

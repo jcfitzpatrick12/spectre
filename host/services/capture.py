@@ -13,7 +13,7 @@ import multiprocessing
 
 from spectre.receivers.factory import get_receiver
 from spectre.watchdog.watcher import Watcher
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.logging import (
     configure_root_logger, 
     log_call
@@ -124,8 +124,8 @@ def _start_capture(tag: str,
                    logging_level: int = logging.INFO) -> None:
     
     # load the receiver and mode from the capture config file
-    capture_config_handler = CaptureConfigHandler(tag)
-    receiver_name, mode = capture_config_handler.get_receiver_metadata()
+    capture_config = CaptureConfig(tag)
+    receiver_name, mode = capture_config.get_receiver_metadata()
 
     if do_logging:  
         configure_root_logger(f"WORKER", 

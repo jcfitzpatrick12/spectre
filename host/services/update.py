@@ -10,9 +10,9 @@ from typing import List
 from spectre.receivers.factory import get_receiver
 from spectre.chunks import Chunks
 from spectre.logging import log_call
-from spectre.file_handlers.json_configs import (
-    FitsConfigHandler,
-    CaptureConfigHandler,
+from spectre.file_handlers.configs import (
+    FitsConfig,
+    CaptureConfig,
     type_cast_params,
     validate_against_type_template
 )
@@ -46,8 +46,7 @@ def capture_config(tag: str,
 ) -> None: 
     _caution_update(tag, force)
 
-    capture_config_handler = CaptureConfigHandler(tag)
-    capture_config = capture_config_handler.read()
+    capture_config = CaptureConfig(tag)
 
     receiver_name = capture_config.get("receiver")
     mode = capture_config.get("mode")
@@ -70,16 +69,15 @@ def fits_config(tag: str,
                 force: bool = False,
 ) -> None:
     _caution_update(tag, force)
-    fits_config_handler = FitsConfigHandler(tag)
-    fits_config = fits_config_handler.read()
+    fits_config = FitsConfig(tag)
 
     d = type_cast_params(params,
-                         fits_config_handler.template)
+                         fits_config.type_template)
     fits_config.update(d)
     
-    validate_against_type_template(fits_config, fits_config_handler.template)
+    validate_against_type_template(fits_config, fits_config.type_template)
 
-    fits_config_handler.save(fits_config, 
-                             doublecheck_overwrite = False)
+    fits_config.save(fits_config, 
+                     doublecheck_overwrite = False)
 
     _LOGGER.info(f"Fits config for tag: {tag} has been successfully updated")

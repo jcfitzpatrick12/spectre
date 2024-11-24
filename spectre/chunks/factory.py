@@ -5,7 +5,7 @@
 # after we decorate all chunks, we can import the chunk_key -> chunk maps
 from spectre.chunks.chunk_register import chunk_map
 from spectre.chunks.base import BaseChunk
-from spectre.file_handlers.json_configs import CaptureConfigHandler
+from spectre.file_handlers.configs import CaptureConfig
 from spectre.exceptions import ChunkNotFoundError
 
 
@@ -22,7 +22,6 @@ def get_chunk_from_tag(tag: str) -> BaseChunk:
         chunk_key = "callisto"
     # otherwise, we fetch the chunk key from the capture config
     else:
-        capture_config_handler = CaptureConfigHandler(tag)
-        capture_config = capture_config_handler.read()
+        capture_config= CaptureConfig(tag)
         chunk_key = capture_config.get('chunk_key')
     return get_chunk(chunk_key)

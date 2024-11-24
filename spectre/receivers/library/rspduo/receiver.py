@@ -7,6 +7,7 @@ from typing import Any
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SDRPlayReceiver
 from spectre.receivers.library.rspduo.gr import tuner_1_fixed, tuner_1_sweep
+from file_handlers.configs import CaptureConfig
 
 
 @register_receiver("rspduo")
@@ -50,20 +51,20 @@ class Receiver(SDRPlayReceiver):
         }
 
 
-    def __tuner_1_fixed(self, capture_config: dict[str, Any]) -> None:
+    def __tuner_1_fixed(self, capture_config: CaptureConfig) -> None:
         tuner_1_fixed.main(capture_config)
     
 
-    def __tuner_1_sweep(self, capture_config: dict[str, Any]) -> None:
+    def __tuner_1_sweep(self, capture_config: CaptureConfig) -> None:
         tuner_1_sweep.main(capture_config)
     
 
-    def __tuner_1_fixed_validator(self, capture_config: dict[str, Any]) -> None:
+    def __tuner_1_fixed_validator(self, capture_config: CaptureConfig) -> None:
         self._default_fixed_validator(capture_config)
         self._sdrplay_validator(capture_config)
     
     
-    def __tuner_1_sweep_validator(self, capture_config: dict[str, Any]) -> None:
+    def __tuner_1_sweep_validator(self, capture_config: CaptureConfig) -> None:
         self._default_sweep_validator(capture_config)
         self._sdrplay_validator(capture_config)
     

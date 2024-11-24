@@ -23,9 +23,9 @@ from spectre.logging import (
     LogHandler,
     log_call
 )
-from spectre.file_handlers.json_configs import (
-    FitsConfigHandler,
-    CaptureConfigHandler
+from spectre.file_handlers.configs import (
+    FitsConfig,
+    CaptureConfig
 )
 
 
@@ -166,11 +166,11 @@ def fits_config_type_template(tag: Optional[str] = None,
     if as_command:
         if not tag:
             raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
-        fits_config_handler = FitsConfigHandler(tag)
-        return fits_config_handler.get_create_fits_config_cmd(tag, 
-                                                              as_string = True)
+        fits_config = FitsConfig(tag)
+        return fits_config.get_create_fits_config_cmd(tag, 
+                                                      as_string = True)
     else:
-        return FitsConfigHandler.type_template
+        return FitsConfig.type_template
 
 
 @log_call(_LOGGER)
@@ -191,13 +191,11 @@ def type_template(receiver_name: str,
 
 @log_call(_LOGGER)
 def fits_config(tag: str
-) -> dict[str, Any]:
-    fits_config_handler = FitsConfigHandler(tag)
-    return fits_config_handler.read()
+) -> FitsConfig:
+    return FitsConfig(tag)
 
 
 @log_call(_LOGGER)
 def capture_config(tag: str
-) -> dict[str, Any]:
-    capture_config_handler = CaptureConfigHandler(tag)
-    return capture_config_handler.read()
+) -> CaptureConfig:
+    return CaptureConfig(tag)

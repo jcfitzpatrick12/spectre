@@ -26,11 +26,12 @@ from gnuradio import sdrplay3
 from gnuradio import spectre
 
 from spectre.cfg import CHUNKS_DIR_PATH
+from spectre.file_handlers.configs import CaptureConfig
 
 
 class tuner_1_fixed(gr.top_block):
 
-    def __init__(self, capture_config: dict[str, Any]):
+    def __init__(self, capture_config: CaptureConfig):
         gr.top_block.__init__(self, "tuner_1_fixed", catch_exceptions=True)
 
         ##################################################
@@ -87,7 +88,7 @@ class tuner_1_fixed(gr.top_block):
 
 
 
-def main(capture_config: dict[str, Any], top_block_cls=tuner_1_fixed, options=None):
+def main(capture_config: CaptureConfig, top_block_cls=tuner_1_fixed, options=None):
 
     tb = top_block_cls(capture_config)
 

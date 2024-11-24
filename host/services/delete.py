@@ -10,9 +10,9 @@ from typing import Optional
 from spectre.logging import LogHandlers
 from spectre.chunks import Chunks
 from spectre.logging import log_call
-from spectre.file_handlers.json_configs import (
-    FitsConfigHandler,
-    CaptureConfigHandler
+from spectre.file_handlers.configs import (
+    FitsConfig,
+    CaptureConfig
 )
 
 
@@ -66,14 +66,14 @@ def chunk_files(tag: str,
 @log_call(_LOGGER)
 def fits_config(tag: str,
 ) -> None:
-    fits_config_handler = FitsConfigHandler(tag)
-    fits_config_handler.delete()
-    _LOGGER.info(f"File deleted: {fits_config_handler.file_path}")
+    fits_config = FitsConfig(tag)
+    fits_config.delete()
+    _LOGGER.info(f"File deleted: {fits_config.file_path}")
 
 
 @log_call(_LOGGER)
 def capture_config(tag: str,
 ) -> None:
-    capture_config_handler = CaptureConfigHandler(tag)
-    capture_config_handler.delete()
-    _LOGGER.info(f"File deleted: {capture_config_handler.file_path}")
+    capture_config = CaptureConfig(tag)
+    capture_config.delete()
+    _LOGGER.info(f"File deleted: {capture_config.file_path}")
