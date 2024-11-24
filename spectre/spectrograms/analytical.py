@@ -52,58 +52,83 @@ class _AnalyticalFactory:
     def cosine_signal_1(self, 
                         num_spectrums: int,
                         capture_config: dict[str, Any]) -> Spectrogram:
-        # retrieve the parameters in the capture config which are required 
-        # to build the analytical spectrogram.
+        # Extract necessary parameters from the capture configuration.
         window_size = capture_config['window_size']
-        samp_rate = capture_config['samp_rate'] 
-        amplitude = capture_config['amplitude'] 
+        samp_rate = capture_config['samp_rate']
+        amplitude = capture_config['amplitude']
         frequency = capture_config['frequency']
         hop = capture_config['STFFT_kwargs']['hop']
 
-        # a defines the ratio of the sampling rate to the frequency of the synthetic signal
+        # Calculate derived parameters a (sampling rate ratio) and p (sampled periods).
         a = int(samp_rate / frequency)
-
-        # p is effectively the "number of sampled periods"
-        # which can be found equal to the ratio of window_size to a
         p = int(window_size / a)
 
-        # for the case of cosine-signal-1, the spectrogram
-        # should be constant in time so we will build one spectrum, 
-        # then use that to populate the spectrogram.
+        # Create the analytical spectrum, which is constant in time.
         spectrum = np.zeros(window_size)
         derived_spectral_amplitude = amplitude * window_size / 2
         spectrum[p] = derived_spectral_amplitude
         spectrum[window_size - p] = derived_spectral_amplitude
 
-        # analytical solution is derived for 0 <= k <= N-1 DFT summation indexing
-        # so, we need to fftshift the array to align the slices to the naturally
-        # ordered frequency array (-ve -> +ve for increasing indices from 0 -> N-1)
-        spectrum= np.fft.fftshift(spectrum)
+        # Align spectrum to naturally ordered frequency array.
+        spectrum = np.fft.fftshift(spectrum)
 
-        # fill the analytical spectra identically with the common derived
-        # spectrum.
-        analytical_dynamic_spectra = np.ones((window_size, num_spectrums))
-        analytical_dynamic_spectra = analytical_dynamic_spectra*spectrum[:, np.newaxis]   
+        # Populate the spectrogram with identical spectra.
+        analytical_dynamic_spectra = np.ones((window_size, num_spectrums)) * spectrum[:, np.newaxis]
 
-        # assign physical times to each of the spectrum
-        sampling_interval = ( 1 / samp_rate )
-        times = np.array([tau*hop*sampling_interval for tau in range(num_spectrums)])
+        # Compute time and frequency arrays.
+        sampling_interval = 1 / samp_rate
+        times = np.arange(num_spectrums) * hop * sampling_interval
+        frequencies = np.fft.fftshift(np.fft.fftfreq(window_size, sampling_interval))
 
-        # assign physical frequencies to each spectrum
-        frequencies = np.fft.fftfreq(window_size, sampling_interval)
-        frequencies = np.fft.fftshift(frequencies)
-
+        # Return the spectrogram.
         return Spectrogram(analytical_dynamic_spectra,
                            times,
                            frequencies,
                            'analytically-derived-spectrogram',
-                           spectrum_type = "amplitude")
+                           spectrum_type="amplitude")
 
-    def tagged_staircase(self,
-                         num_spectrums: int,
-                         capture_config: dict) -> Spectrogram:
+
+    def tagged_staircase(self, 
+                        num_spectrums: int,
+                        capture_config: dict) -> Spectrogram:
+        # Extract necessary parameters from the capture configuration.
         window_size = capture_config['window_size']
-        return
+        min_samples_per_step = capture_config['min_samples_per_step']
+        max_samples_per_step = capture_config['max_samples_per_step']
+        step_increment = capture_config['step_increment']
+        samp_rate = capture_config['samp_rate']
+
+        # Calculate step sizes and derived parameters.
+        num_samples = np.arange(min_samples_per_step, max_samples_per_step + 1, step_increment)
+        num_steps = len(num_samples)
+
+        # Create the analytical spectrum, constant in time.
+        spectrum = np.zeros(window_size * num_steps)
+        for i in range(num_steps):
+            spectrum[i * window_size] = window_size * i
+        spectrum = np.fft.fftshift(spectrum)
+
+        # Populate the spectrogram with identical spectra.
+        analytical_dynamic_spectra = np.ones((window_size * num_steps, num_spectrums)) * spectrum[:, np.newaxis]
+
+        # Compute time and frequency arrays.
+        midpoint_sample = sum(num_samples) // 2
+        sampling_interval = 1 / samp_rate
+        times = np.arange(num_spectrums) * midpoint_sample * sampling_interval
+
+        baseband_frequencies = np.fft.fftfreq(window_size, sampling_interval)
+        frequencies = np.empty(window_size * num_steps)
+        for i in range(num_steps):
+            lower_bound = i * window_size
+            upper_bound = (i + 1) * window_size
+            frequencies[lower_bound:upper_bound] = baseband_frequencies + samp_rate * i
+
+        # Return the spectrogram.
+        return Spectrogram(analytical_dynamic_spectra,
+                           times,
+                           frequencies,
+                           'analytically-derived-spectrogram',
+                           spectrum_type="amplitude")
     
 
 def get_analytical_spectrogram(num_spectrums: int,
