@@ -13,7 +13,8 @@ from spectre.exceptions import ModeNotFoundError
 class _AnalyticalFactory:
     def __init__(self):
         self._builders: dict[str, Callable] = {
-            "cosine-signal-1": self.cosine_signal_1
+            "cosine-signal-1": self.cosine_signal_1,
+            "tagged-staircase": self.tagged_staircase
         }
         self._test_modes = list(self.builders.keys())
 
