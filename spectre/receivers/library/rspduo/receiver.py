@@ -7,7 +7,7 @@ from typing import Any
 from spectre.receivers.receiver_register import register_receiver
 from spectre.receivers.base import SDRPlayReceiver
 from spectre.receivers.library.rspduo.gr import tuner_1_fixed, tuner_1_sweep
-from file_handlers.configs import CaptureConfig
+from spectre.file_handlers.configs import CaptureConfig
 
 
 @register_receiver("rspduo")
