@@ -6,6 +6,16 @@ from datetime import datetime
 
 import numpy as np
 
+
+def is_close(ar: np.ndarray, 
+             ar_comparison: np.ndarray,
+             absolute_tolerance: float) -> bool:
+    """Close enough accounts for wiggle-room equating floats."""
+    return np.all(np.isclose(ar, 
+                             ar_comparison, 
+                             atol=absolute_tolerance))
+
+
 def find_closest_index(
     target_value: float | datetime, 
     array: np.ndarray, 
