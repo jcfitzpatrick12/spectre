@@ -19,7 +19,6 @@ from host.cli.tools.test import app as test_app
 
 from spectre.logging import configure_root_logger
 
-
 app = typer.Typer()
 
 app.add_typer(create_app, name="create")

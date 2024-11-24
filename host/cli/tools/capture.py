@@ -3,12 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-from typing import List
 
 from host.services import capture
 from host.cli import (
-    RECEIVER_NAME_HELP,
-    MODE_HELP,
     TAG_HELP,
     SECONDS_HELP,
     MINUTES_HELP,

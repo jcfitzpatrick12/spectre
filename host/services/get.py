@@ -177,7 +177,8 @@ def fits_config_type_template(tag: Optional[str] = None,
 def type_template(receiver_name: str,
                   mode: str,
                   as_command: bool = False,
-                  tag: Optional[str] = None) -> dict[str, Any] | str:
+                  tag: Optional[str] = None
+) -> dict[str, Any] | str:
     
     receiver = get_receiver(receiver_name, 
                             mode = mode)

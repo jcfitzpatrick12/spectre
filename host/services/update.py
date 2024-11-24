@@ -17,14 +17,16 @@ from spectre.file_handlers.configs import (
     validate_against_type_template
 )
 
-def _has_chunks(tag: str) -> bool:
+def _has_chunks(tag: str
+) -> bool:
     """Returns True if any files exist under the input tag."""
     chunks = Chunks(tag)
     return (len(chunks.chunk_list) > 0)
 
 
 def _caution_update(tag: str,
-                    force: bool) -> None:
+                    force: bool
+) -> None:
     """Caution the user if chunks exist under the input tag."""
     if _has_chunks(tag):
         if force:

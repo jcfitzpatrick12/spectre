@@ -46,7 +46,7 @@ def chunk_files(
 ) -> None:
     for chunk_file_name in get.chunk_file_names(tag, year, month, day, extensions):
         typer.secho(chunk_file_name)
-    typer.Exit()
+    raise typer.Exit()
 
 
 @app.command()
@@ -54,7 +54,7 @@ def receivers(
 ) -> None:
     for receiver_name in get.receiver_names():
         typer.secho(receiver_name)
-
+    raise typer.Exit()
 
 @app.command()
 def modes(
