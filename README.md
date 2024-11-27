@@ -17,7 +17,7 @@
 
 ## Use-case: Solar Radio Observations :sunny:
 Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a ```spectre``` spectrogram (second panel) captured in the West End of Glasgow, to that observed by the [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel)
-![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a SPECTRE spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
+![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a spectre spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
 
 
 ## Supported Receivers
@@ -35,7 +35,7 @@ The framework is in place to integrate the following receivers, this is planned 
 - USRP SDRs
 - RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
 
-**Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with SPECTRE as they are not compatible with the official SDRPlay API**. 
+**Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with spectre as they are not compatible with the official SDRPlay API**. 
 
 ## Supported Operating Systems and Platforms
 This project is tested to be compatible with the following operating systems and architectures:
