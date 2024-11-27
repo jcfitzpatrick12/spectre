@@ -54,5 +54,5 @@ Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubunt
 
 ...
 
-# Contributing
+## Contributing
 Once the testing framework is in place, we will be looking for contributors. In the meantime, feel free to contact jcfitzpatrick12@gmail.com if you are interested :)
