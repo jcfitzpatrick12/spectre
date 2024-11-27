@@ -7,8 +7,8 @@ _LOGGER = getLogger(__name__)
 
 from typing import Optional
 
-from spectre_radio.web_fetch.callisto import fetch_chunks
-from spectre_radio.logging import log_call
+from spectre_core.web_fetch.callisto import fetch_chunks
+from spectre_core.logging import log_call
 
 
 @log_call(_LOGGER)

@@ -6,7 +6,7 @@ import logging
 import typer
 from typing import Optional
 
-from spectre_radio.logging import configure_root_logger
+from spectre_core.logging import configure_root_logger
 
 from cli import APP_NAME, VERSION
 from cli.commands.create import app as create_app

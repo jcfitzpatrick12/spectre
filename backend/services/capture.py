@@ -11,10 +11,10 @@ import time
 from typing import List, Callable, Tuple
 import multiprocessing
 
-from spectre_radio.receivers.factory import get_receiver
-from spectre_radio.watchdog.watcher import Watcher
-from spectre_radio.file_handlers.configs import CaptureConfig
-from spectre_radio.logging import (
+from spectre_core.receivers.factory import get_receiver
+from spectre_core.watchdog.watcher import Watcher
+from spectre_core.file_handlers.configs import CaptureConfig
+from spectre_core.logging import (
     configure_root_logger, 
     log_call
 )

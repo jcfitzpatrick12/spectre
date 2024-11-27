@@ -9,21 +9,21 @@ from os import listdir, walk
 from os.path import splitext
 from typing import Any, Optional
 
-from spectre_radio.receivers.factory import get_receiver
-from spectre_radio.receivers.receiver_register import list_all_receiver_names
-from spectre_radio.chunks import Chunks
-from spectre_radio.chunks.base import ChunkFile
-from spectre_radio.cfg import (
+from spectre_core.receivers.factory import get_receiver
+from spectre_core.receivers.receiver_register import list_all_receiver_names
+from spectre_core.chunks import Chunks
+from spectre_core.chunks.base import ChunkFile
+from spectre_core.cfg import (
     JSON_CONFIGS_DIR_PATH,
     CALLISTO_INSTRUMENT_CODES,
     get_chunks_dir_path
 )
-from spectre_radio.logging import (
+from spectre_core.logging import (
     LogHandlers, 
     LogHandler,
     log_call
 )
-from spectre_radio.file_handlers.configs import (
+from spectre_core.file_handlers.configs import (
     FitsConfig,
     CaptureConfig
 )

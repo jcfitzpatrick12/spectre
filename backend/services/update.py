@@ -7,10 +7,10 @@ _LOGGER = getLogger(__name__)
 
 from typing import List
 
-from spectre_radio.receivers.factory import get_receiver
-from spectre_radio.chunks import Chunks
-from spectre_radio.logging import log_call
-from spectre_radio.file_handlers.configs import (
+from spectre_core.receivers.factory import get_receiver
+from spectre_core.chunks import Chunks
+from spectre_core.logging import log_call
+from spectre_core.file_handlers.configs import (
     FitsConfig,
     CaptureConfig,
     type_cast_params,

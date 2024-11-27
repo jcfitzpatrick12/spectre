@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from spectre_radio.logging import PROCESS_TYPES
+from spectre_core.logging import PROCESS_TYPES
 
 APP_NAME = "spectre"
 VERSION = "0.0.1"

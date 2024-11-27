@@ -8,13 +8,13 @@ _LOGGER =  getLogger(__name__)
 import numpy as np
 from dataclasses import dataclass
 
-from spectre_radio.logging import log_call
-from spectre_radio.chunks import Chunks
-from spectre_radio.spectrograms.analytical import (
+from spectre_core.logging import log_call
+from spectre_core.chunks import Chunks
+from spectre_core.spectrograms.analytical import (
     TestResults,
     validate_analytically
 )
-from spectre_radio.file_handlers.configs import CaptureConfig
+from spectre_core.file_handlers.configs import CaptureConfig
 
 
 @log_call(_LOGGER)
