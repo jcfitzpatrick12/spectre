@@ -2,17 +2,17 @@
 
 ## Overview
 
-:loudspeaker: **This project is under active development**  :loudspeaker:
+:loudspeaker: **This project is under active development. Contributors welcome.**  :loudspeaker:
 
-`spectre` is a program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/), the framework is in place to accommodate any SDR receiver with a GNU Radio source block. 
+`spectre` is a vendor-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/), the framework is in place to accommodate any SDR receiver with a GNU Radio source block. 
 
 **Features**:  
 
 - Intuitive CLI tool :computer:
-- Containerised backend :whale:
 - Wide receiver support :satellite:
+- Live recording of radio spectrograms and I/Q data :floppy_disk:
 - Flexible, configurable data capture :gear:
-- Live recording of radio spectrograms or IQ data :floppy_disk:
+- Containerised backend :whale:g 
 - Developer-friendly, extensible digital signal processing framework :hammer_and_wrench:
 
 ## Use-case: Solar Radio Observations :sunny:
@@ -32,7 +32,7 @@ Current supported receivers include:
 The framework is in place to integrate the following receivers, this is planned for the near future:  
 
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
-- USRP SDRs
+- USRP SDRs (e.g., the [b200-mini](https://www.ettus.com/all-products/usrp-b200mini/))
 - RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
 
 **Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with spectre as they are not compatible with the official SDRPlay API**. 
@@ -50,7 +50,8 @@ Support for Windows will be explored in the future.
 ## Installation
 
 **Prerequisites:**
-Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
+- Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
+- While the back-end is containerised entirely, it is still required to install any relevant third-party drivers on your host system.
 
 ...
 
