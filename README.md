@@ -4,7 +4,7 @@
 
 :loudspeaker: **This project is under active development. Contributors welcome.**  :loudspeaker:
 
-`spectre` is a vendor-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/), the framework is in place to accommodate any SDR receiver with a GNU Radio source block. 
+`spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
 
 **Features**:  
 
