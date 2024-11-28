@@ -12,7 +12,7 @@
 - Wide receiver support :satellite:
 - Live recording of radio spectrograms and I/Q data :floppy_disk:
 - Flexible, configurable data capture :gear:
-- Containerised backend :whale:g 
+- Containerised backend :whale:
 - Developer-friendly, extensible digital signal processing framework :hammer_and_wrench:
 
 ## Use-case: Solar Radio Observations :sunny:
