@@ -1,0 +1,20 @@
+{
+    "receiver": "rsp1a",
+    "mode": "fixed",
+    "tag": "rsp1a-fixed-example",
+    "event_handler_key": "fixed",
+    "chunk_key": "fixed",
+    "chunk_size": 3,
+    "joining_time": 20,
+    "time_resolution": 0.01,
+    "frequency_resolution": 6000.0,
+    "samp_rate": 600000,
+    "center_freq": 95800000.0,
+    "RF_gain": 0,
+    "bandwidth": 600000.0,
+    "IF_gain": -40,
+    "window_size": 512,
+    "window_type": "blackman",
+    "window_kwargs": {},
+    "STFFT_kwargs": {"hop": 256}
+}

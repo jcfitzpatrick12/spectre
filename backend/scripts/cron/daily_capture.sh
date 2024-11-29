@@ -3,15 +3,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-#Set the SPECTRE_DIR_PATH environment variable
-export SPECTRE_DIR_PATH=/home/spectre
-#add spectre to the python path so we can import modules properly
-export PYTHONPATH="${SPECTRE_DIR_PATH}:${PYTHONPATH}"
-# ensure that spectre is recognised as a command in the cron environment
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# setting environment variables
+export SPECTRE_DATA_DIR_PATH=/home/spectre/spectre-data
 
 # start the capture session
-spectre --log capture session --tag RSP1A-sweeper --hours 8 --force-restart
+spectre --log capture session --tag rsp1a-fixed-example --hours 8 --force-restart
 # deletes all remnant bin and hdr chunk files in all chunks subdirectories
-spectre --log delete chunk-files --tag RSP1A-sweeper --extension bin --extension hdr --suppress-doublecheck
+spectre --log delete chunk-files --tag rsp1a-fixed-example --extension bin --extension hdr --suppress-doublecheck
 
