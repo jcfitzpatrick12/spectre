@@ -7,7 +7,7 @@ from spectre_core.logging import PROCESS_TYPES
 APP_NAME = "spectre"
 VERSION = "0.0.1"
 
-BASE_URL = "http://localhost:5000" 
+BASE_URL = "http://127.0.0.1:5000"
 
 RECEIVER_NAME_HELP = "The name of the receiver"
 MODE_HELP = "The operating mode for the receiver"
