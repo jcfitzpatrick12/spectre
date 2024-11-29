@@ -2,15 +2,19 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Optional
+from typing import Optional, Callable
 
-from flask import jsonify
+import logging
+
+from flask import jsonify, request
 from http import HTTPStatus
+
+from spectre_core.logging import configure_root_logger
 
 ALLOWED_STATUSES = {"success", "fail", "error"}
 DATA_REQUIRED_STATUSES = {"success", "fail"}
 MESSAGE_REQUIRED_STATUSES = {"error"}
-
+DEFAULT_LOG_LEVEL = logging.info
 
 def jsend_response(
     status: str,
@@ -38,3 +42,12 @@ def jsend_response(
             response["data"] = data 
 
     return jsonify(response)
+
+
+def configure_logging(func: Callable):
+    def wrapper(*args, **kwargs):
+        data = request.get_json()
+        data.get("log_level")
+        configure_root_logger("USER", data.get("log_level", 10))
+        return func(*args, **kwargs)
+    return wrapper

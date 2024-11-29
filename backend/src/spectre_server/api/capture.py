@@ -5,12 +5,14 @@
 from flask import Blueprint, request, jsonify
 from http import HTTPStatus
 
+from spectre_server.api import configure_logging
 from spectre_server.api import jsend_response
 from spectre_server.services import capture
 
 capture_blueprint = Blueprint("capture", __name__)
 
 @capture_blueprint.route("/start", methods=["POST"])
+@configure_logging
 def start():
     data = request.get_json()
 

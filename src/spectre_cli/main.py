@@ -2,11 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
 import typer
 from typing import Optional
-
-from spectre_core.logging import configure_root_logger
 
 from spectre_cli import APP_NAME, VERSION
 from spectre_cli.commands.create import app as create_app
@@ -46,20 +43,7 @@ def main(
         help="Show the application's version and exit.", 
         callback=_version_callback, 
         is_eager=True,
-    ),
-    log: Optional[bool] = typer.Option(
-        False,  # Default to False, becomes True when flag is used
-        "--log",
-        help="Generate a log for this session.",
-        is_flag=True
-    ),
-    log_level: Optional[int] = typer.Option(
-        logging.INFO,
-        "--log-level",
-        help="Set the logging level (e.g., 10 for DEBUG, 20 for INFO)."
     )
 ) -> None:
-    if log:
-        logs_handler = configure_root_logger("USER", log_level)
-        typer.secho(f"Generating logs at {logs_handler.file_path}", fg=typer.colors.GREEN)
+    raise typer.Exit()
 
