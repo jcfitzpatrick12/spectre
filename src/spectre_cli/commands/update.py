@@ -5,7 +5,7 @@
 import typer
 from typing import List
 
-from cli import (
+from spectre_cli import (
     TAG_HELP,
     FORCE_UPDATE_HELP
 )

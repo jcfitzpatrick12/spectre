@@ -4,7 +4,7 @@
 
 import typer
 
-from cli import (
+from spectre_cli import (
     PROCESS_TYPE_HELP,
     YEAR_HELP,
     MONTH_HELP,

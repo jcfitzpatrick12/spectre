@@ -8,15 +8,15 @@ from typing import Optional
 
 from spectre_core.logging import configure_root_logger
 
-from cli import APP_NAME, VERSION
-from cli.commands.create import app as create_app
-from cli.commands.list import app as list_app
-from cli.commands.print import app as print_app
-from cli.commands.delete import app as delete_app
-from cli.commands.capture import app as capture_app
-from cli.commands.update import app as update_app
-from cli.commands.web_fetch import app as web_fetch_app
-from cli.commands.test import app as test_app
+from spectre_cli import APP_NAME, VERSION
+from spectre_cli.commands.create import app as create_app
+from spectre_cli.commands.list import app as list_app
+from spectre_cli.commands.print import app as print_app
+from spectre_cli.commands.delete import app as delete_app
+from spectre_cli.commands.capture import app as capture_app
+from spectre_cli.commands.update import app as update_app
+from spectre_cli.commands.web_fetch import app as web_fetch_app
+from spectre_cli.commands.test import app as test_app
 
 app = typer.Typer()
 
