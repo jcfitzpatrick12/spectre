@@ -10,6 +10,7 @@ from typing import Any
 import time
 from typing import List, Callable, Tuple
 import multiprocessing
+from http import HTTPStatus
 
 from spectre_core.receivers.factory import get_receiver
 from spectre_core.watchdog.watcher import Watcher
@@ -96,7 +97,7 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
                             wrapper.restart()
                     else:
                         _terminate_processes(process_wrappers)
-                        return
+                        return 
             time.sleep(1)  # Poll every second
         _LOGGER.info("Session duration reached")
         _terminate_processes(process_wrappers)
@@ -178,9 +179,10 @@ def start(tag: str,
     capture_process = _ProcessWrapper.start(_start_capture, 
                                             capture_args, 
                                             "capture")
-    _monitor_processes([capture_process], 
-                       total_runtime, 
-                       force_restart)
+    return _monitor_processes([capture_process], 
+                              total_runtime, 
+                              force_restart)
+                       
 
 
 @log_call(_LOGGER)
@@ -214,7 +216,7 @@ def session(tag: str,
                                             capture_args, 
                                             "capture")
 
-    _monitor_processes([watcher_process, capture_process], 
-                        total_runtime, 
-                        force_restart)
+    return _monitor_processes([watcher_process, capture_process], 
+                               total_runtime, 
+                               force_restart)
     

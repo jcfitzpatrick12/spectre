@@ -23,7 +23,15 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
           hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
           force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
-    response = requests.post(f"{BASE_URL}/capture/start", json={"tag": tag})
+    payload = {
+        "tag": tag,
+        "seconds": seconds,
+        "minutes": minutes,
+        "hours": hours,
+        "force_restart": force_restart
+    }
+    response = requests.post(f"{BASE_URL}/capture/start", json=payload)
+    print(response)
 
 
 @app.command()

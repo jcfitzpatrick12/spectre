@@ -1,16 +1,29 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from flask import Blueprint, request, jsonify
-from spectre_server.services.capture import start_capture
+from http import HTTPStatus
+
+from spectre_server.api import jsend_response
+from spectre_server.services import capture
 
 capture_blueprint = Blueprint("capture", __name__)
 
 @capture_blueprint.route("/start", methods=["POST"])
 def start():
     data = request.get_json()
-    tag = data.get("tag")
-    
-    if not tag:
-        return jsonify({"error": "Tag is required"}), 400
 
-    # Call the service layer
-    result = start_capture(tag)
-    return jsonify({"message": result})
+    tag = data.get("tag")
+    seconds = data.get("seconds")
+    minutes = data.get("minutes")
+    hours = data.get("hours")
+    force_restart = data.get("force_restart")
+
+    capture.start(tag,
+                  seconds,
+                  minutes,
+                  hours,
+                  force_restart)
+    
+    return jsend_response("success")
