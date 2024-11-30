@@ -45,5 +45,5 @@ def main(
         is_eager=True,
     )
 ) -> None:
-    raise typer.Exit()
+    return
 
