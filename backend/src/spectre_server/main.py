@@ -1,7 +1,7 @@
 from flask import Flask
 from spectre_core.logging import configure_root_logger
 
-from spectre_server.api.capture import capture_blueprint
+from spectre_server.routes.capture import capture_blueprint
 
 app = Flask(__name__)
 
