@@ -179,9 +179,9 @@ def start(tag: str,
     capture_process = _ProcessWrapper.start(_start_capture, 
                                             capture_args, 
                                             "capture")
-    return _monitor_processes([capture_process], 
-                              total_runtime, 
-                              force_restart)
+    _monitor_processes([capture_process], 
+                        total_runtime, 
+                        force_restart)
                        
 
 
@@ -216,7 +216,7 @@ def session(tag: str,
                                             capture_args, 
                                             "capture")
 
-    return _monitor_processes([watcher_process, capture_process], 
-                               total_runtime, 
-                               force_restart)
+    _monitor_processes([watcher_process, capture_process], 
+                        total_runtime, 
+                        force_restart)
     
