@@ -8,7 +8,7 @@ from typing import Optional
 from flask import Blueprint, request
 from flask.wrappers import Request
 
-from spectre_server.api import jsend_response
+from spectre_server.routes import jsend_response
 from spectre_server.services import capture
 
 capture_blueprint = Blueprint("capture", __name__)
