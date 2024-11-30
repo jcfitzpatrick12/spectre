@@ -18,7 +18,7 @@ def _validate_capture_data(
         seconds: Optional[int],
         hours: Optional[int],
         minutes: Optional[int],
-        force_restart: Optional[b]
+        force_restart: Optional[bool]
 
 ) -> Optional[Request]:
     # Validate types and constraints
