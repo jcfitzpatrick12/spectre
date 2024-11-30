@@ -97,4 +97,4 @@ COPY scripts/cron/daily_capture.sh /home/spectre/cron/daily_capture.sh
 # Final set-up ...                                   #
 # -------------------------------------------------- # 
 WORKDIR /home
-ENTRYPOINT ["python3", "/home/spectre/src/spectre_server/app.py"]
+ENTRYPOINT ["python3", "/home/spectre/src/spectre_server/main.py"]
