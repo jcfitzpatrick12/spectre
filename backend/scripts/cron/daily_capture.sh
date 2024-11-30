@@ -7,7 +7,7 @@
 export SPECTRE_DATA_DIR_PATH=/home/spectre/spectre-data
 
 # start the capture session
-spectre --log capture session --tag rsp1a-fixed-example --hours 8 --force-restart
+spectre capture session --tag rsp1a-fixed-example --hours 8 --force-restart
 # deletes all remnant bin and hdr chunk files in all chunks subdirectories
-spectre --log delete chunk-files --tag rsp1a-fixed-example --extension bin --extension hdr --suppress-doublecheck
+spectre delete chunk-files --tag rsp1a-fixed-example --extension bin --extension hdr --suppress-doublecheck
 
