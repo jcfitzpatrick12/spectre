@@ -30,17 +30,17 @@ def _validate_capture_data(
         return jsend_response("fail",
                               message = "'seconds' must be a non-negative integer",
                               code = HTTPStatus.BAD_REQUEST)
-    if seconds is not None and (not isinstance(seconds, int)):
+    if minutes is not None and (not isinstance(minutes, int)):
         return jsend_response("fail",
                               message = "'minutes' must be a non-negative integer",
                               code = HTTPStatus.BAD_REQUEST)
-    if seconds is not None and (not isinstance(seconds, int)):
+    if hours is not None and (not isinstance(hours, int)):
         return jsend_response("fail",
                               message = "'hours' must be a non-negative integer",
                               code = HTTPStatus.BAD_REQUEST)
     if force_restart is not None and not isinstance(force_restart, bool):
         return jsend_response("fail",
-                              message = "'hours' must be a non-negative integer",
+                              message = "'force_restart' must be a boolean type.",
                               code = HTTPStatus.BAD_REQUEST)
     return None
 
