@@ -5,7 +5,7 @@ from spectre_server.routes.capture import capture_blueprint
 
 app = Flask(__name__)
 
-# Register blueprints for modularity
+# Register blueprints for modularity 
 app.register_blueprint(capture_blueprint, url_prefix="/capture")
 
 
