@@ -13,7 +13,7 @@ cd spectre
 # --cone means all paths inside specified directories are included
 git sparse-checkout init
 # Update the working directory only with the backend folder
-git sparse-checkout set backend/
+git sparse-checkout set backend/src backend/pyproject.toml
 # Update the working directory
 git checkout formal-installation
 
