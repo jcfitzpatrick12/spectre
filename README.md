@@ -53,7 +53,20 @@ Support for Windows will be explored in the future.
 - Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
 - While the back-end is containerised entirely, it is still required to install any relevant third-party drivers on your host system.
 
-...
+Clone the repository in your preferred directory:  
+```git clone https://github.com/jcfitzpatrick12/spectre.git```  
+
+Change into the ```spectre``` directory:  
+```cd spectre```  
+
+Set the ```SPECTRE_DATA_DIR_PATH``` environment variable:  
+```echo "export SPECTRE_DATA_DIR_PATH=$(pwd)/spectre-data" >> ~/.bashrc```
+
+And open a new terminal. Build the image, using the backend directory:  
+```docker build spectre-server ./backend```  
+
+Finally, run the ```spectre-server``` container:  
+```chmod +x ./backend/run.sh && ./backend/run.sh```  
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
