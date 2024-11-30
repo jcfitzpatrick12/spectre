@@ -69,32 +69,31 @@ RUN chmod +x file_fix.sh && \
     ./file_fix.sh && \
     rm file_fix.sh
 
-# -------------------------------------------------- # 
-# Installing dependencies ...                        #
-# -------------------------------------------------- # 
 
-WORKDIR /home/spectre
-COPY pyproject.toml pyproject.toml
-COPY src src
-RUN pip install --upgrade pip && \
-    pip install -e .
+# -------------------------------------------------- # 
+# Installing spectre backend ...                     #
+# -------------------------------------------------- # 
+WORKDIR /home
+COPY scripts/installation/spectre_backend.sh spectre_backend.sh
+RUN chmod +x spectre_backend.sh && \ 
+    ./spectre_backend.sh && \
+    rm spectre_backend.sh
 
 # -------------------------------------------------- # 
 # Configuring cron jobs ...                          #
 # -------------------------------------------------- # 
 
-# Copy the default crontab file to the cron.d directory
-WORKDIR /etc/cron.d
-# copy in the default crontab
-COPY scripts/cron/default_crontab default_crontab
-# install the crontab
-RUN crontab default_crontab
-# Copy the daily capture scripts
-COPY scripts/cron/daily_capture.sh /home/spectre/cron/daily_capture.sh
+# # Copy the default crontab file to the cron.d directory
+# WORKDIR /etc/cron.d
+# # copy in the default crontab
+# COPY scripts/cron/default_crontab default_crontab
+# # install the crontab
+# RUN crontab default_crontab
+# # Copy the daily capture scripts
+# COPY scripts/cron/daily_capture.sh /home/cron/daily_capture.sh
 
 
 # -------------------------------------------------- # 
 # Final set-up ...                                   #
 # -------------------------------------------------- # 
-WORKDIR /home
-ENTRYPOINT ["python3", "/home/spectre/src/spectre_server/main.py"]
+# ENTRYPOINT ["python3", "/home/spectre/backend/src/spectre_server/main.py"]
