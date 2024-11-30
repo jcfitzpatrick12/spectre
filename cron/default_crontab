@@ -5,4 +5,4 @@
 # Experimental cron job for daily occuring spectre capture sessions
 
 # m h  dom mon dow   command
-30 7 * * * /home/spectre/cron/daily_capture.sh
+30 7 * * * /usr/local/bin/daily_capture.sh
