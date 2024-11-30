@@ -10,11 +10,10 @@
 git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git
 cd spectre
 
-# --cone means all paths inside specified directories are included
-git sparse-checkout init
 # Update the working directory only with the backend folder
 git sparse-checkout set backend/src backend/pyproject.toml
 # Update the working directory
+# git checkout main
 git checkout formal-installation
 
 # install dependencies (in editable mode)
