@@ -16,7 +16,7 @@ from spectre_core.file_handlers.configs import (
 )
 
 
-@log_call(_LOGGER)
+@log_call
 def logs(process_type: str = None,
          year: Optional[int] = None,
          month: Optional[int] = None,
@@ -39,7 +39,7 @@ def logs(process_type: str = None,
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
 
 
-@log_call(_LOGGER)
+@log_call
 def chunk_files(tag: str,
                 extensions: list[str],
                 year: Optional[int] = None,
@@ -63,7 +63,7 @@ def chunk_files(tag: str,
                 _LOGGER.info(f"File deleted: {chunk.get_file(extension).file_path}")
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config(tag: str,
 ) -> None:
     fits_config = FitsConfig(tag)
@@ -71,7 +71,7 @@ def fits_config(tag: str,
     _LOGGER.info(f"File deleted: {fits_config.file_path}")
 
 
-@log_call(_LOGGER)
+@log_call
 def capture_config(tag: str,
 ) -> None:
     capture_config = CaptureConfig(tag)

@@ -29,14 +29,14 @@ from spectre_core.file_handlers.configs import (
 )
 
 
-@log_call(_LOGGER)
+@log_call
 def callisto_instrument_codes(
 ) -> None:
     """Gets all defined CALLISTO instrument codes"""
     return CALLISTO_INSTRUMENT_CODES
 
 
-@log_call(_LOGGER)
+@log_call
 def log_handlers(process_type: Optional[str] = None,
                  year: Optional[int] = None,
                  month: Optional[int] = None,
@@ -50,7 +50,7 @@ def log_handlers(process_type: Optional[str] = None,
     return log_handlers.log_handler_list
 
 
-@log_call(_LOGGER)
+@log_call
 def log_file_names(process_type: Optional[str] = None,
                    year: Optional[int] = None,
                    month: Optional[int] = None,
@@ -60,7 +60,7 @@ def log_file_names(process_type: Optional[str] = None,
     return [log_handler.file_name for log_handler in log_handler_list]
 
 
-@log_call(_LOGGER)
+@log_call
 def chunk_files(tag: str,
                 year: Optional[int] = None,
                 month: Optional[int] = None,
@@ -86,7 +86,7 @@ def chunk_files(tag: str,
     return chunk_files
 
 
-@log_call(_LOGGER)
+@log_call
 def chunk_file_names(tag: str,
                      year: Optional[int] = None,
                      month: Optional[int] = None,
@@ -97,39 +97,39 @@ def chunk_file_names(tag: str,
     return [chunk_file.file_name for chunk_file in chunk_file_list]
     
 
-@log_call(_LOGGER)
+@log_call
 def receiver_names(
 ) -> list[str]:
     return list_all_receiver_names()
 
 
-@log_call(_LOGGER)
+@log_call
 def receiver_modes(receiver_name: str,
 ) -> list[str]:
     receiver = get_receiver(receiver_name)
     return receiver.valid_modes
 
 
-@log_call(_LOGGER)
+@log_call
 def receiver_specifications(receiver_name: str,
 ) -> dict[str, Any]:
     receiver = get_receiver(receiver_name)
     return receiver.specifications
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config_file_names(
 ) -> list[str]:
     return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("fits_config")]
 
 
-@log_call(_LOGGER)
+@log_call
 def capture_config_names(
 ) -> list[str]:
     return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("capture_config")]   
 
 
-@log_call(_LOGGER)
+@log_call
 def tags(year: Optional[int] = None,
          month: Optional[int] = None,
          day: Optional[int] = None,
@@ -144,7 +144,7 @@ def tags(year: Optional[int] = None,
     return sorted(list(tags))
 
 
-@log_call(_LOGGER)
+@log_call
 def log_handler(pid: Optional[str] = None,
                 file_name: Optional[str] = None
 ) -> LogHandler:
@@ -159,7 +159,7 @@ def log_handler(pid: Optional[str] = None,
         return log_handlers.get_log_handler_from_file_name(file_name)
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config_type_template(tag: Optional[str] = None,
                               as_command: bool = False
 ) -> dict[str, Any] | str:
@@ -173,7 +173,7 @@ def fits_config_type_template(tag: Optional[str] = None,
         return FitsConfig.type_template
 
 
-@log_call(_LOGGER)
+@log_call
 def type_template(receiver_name: str,
                   mode: str,
                   as_command: bool = False,
@@ -190,13 +190,13 @@ def type_template(receiver_name: str,
         return receiver.type_template
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config(tag: str
 ) -> FitsConfig:
     return FitsConfig(tag)
 
 
-@log_call(_LOGGER)
+@log_call
 def capture_config(tag: str
 ) -> CaptureConfig:
     return CaptureConfig(tag)

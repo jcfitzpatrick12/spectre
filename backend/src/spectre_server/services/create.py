@@ -12,7 +12,7 @@ from spectre_core.file_handlers.configs import FitsConfig
 from spectre_core.logging import log_call
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config(tag: str,
                 params: Optional[List[str]] = None,
 ) -> None:
@@ -23,7 +23,7 @@ def fits_config(tag: str,
     _LOGGER.info(f"The fits-config for tag: {tag} has been created")
 
 
-@log_call(_LOGGER)
+@log_call
 def capture_config(tag: str,
                    receiver_name: str,
                    mode: str,

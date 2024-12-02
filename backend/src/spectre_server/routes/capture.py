@@ -6,13 +6,13 @@
 from flask import Blueprint, request
 
 from spectre_server.services import capture
-from spectre_server.routes import wrap_route
+from spectre_server.routes import jsendify_response
 
 capture_blueprint = Blueprint("capture", __name__)
 
 
 @capture_blueprint.route("/start", methods=["POST"])
-@wrap_route
+@jsendify_response
 def start():
     data = request.get_json()
     tag = data.get("tag")
@@ -25,3 +25,19 @@ def start():
                          minutes,
                          hours,
                          force_restart)
+
+
+@capture_blueprint.route("/session", methods=["POST"])
+@jsendify_response
+def session():
+    data = request.get_json()
+    tag = data.get("tag")
+    seconds = data.get("seconds")
+    minutes = data.get("minutes")
+    hours = data.get("hours")
+    force_restart = data.get("force_restart")
+    return capture.session(tag,
+                           seconds,
+                           minutes,
+                           hours,
+                           force_restart)

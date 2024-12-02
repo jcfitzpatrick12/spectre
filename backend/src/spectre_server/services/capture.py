@@ -11,6 +11,7 @@ import time
 from typing import List, Callable, Tuple
 import multiprocessing
 
+from spectre_core.logging import log_call
 from spectre_core.receivers.factory import get_receiver
 from spectre_core.watchdog.watcher import Watcher
 from spectre_core.file_handlers.configs import CaptureConfig
@@ -40,12 +41,16 @@ class _ProcessWrapper:
               args: Tuple[Any, ...], 
               name: str) -> '_ProcessWrapper':
         """Start a new process"""
-        _LOGGER.info(f"Starting {name} process..")
-        process = multiprocessing.Process(target=target, 
-                                          args=args,  
-                                          name=name, 
+        _LOGGER.info(f"Starting {name} process...")
+
+        process = multiprocessing.Process(target=target,
+                                          args=args,
+                                          name=name,
                                           daemon=True)
+  
         process.start()
+        
+        # pass the wrapper function so to preserve 
         return _ProcessWrapper(process, 
                                target, 
                                args)
@@ -112,8 +117,8 @@ def _calculate_total_runtime(seconds: int = 0,
 ) -> float:
     """Calculate total runtime in seconds"""
     total_duration = seconds + (minutes * 60) + (hours * 3600) # [s]
-    if total_duration < 0:
-        raise ValueError(f"Total duration must be non-negative.")
+    if total_duration <= 0:
+        raise ValueError(f"Total duration must be strictly positive")
     return total_duration
 
 
@@ -126,6 +131,7 @@ def _get_user_root_logger_state(
     return False, logging.NOTSET
 
 
+@log_call
 def _start_capture(tag: str,
                    do_logging: bool,
                    logging_level: int = logging.INFO
@@ -135,18 +141,21 @@ def _start_capture(tag: str,
         configure_root_logger(f"WORKER", 
                               level = logging_level) 
 
-    _LOGGER.info((f"Starting capture with the receiver: {receiver_name} "
-                  f"operating in mode: {mode} "
-                  f"with tag: {tag}"))
+    _LOGGER.info((f"Reading capture config with tag `{tag}`"))
 
     # load the receiver and mode from the capture config file
     capture_config = CaptureConfig(tag)
     receiver_name, mode = capture_config.get_receiver_metadata()
 
+    _LOGGER.info((f"Starting capture with the receiver `{receiver_name}` "
+                  f"operating in mode `{mode}` "
+                  f"with tag `{tag}`"))
+
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tag)
 
 
+@log_call
 def _start_watcher(tag: str,
                    do_logging: bool = False,
                    logging_level: int = logging.INFO
@@ -158,7 +167,7 @@ def _start_watcher(tag: str,
     watcher.start()
 
 
-@log_call(_LOGGER)
+@log_call
 def start(tag: str, 
           seconds: int = 0, 
           minutes: int = 0, 
@@ -187,14 +196,15 @@ def start(tag: str,
                        
 
 
-@log_call(_LOGGER)
+@log_call
 def session(tag: str, 
-            force_restart: bool = False, 
             seconds: int = 0, 
             minutes: int = 0, 
-            hours: int = 0
+            hours: int = 0, 
+            force_restart: bool = False
 ) -> None:
-    
+
+    print(seconds, minutes, hours)
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
