@@ -6,13 +6,13 @@
 from flask import Blueprint, request
 
 from spectre_server.services import capture
-from spectre_server.routes import wrap_route
+from spectre_server.routes import jsendify_response
 
 capture_blueprint = Blueprint("capture", __name__)
 
 
 @capture_blueprint.route("/start", methods=["POST"])
-@wrap_route
+@jsendify_response
 def start():
     data = request.get_json()
     tag = data.get("tag")

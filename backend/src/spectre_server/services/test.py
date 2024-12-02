@@ -17,7 +17,7 @@ from spectre_core.spectrograms.analytical import (
 from spectre_core.file_handlers.configs import CaptureConfig
 
 
-@log_call(_LOGGER)
+@log_call
 def analytical(
     tag: str,
     absolute_tolerance: float

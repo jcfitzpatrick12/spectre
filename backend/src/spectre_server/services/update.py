@@ -41,7 +41,7 @@ def _caution_update(tag: str,
             raise FileExistsError(error_message)
 
 
-@log_call(_LOGGER)
+@log_call
 def capture_config(tag: str,
                    params: List[str],
                    force: bool = False,
@@ -65,7 +65,7 @@ def capture_config(tag: str,
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated")
 
 
-@log_call(_LOGGER)
+@log_call
 def fits_config(tag: str,
                 params: List[str],
                 force: bool = False,

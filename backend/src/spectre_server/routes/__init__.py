@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from logging import getLogger
+_LOGGER = getLogger(__name__)
+
 from typing import Optional, Callable
 from functools import wraps
 import os
@@ -12,7 +15,7 @@ from http import HTTPStatus
 
 ALLOWED_STATUSES = {"success", "fail", "error"}
 
-def jsend_response(
+def make_jsend_response(
     status: str, 
     data: Optional[dict] = None,
     message: Optional[str] = None,
@@ -51,7 +54,7 @@ def jsend_response(
         raise ValueError(f"Invalid status. Expected one of {ALLOWED_STATUSES}, but got: {status}")
 
 
-def wrap_route(func: Callable):
+def jsendify_response(func: Callable):
     """Wrap route calls for simplified responses.
     
     Returns `jsend` formatted responses.
@@ -59,15 +62,16 @@ def wrap_route(func: Callable):
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args, **kwargs):
         try:
+            # _LOGGER.info()
             data = func(*args, **kwargs)
-            return jsend_response("success",
-                                  data = data,
-                                  code = HTTPStatus.OK)
+            return make_jsend_response("success",
+                                        data = data,
+                                        code = HTTPStatus.OK)
         except:
             user_pid = os.getpid()
-            return jsend_response("error",
-                                  message = (f"An internal server error has occured. "
-                                             f"Received the following error: \n{traceback.format_exc()}"
-                                             f"Please use 'spectre print log --pid {user_pid}` for more details"),
-                                  code = HTTPStatus.INTERNAL_SERVER_ERROR)
+            return make_jsend_response("error",
+                                        message = (f"An internal server error has occured. "
+                                                    f"Received the following error: \n{traceback.format_exc()}"
+                                                    f"Please use 'spectre print log --pid {user_pid}` for more details"),
+                                        code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper

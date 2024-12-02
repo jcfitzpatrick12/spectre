@@ -11,7 +11,7 @@ from spectre_core.web_fetch.callisto import fetch_chunks
 from spectre_core.logging import log_call
 
 
-@log_call(_LOGGER)
+@log_call
 def callisto(
     instrument_code: str,
     year: Optional[int] = None,

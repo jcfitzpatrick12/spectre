@@ -131,7 +131,7 @@ def _get_user_root_logger_state(
     return False, logging.NOTSET
 
 
-@log_call(_LOGGER)
+@log_call
 def _start_capture(tag: str,
                    do_logging: bool,
                    logging_level: int = logging.INFO
@@ -155,7 +155,7 @@ def _start_capture(tag: str,
     receiver.start_capture(tag)
 
 
-@log_call(_LOGGER)
+@log_call
 def _start_watcher(tag: str,
                    do_logging: bool = False,
                    logging_level: int = logging.INFO
@@ -167,7 +167,7 @@ def _start_watcher(tag: str,
     watcher.start()
 
 
-@log_call(_LOGGER)
+@log_call
 def start(tag: str, 
           seconds: int = 0, 
           minutes: int = 0, 
@@ -196,7 +196,7 @@ def start(tag: str,
                        
 
 
-@log_call(_LOGGER)
+@log_call
 def session(tag: str, 
             force_restart: bool = False, 
             seconds: int = 0, 
