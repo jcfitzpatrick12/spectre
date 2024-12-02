@@ -43,20 +43,14 @@ class _ProcessWrapper:
         """Start a new process"""
         _LOGGER.info(f"Starting {name} process..")
 
-        # wrap the target to log any internal errors
-        def wrapper(*args):
-            try:
-                target(*args)
-            except:
-                _LOGGER.error(f"Exception in {name} process.", exc_info=True)
-                raise
-
-        process = multiprocessing.Process(target=wrapper,
+        process = multiprocessing.Process(target=target,
                                           args=args,
                                           name=name,
                                           daemon=True)
   
         process.start()
+        
+        # pass the wrapper function so to preserve 
         return _ProcessWrapper(process, 
                                target, 
                                args)
@@ -137,6 +131,7 @@ def _get_user_root_logger_state(
     return False, logging.NOTSET
 
 
+@log_call(_LOGGER)
 def _start_capture(tag: str,
                    do_logging: bool,
                    logging_level: int = logging.INFO
@@ -160,6 +155,7 @@ def _start_capture(tag: str,
     receiver.start_capture(tag)
 
 
+@log_call(_LOGGER)
 def _start_watcher(tag: str,
                    do_logging: bool = False,
                    logging_level: int = logging.INFO
