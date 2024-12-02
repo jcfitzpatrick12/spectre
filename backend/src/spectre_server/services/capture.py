@@ -10,7 +10,6 @@ from typing import Any
 import time
 from typing import List, Callable, Tuple
 import multiprocessing
-from http import HTTPStatus
 
 from spectre_core.receivers.factory import get_receiver
 from spectre_core.watchdog.watcher import Watcher
@@ -90,14 +89,15 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
         while time.time() - start_time < total_runtime:
             for wrapper in process_wrappers:
                 if not wrapper.process.is_alive():
-                    _LOGGER.error(f"Process {wrapper.process.name} unexpectedly exited")
+                    error_message = f"Worker process with name `{wrapper.process.name}` unexpectedly exited"
+                    _LOGGER.error(error_message)
                     if force_restart:
                         # restart all processes
                         for wrapper in process_wrappers:
                             wrapper.restart()
                     else:
                         _terminate_processes(process_wrappers)
-                        return 
+                        raise RuntimeError(error_message)
             time.sleep(1)  # Poll every second
         _LOGGER.info("Session duration reached")
         _terminate_processes(process_wrappers)
@@ -111,9 +111,10 @@ def _calculate_total_runtime(seconds: int = 0,
                              hours: int = 0
 ) -> float:
     """Calculate total runtime in seconds"""
-    if seconds == 0 and minutes == 0 and hours == 0:
-        raise ValueError(f"Session duration must be specified")
-    return seconds + (minutes * 60) + (hours * 3600)
+    total_duration = seconds + (minutes * 60) + (hours * 3600) # [s]
+    if total_duration < 0:
+        raise ValueError(f"Total duration must be non-negative.")
+    return total_duration
 
 
 def _get_user_root_logger_state(
@@ -129,17 +130,18 @@ def _start_capture(tag: str,
                    do_logging: bool,
                    logging_level: int = logging.INFO
 ) -> None:
-    
-    # load the receiver and mode from the capture config file
-    capture_config = CaptureConfig(tag)
-    receiver_name, mode = capture_config.get_receiver_metadata()
 
     if do_logging:  
         configure_root_logger(f"WORKER", 
-                              level = logging_level)
+                              level = logging_level) 
+
     _LOGGER.info((f"Starting capture with the receiver: {receiver_name} "
                   f"operating in mode: {mode} "
                   f"with tag: {tag}"))
+
+    # load the receiver and mode from the capture config file
+    capture_config = CaptureConfig(tag)
+    receiver_name, mode = capture_config.get_receiver_metadata()
 
     receiver = get_receiver(receiver_name, mode=mode)
     receiver.start_capture(tag)

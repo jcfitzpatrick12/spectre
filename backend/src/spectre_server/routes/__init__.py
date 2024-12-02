@@ -2,8 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Optional
+from typing import Optional, Callable
 import os
+import traceback
 
 from flask import jsonify
 from http import HTTPStatus
@@ -47,3 +48,21 @@ def jsend_response(
     
     else:
         raise ValueError(f"Invalid status. Expected one of {ALLOWED_STATUSES}, but got: {status}")
+
+
+def wrap_route(func: Callable):
+    def wrapper(*args, **kwargs):
+        try:
+            data = func(*args, **kwargs)
+            return jsend_response("success",
+                                  data = data,
+                                  message = f"{func.__name__} called successfully",
+                                  code = HTTPStatus.OK)
+        except:
+            user_pid = os.getpid()
+            return jsend_response("error",
+                                  message = (f"An internal server error has occured while calling {func.__name__}"
+                                             f"Received the following error: \n{traceback.format_exc()}\n"
+                                             f"Please use 'spectre print log --pid {user_pid}` for more details"),
+                                  code = HTTPStatus.INTERNAL_SERVER_ERROR)
+    return wrapper
