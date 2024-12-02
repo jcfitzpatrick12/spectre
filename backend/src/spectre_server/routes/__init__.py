@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from typing import Optional, Callable
+from functools import wraps
 import os
 import traceback
 
@@ -51,10 +52,11 @@ def jsend_response(
 
 
 def wrap_route(func: Callable):
-    """Wrap route calls for simplified, consistent error handling.
+    """Wrap route calls for simplified responses.
     
-    Returns jsend formatted responses.
+    Returns `jsend` formatted responses.
     """
+    @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args, **kwargs):
         try:
             data = func(*args, **kwargs)
