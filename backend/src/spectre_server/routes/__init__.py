@@ -51,18 +51,21 @@ def jsend_response(
 
 
 def wrap_route(func: Callable):
+    """Wrap route calls for simplified, consistent error handling.
+    
+    Returns jsend formatted responses.
+    """
     def wrapper(*args, **kwargs):
         try:
             data = func(*args, **kwargs)
             return jsend_response("success",
                                   data = data,
-                                  message = f"{func.__name__} called successfully",
                                   code = HTTPStatus.OK)
         except:
             user_pid = os.getpid()
             return jsend_response("error",
-                                  message = (f"An internal server error has occured while calling {func.__name__}"
-                                             f"Received the following error: \n{traceback.format_exc()}\n"
+                                  message = (f"An internal server error has occured. "
+                                             f"Received the following error: \n{traceback.format_exc()}"
                                              f"Please use 'spectre print log --pid {user_pid}` for more details"),
                                   code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper
