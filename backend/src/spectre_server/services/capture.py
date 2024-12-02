@@ -41,7 +41,7 @@ class _ProcessWrapper:
               args: Tuple[Any, ...], 
               name: str) -> '_ProcessWrapper':
         """Start a new process"""
-        _LOGGER.info(f"Starting {name} process..")
+        _LOGGER.info(f"Starting {name} process...")
 
         process = multiprocessing.Process(target=target,
                                           args=args,
@@ -147,8 +147,8 @@ def _start_capture(tag: str,
     capture_config = CaptureConfig(tag)
     receiver_name, mode = capture_config.get_receiver_metadata()
 
-    _LOGGER.info((f"Starting capture with the receiver `{receiver_name}`"
-                  f"operating in mode `{mode}`"
+    _LOGGER.info((f"Starting capture with the receiver `{receiver_name}` "
+                  f"operating in mode `{mode}` "
                   f"with tag `{tag}`"))
 
     receiver = get_receiver(receiver_name, mode=mode)
