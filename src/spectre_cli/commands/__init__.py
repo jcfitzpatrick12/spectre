@@ -8,6 +8,7 @@ from functools import wraps
 import typer
 
 def secho_response(func: Callable):
+    """Print the jsendified response from the spectre server"""
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args, **kwargs):
         jsend_response = func(*args, **kwargs)
