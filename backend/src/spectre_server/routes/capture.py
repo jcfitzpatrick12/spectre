@@ -25,3 +25,19 @@ def start():
                          minutes,
                          hours,
                          force_restart)
+
+
+@capture_blueprint.route("/session", methods=["POST"])
+@jsendify_response
+def session():
+    data = request.get_json()
+    tag = data.get("tag")
+    seconds = data.get("seconds")
+    minutes = data.get("minutes")
+    hours = data.get("hours")
+    force_restart = data.get("force_restart")
+    return capture.session(tag,
+                           seconds,
+                           minutes,
+                           hours,
+                           force_restart)
