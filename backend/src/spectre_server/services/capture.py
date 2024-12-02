@@ -117,8 +117,8 @@ def _calculate_total_runtime(seconds: int = 0,
 ) -> float:
     """Calculate total runtime in seconds"""
     total_duration = seconds + (minutes * 60) + (hours * 3600) # [s]
-    if total_duration < 0:
-        raise ValueError(f"Total duration must be non-negative.")
+    if total_duration <= 0:
+        raise ValueError(f"Total duration must be strictly positive")
     return total_duration
 
 
@@ -198,12 +198,13 @@ def start(tag: str,
 
 @log_call
 def session(tag: str, 
-            force_restart: bool = False, 
             seconds: int = 0, 
             minutes: int = 0, 
-            hours: int = 0
+            hours: int = 0, 
+            force_restart: bool = False
 ) -> None:
-    
+
+    print(seconds, minutes, hours)
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
