@@ -2,12 +2,17 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
+from typing import Callable
+from functools import wraps
 
 import typer
 
-log_level_option: int = typer.Option(
-    logging.INFO,
-    "--log-level",
-    help="Set the logging level (e.g., 10 for DEBUG, 20 for INFO)."
-)
+def secho_response(func: Callable):
+    @wraps(func)  # Preserves the original function's name and metadata
+    def wrapper(*args, **kwargs):
+        jsend_response = func(*args, **kwargs)
+        if jsend_response['status'] == "success":
+            typer.secho(jsend_response['data'])
+        elif jsend_response['status'] == "error":
+            typer.secho(jsend_response["message"], fg="yellow")
+    return wrapper
