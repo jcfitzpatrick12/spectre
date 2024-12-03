@@ -5,9 +5,9 @@
 import typer
 import requests
 
+from spectre_cli import BASE_URL
 from spectre_cli.commands import secho_response
-from spectre_cli import (
-    BASE_URL,
+from spectre_cli.commands import (
     TAG_HELP,
     SECONDS_HELP,
     MINUTES_HELP,
