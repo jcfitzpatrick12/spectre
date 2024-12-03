@@ -20,6 +20,7 @@ from spectre_core.logging import (
     log_call
 )
 
+
 class _ProcessWrapper:
     """Encapsulates a process and its callable information"""
     def __init__(self,
@@ -36,26 +37,6 @@ class _ProcessWrapper:
         return self._process
     
 
-    @staticmethod
-    def start(target: Callable, 
-              args: Tuple[Any, ...], 
-              name: str) -> '_ProcessWrapper':
-        """Start a new process"""
-        _LOGGER.info(f"Starting {name} process...")
-
-        process = multiprocessing.Process(target=target,
-                                          args=args,
-                                          name=name,
-                                          daemon=True)
-  
-        process.start()
-        
-        # pass the wrapper function so to preserve 
-        return _ProcessWrapper(process, 
-                               target, 
-                               args)
-    
-
     def restart(self) -> None:
         """Restart the encapsulated process"""
         _LOGGER.info(f"Restarting {self._process.name} process")
@@ -70,6 +51,26 @@ class _ProcessWrapper:
                                                 name=self.process.name, 
                                                 daemon=True)
         self._process.start()
+
+
+def start_process(target: Callable, 
+                  args: Tuple[Any, ...], 
+                  name: str
+) -> _ProcessWrapper:
+    """Start a new process"""
+    _LOGGER.info(f"Starting {name} process...")
+
+    process = multiprocessing.Process(target=target,
+                                      args=args,
+                                      name=name,
+                                      daemon=True)
+
+    process.start()
+    
+    # return a wrapper, which will allow us to simply restart the process
+    return _ProcessWrapper(process, 
+                           target, 
+                           args)
 
 
 def _terminate_processes(process_wrappers: List[_ProcessWrapper]) -> None:
@@ -109,7 +110,7 @@ def _monitor_processes(process_wrappers: List[_ProcessWrapper],
     except KeyboardInterrupt:
         _LOGGER.info("Keyboard interrupt detected. Terminating processes")
         _terminate_processes(process_wrappers)
-
+    
 
 def _calculate_total_runtime(seconds: int = 0, 
                              minutes: int = 0, 
@@ -203,9 +204,10 @@ def session(tag: str,
             hours: int = 0, 
             force_restart: bool = False
 ) -> None:
-
-    print(seconds, minutes, hours)
-    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
+    
+    total_runtime = _calculate_total_runtime(seconds, 
+                                             minutes, 
+                                             hours)
 
     # evaluate the user root logger state, so we can propagate it to the worker processes
     do_logging, logging_level = _get_user_root_logger_state()
@@ -215,18 +217,18 @@ def session(tag: str,
         do_logging,
         logging_level
     )
-    watcher_process = _ProcessWrapper.start(_start_watcher, 
-                                            watcher_args, 
-                                            "watcher")
+    watcher_process = start_process(_start_watcher, 
+                                    watcher_args, 
+                                    "watcher")
 
     capture_args = (
         tag,
         do_logging,
         logging_level
     )
-    capture_process = _ProcessWrapper.start(_start_capture, 
-                                            capture_args, 
-                                            "capture")
+    capture_process = start_process(_start_capture, 
+                                    capture_args, 
+                                    "capture")
 
     _monitor_processes([watcher_process, capture_process], 
                         total_runtime, 
