@@ -188,9 +188,9 @@ def start(tag: str,
         do_logging,
         logging_level
     )
-    capture_process = _ProcessWrapper.start(_start_capture, 
-                                            capture_args, 
-                                            "capture")
+    capture_process = start_process(_start_capture, 
+                                    capture_args, 
+                                    "capture")
     _monitor_processes([capture_process], 
                         total_runtime, 
                         force_restart)
