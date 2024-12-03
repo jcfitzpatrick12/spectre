@@ -34,7 +34,6 @@ def make_jsend_response(
 
     if status in ["fail", "success"]:
         # add the current pid (so user can find corresponding logs)
-        data["pid"] = os.getpid()
         response["data"] = data
         return jsonify(response)
 
@@ -62,7 +61,6 @@ def jsendify_response(func: Callable):
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args, **kwargs):
         try:
-            # _LOGGER.info()
             data = func(*args, **kwargs)
             return make_jsend_response("success",
                                         data = data,
