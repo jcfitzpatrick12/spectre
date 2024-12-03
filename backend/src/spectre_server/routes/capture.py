@@ -14,12 +14,12 @@ capture_blueprint = Blueprint("capture", __name__)
 @capture_blueprint.route("/start", methods=["POST"])
 @jsendify_response
 def start():
-    data = request.get_json()
-    tag = data.get("tag")
-    seconds = data.get("seconds")
-    minutes = data.get("minutes")
-    hours = data.get("hours")
-    force_restart = data.get("force_restart")
+    payload = request.get_json()
+    tag = payload.get("tag")
+    seconds = payload.get("seconds")
+    minutes = payload.get("minutes")
+    hours = payload.get("hours")
+    force_restart = payload.get("force_restart")
     return capture.start(tag,
                          seconds,
                          minutes,
@@ -30,12 +30,12 @@ def start():
 @capture_blueprint.route("/session", methods=["POST"])
 @jsendify_response
 def session():
-    data = request.get_json()
-    tag = data.get("tag")
-    seconds = data.get("seconds")
-    minutes = data.get("minutes")
-    hours = data.get("hours")
-    force_restart = data.get("force_restart")
+    payload = request.get_json()
+    tag = payload.get("tag")
+    seconds = payload.get("seconds")
+    minutes = payload.get("minutes")
+    hours = payload.get("hours")
+    force_restart = payload.get("force_restart")
     return capture.session(tag,
                            seconds,
                            minutes,
