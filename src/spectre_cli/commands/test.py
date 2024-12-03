@@ -4,7 +4,7 @@
 
 import typer
 
-from spectre_cli import (
+from spectre_cli.commands import (
     TAG_HELP,
     ABSOLUTE_TOLERANCE_HELP,
     PER_SPECTRUM_HELP

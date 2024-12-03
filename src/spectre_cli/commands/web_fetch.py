@@ -4,7 +4,7 @@
 
 import typer
 
-from spectre_cli import(
+from spectre_cli.commands import(
     YEAR_HELP,
     MONTH_HELP,
     DAY_HELP,

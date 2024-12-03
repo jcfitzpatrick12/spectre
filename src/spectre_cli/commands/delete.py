@@ -4,7 +4,7 @@
 
 import typer
 
-from spectre_cli import (
+from spectre_cli.commands import (
     TAG_HELP,
     PROCESS_TYPE_HELP,
     DAY_HELP,

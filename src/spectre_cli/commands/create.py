@@ -5,7 +5,7 @@
 import typer
 from typing import List
 
-from spectre_cli import (
+from spectre_cli.commands import (
     RECEIVER_NAME_HELP,
     MODE_HELP,
     TAG_HELP,

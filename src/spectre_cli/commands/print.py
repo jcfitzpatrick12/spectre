@@ -4,7 +4,7 @@
 
 import typer
 
-from spectre_cli import (
+from spectre_cli.commands import (
     PID_HELP,
     FILE_NAME_HELP,
     AS_COMMAND_HELP,
