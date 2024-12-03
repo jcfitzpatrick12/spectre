@@ -10,8 +10,7 @@ from spectre_cli.commands import (
     DAY_HELP,
     MONTH_HELP,
     YEAR_HELP,
-    EXTENSIONS_HELP,
-    SUPPRESS_DOUBLECHECK_HELP
+    EXTENSIONS_HELP
 )
 
 app = typer.Typer()
@@ -22,7 +21,6 @@ def logs(
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-    suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help="")
 ) -> None:
     # delete.logs(process_type,
     #             year,
@@ -38,7 +36,6 @@ def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
                 month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
                 day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-                suppress_doublecheck: bool = typer.Option(False, "--suppress-doublecheck", help=SUPPRESS_DOUBLECHECK_HELP)
 ) -> None:
     # delete.chunk_files(tag,
     #                    extensions,
