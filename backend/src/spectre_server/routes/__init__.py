@@ -2,9 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from logging import getLogger
-_LOGGER = getLogger(__name__)
-
+from flask import Response
 from typing import Optional, Callable
 from functools import wraps
 import os
@@ -15,43 +13,46 @@ from http import HTTPStatus
 
 ALLOWED_STATUSES = {"success", "fail", "error"}
 
+
 def make_jsend_response(
-    status: str, 
+    status: str,
     data: Optional[dict] = None,
     message: Optional[str] = None,
-    code: Optional[HTTPStatus] = None):
-    """Create a standardised Jsend API response.
-    
-    Adheres to https://github.com/omniti-labs/jsend"""
-    # avoid mutable default
-    if data is None:
-        data = {}
+    code: Optional[int] = None
+) -> Response:
+    """Create a JSEND-compliant API response.
+
+    Please refer to: https://github.com/omniti-labs/jsend
+    """
 
     if status not in ALLOWED_STATUSES:
-        raise ValueError(f"Invalid status. Expected one of {ALLOWED_STATUSES}, but got: {status}")
+        raise ValueError(f"Invalid status: '{status}'. Must be one of {ALLOWED_STATUSES}.")
 
     response = {"status": status}
 
-    if status in ["fail", "success"]:
-        # add the current pid (so user can find corresponding logs)
+    # Handle success status
+    if status == "success" or status == "fail":
+        # 'data' is a mandatory field for responses with 'fail' and 'success' statuses.
+        # if None, the value must be null.
         response["data"] = data
         return jsonify(response)
 
+
+    # Handle error status
     elif status == "error":
-        if message is None:
-            raise ValueError(f"Message is required for status {status}, but got: {message}")
+        if not message:
+            raise ValueError("The 'message' field is required for 'error' responses.")
         response["message"] = message
 
-        if data:
-            response["data"] = data 
+        # 'data' is an optional key for responses with status 'error'
+        if data is not None:
+            response["data"] = data
+
+        # 'code' is an optional key for responses with status 'error'
         if code is not None:
             response["code"] = code
 
         return jsonify(response)
-    
-    else:
-        raise ValueError(f"Invalid status. Expected one of {ALLOWED_STATUSES}, but got: {status}")
-
 
 def jsendify_response(func: Callable):
     """Wrap route calls for simplified responses.
