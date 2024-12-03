@@ -17,7 +17,7 @@ classifiers = [
 dependencies = [
     "typer-slim==0.13.1",
     "requests==2.31.0",
-    "spectre_core==0.0.2"
+    "spectre_core==0.0.3"
 ]
 
 
