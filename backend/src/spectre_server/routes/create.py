@@ -16,8 +16,10 @@ def fits_config():
     payload = request.get_json()
     tag = payload.get("tag")
     params = payload.get("params")
+    force = payload.get("force")
     create.fits_config(tag, 
-                       params)
+                       params,
+                       force)
     
 
 @create_blueprint.route("/capture-config", methods=["POST"])
@@ -28,7 +30,9 @@ def capture_config():
     receiver_name = payload.get("receiver_name")
     mode = payload.get("mode")
     params = payload.get("params")
+    force = payload.get("force")
     create.capture_config(tag, 
                           receiver_name,
                           mode,
-                          params)
+                          params,
+                          force)
