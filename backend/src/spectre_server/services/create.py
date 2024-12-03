@@ -15,11 +15,13 @@ from spectre_core.logging import log_call
 @log_call
 def fits_config(tag: str,
                 params: Optional[List[str]] = None,
+                force: bool = False,
 ) -> None:
     if params is None:
         params = []
     fits_config = FitsConfig(tag)
-    fits_config.save_params(params)
+    fits_config.save_params(params,
+                            force)
     _LOGGER.info(f"The fits-config for tag: {tag} has been created")
 
 
@@ -27,12 +29,14 @@ def fits_config(tag: str,
 def capture_config(tag: str,
                    receiver_name: str,
                    mode: str,
-                   params: Optional[List[str]]
+                   params: Optional[List[str]],
+                   force: bool = False
 ) -> None:
     if params is None:
         params = []
     receiver = get_receiver(receiver_name, 
                             mode = mode)
     receiver.save_params(params,
-                         tag)
+                         tag,
+                         force)
     _LOGGER.info(f"The capture-config for tag: {tag} has been created")

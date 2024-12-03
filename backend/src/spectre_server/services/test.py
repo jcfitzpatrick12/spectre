@@ -2,18 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from logging import getLogger
-_LOGGER =  getLogger(__name__)
 
-import numpy as np
-from dataclasses import dataclass
+from typing import Any
 
 from spectre_core.logging import log_call
 from spectre_core.chunks import Chunks
-from spectre_core.spectrograms.analytical import (
-    TestResults,
-    validate_analytically
-)
+from spectre_core.spectrograms.analytical import validate_analytically
 from spectre_core.file_handlers.configs import CaptureConfig
 
 
@@ -21,7 +15,7 @@ from spectre_core.file_handlers.configs import CaptureConfig
 def analytical(
     tag: str,
     absolute_tolerance: float
-) -> dict[str, TestResults]:
+) -> dict[str, dict[str, Any]]:
     capture_config = CaptureConfig(tag)
     
     results_per_chunk = {}
@@ -30,8 +24,9 @@ def analytical(
         if chunk.has_file("fits"):
             chunk_file = chunk.get_file("fits")
             spectrogram = chunk_file.read()
-            results_per_chunk[chunk_file.file_name] = validate_analytically(spectrogram, 
-                                                                            capture_config,
-                                                                            absolute_tolerance)
+            test_results = validate_analytically(spectrogram, 
+                                                 capture_config,
+                                                 absolute_tolerance)
+            results_per_chunk[chunk_file.file_name] = test_results.jsonify()
 
     return results_per_chunk
