@@ -21,7 +21,7 @@ def logs(process_type: str = None,
          year: Optional[int] = None,
          month: Optional[int] = None,
          day: Optional[int] = None,
-         suppress_doublecheck: bool = False
+         force: bool = False
 ) -> None:
     log_handlers = LogHandlers(process_type,
                                year,
@@ -31,11 +31,8 @@ def logs(process_type: str = None,
         # if process type is specified, disregard all logs of differing process types
         if process_type and log_handler.process_type != process_type:
             continue
-        if suppress_doublecheck:
-            doublecheck_delete = False
-        else:
-            doublecheck_delete = True
-        log_handler.delete(doublecheck_delete=doublecheck_delete)
+
+        log_handler.delete(force)
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
 
 
@@ -45,7 +42,7 @@ def chunk_files(tag: str,
                 year: Optional[int] = None,
                 month: Optional[int] = None,
                 day: Optional[int] = None,
-                suppress_doublecheck: bool = False
+                force: bool = False
 ) -> None:
     chunks = Chunks(tag, 
                     year=year, 
@@ -53,13 +50,10 @@ def chunk_files(tag: str,
                     day=day)
     
     for chunk in chunks:
-        if suppress_doublecheck:
-            doublecheck_delete = False
-        else:
-            doublecheck_delete = True
         for extension in extensions:
             if chunk.has_file(extension):
-                chunk.delete_file(extension, doublecheck_delete=doublecheck_delete)
+                chunk.delete_file(extension, 
+                                  force = force)
                 _LOGGER.info(f"File deleted: {chunk.get_file(extension).file_path}")
 
 
