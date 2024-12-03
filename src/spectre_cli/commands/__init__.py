@@ -4,6 +4,7 @@
 
 from typing import Callable
 from functools import wraps
+import requests
 
 import typer
 from spectre_core.logging import PROCESS_TYPES
@@ -34,10 +35,23 @@ def secho_response(func: Callable):
     """Print the jsendified response from the spectre server"""
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args, **kwargs):
-        jsend_response = func(*args, **kwargs)
-        if jsend_response['status'] == "success":
-            typer.secho(jsend_response['data'])
-        elif jsend_response['status'] == "error":
-            typer.secho(jsend_response["message"], fg="yellow")
+        try:
+            jsend_response = func(*args, **kwargs)
+        except requests.exceptions.ConnectionError:
+            typer.secho(("Error: Unable to connect to the spectre-server. "
+                         "Is the container running? "
+                         "You can check with 'docker container list' "), fg="yellow")
+            return
+        
+        json_resonse = jsend_response.json()
+        if json_resonse['status'] == "success":
+            data = json_resonse['data']
+            if data:
+                typer.secho(data)
+                
+        elif json_resonse['status'] == "error":
+            typer.secho(json_resonse["message"], fg="yellow")
+
+
     return wrapper
 

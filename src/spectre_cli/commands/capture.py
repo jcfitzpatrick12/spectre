@@ -32,9 +32,8 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    response = requests.post(f"{BASE_URL}/capture/start", 
-                             json=payload)
-    return response.json()
+    return requests.post(f"{BASE_URL}/capture/start", 
+                         json=payload)
 
 
 @app.command()
@@ -52,8 +51,7 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    response = requests.post(f"{BASE_URL}/capture/session", 
-                             json=payload)
-    return response.json()
+    return requests.post(f"{BASE_URL}/capture/session", 
+                         json=payload)
 
 
