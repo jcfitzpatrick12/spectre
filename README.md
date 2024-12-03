@@ -76,7 +76,7 @@ Support for Windows will be explored in the future.
 ---
 
 ### **Starting the `spectre-server`**
-The `spectre-server` backend container must be running to respond to `spectre-cli` requests.
+The `spectre-server` backend container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
 1. Build the Docker image using the `backend` directory:  
    ```bash
@@ -91,6 +91,8 @@ The `spectre-server` backend container must be running to respond to `spectre-cl
 ---
 
 ### **Running the `spectre-cli`**
+The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
+
 1. Create a Python virtual environment:  
    ```bash
    python3 -m venv ./venv
@@ -110,7 +112,7 @@ The `spectre-server` backend container must be running to respond to `spectre-cl
    ```bash
    spectre --version
    ```
-
+Notably, the CLI commands will only work with the virtual environment activated.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
