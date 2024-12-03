@@ -1,4 +1,5 @@
 spectre-data/chunks/*
+spectre-data/configs/fits_config_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
