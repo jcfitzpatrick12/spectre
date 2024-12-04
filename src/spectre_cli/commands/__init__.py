@@ -2,12 +2,18 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import requests
+import os
 from typing import Callable
 from functools import wraps
-import requests
 
 import typer
+from flask import Response
+
 from spectre_core.logging import PROCESS_TYPES
+
+# Base URL of the locally running spectre-server, specifying the loopback IP and port 5000
+BASE_URL = f"http://127.0.0.1:5000"
 
 RECEIVER_NAME_HELP = "The name of the receiver"
 MODE_HELP = "The operating mode for the receiver"
@@ -31,27 +37,63 @@ INSTRUMENT_CODE_HELP = "The case-sensitive CALLISTO instrument code"
 ABSOLUTE_TOLERANCE_HELP = "The value of the 'atol' keyword argument for np.isclose"
 PER_SPECTRUM_HELP = "Show validated status per spectrum."
 
-def secho_response(func: Callable):
-    """Print the jsendified response from the spectre server"""
-    @wraps(func)  # Preserves the original function's name and metadata
+
+def _catch_response_errors(func: Callable):
+    """Standardised error handling on making a request.
+    
+    Assumes jsend formatted responses.
+    """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            jsend_response = func(*args, **kwargs)
+            response = func(*args, **kwargs)
         except requests.exceptions.ConnectionError:
             typer.secho(("Error: Unable to connect to the spectre-server. "
                          "Is the container running? "
                          "You can check with 'docker container list' "), fg="yellow")
             return
         
-        json_resonse = jsend_response.json()
-        if json_resonse['status'] == "success":
-            data = json_resonse['data']
-            if data:
-                typer.secho(data)
-                
-        elif json_resonse['status'] == "error":
-            typer.secho(json_resonse["message"], fg="yellow")
+        jsend_json = response.json()
+        status = jsend_json["status"]
 
-
+        # on success, return the response to be handled by the caller
+        if status == "success":
+            return response
+        
+        # otherwise, we standardise error handling for non-success response statuses
+        elif status == "error":
+            typer.secho((f"{jsend_json['message']}"), fg = "yellow")
+            raise typer.Exit(1)
+        
+        elif status == "fail":
+            typer.secho((f"Error: Bad client request. "
+                         f"{jsend_json['data']}"), fg = "yellow")
+            raise typer.Exit(1)
+        
+        else:
+            raise ValueError((f"Unexpected response status. "
+                             f"Got {status}, expected one of 'success', 'error' or 'fail'"))
     return wrapper
+
+
+@_catch_response_errors
+def safe_request(route_url: str, 
+                 method: str,
+                 payload: dict
+) -> Response:
+    """Request a response at the input route URL.
+    
+    Safety is enforce by the accompanying decorator.
+    """
+
+    if route_url.startswith("/"):
+        raise ValueError((f"The route URL should not be an absolute path. "
+                          f"It will be prepended with {BASE_URL}"))
+    
+    full_url = os.path.join(BASE_URL, route_url)
+
+    return requests.request(method, 
+                            full_url, 
+                            json = payload)
+
 

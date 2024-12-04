@@ -3,10 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-import requests
 
-from spectre_cli import BASE_URL
-from spectre_cli.commands import secho_response
+from spectre_cli.commands import safe_request
 from spectre_cli.commands import (
     TAG_HELP,
     SECONDS_HELP,
@@ -18,7 +16,6 @@ from spectre_cli.commands import (
 app = typer.Typer()
 
 @app.command()
-@secho_response
 def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
           seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
           minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
@@ -32,12 +29,11 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    return requests.post(f"{BASE_URL}/capture/start", 
-                         json=payload)
+    _ = safe_request("capture/start", "POST", payload)
+    typer.secho(f"Capture completed sucessfully for tag '{tag}'", fg = "green")
 
 
 @app.command()
-@secho_response
 def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
@@ -51,7 +47,8 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    return requests.post(f"{BASE_URL}/capture/session", 
-                         json=payload)
+    _ = safe_request("capture/start", "POST", payload)
+    typer.secho(f"Capture session completed sucessfully for tag '{tag}'", fg = "green")
+    
 
 
