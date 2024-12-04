@@ -28,31 +28,31 @@ def make_jsend_response(
     if status not in ALLOWED_STATUSES:
         raise ValueError(f"Invalid status: '{status}'. Must be one of {ALLOWED_STATUSES}.")
 
-    response = {"status": status}
+    jsend_dict = {"status": status}
 
     # Handle success status
     if status == "success" or status == "fail":
         # 'data' is a mandatory field for responses with 'fail' and 'success' statuses.
         # if None, the value must be null.
-        response["data"] = data
-        return jsonify(response)
+        jsend_dict["data"] = data
+        return jsonify(jsend_dict)
 
 
     # Handle error status
     elif status == "error":
         if not message:
             raise ValueError("The 'message' field is required for 'error' responses.")
-        response["message"] = message
+        jsend_dict["message"] = message
 
         # 'data' is an optional key for responses with status 'error'
         if data is not None:
-            response["data"] = data
+            jsend_dict["data"] = data
 
         # 'code' is an optional key for responses with status 'error'
         if code is not None:
-            response["code"] = code
+            jsend_dict["code"] = code
 
-        return jsonify(response)
+        return jsonify(jsend_dict)
 
 def jsendify_response(func: Callable):
     """Wrap route calls for simplified responses.
