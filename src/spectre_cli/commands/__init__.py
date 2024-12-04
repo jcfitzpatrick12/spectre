@@ -86,8 +86,7 @@ def safe_request(route_url: str,
     """
 
     if route_url.startswith("/"):
-        raise ValueError((f"The route URL should not be an absolute path. "
-                          f"It will be prepended with {BASE_URL}"))
+        route_url.lstrip("/")
     
     full_url = os.path.join(BASE_URL, route_url)
 
