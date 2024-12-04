@@ -46,28 +46,27 @@ def _catch_response_errors(func: Callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            response = func(*args, **kwargs)
+            jsend_dict = func(*args, **kwargs)
         except requests.exceptions.ConnectionError:
             typer.secho(("Error: Unable to connect to the spectre-server. "
                          "Is the container running? "
                          "You can check with 'docker container list' "), fg="yellow")
             return
         
-        jsend_json = response.json()
-        status = jsend_json["status"]
+        status = jsend_dict["status"]
 
         # on success, return the response to be handled by the caller
         if status == "success":
-            return response
+            return jsend_dict
         
         # otherwise, we standardise error handling for non-success response statuses
         elif status == "error":
-            typer.secho((f"{jsend_json['message']}"), fg = "yellow")
+            typer.secho((f"{jsend_dict['message']}"), fg = "yellow")
             raise typer.Exit(1)
         
         elif status == "fail":
             typer.secho((f"Error: Bad client request. "
-                         f"{jsend_json['data']}"), fg = "yellow")
+                         f"{jsend_dict['data']}"), fg = "yellow")
             raise typer.Exit(1)
         
         else:
@@ -80,7 +79,7 @@ def _catch_response_errors(func: Callable):
 def safe_request(route_url: str, 
                  method: str,
                  payload: dict
-) -> Response:
+) -> dict:
     """Request a response at the input route URL.
     
     Safety is enforce by the accompanying decorator.
@@ -92,8 +91,9 @@ def safe_request(route_url: str,
     
     full_url = os.path.join(BASE_URL, route_url)
 
-    return requests.request(method, 
-                            full_url, 
-                            json = payload)
+    response = requests.request(method,
+                                full_url,
+                                json = payload)
+    return response.json()
 
 
