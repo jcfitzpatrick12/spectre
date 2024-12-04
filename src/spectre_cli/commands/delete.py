@@ -4,6 +4,7 @@
 
 import typer
 
+from spectre_cli.commands import safe_request
 from spectre_cli.commands import (
     TAG_HELP,
     PROCESS_TYPE_HELP,
@@ -22,12 +23,14 @@ def logs(
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
 ) -> None:
-    # delete.logs(process_type,
-    #             year,
-    #             month,
-    #             day,
-    #             suppress_doublecheck)
-    raise typer.Exit()
+    payload = {
+        "process_type": process_type,
+        "year": year,
+        "month": month,
+        "day": day
+    }
+    _ = safe_request("delete/logs", "DELETE", payload)
+    typer.secho("Logs successfully deleted.")
 
 
 @delete_app.command()
@@ -46,14 +49,14 @@ def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     raise typer.Exit()
 
 
-@app.command()
+@delete_app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     # delete.fits_config(tag)
     raise typer.Exit()
 
 
-@app.command()
+@delete_app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     # delete.capture_config(tag)
