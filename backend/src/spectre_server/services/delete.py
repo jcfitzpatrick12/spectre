@@ -21,17 +21,21 @@ def logs(process_type: str = None,
          year: Optional[int] = None,
          month: Optional[int] = None,
          day: Optional[int] = None
-) -> None:
+) -> dict[str, list[str]]:
     log_handlers = LogHandlers(process_type,
                                year,
                                month,
                                day)
+    deleted_file_names = []
     for log_handler in log_handlers:
         # if process type is specified, disregard all logs of differing process types
         if process_type and log_handler.process_type != process_type:
             continue
         log_handler.delete()
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
+        deleted_file_names.append(log_handler.file_name)
+
+    return {"file_names": deleted_file_names}
 
 
 @log_call
@@ -46,11 +50,16 @@ def chunk_files(tag: str,
                     month=month,
                     day=day)
     
+    deleted_file_names = []
     for chunk in chunks:
         for extension in extensions:
             if chunk.has_file(extension):
-                chunk.delete_file(extension)
-                _LOGGER.info(f"File deleted: {chunk.get_file(extension).file_path}")
+                chunk_file = chunk.get_file(extension)
+                chunk_file.delete()
+                _LOGGER.info(f"File deleted: {chunk_file.file_name}")
+                deleted_file_names.append(chunk_file.file_name)
+
+    return {"file_names": deleted_file_names}
 
 
 @log_call
@@ -58,12 +67,15 @@ def fits_config(tag: str,
 ) -> None:
     fits_config = FitsConfig(tag)
     fits_config.delete()
-    _LOGGER.info(f"File deleted: {fits_config.file_path}")
+    _LOGGER.info(f"File deleted: {fits_config.file_name}")
 
+    return {"file_name": fits_config.file_name}
 
 @log_call
 def capture_config(tag: str,
 ) -> None:
     capture_config = CaptureConfig(tag)
     capture_config.delete()
-    _LOGGER.info(f"File deleted: {capture_config.file_path}")
+    _LOGGER.info(f"File deleted: {capture_config.file_name}")
+    
+    return {"file_name": capture_config.file_name}
