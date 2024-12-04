@@ -13,9 +13,9 @@ from spectre_cli.commands import (
     EXTENSIONS_HELP
 )
 
-app = typer.Typer()
+delete_app = typer.Typer()
 
-@app.command()
+@delete_app.command()
 def logs(
     process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -30,7 +30,7 @@ def logs(
     raise typer.Exit()
 
 
-@app.command()
+@delete_app.command()
 def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
                 year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),

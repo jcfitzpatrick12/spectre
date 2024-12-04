@@ -14,9 +14,9 @@ from spectre_cli.commands import (
     RECEIVER_NAME_HELP
 )
 
-app = typer.Typer()
+list_app = typer.Typer()
 
-@app.command()
+@list_app.command()
 def callisto_instrument_codes(
 ) -> None:
     # for instrument_code in get.callisto_instrument_codes():
@@ -24,7 +24,7 @@ def callisto_instrument_codes(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
          year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
          month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
@@ -35,7 +35,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -48,14 +48,14 @@ def chunk_files(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def receivers(
 ) -> None:
     # for receiver_name in get.receiver_names():
     #     typer.secho(receiver_name)
     raise typer.Exit()
 
-@app.command()
+@list_app.command()
 def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
 ) -> None:
@@ -64,7 +64,7 @@ def modes(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def specifications(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
 ) -> None:
@@ -74,7 +74,7 @@ def specifications(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def fits_configs(
 ) -> None:
     # for file_name in get.fits_config_file_names():
@@ -82,7 +82,7 @@ def fits_configs(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def capture_configs(
 ) -> None:
     # for file_name in get.capture_config_names():
@@ -90,7 +90,7 @@ def capture_configs(
     raise typer.Exit()
 
 
-@app.command()
+@list_app.command()
 def tags(
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),

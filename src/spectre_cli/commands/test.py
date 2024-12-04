@@ -10,7 +10,7 @@ from spectre_cli.commands import (
     PER_SPECTRUM_HELP
 )
 
-app = typer.Typer()
+test_app = typer.Typer()
 
 
 # def _pretty_print_test_results(file_name: str, 
@@ -36,7 +36,7 @@ app = typer.Typer()
 #     print_spectrum_results()
 
 
-@app.command()
+@test_app.command()
 def analytical(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     absolute_tolerance: float = typer.Option(1e-3, "--atol", "--absolute-tolerance", help=ABSOLUTE_TOLERANCE_HELP),

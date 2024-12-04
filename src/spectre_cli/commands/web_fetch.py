@@ -11,9 +11,9 @@ from spectre_cli.commands import(
     INSTRUMENT_CODE_HELP
 )
 
-app = typer.Typer()
+web_fetch_app = typer.Typer()
 
-@app.command()
+@web_fetch_app.command()
 def callisto(
     instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=INSTRUMENT_CODE_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),

@@ -13,9 +13,9 @@ from spectre_cli.commands import (
     MODE_HELP
 )
 
-app = typer.Typer()
+print_app = typer.Typer()
     
-@app.command()
+@print_app.command()
 def log(
     pid: str = typer.Option(None, "--pid", help=PID_HELP),
     file_name: str = typer.Option(None, "--file-name", help=FILE_NAME_HELP)
@@ -25,7 +25,7 @@ def log(
     raise typer.Exit()
 
 
-@app.command()
+@print_app.command()
 def fits_config_type_template(
     tag: str = typer.Option(None, "--tag", "-t", help=TAG_HELP),
     as_command: bool = typer.Option(False, "--as-command", help=AS_COMMAND_HELP)
@@ -39,7 +39,7 @@ def fits_config_type_template(
     typer.Exit()
 
 
-@app.command()
+@print_app.command()
 def type_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
     mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
@@ -58,7 +58,7 @@ def type_template(
     typer.Exit()
 
 
-@app.command()
+@print_app.command()
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     # fits_config = get.fits_config(tag)
@@ -67,7 +67,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     raise typer.Exit()
 
 
-@app.command()
+@print_app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     # fits_config = get.capture_config(tag)
