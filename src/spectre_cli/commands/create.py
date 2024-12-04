@@ -4,7 +4,6 @@
 
 import typer
 from typing import List
-import requests
 
 from spectre_cli.commands import safe_request
 from spectre_cli.commands import (
@@ -28,8 +27,9 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "params": params,
         "force": force
     }
-    _ = safe_request("create/fits-config", "POST", payload)
-    typer.secho(f"Fits-config created successfully with tag '{tag}'", 
+    jsend_dict = safe_request("create/fits-config", "POST", payload)
+    jsend_data = jsend_dict["data"]
+    typer.secho(f"Fits config created successfully with tag '{tag}': {jsend_data['file_name']}", 
                 fg = "green")
 
 
@@ -48,8 +48,10 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "params": params,
         "force": force
     }
-    _ = safe_request("create/capture-config", "POST", payload)
-    typer.secho(f"Capture-config created successfully with tag '{tag}'", fg = "green")
+    jsend_dict = safe_request("create/fits-config", "POST", payload)
+    jsend_data = jsend_dict["data"]
+    typer.secho(f"Capture config created successfully with tag '{tag}': {jsend_data['file_name']}", 
+                fg = "green")
 
         
 
