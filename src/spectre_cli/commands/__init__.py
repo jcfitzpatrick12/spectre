@@ -51,7 +51,7 @@ def _catch_response_errors(func: Callable):
             typer.secho(("Error: Unable to connect to the spectre-server. "
                          "Is the container running? "
                          "You can check with 'docker container list' "), fg="yellow")
-            return
+            raise typer.Exit(1)
         
         status = jsend_dict["status"]
 
