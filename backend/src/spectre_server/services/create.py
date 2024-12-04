@@ -25,6 +25,7 @@ def fits_config(tag: str,
     fits_config = FitsConfig(tag)
     fits_config.save_params(params,
                             force)
+    
     _LOGGER.info(f"The fits-config for tag '{tag}' has been created: {fits_config.file_name}")
 
     return {"file_name": fits_config.file_name}
@@ -45,8 +46,10 @@ def capture_config(tag: str,
     receiver.save_params(params,
                          tag,
                          force)
-    _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
-
+    
     # create an instance of the newly created capture config
     capture_config = CaptureConfig(tag)
+    
+    _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
+
     return {"file_name": capture_config.file_name}
