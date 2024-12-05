@@ -9,6 +9,6 @@ docker run --interactive \
            --publish 127.0.0.1:5000:5000 \
            --name spectre-server \
            --volume /dev/shm:/dev/shm \
-           --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/spectre-data \
+           --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
            spectre-server \
            /bin/bash

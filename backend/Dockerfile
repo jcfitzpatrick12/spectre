@@ -12,7 +12,7 @@ FROM ubuntu@sha256:3d1556a8a18cf5307b121e0a98e93f1ddf1f3f8e092f1fddfd941254785b9
 # stop interactive dialogue (only for the duration of the build)
 ARG DEBIAN_FRONTEND=noninteractive
 # define the spectre data directory path as an environment variable inside the container
-ENV SPECTRE_DATA_DIR_PATH="/home/spectre/spectre-data/"
+ENV SPECTRE_DATA_DIR_PATH="/home/spectre/.spectre-data/"
 
 # -------------------------------------------------- # 
 # Installing container packages ...                  #
