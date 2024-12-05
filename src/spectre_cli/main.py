@@ -7,8 +7,7 @@ from typing import Optional
 
 from spectre_cli import APP_NAME, VERSION
 from spectre_cli.commands.create import create_app
-from spectre_cli.commands.list import list_app
-from spectre_cli.commands.print import print_app
+from spectre_cli.commands.get import get_app
 from spectre_cli.commands.delete import delete_app
 from spectre_cli.commands.capture import capture_app
 from spectre_cli.commands.update import update_app
@@ -19,8 +18,7 @@ app = typer.Typer()
 
 # Register subcommands
 app.add_typer(create_app, name="create")
-app.add_typer(list_app, name="list")
-app.add_typer(print_app, name="print")
+app.add_typer(get_app, name="get")
 app.add_typer(delete_app, name="delete")
 app.add_typer(capture_app, name="capture")
 app.add_typer(update_app, name="update")
