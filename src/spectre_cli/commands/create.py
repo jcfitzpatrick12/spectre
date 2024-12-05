@@ -28,8 +28,8 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "force": force
     }
     jsend_dict = safe_request("create/fits-config", "POST", payload)
-    jsend_data = jsend_dict["data"]
-    typer.secho(f"Fits config created successfully with tag '{tag}': {jsend_data['file_name']}", 
+    file_name = jsend_dict["data"]
+    typer.secho(f"Fits config created successfully with tag '{tag}': {file_name}", 
                 fg = "green")
     raise typer.Exit()
 
@@ -51,8 +51,8 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("create/capture-config", 
                               "POST", 
                               payload)
-    jsend_data = jsend_dict["data"]
-    typer.secho(f"Capture config created successfully with tag '{tag}': {jsend_data['file_name']}", 
+    file_name = jsend_dict["data"]
+    typer.secho(f"Capture config created successfully with tag '{tag}': {file_name}", 
                 fg = "green")
     raise typer.Exit()
         

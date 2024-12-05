@@ -27,9 +27,9 @@ def callisto_instrument_codes(
     
     jsend_dict = safe_request("get/callisto-instrument-codes",
                               "GET")
-    jsend_data = jsend_dict["data"]
+    callisto_instrument_codes = jsend_dict["data"]
 
-    for instrument_code in jsend_data["callisto_instrument_codes"]:
+    for instrument_code in callisto_instrument_codes:
         typer.secho(instrument_code)
 
     raise typer.Exit()
@@ -51,9 +51,9 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
     jsend_dict = safe_request("get/logs",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
+    file_names = jsend_dict["data"]
 
-    for file_name in jsend_data["file_names"]:
+    for file_name in file_names:
         typer.secho(file_name)
 
     raise typer.Exit()
@@ -78,9 +78,9 @@ def chunk_files(
     jsend_dict = safe_request("get/chunk-files",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
+    file_names = jsend_dict["data"]
 
-    for file_name in jsend_data["file_names"]:
+    for file_name in file_names:
         typer.secho(file_name)
 
     raise typer.Exit()
@@ -92,9 +92,9 @@ def receivers(
     
     jsend_dict = safe_request("get/receivers",
                               "GET")
-    jsend_data = jsend_dict["data"]
+    receiver_names = jsend_dict["data"]
     
-    for receiver_name in jsend_data["receiver_names"]:
+    for receiver_name in receiver_names:
         typer.secho(receiver_name)
         
     raise typer.Exit()
@@ -111,9 +111,9 @@ def modes(
     jsend_dict = safe_request("get/modes",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
+    receiver_modes = jsend_dict["data"]
 
-    for mode in jsend_data["modes"]:
+    for mode in receiver_modes:
         typer.secho(mode)
 
     raise typer.Exit()
@@ -130,9 +130,11 @@ def specifications(
     jsend_dict = safe_request("get/specifications",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
+    specifications = jsend_dict["data"]
 
-    typer.secho(jsend_data["receiver_name"])
+    for k, v in specifications.items():
+        typer.secho(f"{k}: {v}")
+
     raise typer.Exit()
 
 
@@ -142,10 +144,8 @@ def fits_configs(
     
     jsend_dict = safe_request("get/fits-configs",
                               "GET")
-    jsend_data = jsend_dict["data"]
+    file_names = jsend_dict["data"]
     
-    file_names = jsend_data["file_names"]
-
     if not file_names:
         typer.secho(f"No fits configs found")
     
@@ -162,8 +162,7 @@ def capture_configs(
     
     jsend_dict = safe_request("get/capture-configs",
                               "GET")
-    jsend_data = jsend_dict["data"]
-    file_names = jsend_data["file_names"]
+    file_names = jsend_dict["data"]
     
     if not file_names:
         typer.secho(f"No capture configs found")
@@ -191,8 +190,7 @@ def tags(
     jsend_dict = safe_request("get/tags",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
-    tags = jsend_data["tags"]
+    tags = jsend_dict["data"]
 
     if not tags:
         typer.secho("No tags found")
@@ -217,9 +215,9 @@ def log(
     jsend_dict = safe_request("get/log",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
+    file_contents = jsend_dict["data"]
 
-    typer.secho(jsend_data["file_contents"])
+    typer.secho(file_contents)
     raise typer.Exit()
 
 
@@ -234,8 +232,7 @@ def fits_config_type_template(
     jsend_dict = safe_request("get/fits-config-type-template",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
-    type_template = jsend_data["type_template"]
+    type_template = jsend_dict["data"]
 
     for k, v in type_template.items():
         typer.secho(f"{k}: {v}")
@@ -258,8 +255,7 @@ def capture_config_type_template(
     jsend_dict = safe_request("get/capture-config-type-template",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
-    type_template = jsend_data["type_template"]
+    type_template = jsend_dict["data"]
 
     for k, v in type_template.items():
         typer.secho(f"{k}: {v}")
@@ -277,8 +273,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("get/fits-config",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
-    fits_config = jsend_data["fits_config"]
+    fits_config = jsend_dict["data"]
 
     for k, v in fits_config.items():
         typer.secho(f"{k}: {v}")
@@ -296,10 +291,9 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("get/capture-config",
                               "GET",
                               payload)
-    jsend_data = jsend_dict["data"]
-    fits_config = jsend_data["fits_config"]
+    capture_config = jsend_dict["data"]
 
-    for k, v in fits_config.items():
+    for k, v in capture_config.items():
         typer.secho(f"{k}: {v}")
 
     raise typer.Exit()

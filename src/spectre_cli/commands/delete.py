@@ -45,8 +45,8 @@ def logs(
         "day": day
     }
     jsend_dict = safe_request("delete/logs", "DELETE", payload)
-    jsend_data = jsend_dict["data"]
-    _secho_deleted_files(jsend_data["file_names"])
+    file_names = jsend_dict["data"]
+    _secho_deleted_files(file_names)
     raise typer.Exit()
 
 
@@ -66,8 +66,8 @@ def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("delete/chunk-files", 
                               "DELETE", 
                               payload)
-    jsend_data = jsend_dict["data"]
-    _secho_deleted_files(jsend_data["file_names"])
+    file_names = jsend_dict["data"]
+    _secho_deleted_files(file_names)
     raise typer.Exit()
 
 
@@ -80,8 +80,8 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("delete/fits-config", 
                               "DELETE", 
                               payload)
-    jsend_data = jsend_dict["data"]
-    _secho_deleted_file(jsend_data["file_name"])
+    file_name = jsend_dict["data"]
+    _secho_deleted_file(file_name)
     raise typer.Exit()
 
 
@@ -94,8 +94,8 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("delete/capture-config",
                               "DELETE",
                               payload)
-    jsend_data = jsend_dict["data"]
-    _secho_deleted_file(jsend_data["file_name"])
+    file_name = jsend_dict[file_name]
+    _secho_deleted_file(file_name)
     raise typer.Exit()
 
 
