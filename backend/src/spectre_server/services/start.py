@@ -169,11 +169,11 @@ def _start_watcher(tag: str,
 
 
 @log_call
-def start(tag: str, 
-          seconds: int = 0, 
-          minutes: int = 0, 
-          hours: int = 0, 
-          force_restart: bool = False
+def capture(tag: str, 
+            seconds: int = 0, 
+            minutes: int = 0, 
+            hours: int = 0, 
+            force_restart: bool = False
 ) -> None:
 
     total_runtime = _calculate_total_runtime(seconds, 
