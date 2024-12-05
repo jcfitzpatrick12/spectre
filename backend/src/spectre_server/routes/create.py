@@ -9,7 +9,7 @@ from spectre_server.routes import jsendify_response
 
 create_blueprint = Blueprint("create", __name__)
 
-@create_blueprint.route("/fits-config", methods=["PUT"])
+@create_blueprint.route("/fits-config", methods=["POST"])
 @jsendify_response
 def fits_config():
     payload = request.get_json()
@@ -21,7 +21,7 @@ def fits_config():
                               force)
     
 
-@create_blueprint.route("/capture-config", methods=["PUT"])
+@create_blueprint.route("/capture-config", methods=["POST"])
 @jsendify_response
 def capture_config():
     payload = request.get_json()
