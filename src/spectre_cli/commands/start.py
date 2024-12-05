@@ -13,14 +13,14 @@ from spectre_cli.commands import (
     FORCE_RESTART_HELP
 )
 
-capture_app = typer.Typer()
+start_app = typer.Typer()
 
-@capture_app.command()
-def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-          seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
-          minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
-          hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
-          force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
+@start_app.command()
+def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+            seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
+            minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
+            hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
+            force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
     payload = {
         "tag": tag,
@@ -29,13 +29,13 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    _ = safe_request("capture/start", 
+    _ = safe_request("start/capture", 
                      "POST", 
                      payload)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
-@capture_app.command()
+@start_app.command()
 def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
@@ -49,7 +49,7 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    _ = safe_request("capture/session", 
+    _ = safe_request("start/session", 
                      "POST", 
                      payload)
     typer.secho(f"Capture session completed sucessfully for tag '{tag}'")
