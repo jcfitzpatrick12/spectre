@@ -13,6 +13,23 @@ from spectre_core.receivers.factory import get_receiver
 from spectre_core.file_handlers.configs import FitsConfig, CaptureConfig
 from spectre_core.logging import log_call
 
+
+@log_call
+def get_configs(config_type: Optional[str] = None,
+                tag: Optional[str] = None
+) -> list[str]:
+    """Get the file names for all existing fits configs"""
+    file_names = []
+    for file_name in listdir(JSON_CONFIGS_DIR_PATH):
+        if config_type and not file_name.startswith(config_type):
+            continue
+        if tag and not file_name.endswith(tag):
+            continue
+        file_names.append(file_name)
+    return file_names
+ 
+
+
 @log_call
 def create_capture_config(tag: str,
                           receiver_name: str,
@@ -91,38 +108,3 @@ def delete_capture_config(tag: str,
     _LOGGER.info(f"File deleted: {capture_config.file_name}")
     
     return capture_config.file_name
-
-
-@log_call
-def get_capture_config_type_template(receiver_name: str,
-                                     mode: str
-) -> dict[str, Any]:
-    """Get the type template for a capture config for a receiver operating in a particular mode.
-    
-    Optionally, format the return as a command to create a capture config with the input tag.
-    """
-    receiver = get_receiver(receiver_name, 
-                            mode = mode)
-    
-    return {k: v.__name__ for k, v in receiver.type_template.items()}
-
-
-@log_call
-def get_fits_config_type_template(
-) -> dict[str, Any]:
-    """Get the type template for the fits config with a given tag."""
-    return {k: v.__name__ for k, v in FitsConfig.type_template}
-
-
-@log_call
-def get_fits_configs(
-) -> list[str]:
-    """Get the file names for all existing fits configs"""
-    return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("fits_config")]
-
-
-@log_call
-def get_capture_configs(
-) -> list[str]:
-    """Get the file names for all existing capture configs"""
-    return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("capture_config")]  

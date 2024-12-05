@@ -1,19 +1,22 @@
 from flask import Flask
 from spectre_core.logging import configure_root_logger
 
+from spectre_server.routes.chunks import chunks_blueprint
 from spectre_server.routes.configs import configs_blueprint
+from spectre_server.routes.receivers import receivers_blueprint
+from spectre_server.routes.jobs import jobs_blueprint
+from spectre_server.routes.logs import logs_blueprint
+from spectre_server.routes.callisto import callisto_blueprint
 
 app = Flask(__name__)
 
 # Register blueprints for modularity 
-# app.register_blueprint(start_blueprint, url_prefix="/start")
-# app.register_blueprint(create_blueprint, url_prefix="/create")
-# app.register_blueprint(delete_blueprint, url_prefix="/delete")
-# app.register_blueprint(get_blueprint, url_prefix="/get")
-# app.register_blueprint(test_blueprint, url_prefix="/test")
-# app.register_blueprint(update_blueprint, url_prefix="/update")
-# app.register_blueprint(web_fetch_blueprint, url_prefix="/web-fetch")
-
+app.register_blueprint(chunks_blueprint, url_prefix = "/chunks")
+app.register_blueprint(configs_blueprint, url_prefix = "/configs")
+app.register_blueprint(receivers_blueprint, url_prefix="/receivers")
+app.register_blueprint(jobs_blueprint, url_prefix="/jobs")
+app.register_blueprint(logs_blueprint, url_prefix="/logs")
+app.register_blueprint(callisto_blueprint, url_prefix="/callisto")
 
 if __name__ == "__main__":
     configure_root_logger("USER")

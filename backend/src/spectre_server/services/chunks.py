@@ -17,10 +17,10 @@ from spectre_core.cfg import get_chunks_dir_path
 
 @log_call
 def get_chunk_files(tag: str,
+                    extensions: Optional[list[str]] = None,
                     year: Optional[int] = None,
                     month: Optional[int] = None,
                     day: Optional[int] = None,
-                    extensions: Optional[list[str]] = None,
 ) -> list[str]:
     """Get the file names of all existing chunk files.
     

@@ -38,10 +38,10 @@ def delete_logs(process_type: str = None,
 
 
 @log_call
-def log_files(process_type: Optional[str] = None,
-              year: Optional[int] = None,
-              month: Optional[int] = None,
-              day: Optional[int] = None,
+def get_logs(process_type: Optional[str] = None,
+             year: Optional[int] = None,
+             month: Optional[int] = None,
+             day: Optional[int] = None,
 ) -> list[str]:
     """Get the file names of all existing logs.
     
@@ -55,18 +55,9 @@ def log_files(process_type: Optional[str] = None,
 
 
 @log_call
-def log_file(pid: Optional[str] = None,
-             file_name: Optional[str] = None
+def get_log(pid: Optional[str] = None
 ) -> str:
-    """Get the contents of a log according to the process ID or by file name directly"""
-    # Ensure that exactly one of --pid or --file-name is specified
-    if not (bool(pid) ^ bool(file_name)):
-        raise ValueError("Exactly one of --pid or --file-name must be specified")
-    
+    """Get the contents of a log according to the process ID"""
     log_handlers = LogHandlers()
-    if pid:
-        log_handler = log_handlers.get_log_handler_from_pid(pid)
-    if file_name:
-        log_handler = log_handlers.get_log_handler_from_file_name(file_name)
-
+    log_handler = log_handlers.get_log_handler_from_pid(pid)
     return log_handler.read()

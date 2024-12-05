@@ -30,3 +30,17 @@ def get_specifications(receiver_name: str,
     """For the input receiver, get the corresponding specifications"""
     receiver = get_receiver(receiver_name)
     return receiver.specifications
+
+
+@log_call
+def get_type_template(receiver_name: str,
+                      mode: str
+) -> dict[str, Any]:
+    """Get the type template for a capture config for a receiver operating in a particular mode.
+    
+    Optionally, format the return as a command to create a capture config with the input tag.
+    """
+    receiver = get_receiver(receiver_name, 
+                            mode = mode)
+    
+    return {k: v.__name__ for k, v in receiver.type_template.items()}
