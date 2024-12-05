@@ -16,19 +16,27 @@ from spectre_cli.commands import (
 
 delete_app = typer.Typer()
 
-def _secho_deleted_files(file_names: list[str]
-) -> None:
+def _secho_deleted_files(file_names: list[str]) -> None:
     if not file_names:
         typer.secho(f"No files found", fg="yellow")
         return 
     
     for file_name in file_names:
-        typer.secho(f"Deleted '{file_name}'", fg = "yellow")
+        typer.secho(f"Deleted '{file_name}'", fg="yellow")
 
 
-def _secho_deleted_file(file_name: str
-) -> None:
-    typer.secho(f"Deleted '{file_name}'", fg = "yellow")
+def _secho_deleted_file(file_name: str) -> None:
+    typer.secho(f"Deleted '{file_name}'", fg="yellow")
+
+
+def _caution_irreversible(force: bool) -> None:
+    if force:
+        return
+    typer.secho("This action is irreversible. Do you wish to continue? [y/n]", fg="red", bold=True)
+    confirmation = input().strip().lower()
+    if confirmation not in ("y", "yes"):
+        typer.secho("Operation cancelled.", fg="yellow")
+        raise typer.Exit()
 
 
 @delete_app.command()
@@ -37,7 +45,9 @@ def logs(
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
+    _caution_irreversible(force)
     payload = {
         "process_type": process_type,
         "year": year,
@@ -51,12 +61,15 @@ def logs(
 
 
 @delete_app.command()
-def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-                extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
-                year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-                month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-                day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+def chunk_files(
+    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
+    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
+    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
+    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
+    _caution_irreversible(force)
     payload = {
         "tag": tag,
         "extensions": extensions,
@@ -64,42 +77,33 @@ def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("delete/chunk-files", 
-                              "DELETE", 
-                              payload)
+    jsend_dict = safe_request("delete/chunk-files", "DELETE", payload)
     file_names = jsend_dict["data"]
     _secho_deleted_files(file_names)
     raise typer.Exit()
 
 
 @delete_app.command()
-def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+def fits_config(
+    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
-    payload = {
-        "tag": tag
-    }
-    jsend_dict = safe_request("delete/fits-config", 
-                              "DELETE", 
-                              payload)
+    _caution_irreversible(force)
+    payload = {"tag": tag}
+    jsend_dict = safe_request("delete/fits-config", "DELETE", payload)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
 
 
 @delete_app.command()
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+def capture_config(
+    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
-    payload = {
-        "tag": tag
-    }
-    jsend_dict = safe_request("delete/capture-config",
-                              "DELETE",
-                              payload)
+    _caution_irreversible(force)
+    payload = {"tag": tag}
+    jsend_dict = safe_request("delete/capture-config", "DELETE", payload)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
-
-
-
-
-
