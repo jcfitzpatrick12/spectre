@@ -14,9 +14,7 @@
     "IF_gain": -40,
     "window_kwargs": {
     },
-    "STFFT_kwargs": {
-        "hop": 256
-    },
+    "hop": 256,
     "receiver": "rspduo",
     "mode": "tuner-1-fixed",
     "tag": "rspduo-tuner-1-fixed-example"

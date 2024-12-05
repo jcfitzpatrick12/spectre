@@ -14,9 +14,7 @@
     "IF_gain": -40,
     "window_kwargs": {
     },
-    "STFFT_kwargs": {
-        "hop": 256
-    },
+    "hop": 256,
     "receiver": "rsp1a",
     "mode": "fixed",
     "tag": "rsp1a-fixed-example"

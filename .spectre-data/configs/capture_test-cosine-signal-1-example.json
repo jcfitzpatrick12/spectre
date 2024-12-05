@@ -8,9 +8,7 @@
     "joining_time": 0,
     "window_type": "boxcar",
     "window_kwargs": {},
-    "STFFT_kwargs": {
-        "hop": 512
-    },
+    "hop": 512,
     "window_size": 256,
     "event_handler_key": "fixed",
     "chunk_key": "fixed",

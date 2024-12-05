@@ -9,9 +9,7 @@
     "window_type": "boxcar",
     "window_kwargs": {},
     "window_size": 256,
-    "STFFT_kwargs": {
-        "hop": 256
-    },
+    "hop": 256,
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
     "time_resolution": 0.0,

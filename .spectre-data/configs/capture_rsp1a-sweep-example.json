@@ -14,9 +14,7 @@
     "window_type": "blackman",
     "window_kwargs": {},
     "window_size": 1024,
-    "STFFT_kwargs": {
-        "hop": 768
-    },
+    "hop": 768,
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
     "receiver": "rsp1a",
