@@ -60,7 +60,7 @@ def capture_config(tag: str,
 
     receiver.save_capture_config(capture_config.dict, 
                                  tag, 
-                                 force = force)
+                                 force = True)
 
     # create an instance of the newly created capture config
     capture_config = CaptureConfig(tag)
@@ -85,7 +85,7 @@ def fits_config(tag: str,
     validate_against_type_template(fits_config, fits_config.type_template)
 
     fits_config.save(fits_config.dict, 
-                     force = force)
+                     force = True)
     
     _LOGGER.info(f"The fits-config for tag '{tag}' has been updated: {fits_config.file_name}")
 
