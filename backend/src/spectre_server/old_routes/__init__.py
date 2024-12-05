@@ -54,7 +54,6 @@ def make_jsend_response(
 
         return jsonify(jsend_dict)
 
-
 def jsendify_response(func: Callable):
     """Wrap route calls for simplified responses.
     

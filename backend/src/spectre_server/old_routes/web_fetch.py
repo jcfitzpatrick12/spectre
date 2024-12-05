@@ -4,8 +4,8 @@
 
 from flask import Blueprint, request
 
-from spectre_server.services import web_fetch
-from spectre_server.routes import jsendify_response
+from spectre_server.old_services import web_fetch
+from spectre_server.old_routes import jsendify_response
 
 web_fetch_blueprint = Blueprint("web-fetch", __name__)
 

@@ -4,8 +4,8 @@
 
 from flask import Blueprint, request
 
-from spectre_server.services import start
-from spectre_server.routes import jsendify_response
+from spectre_server.old_services import start
+from spectre_server.old_routes import jsendify_response
 
 
 start_blueprint = Blueprint("start", __name__)
