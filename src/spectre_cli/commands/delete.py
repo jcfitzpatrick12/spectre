@@ -58,6 +58,7 @@ def chunk_files(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
 ) -> None:
     payload = {
+        "tag": tag,
         "extensions": extensions,
         "year": year,
         "month": month,
