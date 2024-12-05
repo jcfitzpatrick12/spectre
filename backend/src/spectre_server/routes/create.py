@@ -2,7 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
 from flask import Blueprint, request
 
 from spectre_server.services import create

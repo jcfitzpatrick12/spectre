@@ -35,7 +35,7 @@ def logs(process_type: str = None,
         _LOGGER.info(f"File deleted: {log_handler.file_path}")
         deleted_file_names.append(log_handler.file_name)
 
-    return {"file_names": deleted_file_names}
+    return deleted_file_names
 
 
 @log_call
@@ -59,7 +59,7 @@ def chunk_files(tag: str,
                 _LOGGER.info(f"File deleted: {chunk_file.file_name}")
                 deleted_file_names.append(chunk_file.file_name)
 
-    return {"file_names": deleted_file_names}
+    return deleted_file_names
 
 
 @log_call
@@ -68,8 +68,8 @@ def fits_config(tag: str,
     fits_config = FitsConfig(tag)
     fits_config.delete()
     _LOGGER.info(f"File deleted: {fits_config.file_name}")
-
-    return {"file_name": fits_config.file_name}
+    
+    return fits_config.file_name
 
 @log_call
 def capture_config(tag: str,
@@ -78,4 +78,4 @@ def capture_config(tag: str,
     capture_config.delete()
     _LOGGER.info(f"File deleted: {capture_config.file_name}")
     
-    return {"file_name": capture_config.file_name}
+    return capture_config.file_name
