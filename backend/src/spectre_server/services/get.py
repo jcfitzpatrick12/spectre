@@ -12,7 +12,6 @@ from typing import Any, Optional
 from spectre_core.receivers.factory import get_receiver
 from spectre_core.receivers.receiver_register import list_all_receiver_names
 from spectre_core.chunks import Chunks
-from spectre_core.chunks.base import ChunkFile
 from spectre_core.cfg import (
     JSON_CONFIGS_DIR_PATH,
     CALLISTO_INSTRUMENT_CODES,
@@ -20,7 +19,6 @@ from spectre_core.cfg import (
 )
 from spectre_core.logging import (
     LogHandlers, 
-    LogHandler,
     log_call
 )
 from spectre_core.file_handlers.configs import (
@@ -109,15 +107,15 @@ def receiver_specifications(receiver_name: str,
 @log_call
 def fits_config_file_names(
 ) -> list[str]:
-    """Get the file names for all defined fits configs"""
+    """Get the file names for all existing fits configs"""
     return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("fits_config")]
 
 
 @log_call
 def capture_config_file_names(
 ) -> list[str]:
-    """Get the file names for all defined capture configs"""
-    return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("capture_config")]   
+    """Get the file names for all existing capture configs"""
+    return [file_name for file_name in listdir(JSON_CONFIGS_DIR_PATH) if file_name.startswith("capture_config")]  
 
 
 @log_call
@@ -133,12 +131,13 @@ def tags(year: Optional[int] = None,
         chunk_base_name, _ = splitext(chunk_file)
         tag = chunk_base_name.split("_")[1]
         tags.add(tag)
+
     return sorted(list(tags))
 
 
 @log_call
-def log_contents(pid: Optional[str] = None,
-                 file_name: Optional[str] = None
+def log_file_contents(pid: Optional[str] = None,
+                      file_name: Optional[str] = None
 ) -> str:
     """Get the contents of a log according to the process ID or by file name directly"""
     # Ensure that exactly one of --pid or --file-name is specified
@@ -155,28 +154,15 @@ def log_contents(pid: Optional[str] = None,
 
 
 @log_call
-def fits_config_type_template(tag: Optional[str] = None,
-                              as_command: bool = False
+def fits_config_type_template(
 ) -> dict[str, Any] | str:
-    """Get the type template for the fits config with a given tag.
-    
-    Optionally, format the return as a command to create a fits config with the input tag.
-    """
-    if as_command:
-        if not tag:
-            raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
-        fits_config = FitsConfig(tag)
-        return fits_config.get_create_fits_config_cmd(tag, 
-                                                      as_string = True)
-    else:
-        return FitsConfig.type_template
+    """Get the type template for the fits config with a given tag."""
+    return FitsConfig.type_template
 
 
 @log_call
-def type_template(receiver_name: str,
-                  mode: str,
-                  as_command: bool = False,
-                  tag: Optional[str] = None
+def capture_config_type_template(receiver_name: str,
+                                 mode: str
 ) -> dict[str, Any] | str:
     """Get the type template for a capture config for a receiver operating in a particular mode.
     
@@ -184,12 +170,8 @@ def type_template(receiver_name: str,
     """
     receiver = get_receiver(receiver_name, 
                             mode = mode)
-    if as_command:
-        if not tag:
-            raise ValueError("If specifying --as-command, the tag must also be specified with --tag or -t")
-        return receiver.get_create_capture_config_cmd(tag, as_string=True)
-    else:
-        return receiver.type_template
+    
+    return receiver.type_template
 
 
 @log_call
@@ -201,7 +183,7 @@ def fits_config_contents(tag: str
 
 
 @log_call
-def capture_config(tag: str
+def capture_config_contents(tag: str
 ) -> dict[str, Any]:
     """Return the contents of a capture config with a given tag."""
     capture_config = CaptureConfig(tag)
