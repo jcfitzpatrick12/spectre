@@ -17,9 +17,9 @@ def callisto_instrument_codes():
     return get.callisto_instrument_codes()
 
 
-@get_blueprint.route("/log-file-names", methods=["GET"])
+@get_blueprint.route("/logs", methods=["GET"])
 @jsendify_response
-def log_file_names():
+def logs():
     payload = request.get_json()
     process_type = payload.get("process_type")
     year = payload.get("year")
