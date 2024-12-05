@@ -31,9 +31,9 @@ def log_file_names():
                               day)
 
 
-@get_blueprint.route("/chunk-file-names", methods=["GET"])
+@get_blueprint.route("/chunk-files", methods=["GET"])
 @jsendify_response
-def chunk_file_names():
+def chunk_files():
     payload = request.get_json()
     tag = payload.get("tag")
     year = payload.get("year")
