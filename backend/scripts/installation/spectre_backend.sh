@@ -20,3 +20,9 @@ git checkout rest-api
 cd backend
 pip install --upgrade pip
 pip install -e .
+
+# install spectre-core via git clone for easier development
+git clone https://github.com/jcfitzpatrick12/spectre-core.git
+git checkout v0.0.5
+cd spectre-core
+pip install -e .
