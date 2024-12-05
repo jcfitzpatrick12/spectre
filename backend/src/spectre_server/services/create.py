@@ -28,7 +28,7 @@ def fits_config(tag: str,
     
     _LOGGER.info(f"The fits-config for tag '{tag}' has been created: {fits_config.file_name}")
 
-    return {"file_name": fits_config.file_name}
+    return fits_config.file_name
 
 @log_call
 def capture_config(tag: str,
@@ -52,4 +52,4 @@ def capture_config(tag: str,
     
     _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
 
-    return {"file_name": capture_config.file_name}
+    return capture_config.file_name
