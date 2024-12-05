@@ -6,9 +6,9 @@ import requests
 import os
 from typing import Callable
 from functools import wraps
+from typing import Optional
 
 import typer
-from flask import Response
 
 from spectre_core.logging import PROCESS_TYPES
 
@@ -78,7 +78,7 @@ def _catch_response_errors(func: Callable):
 @_catch_response_errors
 def safe_request(route_url: str, 
                  method: str,
-                 payload: dict
+                 payload: Optional[dict] = None
 ) -> dict:
     """Request a response at the input route URL.
     
