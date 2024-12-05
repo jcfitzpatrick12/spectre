@@ -71,6 +71,6 @@ def jsendify_response(func: Callable):
             return make_jsend_response("error",
                                         message = (f"An internal server error has occured. "
                                                     f"Received the following error: \n{traceback.format_exc()}"
-                                                    f"Please use 'spectre print log --pid {user_pid}` for more details"),
+                                                    f"Please use 'spectre get log --pid {user_pid}` for more details"),
                                         code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper
