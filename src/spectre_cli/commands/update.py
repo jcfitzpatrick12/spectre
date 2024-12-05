@@ -5,6 +5,7 @@
 import typer
 from typing import List
 
+from spectre_cli.commands import safe_request
 from spectre_cli.commands import (
     TAG_HELP,
     FORCE_UPDATE_HELP
@@ -17,10 +18,19 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
                    force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
 ) -> None:
-    # update.capture_config(tag, 
-    #                       params, 
-    #                       force = force)
-    # typer.secho(f"The capture-config for tag \"{tag}\" has been successfully updated", fg=typer.colors.GREEN)
+    
+    payload = {
+        "tag": tag,
+        "params": params,
+        "force": force
+    }
+    jsend_dict = safe_request("update/capture-config",
+                              "PATCH",
+                              payload)
+    file_name = jsend_dict["data"]
+
+    typer.secho(f"Successfully updated `{file_name}`")
+
     raise typer.Exit()
 
 
@@ -29,8 +39,16 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
                 force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
 ) -> None:
-    # update.fits_config(tag, 
-    #                    params,
-    #                    force)
-    # typer.secho(f"The fits-config for tag \"{tag}\" has been successfully updated", fg=typer.colors.GREEN)
+    payload = {
+        "tag": tag,
+        "params": params,
+        "force": force
+    }
+    jsend_dict = safe_request("update/fits-config",
+                              "PATCH",
+                              payload)
+    file_name = jsend_dict["data"]
+
+    typer.secho(f"Successfully updated `{file_name}`")
+
     raise typer.Exit()
