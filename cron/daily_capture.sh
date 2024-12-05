@@ -3,9 +3,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# setting environment variables
-export SPECTRE_DATA_DIR_PATH=/home/spectre/spectre-data
-
 # start the capture session
 spectre capture session --tag rsp1a-fixed-example --hours 8 --force-restart
 # deletes all remnant bin and hdr chunk files in all chunks subdirectories
