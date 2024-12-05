@@ -22,17 +22,17 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 force: bool = typer.Option(False, "--force", help = FORCE_HELP, is_flag=True)
 ) -> None:
     
-    payload = {
-        "tag": tag,
+    json = {
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request("create/fits-config", 
-                              "POST", 
-                              payload)
+    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
+                              "PUT", 
+                              json = json)
     file_name = jsend_dict["data"]
     typer.secho(f"Fits config created successfully with tag '{tag}': {file_name}")
     raise typer.Exit()
+
 
 @create_app.command()
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
@@ -42,16 +42,15 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    force: bool = typer.Option(False, "--force", help = FORCE_HELP, is_flag=True)
 ) -> None:
     
-    payload = {
-        "tag": tag,
+    json = {
         "receiver_name": receiver_name,
         "mode": mode,
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request("create/capture-config", 
+    jsend_dict = safe_request("spectre-data/configs/fits/{tag}", 
                               "POST", 
-                              payload)
+                              json)
     file_name = jsend_dict["data"]
     typer.secho(f"Capture config created successfully with tag '{tag}': {file_name}")
     raise typer.Exit()

@@ -25,7 +25,7 @@ get_app = typer.Typer()
 def callisto_instrument_codes(
 ) -> None:
     
-    jsend_dict = safe_request("get/callisto-instrument-codes",
+    jsend_dict = safe_request("callisto/instrument-codes",
                               "GET")
     callisto_instrument_codes = jsend_dict["data"]
 
@@ -42,15 +42,15 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
          day: int = typer.Option(None, "--day", "-d", help=DAY_HELP)
 ) -> None:
     
-    payload = {
+    params = {
         "process_type": process_type,
         "year": year,
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("get/logs",
+    jsend_dict = safe_request("spectre-data/logs",
                               "GET",
-                              payload)
+                              params)
     file_names = jsend_dict["data"]
 
     for file_name in file_names:
@@ -61,23 +61,23 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 
 @get_app.command()
 def chunk_files(
-    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    tag: list[str] = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
     extensions: list[str] = typer.Option(None, "--extension", "-e", help=EXTENSIONS_HELP)
 ) -> None:
     
-    payload = {
+    params = {
         "tag": tag,
         "year": year,
         "month": month,
         "day": day,
         "extensions": extensions
     }
-    jsend_dict = safe_request("get/chunk-files",
+    jsend_dict = safe_request("spectre-data/chunks",
                               "GET",
-                              payload)
+                              params)
     file_names = jsend_dict["data"]
 
     for file_name in file_names:
@@ -90,7 +90,7 @@ def chunk_files(
 def receivers(
 ) -> None:
     
-    jsend_dict = safe_request("get/receivers",
+    jsend_dict = safe_request("/receivers",
                               "GET")
     receiver_names = jsend_dict["data"]
     
@@ -105,12 +105,8 @@ def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
 ) -> None:
     
-    payload = {
-        "receiver_name": receiver_name
-    }
-    jsend_dict = safe_request("get/modes",
-                              "GET",
-                              payload)
+    jsend_dict = safe_request(f"receivers/{receiver_name}/modes",
+                              "GET")
     receiver_modes = jsend_dict["data"]
 
     for mode in receiver_modes:
@@ -127,7 +123,7 @@ def specifications(
     payload = {
         "receiver_name": receiver_name
     }
-    jsend_dict = safe_request("get/specifications",
+    jsend_dict = safe_request(f"receivers/{receiver_name}/specifications",
                               "GET",
                               payload)
     specifications = jsend_dict["data"]
@@ -142,7 +138,7 @@ def specifications(
 def fits_configs(
 ) -> None:
     
-    jsend_dict = safe_request("get/fits-configs",
+    jsend_dict = safe_request(f"spectre-data/configs/fits",
                               "GET")
     file_names = jsend_dict["data"]
     
@@ -160,7 +156,7 @@ def fits_configs(
 def capture_configs(
 ) -> None:
     
-    jsend_dict = safe_request("get/capture-configs",
+    jsend_dict = safe_request(f"spectre-data/configs/capture",
                               "GET")
     file_names = jsend_dict["data"]
     
@@ -182,14 +178,14 @@ def tags(
     
 ) -> None:
     
-    payload = {
+    params = {
         "year": year,
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("get/tags",
+    jsend_dict = safe_request("spectre-data/chunks/tags",
                               "GET",
-                              payload)
+                              params = params)
     tags = jsend_dict["data"]
 
     if not tags:
@@ -205,16 +201,10 @@ def tags(
 @get_app.command()
 def log(
     pid: str = typer.Option(None, "--pid", help=PID_HELP),
-    file_name: str = typer.Option(None, "--file-name", help=FILE_NAME_HELP)
 ) -> None:
     
-    payload = {
-        "pid": pid,
-        "file_name": file_name
-    }
-    jsend_dict = safe_request("get/log",
-                              "GET",
-                              payload)
+    jsend_dict = safe_request(f"spectre-data/logs/{pid}",
+                              "GET")
     file_contents = jsend_dict["data"]
 
     typer.secho(file_contents)
@@ -222,39 +212,17 @@ def log(
 
 
 @get_app.command()
-def fits_config_type_template(
-    tag: str = typer.Option(None, "--tag", "-t", help=TAG_HELP),
-) -> None:
-    
-    payload = {
-        "tag": tag
-    }
-    jsend_dict = safe_request("get/fits-config-type-template",
-                              "GET",
-                              payload)
-    type_template = jsend_dict["data"]
-
-    for k, v in type_template.items():
-        typer.secho(f"{k}: {v}")
-
-    typer.Exit()
-
-
-@get_app.command()
-def capture_config_type_template(
+def type_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
     mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
-    tag: str = typer.Option(None, "--tag", "-t", help=TAG_HELP)
 ) -> None: 
     
-    payload = {
-        "receiver_name": receiver_name,
+    params = {
         "mode": mode,
-        "tag": tag
     }
-    jsend_dict = safe_request("get/capture-config-type-template",
+    jsend_dict = safe_request(f"receivers/{receiver_name}/type-template",
                               "GET",
-                              payload)
+                              params = params)
     type_template = jsend_dict["data"]
 
     for k, v in type_template.items():
@@ -267,12 +235,8 @@ def capture_config_type_template(
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     
-    payload = {
-        "tag": tag
-    }
-    jsend_dict = safe_request("get/fits-config",
-                              "GET",
-                              payload)
+    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}",
+                              "GET")
     fits_config = jsend_dict["data"]
 
     for k, v in fits_config.items():
@@ -285,12 +249,8 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     
-    payload = {
-        "tag": tag
-    }
-    jsend_dict = safe_request("get/capture-config",
-                              "GET",
-                              payload)
+    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}",
+                              "GET")
     capture_config = jsend_dict["data"]
 
     for k, v in capture_config.items():

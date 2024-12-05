@@ -48,13 +48,15 @@ def logs(
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
     _caution_irreversible(force)
-    payload = {
+    params = {
         "process_type": process_type,
         "year": year,
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("delete/logs", "POST", payload)
+    jsend_dict = safe_request("spectre-data/configs/logs", 
+                              "DELETE", 
+                              params = params)
     file_names = jsend_dict["data"]
     _secho_deleted_files(file_names)
     raise typer.Exit()
@@ -70,14 +72,15 @@ def chunk_files(
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
     _caution_irreversible(force)
-    payload = {
-        "tag": tag,
+    params = {
         "extensions": extensions,
         "year": year,
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("delete/chunk-files", "POST", payload)
+    jsend_dict = safe_request(f"spectre-data/chunks/{tag}", 
+                              "DELETE",
+                              params = params)
     file_names = jsend_dict["data"]
     _secho_deleted_files(file_names)
     raise typer.Exit()
@@ -89,8 +92,8 @@ def fits_config(
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
     _caution_irreversible(force)
-    payload = {"tag": tag}
-    jsend_dict = safe_request("delete/fits-config", "POST", payload)
+    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
+                              "DELETE")
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
@@ -102,8 +105,8 @@ def capture_config(
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
     _caution_irreversible(force)
-    payload = {"tag": tag}
-    jsend_dict = safe_request("delete/capture-config", "POST", payload)
+    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
+                              "DELETE")
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()

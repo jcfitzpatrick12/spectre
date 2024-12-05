@@ -79,7 +79,8 @@ def _catch_response_errors(func: Callable):
 @_catch_response_errors
 def safe_request(route_url: str, 
                  method: str,
-                 payload: Optional[dict] = None
+                 json: Optional[dict] = None,
+                 params: Optional[dict] = None
 ) -> dict:
     """Request a response at the input route URL.
     
@@ -93,7 +94,8 @@ def safe_request(route_url: str,
 
     response = requests.request(method,
                                 full_url,
-                                json = payload)
+                                json = json,
+                                params = params)
     response.raise_for_status()
     return response.json()
 
