@@ -6,6 +6,7 @@ from spectre_server.routes.create import create_blueprint
 from spectre_server.routes.delete import delete_blueprint
 from spectre_server.routes.get import get_blueprint
 from spectre_server.routes.test import test_blueprint
+from spectre_server.routes.update import update_blueprint
 
 app = Flask(__name__)
 
@@ -15,6 +16,7 @@ app.register_blueprint(create_blueprint, url_prefix="/create")
 app.register_blueprint(delete_blueprint, url_prefix="/delete")
 app.register_blueprint(get_blueprint, url_prefix="/get")
 app.register_blueprint(test_blueprint, url_prefix="/test")
+app.register_blueprint(update_blueprint, url_prefix="/update")
 
 
 if __name__ == "__main__":
