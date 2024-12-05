@@ -4,6 +4,7 @@ from spectre_core.logging import configure_root_logger
 from spectre_server.routes.capture import capture_blueprint
 from spectre_server.routes.create import create_blueprint
 from spectre_server.routes.delete import delete_blueprint
+from spectre_server.routes.get import get_blueprint
 
 app = Flask(__name__)
 
@@ -11,6 +12,7 @@ app = Flask(__name__)
 app.register_blueprint(capture_blueprint, url_prefix="/capture")
 app.register_blueprint(create_blueprint, url_prefix="/create")
 app.register_blueprint(delete_blueprint, url_prefix="/delete")
+app.register_blueprint(get_blueprint, url_prefix="/get")
 
 
 if __name__ == "__main__":
