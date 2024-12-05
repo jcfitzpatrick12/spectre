@@ -15,3 +15,17 @@ callisto_blueprint = Blueprint("callisto", __name__)
 @jsendify_response
 def get_instrument_codes():
     return callisto.get_instrument_codes()
+
+
+@callisto_blueprint.route("/download", methods=["POST"])
+@jsendify_response
+def download():
+    payload = request.get_json()
+    instrument_code = payload.get("instrument_code")
+    year = payload.get("year")
+    month = payload.get("month")
+    day = payload.get("day")
+    return callisto.download(instrument_code,
+                             year,
+                             month,
+                             day)

@@ -14,22 +14,11 @@ configs_blueprint = Blueprint("configs", __name__)
 @configs_blueprint.route("", methods=["GET"])
 @jsendify_response
 def get_configs():
-    return configs.get_configs()
+    config_type = request.args.get("config-type", type = str)
+    return configs.get_configs(config_type = config_type)
 
 
-@configs_blueprint.route("fits-configs", methods=["GET"])
-@jsendify_response
-def get_fits_configs():
-    return configs.get_configs(config_type = "fits_config")
-
-
-@configs_blueprint.route("capture-configs", methods=["GET"])
-@jsendify_response
-def get_capture_configs():
-    return configs.get_configs(config_type = "capture_config")
-
-
-@configs_blueprint.route("/fits-configs/<string:tag>", methods=["PUT"])
+@configs_blueprint.route("/fits/<string:tag>", methods=["PUT"])
 @jsendify_response
 def create_fits_config(tag: str):
     payload = request.get_json()
@@ -40,7 +29,7 @@ def create_fits_config(tag: str):
                                       force)
 
 
-@configs_blueprint.route("/capture-configs/<string:tag>", methods=["PUT"])
+@configs_blueprint.route("/capture/<string:tag>", methods=["PUT"])
 @jsendify_response
 def create_capture_config(tag: str):
     payload = request.get_json()
@@ -55,25 +44,25 @@ def create_capture_config(tag: str):
                                          force)
 
 
-@configs_blueprint.route("/fits-configs/<string:tag>", methods=["DELETE"])
+@configs_blueprint.route("/fits/<string:tag>", methods=["DELETE"])
 @jsendify_response
 def delete_fits_config(tag: str):
     return configs.delete_fits_config(tag)
 
 
-@configs_blueprint.route("/capture-configs/<string:tag>", methods=["DELETE"])
+@configs_blueprint.route("/capture/<string:tag>", methods=["DELETE"])
 @jsendify_response
 def delete_capture_config(tag: str):
-    return configs.delete_fits_config(tag)
+    return configs.delete_capture_config(tag)
 
 
-@configs_blueprint.route("/fits-configs/<string:tag>", methods=["GET"])
+@configs_blueprint.route("/fits/<string:tag>", methods=["GET"])
 @jsendify_response
 def fits_config(tag: str):
     return configs.get_fits_config(tag)
 
 
-@configs_blueprint.route("/capture-configs/<string:tag>", methods=["GET"])
+@configs_blueprint.route("/capture/<string:tag>", methods=["GET"])
 @jsendify_response
 def capture_config(tag: str):
     return configs.get_capture_config(tag)

@@ -5,7 +5,7 @@
 from flask import Blueprint, request
 
 from spectre_server.services import jobs
-from spectre_server.old_routes import jsendify_response
+from spectre_server.routes import jsendify_response
 
 
 jobs_blueprint = Blueprint("jobs", __name__)
