@@ -54,7 +54,7 @@ def logs(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("delete/logs", "DELETE", payload)
+    jsend_dict = safe_request("delete/logs", "POST", payload)
     file_names = jsend_dict["data"]
     _secho_deleted_files(file_names)
     raise typer.Exit()
@@ -77,7 +77,7 @@ def chunk_files(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("delete/chunk-files", "DELETE", payload)
+    jsend_dict = safe_request("delete/chunk-files", "POST", payload)
     file_names = jsend_dict["data"]
     _secho_deleted_files(file_names)
     raise typer.Exit()
@@ -90,7 +90,7 @@ def fits_config(
 ) -> None:
     _caution_irreversible(force)
     payload = {"tag": tag}
-    jsend_dict = safe_request("delete/fits-config", "DELETE", payload)
+    jsend_dict = safe_request("delete/fits-config", "POST", payload)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
@@ -103,7 +103,7 @@ def capture_config(
 ) -> None:
     _caution_irreversible(force)
     payload = {"tag": tag}
-    jsend_dict = safe_request("delete/capture-config", "DELETE", payload)
+    jsend_dict = safe_request("delete/capture-config", "POST", payload)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
