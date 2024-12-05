@@ -25,7 +25,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "force": force
     }
     jsend_dict = safe_request("update/capture-config",
-                              "PATCH",
+                              "POST",
                               payload)
     file_name = jsend_dict["data"]
 
@@ -45,7 +45,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "force": force
     }
     jsend_dict = safe_request("update/fits-config",
-                              "PATCH",
+                              "POST",
                               payload)
     file_name = jsend_dict["data"]
 

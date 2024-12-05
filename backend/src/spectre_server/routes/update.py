@@ -10,7 +10,7 @@ from spectre_server.routes import jsendify_response
 
 update_blueprint = Blueprint("update", __name__)
 
-@update_blueprint.route("/capture-config", methods=["PATCH"])
+@update_blueprint.route("/capture-config", methods=["POST"])
 @jsendify_response
 def capture_config():
     payload = request.get_json()
@@ -22,7 +22,7 @@ def capture_config():
                                  force)
 
 
-@update_blueprint.route("/fits-config", methods=["PATCH"])
+@update_blueprint.route("/fits-config", methods=["POST"])
 @jsendify_response
 def fits_config():
     payload = request.get_json()
