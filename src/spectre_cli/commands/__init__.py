@@ -47,6 +47,7 @@ def _catch_response_errors(func: Callable):
     def wrapper(*args, **kwargs):
         try:
             jsend_dict = func(*args, **kwargs)
+
         except requests.exceptions.ConnectionError:
             typer.secho(("Error: Unable to connect to the spectre-server. "
                          "Is the container running? "
@@ -93,6 +94,7 @@ def safe_request(route_url: str,
     response = requests.request(method,
                                 full_url,
                                 json = payload)
+    response.raise_for_status()
     return response.json()
 
 
