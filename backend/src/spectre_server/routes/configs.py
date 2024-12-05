@@ -19,6 +19,20 @@ def get_configs(
     return configs.get_configs(config_type = config_type)
 
 
+@configs_blueprint.route("/fits", methods=["GET"])
+@jsendify_response
+def get_fits_configs(
+):
+    return configs.get_configs(config_type = "fits")
+
+
+@configs_blueprint.route("/capture", methods=["GET"])
+@jsendify_response
+def get_capture_configs(
+):
+    return configs.get_configs(config_type = "capture")
+
+
 @configs_blueprint.route("/fits/<string:tag>", methods=["PUT"])
 @jsendify_response
 def create_fits_config(tag: str
