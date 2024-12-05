@@ -28,7 +28,7 @@ def _pretty_print_test_results(file_name: str,
         typer.secho("\nPer spectrum results:" if per_spectrum else "\nSummary:")
         if per_spectrum:
             for time, is_valid in test_results.spectrum_validated.items():
-                typer.secho(f"  Time {time:.3f} [s]: {'PASS' if is_valid else 'FAIL'}", fg="green" if is_valid else "red")
+                typer.secho(f"  Time {float(time):.3f} [s]: {'PASS' if is_valid else 'FAIL'}", fg="green" if is_valid else "red")
         else:
             typer.secho(f"  Validated spectrums: {test_results.num_validated_spectrums}", fg="green")
             typer.secho(f"  Invalid spectrums: {test_results.num_invalid_spectrums}", fg="red")
@@ -45,6 +45,7 @@ def analytical(
     absolute_tolerance: float = typer.Option(1e-3, "--atol", "--absolute-tolerance", help=ABSOLUTE_TOLERANCE_HELP),
     per_spectrum: bool = typer.Option(False, "--per-spectrum", help=PER_SPECTRUM_HELP),
 ) -> None:
+    
     payload = {
         "tag": tag,
         "absolute_tolerance": absolute_tolerance,
@@ -53,6 +54,7 @@ def analytical(
                               "GET",
                               payload)
     results_per_chunk = jsend_dict["data"]
+
     for file_name, test_results in results_per_chunk.items():
         test_results = TestResults(test_results["times_validated"],
                                    test_results["frequencies_validated"],
@@ -61,4 +63,5 @@ def analytical(
         _pretty_print_test_results(file_name,
                                    test_results,
                                    per_spectrum)
+        
     raise typer.Exit()
