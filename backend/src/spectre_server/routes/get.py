@@ -93,7 +93,7 @@ def tags():
                     day)
 
 
-@get_blueprint.route("/log", method=["GET"])
+@get_blueprint.route("/log", methods=["GET"])
 @jsendify_response
 def log():
     payload = request.get_json()
@@ -102,7 +102,7 @@ def log():
     return get.log_file_contents(pid,
                                  file_name)
 
-@get_blueprint.route("/fits-config-type-template", method=["GET"])
+@get_blueprint.route("/fits-config-type-template", methods=["GET"])
 @jsendify_response
 def fits_config_type_template():
     return get.fits_config_type_template()
