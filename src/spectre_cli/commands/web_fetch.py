@@ -4,6 +4,7 @@
 
 import typer
 
+from spectre_cli.commands import safe_request
 from spectre_cli.commands import(
     YEAR_HELP,
     MONTH_HELP,
@@ -20,5 +21,15 @@ def callisto(
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
 ) -> None:
-    # web_fetch.callisto(instrument_code, year, month, day)
+    payload = {
+        "instrument_code": instrument_code,
+        "year": year,
+        "month": month,
+        "day": day
+    }
+    _ = safe_request("/web-fetch/callisto",
+                     "POST",
+                     payload)
+    
+    typer.secho(f"Successfully retrieved files for instrument code {instrument_code}")
     raise typer.Exit()
