@@ -32,7 +32,7 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     _ = safe_request("capture/start", 
                      "POST", 
                      payload)
-    typer.secho(f"Capture completed sucessfully for tag '{tag}'", fg = "green")
+    typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
 @capture_app.command()
@@ -52,7 +52,7 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     _ = safe_request("capture/session", 
                      "POST", 
                      payload)
-    typer.secho(f"Capture session completed sucessfully for tag '{tag}'", fg = "green")
+    typer.secho(f"Capture session completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
 
