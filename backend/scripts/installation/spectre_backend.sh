@@ -14,7 +14,7 @@ cd spectre
 git sparse-checkout set backend/src backend/pyproject.toml
 # Update the working directory
 # git checkout main
-git checkout formal-installation
+git checkout rest-api
 
 # install dependencies (in editable mode)
 cd backend
