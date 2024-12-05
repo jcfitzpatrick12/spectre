@@ -157,7 +157,7 @@ def log_file_contents(pid: Optional[str] = None,
 def fits_config_type_template(
 ) -> dict[str, Any] | str:
     """Get the type template for the fits config with a given tag."""
-    return FitsConfig.type_template
+    return {k: v.__name__ for k, v in FitsConfig.type_template}
 
 
 @log_call
@@ -171,7 +171,7 @@ def capture_config_type_template(receiver_name: str,
     receiver = get_receiver(receiver_name, 
                             mode = mode)
     
-    return receiver.type_template
+    return {k: v.__name__ for k, v in receiver.type_template.items()}
 
 
 @log_call
