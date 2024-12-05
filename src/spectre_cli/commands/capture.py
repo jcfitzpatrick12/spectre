@@ -29,9 +29,11 @@ def start(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    _ = safe_request("capture/start", "POST", payload)
+    _ = safe_request("capture/start", 
+                     "POST", 
+                     payload)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'", fg = "green")
-
+    raise typer.Exit()
 
 @capture_app.command()
 def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
@@ -47,8 +49,10 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "hours": hours,
         "force_restart": force_restart
     }
-    _ = safe_request("capture/session", "POST", payload)
+    _ = safe_request("capture/session", 
+                     "POST", 
+                     payload)
     typer.secho(f"Capture session completed sucessfully for tag '{tag}'", fg = "green")
-    
+    raise typer.Exit()
 
 

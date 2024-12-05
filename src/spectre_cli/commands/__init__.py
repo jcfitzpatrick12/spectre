@@ -6,9 +6,9 @@ import requests
 import os
 from typing import Callable
 from functools import wraps
+from typing import Optional
 
 import typer
-from flask import Response
 
 from spectre_core.logging import PROCESS_TYPES
 
@@ -78,7 +78,7 @@ def _catch_response_errors(func: Callable):
 @_catch_response_errors
 def safe_request(route_url: str, 
                  method: str,
-                 payload: dict
+                 payload: Optional[dict] = None
 ) -> dict:
     """Request a response at the input route URL.
     
@@ -86,8 +86,7 @@ def safe_request(route_url: str,
     """
 
     if route_url.startswith("/"):
-        raise ValueError((f"The route URL should not be an absolute path. "
-                          f"It will be prepended with {BASE_URL}"))
+        route_url.lstrip("/")
     
     full_url = os.path.join(BASE_URL, route_url)
 
