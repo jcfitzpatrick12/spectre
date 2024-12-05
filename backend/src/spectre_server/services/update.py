@@ -62,8 +62,13 @@ def capture_config(tag: str,
                                  tag, 
                                  force = force)
 
-    _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated")
+    # create an instance of the newly created capture config
+    capture_config = CaptureConfig(tag)
+    
+    _LOGGER.info(f"The capture-config for tag '{tag}' has been updated: {capture_config.file_name}")
 
+    return capture_config.file_name
+    
 
 @log_call
 def fits_config(tag: str,
@@ -81,5 +86,7 @@ def fits_config(tag: str,
 
     fits_config.save(fits_config.dict, 
                      force = force)
+    
+    _LOGGER.info(f"The fits-config for tag '{tag}' has been updated: {fits_config.file_name}")
 
-    _LOGGER.info(f"Fits config for tag: {tag} has been successfully updated")
+    return fits_config.file_name
