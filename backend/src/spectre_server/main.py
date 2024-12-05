@@ -12,11 +12,11 @@ app = Flask(__name__)
 
 # Register blueprints
 app.register_blueprint(chunks_blueprint, 
-                       url_prefix = "spectre-data/chunks")
+                       url_prefix = "/spectre-data/chunks")
 app.register_blueprint(configs_blueprint, 
-                       url_prefix = "spectre-data/configs")
+                       url_prefix = "/spectre-data/configs")
 app.register_blueprint(logs_blueprint, 
-                       url_prefix="spectre-data/logs")
+                       url_prefix="/spectre-data/logs")
 app.register_blueprint(receivers_blueprint, 
                        url_prefix="/receivers")
 app.register_blueprint(jobs_blueprint, 
