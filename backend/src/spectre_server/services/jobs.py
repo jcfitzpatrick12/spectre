@@ -144,7 +144,7 @@ def _start_capture(tag: str,
 ) -> None:
 
     if do_logging:  
-        configure_root_logger(f"WORKER", 
+        configure_root_logger(f"worker", 
                               level = logging_level) 
 
     _LOGGER.info((f"Reading capture config with tag `{tag}`"))
@@ -167,7 +167,7 @@ def _start_watcher(tag: str,
                    logging_level: int = logging.INFO
 ) -> None:
     if do_logging:
-        configure_root_logger(f"WORKER", level = logging_level) #  start worker log
+        configure_root_logger(f"worker", level = logging_level)
     _LOGGER.info(f"Starting watcher with tag: {tag}")
     watcher = Watcher(tag)
     watcher.start()

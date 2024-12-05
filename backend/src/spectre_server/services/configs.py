@@ -8,7 +8,7 @@ _LOGGER = getLogger(__name__)
 from typing import List, Optional, Any
 from os import listdir
 
-from spectre_core.cfg import JSON_CONFIGS_DIR_PATH
+from spectre_core.cfg import CONFIGS_DIR_PATH
 from spectre_core.receivers.factory import get_receiver
 from spectre_core.file_handlers.configs import FitsConfig, CaptureConfig
 from spectre_core.logging import log_call
@@ -20,7 +20,7 @@ def get_configs(config_type: Optional[str] = None,
 ) -> list[str]:
     """Get the file names for all existing fits configs"""
     file_names = []
-    for file_name in listdir(JSON_CONFIGS_DIR_PATH):
+    for file_name in listdir(CONFIGS_DIR_PATH):
         if config_type and not file_name.startswith(config_type):
             continue
         if tag and not file_name.endswith(tag):

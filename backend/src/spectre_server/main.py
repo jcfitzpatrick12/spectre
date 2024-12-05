@@ -19,7 +19,7 @@ app.register_blueprint(logs_blueprint, url_prefix="/logs")
 app.register_blueprint(callisto_blueprint, url_prefix="/callisto")
 
 if __name__ == "__main__":
-    configure_root_logger("USER")
+    configure_root_logger("user")
     app.run(host="0.0.0.0", 
             port=5000, 
             debug=True)
