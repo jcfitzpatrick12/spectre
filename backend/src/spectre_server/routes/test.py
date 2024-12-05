@@ -8,9 +8,9 @@ from spectre_server.services import test
 from spectre_server.routes import jsendify_response
 
 
-test_blueprint = Blueprint("get", __name__)
+test_blueprint = Blueprint("test", __name__)
 
-@test_blueprint.route("/test/analytical")
+@test_blueprint.route("/analytical")
 @jsendify_response
 def analytical():
     payload = request.get_json()
