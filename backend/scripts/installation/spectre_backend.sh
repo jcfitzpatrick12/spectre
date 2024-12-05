@@ -6,6 +6,14 @@
 # cloning enables backend development inside the container
 # sparse-checkout means we only take what's necessary from the repo
 
+# upgrade pip
+pip install --upgrade pip
+
+# install spectre-core via git clone for easier development
+git clone https://github.com/jcfitzpatrick12/spectre-core.git
+git checkout v0.0.5
+pip install -e spectre-core
+
 # don't checkout HEAD when clone is complete
 git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git
 cd spectre
@@ -16,13 +24,6 @@ git sparse-checkout set backend/src backend/pyproject.toml
 # git checkout main
 git checkout rest-api
 
-# install spectre-core via git clone for easier development
-git clone https://github.com/jcfitzpatrick12/spectre-core.git
-git checkout v0.0.5
-cd spectre-core
-pip install -e .
-
 # install dependencies (in editable mode)
 cd backend
-pip install --upgrade pip
 pip install -e .
