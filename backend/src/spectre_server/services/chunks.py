@@ -16,22 +16,38 @@ from spectre_core.cfg import get_chunks_dir_path
 
 
 @log_call
-def get_chunk_files(tag: str,
-                    extensions: Optional[list[str]] = None,
-                    year: Optional[int] = None,
-                    month: Optional[int] = None,
-                    day: Optional[int] = None,
+def get_tags(year: Optional[int] = None,
+             month: Optional[int] = None,
+             day: Optional[int] = None,
 ) -> list[str]:
-    """Get the file names of all existing chunk files.
-    
-    Optional filtering by date and by extension.
-    """
+    """Get a list of all unique tags, with corresponding chunk files"""
+    chunks_dir_path = get_chunks_dir_path(year, month, day)
+    chunk_files = [f for (_, _, files) in walk(chunks_dir_path) for f in files]
+    tags = set()
+    for chunk_file in chunk_files:
+        chunk_base_name, _ = splitext(chunk_file)
+        tag = chunk_base_name.split("_")[1]
+        tags.add(tag)
+
+    return sorted(list(tags))
+
+
+@log_call
+def get_chunk_files_for_tag(tag: Optional[str],
+                            extensions: Optional[list[str]] = None,
+                            year: Optional[int] = None,
+                            month: Optional[int] = None,
+                            day: Optional[int] = None
+) -> list[str]:
+    """Get a list of files under a specified tag."""
     if extensions is None:
         extensions = []
-    chunks = Chunks(tag, 
-                    year=year, 
-                    month=month,
-                    day=day)
+    
+    chunks = Chunks(tag,
+                    year,
+                    month,
+                    day)
+    
     chunk_files = []
     for chunk in chunks:
         # if no extensions are specified, look for ALL defined extensions for that chunk
@@ -42,6 +58,28 @@ def get_chunk_files(tag: str,
             if chunk.has_file(extension):
                 chunk_file = chunk.get_file(extension)
                 chunk_files.append(chunk_file.file_name)
+    return chunk_files
+
+
+@log_call
+def get_chunk_files(tags: Optional[list[str]],
+                    extensions: Optional[list[str]] = None,
+                    year: Optional[int] = None,
+                    month: Optional[int] = None,
+                    day: Optional[int] = None,
+) -> list[str]:
+    """Get the file names of all existing chunk files.
+    
+    Optional filtering by tag, date and by extension.
+    """
+    tags = tags or get_tags(year, month, day)
+    chunk_files = []
+    for tag in tags:
+        chunk_files += get_chunk_files_for_tag(tag,
+                                               extensions,
+                                               year,
+                                               month,
+                                               day)
     return chunk_files
 
 

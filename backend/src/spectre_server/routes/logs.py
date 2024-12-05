@@ -12,9 +12,10 @@ from spectre_server.routes import jsendify_response
 logs_blueprint = Blueprint("logs", __name__)
 
 
-@logs_blueprint.route("/log-files", methods=["GET"])
+@logs_blueprint.route("", methods=["GET"])
 @jsendify_response
-def get_logs():
+def get_logs(
+):
     process_type = request.args.get("process-type", type = str)
     year = request.args.get("year", type = int)
     month = request.args.get("month", type = int)
@@ -25,9 +26,10 @@ def get_logs():
                          day)
 
 
-@logs_blueprint.route("/log-files", methods=["DELETE"])
+@logs_blueprint.route("", methods=["DELETE"])
 @jsendify_response
-def delete_logs():
+def delete_logs(
+):
     process_type = request.args.get("process-type", type = str)
     year = request.args.get("year", type = int)
     month = request.args.get("month", type = int)
@@ -37,7 +39,8 @@ def delete_logs():
                             month,
                             day)
 
-@logs_blueprint.route("/log-files/<string:pid>", methods=["GET"])
+@logs_blueprint.route("/<string:pid>", methods=["GET"])
 @jsendify_response
-def get_log(pid: str):
+def get_log(pid: str
+):
     return logs.get_log(pid=pid)

@@ -12,21 +12,35 @@ from spectre_server.routes import jsendify_response
 chunks_blueprint = Blueprint("chunks", __name__)
 
 
-@chunks_blueprint.route("/chunk-files/<string:tag>", methods=["GET"])
+@chunks_blueprint.route("", methods=["GET"])
 @jsendify_response
-def get_chunk_files(tag: str):
+def get_chunk_files():
+    tags = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
     year = request.args.get("year", type = int)
     month = request.args.get("month", type = int)
     day = request.args.get("day", type = int)
-    return chunks.get_chunk_files(tag,
+    return chunks.get_chunk_files(tags,
                                   extensions, 
                                   year,
                                   month,
                                   day)
 
+@chunks_blueprint.route("/<string:tag>", methods=["GET"])
+@jsendify_response
+def get_chunk_files_for_tag(tag: str):
+    extensions = request.args.getlist("extension")
+    year = request.args.get("year", type = int)
+    month = request.args.get("month", type = int)
+    day = request.args.get("day", type = int)
+    return chunks.get_chunk_files_for_tag(tag,
+                                          extensions, 
+                                          year,
+                                          month,
+                                          day)
 
-@chunks_blueprint.route("/chunk-files/<string:tag>", methods=["DELETE"])
+
+@chunks_blueprint.route("/<string:tag>", methods=["DELETE"])
 @jsendify_response
 def delete_chunk_files(tag: str):
     extensions = request.args.getlist("extensions")

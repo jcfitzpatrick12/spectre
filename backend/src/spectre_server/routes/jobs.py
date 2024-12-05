@@ -13,7 +13,8 @@ jobs_blueprint = Blueprint("jobs", __name__)
 
 @jobs_blueprint.route("/capture", methods=["POST"])
 @jsendify_response
-def capture():
+def capture(
+):
     payload = request.get_json()
     tag = payload.get("tag")
     seconds = payload.get("seconds")
@@ -29,7 +30,8 @@ def capture():
 
 @jobs_blueprint.route("/session", methods=["POST"])
 @jsendify_response
-def session():
+def session(
+):
     payload = request.get_json()
     tag = payload.get("tag")
     seconds = payload.get("seconds")

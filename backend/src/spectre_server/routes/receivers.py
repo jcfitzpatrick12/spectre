@@ -12,26 +12,28 @@ receivers_blueprint = Blueprint("receivers", __name__)
 
 @receivers_blueprint.route("", methods=["GET"])
 @jsendify_response
-def get_receivers():
+def get_receivers(
+):
     return receivers.list_all_receiver_names()
 
 
-@receivers_blueprint.route("/<string:receiver_name>/modes", methods=["GET"])
+@receivers_blueprint.route("/<string:receiver_name>", methods=["GET"])
 @jsendify_response
-def get_modes(receiver_name: str):
-    return receivers.get_modes(receiver_name)
+def query_for(receiver_name: str
+):
+    query = request.args.get("query", type = str)
+    return receivers.query_for(receiver_name, 
+                               query,
+                               mode = None)
 
-
-@receivers_blueprint.route("/<string:receiver_name>/modes/<string:mode>/type-template", methods=["GET"])
+@receivers_blueprint.route("/<string:receiver_name>/<string:mode>", methods=["GET"])
 @jsendify_response
-def get_type_template(receiver_name: str,
-                      mode: str):
-    return receivers.get_type_template(receiver_name)
+def get_for_in_mode(receiver_name: str,
+                    mode: str
+):
+    query = request.args.get("query", type = str)
+    return receivers.query_for(receiver_name, 
+                               query,
+                               mode = mode)
 
-
-@receivers_blueprint.route("/<string:receiver_name>/modes/<string:mode>/specification", methods=["GET"])
-@jsendify_response
-def get_specification(receiver_name: str,
-                      mode: str):
-    return receivers.get_type_template(receiver_name)
 
