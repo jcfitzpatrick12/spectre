@@ -94,7 +94,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     jsend_dict = safe_request("delete/capture-config",
                               "DELETE",
                               payload)
-    file_name = jsend_dict[file_name]
+    file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
 
