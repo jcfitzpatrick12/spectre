@@ -120,12 +120,12 @@ def specifications(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
 ) -> None:
     
-    payload = {
+    params = {
         "receiver_name": receiver_name
     }
     jsend_dict = safe_request(f"receivers/{receiver_name}/specifications",
                               "GET",
-                              payload)
+                              params = params)
     specifications = jsend_dict["data"]
 
     for k, v in specifications.items():

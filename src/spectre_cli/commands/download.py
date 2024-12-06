@@ -21,15 +21,15 @@ def callisto(
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
 ) -> None:
-    payload = {
+    json = {
         "instrument_code": instrument_code,
         "year": year,
         "month": month,
         "day": day
     }
-    _ = safe_request("/web-fetch/callisto",
+    _ = safe_request("/web-fetch/chunks",
                      "POST",
-                     payload)
+                     json = json)
     
     typer.secho(f"Successfully retrieved files for instrument code {instrument_code}")
     raise typer.Exit()

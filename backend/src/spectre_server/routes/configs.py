@@ -37,9 +37,9 @@ def get_capture_configs(
 @jsendify_response
 def create_fits_config(tag: str
 ):
-    payload = request.get_json()
-    params = payload.get("params")
-    force = payload.get("force")
+    json = request.get_json()
+    params = json.get("params")
+    force = json.get("force")
     return configs.create_fits_config(tag, 
                                       params,
                                       force)
@@ -49,11 +49,11 @@ def create_fits_config(tag: str
 @jsendify_response
 def create_capture_config(tag: str
 ):
-    payload = request.get_json()
-    receiver_name = payload.get("receiver_name")
-    mode = payload.get("mode")
-    params = payload.get("params")
-    force = payload.get("force")
+    json = request.get_json()
+    receiver_name = json.get("receiver_name")
+    mode = json.get("mode")
+    params = json.get("params")
+    force = json.get("force")
     return configs.create_capture_config(tag, 
                                          receiver_name,
                                          mode,

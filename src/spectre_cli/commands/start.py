@@ -22,7 +22,7 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
             force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
-    payload = {
+    json = {
         "tag": tag,
         "seconds": seconds,
         "minutes": minutes,
@@ -31,7 +31,7 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     }
     _ = safe_request("jobs/capture", 
                      "POST", 
-                     payload)
+                     json = json)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
@@ -42,7 +42,7 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
             force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
 ) -> None:
-    payload = {
+    json = {
         "tag": tag,
         "seconds": seconds,
         "minutes": minutes,
@@ -51,7 +51,7 @@ def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     }
     _ = safe_request("jobs/session", 
                      "POST", 
-                     payload)
+                     json = json)
     typer.secho(f"Session completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 

@@ -17,14 +17,14 @@ def get_instrument_codes():
     return callisto.get_instrument_codes()
 
 
-@callisto_blueprint.route("/download", methods=["POST"])
+@callisto_blueprint.route("/chunks", methods=["POST"])
 @jsendify_response
 def download():
-    payload = request.get_json()
-    instrument_code = payload.get("instrument_code")
-    year = payload.get("year")
-    month = payload.get("month")
-    day = payload.get("day")
+    json = request.get_json()
+    instrument_code = json.get("instrument_code")
+    year = json.get("year")
+    month = json.get("month")
+    day = json.get("day")
     return callisto.download(instrument_code,
                              year,
                              month,

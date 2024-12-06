@@ -15,12 +15,12 @@ jobs_blueprint = Blueprint("jobs", __name__)
 @jsendify_response
 def capture(
 ):
-    payload = request.get_json()
-    tag = payload.get("tag")
-    seconds = payload.get("seconds")
-    minutes = payload.get("minutes")
-    hours = payload.get("hours")
-    force_restart = payload.get("force_restart")
+    json = request.get_json()
+    tag = json.get("tag")
+    seconds = json.get("seconds")
+    minutes = json.get("minutes")
+    hours = json.get("hours")
+    force_restart = json.get("force_restart")
     return jobs.capture(tag,
                         seconds,
                         minutes,
@@ -32,12 +32,12 @@ def capture(
 @jsendify_response
 def session(
 ):
-    payload = request.get_json()
-    tag = payload.get("tag")
-    seconds = payload.get("seconds")
-    minutes = payload.get("minutes")
-    hours = payload.get("hours")
-    force_restart = payload.get("force_restart")
+    json = request.get_json()
+    tag = json.get("tag")
+    seconds = json.get("seconds")
+    minutes = json.get("minutes")
+    hours = json.get("hours")
+    force_restart = json.get("force_restart")
     return jobs.session(tag,
                         seconds,
                         minutes,
