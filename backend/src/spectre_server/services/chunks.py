@@ -135,7 +135,7 @@ def get_tags(year: Optional[int] = None,
 def get_analytical_test_results(
     tag: str,
     absolute_tolerance: float
-) -> dict[str, Any]:
+) -> dict[str, bool | dict[float, bool]]:
     capture_config = CaptureConfig(tag)
     
     results_per_chunk = {}
