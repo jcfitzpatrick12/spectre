@@ -55,16 +55,27 @@ Support for Windows will be explored in the future.
 - Although the back-end is fully containerised, you must install any relevant third-party drivers on your host system.
 
 ### **Starting the `spectre-server`**
-The `spectre-server` backend container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
+The `spectre-server` container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
 1. Run ```docker build```, but point to our development image:  
    ```bash
    docker build --tag spectre-server backend
    ```
 
-2. Run the `spectre-dev-server` container:  
+2. Run the `spectre-server` container:  
    ```bash
-   chmod +x ./backend/run.sh && ./backend/run.sh
+   docker run --detach \
+              --rm \
+              --publish 127.0.0.1:5000:5000 \
+              --name spectre-server \
+              --volume /dev/shm:/dev/shm \
+              --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
+              spectre-server 
+   ```
+ 
+3. At any time, you can stop the ```spectre-server``` using:    
+   ```bash
+   docker container stop spectre-server --signal kill
    ```
 
 
@@ -94,13 +105,15 @@ Notably, the CLI commands will only work with the virtual environment activated.
 
 
 ## Installation for developers
-
-### **Starting the development `spectre-server`**
+*
 We provide the lightly modified ```Dockerfile.dev``` for easier development. This image includes:  
+
 - GUI capablities (so permitting GNURadio companion)
 - Installs ```spectre``` and ```spectre-core``` in editable mode.
 - Does not impose fixed versioning on ```spectre``` and ```spectre-core```
 - Does not delete any OOT modules once they have been installed (allowing rebuilds)
+
+You can run the following steps to get started:  
 
 1. Build the image, but point to our development Dockerfile:  
    ```bash
@@ -109,9 +122,24 @@ We provide the lightly modified ```Dockerfile.dev``` for easier development. Thi
 
 2. Run the `spectre-server` container:  
    ```bash
-   chmod +x ./backend/run_dev_server.sh && ./backend/run_dev_server.sh
-   ```
+   # Enable xhost for the local machine only
+   xhost local:
 
+   docker run --rm \
+            --publish 127.0.0.1:5000:5000 \
+            --name spectre-dev-server \
+            --volume /dev/shm:/dev/shm \
+            --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
+               -e DISPLAY=$DISPLAY \
+               -v /tmp/.X11-unix:/tmp/.X11-unix \
+               --interactive \
+               --tty \
+               spectre-dev-server \
+               /bin/bash
+
+   # Reset xhost
+   xhost -
+   ```
 
 
 ## Contributing
