@@ -13,7 +13,7 @@ git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git && cd spe
 # Update the working directory with only required files
 git sparse-checkout set backend/src backend/pyproject.toml
 # git checkout v0.0.0
-git checkout formal-installation
+git checkout main
 
 # install dependencies
 cd backend
