@@ -6,13 +6,15 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-from typing import Optional
+from typing import Optional, Any
 from os.path import splitext
 from os import walk
 
 from spectre_core.logging import log_call
 from spectre_core.chunks import Chunks
 from spectre_core.cfg import get_chunks_dir_path
+from spectre_core.file_handlers.configs import CaptureConfig
+from spectre_core.spectrograms.analytical import TestResults, validate_analytically
 
 
 @log_call
@@ -80,7 +82,7 @@ def get_chunk_files(tags: Optional[list[str]],
                                                year,
                                                month,
                                                day)
-    return chunk_files
+    return sorted(chunk_files)
 
 
 @log_call
@@ -89,7 +91,7 @@ def delete_chunk_files(tag: str,
                        year: Optional[int] = None,
                        month: Optional[int] = None,
                        day: Optional[int] = None,
-) -> None:
+) -> list[str]:
     """Delete chunk files.
     
     Files to be deleted are specified according to date, and extension.
@@ -126,3 +128,25 @@ def get_tags(year: Optional[int] = None,
         tags.add(tag)
 
     return sorted(list(tags))
+
+
+
+@log_call
+def get_analytical_test_results(
+    tag: str,
+    absolute_tolerance: float
+) -> dict[str, bool | dict[float, bool]]:
+    capture_config = CaptureConfig(tag)
+    
+    results_per_chunk = {}
+    chunks = Chunks(tag)
+    for chunk in chunks:
+        if chunk.has_file("fits"):
+            chunk_file = chunk.get_file("fits")
+            spectrogram = chunk_file.read()
+            test_results = validate_analytically(spectrogram, 
+                                                 capture_config,
+                                                 absolute_tolerance)
+            results_per_chunk[chunk_file.file_name] = test_results.jsonify()
+
+    return results_per_chunk

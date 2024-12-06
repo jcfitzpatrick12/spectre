@@ -22,7 +22,7 @@ app.add_typer(get_app, name="get")
 app.add_typer(delete_app, name="delete")
 app.add_typer(start_app, name="start")
 app.add_typer(update_app, name="update")
-app.add_typer(download_app, name="web-fetch")
+app.add_typer(download_app, name="download")
 app.add_typer(test_app, name="test")
 
 

@@ -2,13 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import Response
 from typing import Optional, Callable
 from functools import wraps
 import os
 import traceback
 
-from flask import jsonify
+from flask import jsonify, Response
 from http import HTTPStatus
 
 ALLOWED_STATUSES = {"success", "fail", "error"}

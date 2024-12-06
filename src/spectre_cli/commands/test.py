@@ -46,15 +46,13 @@ def analytical(
     per_spectrum: bool = typer.Option(False, "--per-spectrum", help=PER_SPECTRUM_HELP),
 ) -> None:
     
-    payload = {
-        "tag": tag,
+    params = {
         "absolute_tolerance": absolute_tolerance,
     }
-    jsend_dict = safe_request("test/analytical",
+    jsend_dict = safe_request(f"spectre-data/chunks/{tag}/analytical-test-results",
                               "GET",
-                              payload)
+                              params = params)
     results_per_chunk = jsend_dict["data"]
-
     for file_name, test_results in results_per_chunk.items():
         test_results = TestResults(test_results["times_validated"],
                                    test_results["frequencies_validated"],
