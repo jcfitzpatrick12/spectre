@@ -49,7 +49,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
         "force": force
     }
     jsend_dict = safe_request("spectre-data/configs/fits/{tag}", 
-                              "POST", 
+                              "PUT", 
                               json = json)
     file_name = jsend_dict["data"]
     typer.secho(f"Capture config created successfully with tag '{tag}': {file_name}")
