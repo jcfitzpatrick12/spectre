@@ -138,7 +138,7 @@ We provide the lightly modified ```Dockerfile.dev``` for easier development. Thi
 - Does not impose fixed versioning on ```spectre``` and ```spectre-core```
 - Does not delete any OOT modules once they have been installed (allowing rebuilds)
 
-You can run the following steps to get started:  
+The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
 1. Build the image, but point to our development Dockerfile:  
    ```bash
