@@ -43,14 +43,14 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 ) -> None:
     
     params = {
-        "process_type": process_type,
+        "process-type": process_type,
         "year": year,
         "month": month,
         "day": day
     }
     jsend_dict = safe_request("spectre-data/logs",
                               "GET",
-                              params)
+                              params = params)
     file_names = jsend_dict["data"]
 
     for file_name in file_names:
@@ -61,7 +61,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 
 @get_app.command()
 def chunk_files(
-    tag: list[str] = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    tag: list[str] = typer.Option([], "--tag", "-t", help=TAG_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
@@ -77,7 +77,7 @@ def chunk_files(
     }
     jsend_dict = safe_request("spectre-data/chunks",
                               "GET",
-                              params)
+                              params = params)
     file_names = jsend_dict["data"]
 
     for file_name in file_names:
