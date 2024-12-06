@@ -12,7 +12,7 @@ git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git && cd spe
 
 # Update the working directory with only required files
 git sparse-checkout set backend/src backend/pyproject.toml
-git checkout bug-fixes
+git checkout main
 # install dependencies in editable mode
 cd backend
 pip install -e .
