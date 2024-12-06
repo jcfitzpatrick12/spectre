@@ -13,6 +13,8 @@ from os import walk
 from spectre_core.logging import log_call
 from spectre_core.chunks import Chunks
 from spectre_core.cfg import get_chunks_dir_path
+from spectre_core.file_handlers.configs import CaptureConfig
+from spectre_core.spectrograms.analytical import TestResults, validate_analytically
 
 
 @log_call
@@ -126,3 +128,24 @@ def get_tags(year: Optional[int] = None,
         tags.add(tag)
 
     return sorted(list(tags))
+
+
+
+@log_call
+def get_analytical_test_results(
+    tag: str,
+    absolute_tolerance: float
+) -> dict[str, TestResults]:
+    capture_config = CaptureConfig(tag)
+    
+    results_per_chunk = {}
+    chunks = Chunks(tag)
+    for chunk in chunks:
+        if chunk.has_file("fits"):
+            chunk_file = chunk.get_file("fits")
+            spectrogram = chunk_file.read()
+            results_per_chunk[chunk_file.file_name] = validate_analytically(spectrogram, 
+                                                                            capture_config,
+                                                                            absolute_tolerance)
+
+    return results_per_chunk

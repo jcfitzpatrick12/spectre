@@ -55,6 +55,14 @@ def delete_chunk_files(tag: str):
                                      day)
 
 
+@chunks_blueprint.route("/<string:tag>/analytical-test-results", methods=["GET"])
+@jsendify_response
+def get_analytical_test_results(tag: str):
+    absolute_tolerance = request.args.get("absolute_tolerance", type = float)
+    return chunks.get_analytical_test_results(tag,
+                                              absolute_tolerance)
+
+
 @chunks_blueprint.route("/tags", methods=["GET"])
 @jsendify_response
 def get_tags():
