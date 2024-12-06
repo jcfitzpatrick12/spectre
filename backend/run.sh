@@ -3,7 +3,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-docker run --detached \
+docker run --detach \
            --rm \
            --publish 127.0.0.1:5000:5000 \
            --name spectre-server \

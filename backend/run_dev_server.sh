@@ -6,7 +6,8 @@
 # Enable xhost for the local machine only
 xhost local:
 
-docker run --publish 127.0.0.1:5000:5000 \
+docker run --rm \
+           --publish 127.0.0.1:5000:5000 \
            --name spectre-dev-server \
            --volume /dev/shm:/dev/shm \
            --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
