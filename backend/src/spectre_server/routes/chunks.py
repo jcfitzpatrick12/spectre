@@ -26,6 +26,7 @@ def get_chunk_files():
                                   month,
                                   day)
 
+
 @chunks_blueprint.route("/<string:tag>", methods=["GET"])
 @jsendify_response
 def get_chunk_files_for_tag(tag: str):
@@ -43,7 +44,7 @@ def get_chunk_files_for_tag(tag: str):
 @chunks_blueprint.route("/<string:tag>", methods=["DELETE"])
 @jsendify_response
 def delete_chunk_files(tag: str):
-    extensions = request.args.getlist("extensions")
+    extensions = request.args.getlist("extension")
     year = request.args.get("year", type = int)
     month = request.args.get("month", type = int)
     day = request.args.get("day", type = int)
