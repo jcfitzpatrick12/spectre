@@ -6,7 +6,7 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-from typing import Optional
+from typing import Optional, Any
 from os.path import splitext
 from os import walk
 
@@ -91,7 +91,7 @@ def delete_chunk_files(tag: str,
                        year: Optional[int] = None,
                        month: Optional[int] = None,
                        day: Optional[int] = None,
-) -> None:
+) -> list[str]:
     """Delete chunk files.
     
     Files to be deleted are specified according to date, and extension.
@@ -135,7 +135,7 @@ def get_tags(year: Optional[int] = None,
 def get_analytical_test_results(
     tag: str,
     absolute_tolerance: float
-) -> dict[str, TestResults]:
+) -> dict[str, Any]:
     capture_config = CaptureConfig(tag)
     
     results_per_chunk = {}
@@ -144,8 +144,9 @@ def get_analytical_test_results(
         if chunk.has_file("fits"):
             chunk_file = chunk.get_file("fits")
             spectrogram = chunk_file.read()
-            results_per_chunk[chunk_file.file_name] = validate_analytically(spectrogram, 
-                                                                            capture_config,
-                                                                            absolute_tolerance)
+            test_results = validate_analytically(spectrogram, 
+                                                 capture_config,
+                                                 absolute_tolerance)
+            results_per_chunk[chunk_file.file_name] = test_results.jsonify()
 
     return results_per_chunk
