@@ -82,7 +82,7 @@ def get_chunk_files(tags: Optional[list[str]],
                                                year,
                                                month,
                                                day)
-    return chunk_files
+    return sorted(chunk_files)
 
 
 @log_call
