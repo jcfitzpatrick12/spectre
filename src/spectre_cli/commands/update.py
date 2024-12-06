@@ -20,12 +20,11 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
     
     json = {
-        "tag": tag,
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request("update/capture-config",
-                              "POST",
+    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}",
+                              "PATCH",
                               json = json)
     file_name = jsend_dict["data"]
 
@@ -39,14 +38,15 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
                 force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
 ) -> None:
+    
     json = {
-        "tag": tag,
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request("update/fits-config",
-                              "POST",
+    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}",
+                              "PATCH",
                               json = json)
+    
     file_name = jsend_dict["data"]
 
     typer.secho(f"Successfully updated `{file_name}`")

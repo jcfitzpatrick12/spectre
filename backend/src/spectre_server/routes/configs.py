@@ -77,13 +77,37 @@ def delete_capture_config(tag: str
 
 @configs_blueprint.route("/fits/<string:tag>", methods=["GET"])
 @jsendify_response
-def fits_config(tag: str
+def get_fits_config(tag: str
 ):
     return configs.get_fits_config(tag)
 
 
 @configs_blueprint.route("/capture/<string:tag>", methods=["GET"])
 @jsendify_response
-def capture_config(tag: str
+def get_capture_config(tag: str
 ):
     return configs.get_capture_config(tag)
+
+
+@configs_blueprint.route("/capture/<string:tag>", methods=["PATCH"])
+@jsendify_response
+def update_capture_config(tag: str
+):
+    json = request.get_json()
+    params = json.get("params")
+    force = json.get("force")
+    return configs.update_capture_config(tag, 
+                                         params,
+                                         force)
+
+
+@configs_blueprint.route("/fits/<string:tag>", methods=["PATCH"])
+@jsendify_response
+def update_fits_config(tag: str
+):
+    json = request.get_json()
+    params = json.get("params")
+    force = json.get("force")
+    return configs.update_fits_config(tag, 
+                                      params,
+                                      force)
