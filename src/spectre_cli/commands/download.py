@@ -27,7 +27,7 @@ def callisto(
         "month": month,
         "day": day
     }
-    _ = safe_request("/web-fetch/chunks",
+    _ = safe_request("callisto/chunks",
                      "POST",
                      json = json)
     
