@@ -90,7 +90,7 @@ def chunk_files(
 def receivers(
 ) -> None:
     
-    jsend_dict = safe_request("/receivers",
+    jsend_dict = safe_request("receivers",
                               "GET")
     receiver_names = jsend_dict["data"]
     
