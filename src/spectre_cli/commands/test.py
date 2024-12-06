@@ -49,11 +49,10 @@ def analytical(
     params = {
         "absolute_tolerance": absolute_tolerance,
     }
-    jsend_dict = safe_request(f"chunks/{tag}/analytical-test-results",
+    jsend_dict = safe_request(f"spectre-data/chunks/{tag}/analytical-test-results",
                               "GET",
-                              oarams = params)
+                              params = params)
     results_per_chunk = jsend_dict["data"]
-
     for file_name, test_results in results_per_chunk.items():
         test_results = TestResults(test_results["times_validated"],
                                    test_results["frequencies_validated"],
