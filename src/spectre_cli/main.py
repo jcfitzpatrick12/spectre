@@ -11,7 +11,7 @@ from spectre_cli.commands.get import get_app
 from spectre_cli.commands.delete import delete_app
 from spectre_cli.commands.start import start_app
 from spectre_cli.commands.update import update_app
-from spectre_cli.commands.web_fetch import web_fetch_app
+from spectre_cli.commands.download import download_app
 from spectre_cli.commands.test import test_app
 
 app = typer.Typer()
@@ -22,7 +22,7 @@ app.add_typer(get_app, name="get")
 app.add_typer(delete_app, name="delete")
 app.add_typer(start_app, name="start")
 app.add_typer(update_app, name="update")
-app.add_typer(web_fetch_app, name="web-fetch")
+app.add_typer(download_app, name="web-fetch")
 app.add_typer(test_app, name="test")
 
 
