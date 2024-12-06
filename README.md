@@ -151,16 +151,16 @@ The following commands assume your working directory corresponds to the cloned `
    xhost local:
 
    docker run --rm \
-            --publish 127.0.0.1:5000:5000 \
-            --name spectre-dev-server \
-            --volume /dev/shm:/dev/shm \
-            --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
-               -e DISPLAY=$DISPLAY \
-               -v /tmp/.X11-unix:/tmp/.X11-unix \
-               --interactive \
-               --tty \
-               spectre-dev-server \
-               /bin/bash
+              --publish 127.0.0.1:5000:5000 \
+              --name spectre-dev-server \
+              --volume /dev/shm:/dev/shm \
+              --volume $SPECTRE_DATA_DIR_PATH:/home/spectre/.spectre-data \
+              --volume /tmp/.X11-unix:/tmp/.X11-unix \
+              -e DISPLAY=$DISPLAY \
+              --interactive \
+              --tty \
+              spectre-dev-server \
+              /bin/bash
 
    # Reset xhost
    xhost -
