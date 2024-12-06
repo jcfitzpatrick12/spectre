@@ -21,7 +21,7 @@ def capture(
     minutes = payload.get("minutes")
     hours = payload.get("hours")
     force_restart = payload.get("force_restart")
-    return jobs.session(tag,
+    return jobs.capture(tag,
                         seconds,
                         minutes,
                         hours,
