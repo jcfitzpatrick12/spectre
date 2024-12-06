@@ -1,0 +1,23 @@
+{
+    "min_freq": 120000000.0,
+    "max_freq": 160000000.0,
+    "samples_per_step": 400000,
+    "freq_step": 8000000.0,
+    "bandwidth": 8000000.0,
+    "samp_rate": 8000000,
+    "IF_gain": -20,
+    "RF_gain": 0,
+    "chunk_size": 3,
+    "joining_time": 60,
+    "time_resolution": 0.0,
+    "frequency_resolution": 0.0,
+    "window_type": "blackman",
+    "window_kwargs": {},
+    "window_size": 1024,
+    "hop": 756,
+    "chunk_key": "sweep",
+    "event_handler_key": "sweep",
+    "receiver": "rsp1a",
+    "mode": "sweep",
+    "tag": "RSP1A-sweeper"
+}

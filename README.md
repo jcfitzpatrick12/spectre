@@ -1,38 +1,41 @@
-# SPECTRE: Process, Explore and Capture Transient Radio Emissions
+# __SPECTRE: Process, Explore and Capture Transient Radio Emissions__
 
 ## Overview
-`SPECTRE` is a program under development for the automated recording, analysis, and visualisation of radio spectrograms. It consists of three primary components: 
-- `spectre` - a set of standalone Python modules for recording, analysing and visualising radio spectrograms 🐍
-- `spectre-host` - a containerised environment for recording radio spectrograms powered by GNU Radio, which includes an accompanying CLI tool 📡 🐳
-- `spectre-client` - a web-based application for viewing and analysis 💻 (planned for the future)
-  
-📢 **This project is under active development, with current efforts set on `spectre` and `spectre-host`. Once the testing framework is in place, we will be looking for contributors.**  📢 
 
-![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a SPECTRE spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
+:loudspeaker: **This project is under active development. Contributors welcome.**  :loudspeaker:
 
-# spectre-host
+`spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
 
-## Introduction
-`spectre-host` is the principal back-end component of the SPECTRE program. It offers a containerised environment for the automated capture and analysis of radio spectrograms. Powered by GNU Radio, the framework is in place to accommodate any SDR receiver with a GNU Radio source block, simply. Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). The container comes preinstalled with:
+**Features**:  
 
-- **[`gnuradio`](https://github.com/gnuradio/gnuradio)**
-- **[`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3)**, which includes the SDRplay RSP* series GNU Radio source blocks.
-- **[`gr-spectre`](https://github.com/jcfitzpatrick12/gr-spectre)**, which includes custom C++ GNU Radio sink blocks for streaming IQ data capture.
-- The **`spectre`** CLI tool, for initiating data capture, creating configuration files and other utilities.
-- **`cron`** and template scripts for daily data capture.
+- Intuitive CLI tool :computer:
+- Wide receiver support :satellite:
+- Live recording of radio spectrograms and I/Q data :floppy_disk:
+- Flexible, configurable data capture :gear:
+- Containerised backend :whale:
+- Developer-friendly, extensible digital signal processing framework :hammer_and_wrench:
+
+## Use-case: Solar Radio Observations :sunny:
+Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a ```spectre``` spectrogram (second panel) captured in the West End of Glasgow, to that observed by the [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel)
+![Observations of the huge X9.0 solar flare on October 3rd 2024. A comparison of a spectre spectrogram (second panel) captured in the West End of Glasgow, to that observed by the CALLISTO spectrometer stationed in Egypt, Alexandria (top panel)](docs/gallery/comparison.png)
+
 
 ## Supported Receivers
 
-Current supported receivers include:
+Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). A wide range of receiver support is planned.
+
+Current supported receivers include:  
+
 - [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)
 - [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)
 
-The framework is in place to integrate the following receivers, this is planned for the near future:
-- RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
-- AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO, RTLSDR (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
-- USRP SDRs
+The framework is in place to integrate the following receivers, this is planned for the near future:  
 
-**Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with SPECTRE as they are not compatible with the official SDRPlay API**. 
+- RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))
+- USRP SDRs (e.g., the [b200-mini](https://www.ettus.com/all-products/usrp-b200mini/))
+- RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))
+
+**Please note! SDRPlay clones (i.e. unofficially produced copies of SDRPlay receivers) will likely not work with spectre as they are not compatible with the official SDRPlay API**. 
 
 ## Supported Operating Systems and Platforms
 This project is tested to be compatible with the following operating systems and architectures:
@@ -45,57 +48,71 @@ It may also work on other Linux distributions. Specifically, I have personally t
 Support for Windows will be explored in the future.
 
 ## Installation
-We're still in active development, so this setup is not the final intended deployment method. In any case, feel free to dive in and tinker around with the current build. But be warned, everything might not be stable! Here's how you can get started:
 
-**Prerequisites:**
-Ensure you have [the docker engine](https://docs.docker.com/engine/install/ubuntu/) installed on your machine. This is essential for building and running the container.
+### **Prerequisites**
+- Ensure the [Docker Engine](https://docs.docker.com/engine/install/ubuntu/) is installed on your machine. This is required to build and run the container.
+- Although the back-end is fully containerised, you must install any relevant third-party drivers on your host system.
 
+---
 
-**Install the RSP API on your host machine**  
-First, download the RSP API from SDRPlay on your host machine by running (in your desired directory):  
-```wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run```  
-  
-Alternatively, you can manually download it [directly from the SDRPlay website](https://www.sdrplay.com/api/).  
-  
-Run the API installation:  
-```chmod +x ./SDRplay_RSP_API-Linux-3.15.2.run && ./SDRplay_RSP_API-Linux-3.15.2.run```  
-  
-With the installation successful, start the sdrplay API service:  
-```sudo systemctl start sdrplay```
+### **Initial Setup**
+1. Clone the repository into your preferred directory:  
+   ```bash
+   git clone https://github.com/jcfitzpatrick12/spectre.git
+   ```
 
-**Set up ```spectre```**  
-Clone the repository (in your desired directory):  
-```git clone https://github.com/jcfitzpatrick12/spectre.git```
+2. Navigate to the `spectre` directory:  
+   ```bash
+   cd spectre
+   ```
 
-Navigate to the ```spectre``` directory:   
-```cd spectre```
+3. Set the `SPECTRE_DATA_DIR_PATH` environment variable:  
+   ```bash
+   echo "export SPECTRE_DATA_DIR_PATH=$(pwd)/spectre-data" >> ~/.bashrc
+   ```
 
-Set the ```SPECTRE_DIR_PATH``` environment variable:  
-```echo "export SPECTRE_DIR_PATH=$(pwd)" >> ~/.bashrc```  
+4. Open a new terminal session to ensure the environment variable is updated.
 
-**Set up ```spectre-host```**  
-Please open a new shell and navigate to the ```host``` directory via:   
-```cd $SPECTRE_DIR_PATH/host```
+---
 
-Build the Docker image:  
-```sudo docker build -t spectre-host .```
+### **Starting the `spectre-server`**
+The `spectre-server` backend container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
-Make the start script executable and run it:  
-```chmod +x run.sh && ./run.sh```  
+1. Build the Docker image using the `backend` directory:  
+   ```bash
+   docker build -t spectre-server ./backend
+   ```
 
-Now inside the container, check everything's up and running:  
-```spectre -v ```
+2. Run the `spectre-server` container:  
+   ```bash
+   chmod +x ./backend/run.sh && ./backend/run.sh
+   ```
 
-With the installation verified, you can freely use the suite of `spectre` CLI commands to create configuration files and capture data. You can exit the container using ```exit```
+---
 
-# spectre-client
+### **Running the `spectre-cli`**
+The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
-## Introduction
-While we are in development, we are creating a placeholder GUI which runs locally using [```tkinter```](https://docs.python.org/3/library/tkinter.html). This is being revised and improved following recent rework.
+1. Create a Python virtual environment:  
+   ```bash
+   python3 -m venv ./venv
+   ```
 
-# Contributing
-Once the testing framework is in place, we will be looking for contributors. In the meantime, feel free to contact jcfitzpatrick12@gmail.com if you are interested :)
+2. Activate the virtual environment:  
+   ```bash
+   source ./venv/bin/activate
+   ```
 
+3. Install the required dependencies:  
+   ```bash
+   pip install -e .
+   ```
 
+4. Verify the CLI is operational:  
+   ```bash
+   spectre --version
+   ```
+Notably, the CLI commands will only work with the virtual environment activated.
 
-
+## Contributing
+This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)

@@ -1,8 +1,0 @@
-# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
-# This file is part of SPECTRE
-# SPDX-License-Identifier: GPL-3.0-or-later
-
-# Experimental cron job for daily occuring spectre capture sessions
-
-# m h  dom mon dow   command
-30 7 * * * /home/spectre/host/cron/daily_capture.sh
