@@ -47,48 +47,26 @@ It may also work on other Linux distributions. Specifically, I have personally t
 
 Support for Windows will be explored in the future.
 
+
 ## Installation
 
 ### **Prerequisites**
 - Ensure the [Docker Engine](https://docs.docker.com/engine/install/ubuntu/) is installed on your machine. This is required to build and run the container.
 - Although the back-end is fully containerised, you must install any relevant third-party drivers on your host system.
 
----
-
-### **Initial Setup**
-1. Clone the repository into your preferred directory:  
-   ```bash
-   git clone https://github.com/jcfitzpatrick12/spectre.git
-   ```
-
-2. Navigate to the `spectre` directory:  
-   ```bash
-   cd spectre
-   ```
-
-3. Set the `SPECTRE_DATA_DIR_PATH` environment variable:  
-   ```bash
-   echo "export SPECTRE_DATA_DIR_PATH=$(pwd)/spectre-data" >> ~/.bashrc
-   ```
-
-4. Open a new terminal session to ensure the environment variable is updated.
-
----
-
 ### **Starting the `spectre-server`**
 The `spectre-server` backend container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
-1. Build the Docker image using the `backend` directory:  
+1. Run ```docker build```, but point to our development image:  
    ```bash
-   docker build -t spectre-server ./backend
+   docker build --tag spectre-server backend
    ```
 
-2. Run the `spectre-server` container:  
+2. Run the `spectre-dev-server` container:  
    ```bash
    chmod +x ./backend/run.sh && ./backend/run.sh
    ```
 
----
 
 ### **Running the `spectre-cli`**
 The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
@@ -113,6 +91,28 @@ The following commands assume your working directory corresponds to the cloned `
    spectre --version
    ```
 Notably, the CLI commands will only work with the virtual environment activated.
+
+
+## Installation for developers
+
+### **Starting the development `spectre-server`**
+We provide the lightly modified ```Dockerfile.dev``` for easier development. This image includes:  
+- GUI capablities (so permitting GNURadio companion)
+- Installs ```spectre``` and ```spectre-core``` in editable mode.
+- Does not impose fixed versioning on ```spectre``` and ```spectre-core```
+- Does not delete any OOT modules once they have been installed (allowing rebuilds)
+
+1. Build the image, but point to our development Dockerfile:  
+   ```bash
+   docker build -t spectre-dev-server -f backend/Dockerfile.dev backend
+   ```
+
+2. Run the `spectre-server` container:  
+   ```bash
+   chmod +x ./backend/run_dev_server.sh && ./backend/run_dev_server.sh
+   ```
+
+
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)

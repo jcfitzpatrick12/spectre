@@ -16,5 +16,6 @@ classifiers = [
 ]
 dependencies = [
     "flask==2.3.2"
+    "spectre-core==0.0.5"
 ]
 

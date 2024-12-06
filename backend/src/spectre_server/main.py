@@ -27,5 +27,4 @@ app.register_blueprint(callisto_blueprint,
 if __name__ == "__main__":
     configure_root_logger("user")
     app.run(host="0.0.0.0", 
-            port=5000, 
-            debug=True)
+            port=5000)
