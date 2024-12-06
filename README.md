@@ -82,7 +82,7 @@ Support for Windows will be explored in the future.
 ### **Starting the `spectre-server`**
 The `spectre-server` container must be running to respond to `spectre-cli` requests. The following commands assume your working directory corresponds to the cloned ```spectre``` repository.
 
-1. Run ```docker build```, but point to our development image:  
+1. Build the image (this can take a bit of time):    
    ```bash
    docker build --tag spectre-server backend
    ```
