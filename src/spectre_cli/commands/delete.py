@@ -65,7 +65,7 @@ def logs(
 @delete_app.command()
 def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-    extensions: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
+    extension: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
     month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
     day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
@@ -73,7 +73,7 @@ def chunk_files(
 ) -> None:
     _caution_irreversible(force)
     params = {
-        "extensions": extensions,
+        "extension": extension,
         "year": year,
         "month": month,
         "day": day
