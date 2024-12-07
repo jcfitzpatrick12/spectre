@@ -13,7 +13,7 @@ import multiprocessing
 
 from spectre_core.logging import log_call
 from spectre_core.receivers.factory import get_receiver
-from spectre_core.watchdog.watcher import Watcher
+from spectre_core.watchdog.post_processor import Postprocessor
 from spectre_core.file_handlers.configs import CaptureConfig
 from spectre_core.logging import (
     configure_root_logger, 
@@ -162,15 +162,15 @@ def _start_capture(tag: str,
 
 
 @log_call
-def _start_watcher(tag: str,
+def _start_post_processor(tag: str,
                    do_logging: bool = False,
                    logging_level: int = logging.INFO
 ) -> None:
     if do_logging:
         configure_root_logger(f"worker", level = logging_level)
-    _LOGGER.info(f"Starting watcher with tag: {tag}")
-    watcher = Watcher(tag)
-    watcher.start()
+    _LOGGER.info(f"Starting post processor with tag: {tag}")
+    post_processor = Postprocessor(tag)
+    post_processor.start()
 
 
 @log_call
@@ -218,14 +218,14 @@ def session(tag: str,
     # evaluate the user root logger state, so we can propagate it to the worker processes
     do_logging, logging_level = _get_user_root_logger_state()
 
-    watcher_args = (
+    post_processor_args = (
         tag,
         do_logging,
         logging_level
     )
-    watcher_worker = start_worker(_start_watcher, 
-                                    watcher_args, 
-                                    "watcher")
+    post_processor_worker = start_worker(_start_post_processor, 
+                                    post_processor_args, 
+                                    "post_processor")
 
     capture_args = (
         tag,
@@ -236,7 +236,7 @@ def session(tag: str,
                                   capture_args, 
                                   "capture")
 
-    _monitor_workers([watcher_worker, capture_worker], 
+    _monitor_workers([post_processor_worker, capture_worker], 
                      total_runtime, 
                      force_restart)
     
