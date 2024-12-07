@@ -169,7 +169,7 @@ def _start_post_processor(tag: str,
     if do_logging:
         configure_root_logger(f"worker", level = logging_level)
     _LOGGER.info(f"Starting post processor with tag: {tag}")
-    post_processor = Postprocessor(tag)
+    post_processor = PostProcessor(tag)
     post_processor.start()
 
 
