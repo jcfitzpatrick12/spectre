@@ -73,7 +73,7 @@ def chunk_files(
         "year": year,
         "month": month,
         "day": day,
-        "extensions": extensions
+        "extension": extensions
     }
     jsend_dict = safe_request("spectre-data/chunks",
                               "GET",

@@ -54,7 +54,7 @@ def logs(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("spectre-data/configs/logs", 
+    jsend_dict = safe_request("spectre-data/logs", 
                               "DELETE", 
                               params = params)
     file_names = jsend_dict["data"]
