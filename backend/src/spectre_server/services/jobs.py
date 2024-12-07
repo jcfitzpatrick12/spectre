@@ -13,7 +13,7 @@ import multiprocessing
 
 from spectre_core.logging import log_call
 from spectre_core.receivers.factory import get_receiver
-from spectre_core.watchdog.post_processor import Postprocessor
+from spectre_core.watchdog.post_processor import PostProcessor
 from spectre_core.file_handlers.configs import CaptureConfig
 from spectre_core.logging import (
     configure_root_logger, 
