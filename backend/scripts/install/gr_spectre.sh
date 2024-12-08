@@ -7,10 +7,8 @@
 git clone https://github.com/jcfitzpatrick12/gr-spectre.git
 # cd into the cloned repo
 cd gr-spectre
-# Checkout a specific branch
-# git checkout <branch name>
-# Checkout a specific commit within the branch
-# git checkout <commit hash>
+# Checkout a specific version
+git checkout v0.0.1
 # Build the OOT module
 mkdir build && cd build && cmake .. && make
 # Install the module
