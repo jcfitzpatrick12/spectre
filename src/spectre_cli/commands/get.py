@@ -17,7 +17,9 @@ from spectre_cli.commands import (
     MODE_HELP
 )
 
-get_app = typer.Typer()
+get_app = typer.Typer(
+    help = "Display one or many resources."
+)
 
 
 @get_app.command(

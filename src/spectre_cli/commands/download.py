@@ -12,7 +12,9 @@ from spectre_cli.commands import(
     INSTRUMENT_CODE_HELP
 )
 
-download_app = typer.Typer()
+download_app = typer.Typer(
+    help = "Download external spectrogram data."
+)
 
 @download_app.command(
         help = ("Download e-Callisto network spectrograms.")

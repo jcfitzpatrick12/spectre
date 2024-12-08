@@ -12,7 +12,9 @@ from spectre_cli.commands import (
     PER_SPECTRUM_HELP
 )
 
-test_app = typer.Typer()
+test_app = typer.Typer(
+    help = "Run tests."
+)
 
 
 def _pretty_print_test_results(file_name: str, 

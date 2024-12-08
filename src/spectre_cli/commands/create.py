@@ -14,7 +14,9 @@ from spectre_cli.commands import (
     FORCE_HELP
 )
 
-create_app = typer.Typer()
+create_app = typer.Typer(
+    help = "Create resources."
+)
 
 @create_app.command(
         help = ("Create a fits config.")

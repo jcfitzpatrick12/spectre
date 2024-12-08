@@ -14,7 +14,9 @@ from spectre_cli.commands import (
     EXTENSIONS_HELP
 )
 
-delete_app = typer.Typer()
+delete_app = typer.Typer(
+    help = "Delete resources."
+)
 
 def _secho_deleted_files(file_names: list[str]) -> None:
     if not file_names:

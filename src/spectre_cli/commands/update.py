@@ -11,7 +11,9 @@ from spectre_cli.commands import (
     FORCE_UPDATE_HELP
 )
 
-update_app = typer.Typer()
+update_app = typer.Typer(
+    help = "Update resources."
+)
 
 @update_app.command(
         help = ("Update a capture config")

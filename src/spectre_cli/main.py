@@ -14,7 +14,9 @@ from spectre_cli.commands.update import update_app
 from spectre_cli.commands.download import download_app
 from spectre_cli.commands.test import test_app
 
-app = typer.Typer()
+app = typer.Typer(
+    help = "SPECTRE: Process, Explore and Capture Transient Radio Emissions"
+)
 
 # Register subcommands
 app.add_typer(create_app, name="create")

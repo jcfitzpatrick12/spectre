@@ -13,7 +13,9 @@ from spectre_cli.commands import (
     FORCE_RESTART_HELP
 )
 
-start_app = typer.Typer()
+start_app = typer.Typer(
+    help = "Start a job."
+)
 
 @start_app.command(
         help = ("Start a capture")
