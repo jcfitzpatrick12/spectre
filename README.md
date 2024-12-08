@@ -134,7 +134,7 @@ The following commands assume your working directory corresponds to the cloned `
 
 4. Verify the CLI is operational:  
    ```bash
-   spectre --version
+   spectre --help
    ```
 Notably, the CLI commands will only work with the virtual environment activated.
 
