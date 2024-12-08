@@ -14,7 +14,7 @@ git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git && cd spe
 
 # Update the working directory with only required files
 git sparse-checkout set backend/src backend/pyproject.toml
-git checkout rspduo-tuner-2-support
+git checkout main
 # install dependencies in editable mode
 cd backend
 pip install -e .
@@ -23,5 +23,5 @@ pip install -e .
 cd /home
 # Overwrite spectre-core with the latest available from git
 git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core
-git checkout rspduo-tuner-2-support
+git checkout main
 pip install -e .
