@@ -20,9 +20,10 @@ from spectre_cli.commands import (
 get_app = typer.Typer()
 
 
-@get_app.command()
+@get_app.command(
+        help = ("List defined e-Callisto instrument codes.")
+)
 def callisto_instrument_codes(
-    help = ("List defined e-Callisto instrument codes.")
 ) -> None:
     
     jsend_dict = safe_request("callisto/instrument-codes",
@@ -36,7 +37,7 @@ def callisto_instrument_codes(
 
 
 @get_app.command(
-        help = ("List log file names.")
+        help = ("List existing log files.")
 )
 def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
          year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -62,7 +63,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
 
 
 @get_app.command(
-        help = ("List chunk file names.")
+        help = ("List existing chunk files.")
 )
 def chunk_files(
     tag: list[str] = typer.Option([], "--tag", "-t", help=TAG_HELP),
@@ -91,7 +92,7 @@ def chunk_files(
 
 
 @get_app.command(
-        help = ("List all defined receivers.")
+        help = ("List defined receivers.")
 )
 def receivers(
 ) -> None:
@@ -107,7 +108,7 @@ def receivers(
 
 
 @get_app.command(
-        help = ("List all defined modes for the given receiver.")
+        help = ("List defined receiver modes.")
 )
 def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
@@ -124,7 +125,7 @@ def modes(
 
 
 @get_app.command(
-        help = ("List the hardware specifications for the given receiver.")
+        help = ("Print receiver hardware specifications.")
 )
 def specifications(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
@@ -145,7 +146,7 @@ def specifications(
 
 
 @get_app.command(
-        help = ("List all defined fits configs.")
+        help = ("List defined fits configs.")
 )
 def fits_configs(
 ) -> None:
@@ -165,7 +166,7 @@ def fits_configs(
 
 
 @get_app.command(
-        help = ("List all defined capture configs.")
+        help = ("List defined capture configs.")
 )
 def capture_configs(
 ) -> None:
@@ -185,7 +186,7 @@ def capture_configs(
 
 
 @get_app.command(
-        help = ("List all tags with existing chunk files.")
+        help = ("List tags with existing chunk files.")
 )
 def tags(
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -230,8 +231,7 @@ def log(
 
 
 @get_app.command(
-        help = ("Print the capture config type template for the given receiver "
-                "and operating mode.")
+        help = ("Print the capture config type template.")
 )
 def type_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),

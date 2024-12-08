@@ -91,7 +91,7 @@ def chunk_files(
 
 
 @delete_app.command(
-        help = ("Delete the fits file corresponding to the given tag.")
+        help = ("Delete a fits config.")
 )
 def fits_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
@@ -106,7 +106,7 @@ def fits_config(
 
 
 @delete_app.command(
-        help = ("Delete the capture config corresponding to the given tag.")
+        help = ("Delete a capture config.")
 )
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
