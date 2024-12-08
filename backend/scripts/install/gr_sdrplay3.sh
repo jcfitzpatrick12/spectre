@@ -9,8 +9,6 @@ git clone https://github.com/fventuri/gr-sdrplay3.git
 cd gr-sdrplay3
 # Checkout a specific branch
 git checkout message-passing
-# Checkout a specific commit within the branch
-# git checkout <commit hash>
 # Build the OOT module
 mkdir build && cd build && cmake .. && make
 # Install the module
