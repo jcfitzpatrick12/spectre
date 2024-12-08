@@ -14,9 +14,13 @@ from spectre_cli.commands import (
     FORCE_HELP
 )
 
-create_app = typer.Typer()
+create_app = typer.Typer(
+    help = "Create resources."
+)
 
-@create_app.command()
+@create_app.command(
+        help = ("Create a fits config.")
+)
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option([], "--param", "-p", help=PARAMS_HELP, metavar="KEY=VALUE",),
                 force: bool = typer.Option(False, "--force", help = FORCE_HELP, is_flag=True)
@@ -34,7 +38,9 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     raise typer.Exit()
 
 
-@create_app.command()
+@create_app.command(
+        help = ("Create a capture config.")
+)
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
                    mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),

@@ -14,7 +14,9 @@ from spectre_cli.commands import (
     EXTENSIONS_HELP
 )
 
-delete_app = typer.Typer()
+delete_app = typer.Typer(
+    help = "Delete resources."
+)
 
 def _secho_deleted_files(file_names: list[str]) -> None:
     if not file_names:
@@ -39,7 +41,9 @@ def _caution_irreversible(force: bool) -> None:
         raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete log files.")
+)
 def logs(
     process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -62,7 +66,9 @@ def logs(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete chunk files.")
+)
 def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     extension: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
@@ -86,7 +92,9 @@ def chunk_files(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete a fits config.")
+)
 def fits_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
@@ -99,7 +107,9 @@ def fits_config(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete a capture config.")
+)
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),

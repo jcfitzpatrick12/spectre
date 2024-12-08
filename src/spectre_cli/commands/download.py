@@ -12,9 +12,13 @@ from spectre_cli.commands import(
     INSTRUMENT_CODE_HELP
 )
 
-download_app = typer.Typer()
+download_app = typer.Typer(
+    help = "Download external spectrogram data."
+)
 
-@download_app.command()
+@download_app.command(
+        help = ("Download e-Callisto network spectrograms.")
+)
 def callisto(
     instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=INSTRUMENT_CODE_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
