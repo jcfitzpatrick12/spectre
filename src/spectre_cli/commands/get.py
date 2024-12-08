@@ -233,7 +233,7 @@ def log(
 
 
 @get_app.command(
-        help = ("Print the capture config type template.")
+        help = ("Print a capture config type template.")
 )
 def type_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
