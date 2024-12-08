@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 pip install --upgrade pip
+pip install --upgrade build
+pip install --upgrade twine
 
 cd /home
 # don't checkout HEAD when clone is complete
@@ -12,7 +14,7 @@ git clone --no-checkout https://github.com/jcfitzpatrick12/spectre.git && cd spe
 
 # Update the working directory with only required files
 git sparse-checkout set backend/src backend/pyproject.toml
-git checkout main
+git checkout rspduo-tuner-2-support
 # install dependencies in editable mode
 cd backend
 pip install -e .
@@ -21,4 +23,5 @@ pip install -e .
 cd /home
 # Overwrite spectre-core with the latest available from git
 git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core
+git checkout rspduo-tuner-2-support
 pip install -e .
