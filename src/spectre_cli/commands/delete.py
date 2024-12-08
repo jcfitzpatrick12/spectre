@@ -39,7 +39,9 @@ def _caution_irreversible(force: bool) -> None:
         raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete log files.")
+)
 def logs(
     process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
     year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
@@ -62,7 +64,9 @@ def logs(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete chunk files.")
+)
 def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     extension: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
@@ -86,7 +90,9 @@ def chunk_files(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete the fits file corresponding to the given tag.")
+)
 def fits_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
@@ -99,7 +105,9 @@ def fits_config(
     raise typer.Exit()
 
 
-@delete_app.command()
+@delete_app.command(
+        help = ("Delete the capture config corresponding to the given tag.")
+)
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),

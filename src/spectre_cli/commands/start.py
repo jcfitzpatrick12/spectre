@@ -15,7 +15,9 @@ from spectre_cli.commands import (
 
 start_app = typer.Typer()
 
-@start_app.command()
+@start_app.command(
+        help = ("Start a capture")
+)
 def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
@@ -35,7 +37,9 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
-@start_app.command()
+@start_app.command(
+        help = ("Start a session")
+)
 def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
             minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),

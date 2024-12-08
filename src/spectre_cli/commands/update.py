@@ -13,7 +13,9 @@ from spectre_cli.commands import (
 
 update_app = typer.Typer()
 
-@update_app.command()
+@update_app.command(
+        help = ("Update capture config file contents")
+)
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
                    force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
@@ -33,7 +35,9 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     raise typer.Exit()
 
 
-@update_app.command()
+@update_app.command(
+        help = ("Update fits config file contents")
+)
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
                 force: bool = typer.Option(False, "--force", is_flag = True, help = FORCE_UPDATE_HELP)
