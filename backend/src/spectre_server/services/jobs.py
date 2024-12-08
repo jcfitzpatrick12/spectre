@@ -224,8 +224,8 @@ def session(tag: str,
         logging_level
     )
     post_processor_worker = start_worker(_start_post_processor, 
-                                    post_processor_args, 
-                                    "post_processor")
+                                         post_processor_args, 
+                                         "post_processor")
 
     capture_args = (
         tag,

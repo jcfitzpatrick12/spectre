@@ -159,7 +159,7 @@ The following commands assume your working directory corresponds to the cloned `
 The ```xhost local:``` command allows all local users to access your X server. While convenient, it can pose security risks if untrusted users or processes have access to the machine. Always reset permissions with ```xhost -``` after your session to reduce exposure. If you do not plan to use gnuradio-companion, you can omit the related parts of the command below
 
 
-2. Run the `spectre-server` container:  
+2. Run the `spectre-dev-server` container:  
    ```bash
    # Enable xhost for the local machine only
    xhost local:

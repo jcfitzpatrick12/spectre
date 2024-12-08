@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 pip install --upgrade pip
+pip install --upgrade build
+pip install --upgrade twine
 
 cd /home
 # don't checkout HEAD when clone is complete
@@ -21,4 +23,5 @@ pip install -e .
 cd /home
 # Overwrite spectre-core with the latest available from git
 git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core
+git checkout main
 pip install -e .
