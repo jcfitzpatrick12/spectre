@@ -18,7 +18,7 @@ start_app = typer.Typer(
 )
 
 @start_app.command(
-        help = ("Start a capture")
+        help = ("Start a capture.")
 )
 def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
@@ -40,7 +40,7 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
     raise typer.Exit()
 
 @start_app.command(
-        help = ("Start a session")
+        help = ("Start a session.")
 )
 def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
             seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),

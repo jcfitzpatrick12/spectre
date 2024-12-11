@@ -16,7 +16,7 @@ update_app = typer.Typer(
 )
 
 @update_app.command(
-        help = ("Update a capture config")
+        help = ("Update a capture config.")
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
@@ -38,7 +38,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 
 
 @update_app.command(
-        help = ("Update a fits config")
+        help = ("Update a fits config.")
 )
 def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
                 params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),

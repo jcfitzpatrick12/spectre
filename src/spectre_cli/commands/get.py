@@ -271,7 +271,7 @@ def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 
 
 @get_app.command(
-        help = ("Print capture config file contents")
+        help = ("Print capture config file contents.")
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 ) -> None:
