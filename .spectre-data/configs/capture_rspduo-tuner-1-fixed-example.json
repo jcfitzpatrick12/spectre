@@ -1,5 +1,6 @@
 {
     "event_handler_key": "fixed",
+    "watch_extension": "bin",
     "chunk_size": 3,
     "joining_time": 20,
     "samp_rate": 600000,
