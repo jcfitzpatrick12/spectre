@@ -11,6 +11,7 @@
     "hop": 512,
     "window_size": 256,
     "event_handler_key": "fixed",
+    "watch_extension": "bin",
     "chunk_key": "fixed",
     "receiver": "test",
     "mode": "cosine-signal-1",

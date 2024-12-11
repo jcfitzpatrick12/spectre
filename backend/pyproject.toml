@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 dependencies = [
-    "spectre-core==0.0.8",
+    "spectre-core==0.0.9",
     "flask==2.3.2"
 ]
 license = { file = "LICENSE" }

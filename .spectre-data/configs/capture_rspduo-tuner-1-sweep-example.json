@@ -17,6 +17,7 @@
     "hop": 768,
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
+    "watch_extension": "bin",
     "receiver": "rspduo",
     "mode": "tuner-1-sweep",
     "tag": "rspduo-tuner-1-sweep-example"

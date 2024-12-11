@@ -17,6 +17,7 @@
     "hop": 768,
     "chunk_key": "sweep",
     "event_handler_key": "sweep",
+    "watch_extension": "bin",
     "receiver": "rsp1a",
     "mode": "sweep",
     "tag": "rsp1a-sweep-example"
