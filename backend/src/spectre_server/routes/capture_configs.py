@@ -53,8 +53,8 @@ def delete_capture_config(tag: str
 def update_capture_config(tag: str
 ):
     json              = request.get_json()
-    string_parameters = json.get("string_parameters")
+    string_parameters = json.get("params")
     force             = json.get("force")
     return capture_configs.update_capture_config(tag, 
-                                         string_parameters,
-                                         force)
+                                                 string_parameters,
+                                                 force)

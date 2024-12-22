@@ -56,7 +56,7 @@ def get_capture_config(tag: str
 ) -> dict[str, Any]:
     """Return the contents of a capture config with a given tag."""
     capture_config = CaptureConfig(tag)
-    return capture_config.to_dict()
+    return capture_config.dict
 
 
 
@@ -95,7 +95,7 @@ def _caution_update(tag: str,
 
 @log_call
 def update_capture_config(tag: str,
-                          string_parameters: List[str],
+                          string_parameters: list[str],
                           force: bool = False,
 ) -> str: 
     
@@ -113,7 +113,8 @@ def update_capture_config(tag: str,
                                                 force=True)
 
     receiver.save_parameters(tag,
-                             parameters,)
+                             parameters,
+                             force=True)
 
 
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.file_name}")
