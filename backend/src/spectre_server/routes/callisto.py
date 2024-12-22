@@ -22,10 +22,10 @@ def get_instrument_codes():
 def download():
     json = request.get_json()
     instrument_code = json.get("instrument_code")
-    year = json.get("year")
-    month = json.get("month")
-    day = json.get("day")
-    return callisto.download(instrument_code,
-                             year,
-                             month,
-                             day)
+    year            = json.get("year")
+    month           = json.get("month")
+    day             = json.get("day")
+    return callisto.download_callisto_data(instrument_code,
+                                           year,
+                                           month,
+                                           day)

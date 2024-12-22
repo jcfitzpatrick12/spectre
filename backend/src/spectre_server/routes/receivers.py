@@ -16,26 +16,28 @@ def get_receivers(
 ):
     return receivers.list_all_receiver_names()
 
+
 @receivers_blueprint.route("/<string:receiver_name>/modes", methods=["GET"])
 @jsendify_response
 def get_modes(receiver_name: str
 ):
     return receivers.get_modes(receiver_name)
 
-@receivers_blueprint.route("/<string:receiver_name>/specifications", methods=["GET"])
+
+@receivers_blueprint.route("/<string:receiver_name>/specs", methods=["GET"])
 @jsendify_response
 def get_specifications(receiver_name: str
 ):
-    return receivers.get_specifications(receiver_name)
+    return receivers.get_specs(receiver_name)
 
 
-@receivers_blueprint.route("/<string:receiver_name>/type-template", methods=["GET"])
+@receivers_blueprint.route("/<string:receiver_name>/capture-template", methods=["GET"])
 @jsendify_response
 def get_type_template(receiver_name: str
 ):
     mode = request.args.get("mode")
-    return receivers.get_type_template(receiver_name, 
-                                       mode)
+    return receivers.get_capture_template(receiver_name, 
+                                          mode)
 
 
 

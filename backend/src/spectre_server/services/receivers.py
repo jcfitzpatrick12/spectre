@@ -20,19 +20,19 @@ def get_modes(receiver_name: str,
 ) -> list[str]:
     """For the input receiver, get all the defined modes"""
     receiver = get_receiver(receiver_name)
-    return receiver.valid_modes
+    return receiver.modes
 
 
 @log_call
-def get_specifications(receiver_name: str,
+def get_specs(receiver_name: str,
 ) -> dict[str, Any]:
     """For the input receiver, get the corresponding specifications"""
     receiver = get_receiver(receiver_name)
-    return receiver.specifications
+    return receiver.specs.to_dict()
 
 
 @log_call
-def get_type_template(receiver_name: str,
+def get_capture_template(receiver_name: str,
                       mode: str
 ) -> dict[str, Any]:
     """Get the type template for a capture config for a receiver operating in a particular mode.
@@ -42,4 +42,4 @@ def get_type_template(receiver_name: str,
     receiver = get_receiver(receiver_name, 
                             mode = mode)
     
-    return {k: v.__name__ for k, v in receiver.type_template.items()}
+    return receiver.capture_template.to_dict()

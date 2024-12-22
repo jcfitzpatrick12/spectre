@@ -5,8 +5,8 @@
 from typing import Optional
 
 from spectre_core.logging import log_call
-from spectre_core.web_fetch.callisto import fetch_chunks
-from spectre_core.cfg import CALLISTO_INSTRUMENT_CODES
+from spectre_core.wget import download_callisto_data
+from spectre_core.constants import CALLISTO_INSTRUMENT_CODES
 
 @log_call
 def get_instrument_codes(
@@ -16,13 +16,13 @@ def get_instrument_codes(
 
 
 @log_call
-def download(
+def download_callisto_data(
     instrument_code: str,
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> None:
-    fetch_chunks(instrument_code, 
-                 year,
-                 month,
-                 day)
+    download_callisto_data(instrument_code, 
+                           year,
+                           month,
+                           day)
