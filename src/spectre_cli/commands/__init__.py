@@ -7,38 +7,47 @@ import os
 from typing import Callable
 from functools import wraps
 from typing import Optional
+from dataclasses import dataclass
 
 import typer
 
 # Base URL of the locally running spectre-server, specifying the loopback IP and port 5000
 BASE_URL = f"http://127.0.0.1:5000"
 
-# Reusable help statements (used across various CLI functions)
-RECEIVER_NAME_HELP =      ("The name of the receiver.")
-MODE_HELP =               ("The operating mode for the receiver.")
-TAG_HELP =                ("The capture config tag.")
-SECONDS_HELP =            ("Seconds component of the session duration.")
-MINUTES_HELP =            ("Minutes component of the session duration.")
-HOURS_HELP =              ("Hours component of the session duration.")
-DAY_HELP =                ("Numeric day of the month.")
-MONTH_HELP =              ("Numeric month of the year.")
-YEAR_HELP =               ("Numeric year.")
-FORCE_RESTART_HELP =      ("When a worker process stops unexpectedly, "
-                           "terminate all workers and restart.")
-FORCE_UPDATE_HELP =       ("Force configuration files to update, even "
-                           "if chunks exist under the given tag.")
-PARAMS_HELP =             ("Configuration file parameters "
-                           "as key value pairs.")
-PROCESS_TYPE_HELP =       ("Specifies one of 'worker' or 'user'.")
-EXTENSIONS_HELP =         ("The file extension.")
-FORCE_HELP =              ("Forcibly ignore user warnings.")
-PID_HELP =                ("The process ID.")
-INSTRUMENT_CODE_HELP =    ("The case-sensitive CALLISTO instrument code.")
-ABSOLUTE_TOLERANCE_HELP = ("The absolute tolerance to which we consider "
-                           "'agreement' with the analytical solution for "
-                           "each spectral component. See the 'atol' keyword "
-                           "argument for np.isclose.")
-PER_SPECTRUM_HELP =       ("Show validated status per spectrum.")
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class CliHelp:
+    RECEIVER_NAME       = "The name of the receiver."
+    MODE                = "The operating mode for the receiver."
+    TAG                 = "The capture config tag."
+    SECONDS             = "Seconds component of the session duration."
+    MINUTES             = "Minutes component of the session duration."
+    HOURS               = "Hours component of the session duration."
+    DAY                 = "Numeric day of the month."
+    MONTH               = "Numeric month of the year."
+    YEAR                = "Numeric year."
+    FORCE_RESTART       = (
+        "When a worker process stops unexpectedly, terminate all workers "
+        "and restart."
+    )
+    FORCE_UPDATE        = (
+        "Force configuration files to update, even if chunks exist under "
+        "the given tag."
+    )
+    PARAM               = "Configuration file parameters as key-value pairs."
+    PROCESS_TYPE        = "Specifies one of 'worker' or 'user'."
+    EXTENSIONS          = "The file extension."
+    FORCE               = "Forcibly ignore user warnings."
+    PID                 = "The process ID."
+    INSTRUMENT_CODE     = "The case-sensitive CALLISTO instrument code."
+    ABSOLUTE_TOLERANCE  = (
+        "The absolute tolerance to which we consider 'agreement' with the "
+        "analytical solution for each spectral component. See the 'atol' "
+        "keyword argument for np.isclose."
+    )
+    PER_SPECTRUM        = "Show validated status per spectrum."
 
 
 def _catch_response_errors(func: Callable):

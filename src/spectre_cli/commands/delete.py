@@ -5,14 +5,7 @@
 import typer
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import (
-    TAG_HELP,
-    PROCESS_TYPE_HELP,
-    DAY_HELP,
-    MONTH_HELP,
-    YEAR_HELP,
-    EXTENSIONS_HELP
-)
+from spectre_cli.commands import CliHelp
 
 delete_app = typer.Typer(
     help = "Delete resources."
@@ -45,11 +38,11 @@ def _caution_irreversible(force: bool) -> None:
         help = ("Delete log files.")
 )
 def logs(
-    process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
-    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
+    process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
+    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
+    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
+    force: bool = typer.Option(False, "--force", help=CliHelp.FORCE),
 ) -> None:
     _caution_irreversible(force)
     params = {
@@ -70,12 +63,12 @@ def logs(
         help = ("Delete chunk files.")
 )
 def chunk_files(
-    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-    extension: list[str] = typer.Option(..., "--extension", "-e", help=EXTENSIONS_HELP),
-    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+    extension: list[str] = typer.Option(..., "--extension", "-e", help=CliHelp.EXTENSIONS),
+    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MINUTES),
+    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
+    force: bool = typer.Option(False, "--force", help=CliHelp.FORCE),
 ) -> None:
     _caution_irreversible(force)
     params = {
@@ -93,29 +86,14 @@ def chunk_files(
 
 
 @delete_app.command(
-        help = ("Delete a fits config.")
-)
-def fits_config(
-    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
-) -> None:
-    _caution_irreversible(force)
-    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
-                              "DELETE")
-    file_name = jsend_dict["data"]
-    _secho_deleted_file(file_name)
-    raise typer.Exit()
-
-
-@delete_app.command(
         help = ("Delete a capture config.")
 )
 def capture_config(
-    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
     _caution_irreversible(force)
-    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
                               "DELETE")
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)

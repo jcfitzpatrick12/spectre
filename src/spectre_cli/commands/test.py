@@ -6,16 +6,11 @@ import typer
 from spectre_core.spectrograms.analytical import TestResults
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import (
-    TAG_HELP,
-    ABSOLUTE_TOLERANCE_HELP,
-    PER_SPECTRUM_HELP
-)
+from spectre_cli.commands import CliHelp
 
 test_app = typer.Typer(
     help = "Run tests."
 )
-
 
 def _pretty_print_test_results(file_name: str, 
                                test_results: TestResults, 
@@ -46,9 +41,9 @@ def _pretty_print_test_results(file_name: str,
                 "to known analytically derived solutions.")
 )
 def analytical(
-    tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-    absolute_tolerance: float = typer.Option(1e-3, "--atol", "--absolute-tolerance", help=ABSOLUTE_TOLERANCE_HELP),
-    per_spectrum: bool = typer.Option(False, "--per-spectrum", help=PER_SPECTRUM_HELP),
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+    absolute_tolerance: float = typer.Option(1e-3, "--atol", "--absolute-tolerance", help=CliHelp.ABSOLUTE_TOLERANCE),
+    per_spectrum: bool = typer.Option(False, "--per-spectrum", help=CliHelp.PER_SPECTRUM),
 ) -> None:
     
     params = {

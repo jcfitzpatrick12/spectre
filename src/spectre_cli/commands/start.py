@@ -5,13 +5,7 @@
 import typer
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import (
-    TAG_HELP,
-    SECONDS_HELP,
-    MINUTES_HELP,
-    HOURS_HELP,
-    FORCE_RESTART_HELP
-)
+from spectre_cli.commands import CliHelp
 
 start_app = typer.Typer(
     help = "Start a job."
@@ -20,11 +14,11 @@ start_app = typer.Typer(
 @start_app.command(
         help = ("Start a capture.")
 )
-def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-            seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
-            minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
-            hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
-            force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
+def capture(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+            seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
+            minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
+            hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
+            force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
 ) -> None:
     json = {
         "tag": tag,
@@ -42,11 +36,11 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
 @start_app.command(
         help = ("Start a session.")
 )
-def session(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-            seconds: int = typer.Option(0, "--seconds", help=SECONDS_HELP),
-            minutes: int = typer.Option(0, "--minutes", help=MINUTES_HELP),
-            hours: int = typer.Option(0, "--hours", help=HOURS_HELP),
-            force_restart: bool = typer.Option(False, "--force-restart", help=FORCE_RESTART_HELP)
+def session(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+            seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
+            minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
+            hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
+            force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
 ) -> None:
     json = {
         "tag": tag,

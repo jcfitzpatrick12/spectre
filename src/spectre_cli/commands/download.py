@@ -5,12 +5,7 @@
 import typer
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import(
-    YEAR_HELP,
-    MONTH_HELP,
-    DAY_HELP,
-    INSTRUMENT_CODE_HELP
-)
+from spectre_cli.commands import CliHelp
 
 download_app = typer.Typer(
     help = "Download external spectrogram data."
@@ -20,10 +15,10 @@ download_app = typer.Typer(
         help = ("Download e-Callisto network spectrograms.")
 )
 def callisto(
-    instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=INSTRUMENT_CODE_HELP),
-    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+    instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=CliHelp.INSTRUMENT_CODE),
+    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
+    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
 ) -> None:
     json = {
         "instrument_code": instrument_code,
