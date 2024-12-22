@@ -24,7 +24,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}",
+    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}",
                               "PATCH",
                               json = json)
     file_name = jsend_dict["data"]
