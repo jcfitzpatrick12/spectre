@@ -26,7 +26,7 @@ def get_modes(receiver_name: str
 
 @receivers_blueprint.route("/<string:receiver_name>/specs", methods=["GET"])
 @jsendify_response
-def get_specifications(receiver_name: str
+def get_specs(receiver_name: str
 ):
     return receivers.get_specs(receiver_name)
 
