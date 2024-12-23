@@ -11,11 +11,7 @@ delete_app = typer.Typer(
     help = "Delete resources."
 )
 
-def _secho_deleted_files(file_names: list[str]) -> None:
-    if not file_names:
-        typer.secho(f"No files found", fg="yellow")
-        return 
-    
+def _secho_deleted_files(file_names: list[str]) -> None:    
     for file_name in file_names:
         typer.secho(f"Deleted '{file_name}'", fg="yellow")
 
@@ -64,7 +60,7 @@ def logs(
 )
 def chunk_files(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-    extension: list[str] = typer.Option(..., "--extension", "-e", help=CliHelp.EXTENSIONS),
+    extension: list[str] = typer.Option([], "--extension", "-e", help=CliHelp.EXTENSIONS),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
     month: int = typer.Option(None, "--month", "-m", help=CliHelp.MINUTES),
     day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
