@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-import json
-from pprint import pprint
+import yaml
 
 from spectre_cli.commands import safe_request
 from spectre_cli.commands import CliHelp
@@ -13,6 +12,8 @@ get_app = typer.Typer(
     help = "Display one or many resources."
 )
 
+def pprint_dict(d: dict):
+    print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
 
 @get_app.command(
         help = ("List defined e-Callisto instrument codes.")
@@ -149,12 +150,8 @@ def capture_configs(
                               "GET")
     file_names = jsend_dict["data"]
     
-    if not file_names:
-        typer.secho(f"No capture configs found")
-    
-    else:
-        for file_name in file_names:
-            typer.secho(file_name)
+    for file_name in file_names:
+        typer.secho(file_name)
 
     raise typer.Exit()
 
@@ -168,7 +165,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
                               "GET")
     capture_config = jsend_dict["data"]
 
-    pprint(capture_config)
+    pprint_dict(capture_config)
 
     raise typer.Exit()
 
@@ -193,12 +190,8 @@ def tags(
                               params = params)
     tags = jsend_dict["data"]
 
-    if not tags:
-        typer.secho("No tags found")
-
-    else:
-        for tag in tags:
-            typer.secho(tag)
+    for tag in tags:
+        typer.secho(tag)
     
     raise typer.Exit()
 
@@ -219,24 +212,33 @@ def log(
 
 
 @get_app.command(
-        help = ("Print a capture config type template.")
+        help = ("Print a capture template.")
 )
-def type_template(
+def capture_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
     mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
+    param_name: str = typer.Option(None, "--param", "-p", help=CliHelp.PARAMETER_NAME)
 ) -> None: 
     
     params = {
         "mode": mode,
     }
-    jsend_dict = safe_request(f"receivers/{receiver_name}/type-template",
+    jsend_dict = safe_request(f"receivers/{receiver_name}/capture-template",
                               "GET",
                               params = params)
-    type_template = jsend_dict["data"]
+    capture_template = jsend_dict["data"]
 
-    for k, v in type_template.items():
-        typer.secho(f"{k}: {v}")
+    if param_name is None:
+        pprint_dict(capture_template)
+    else:
+        if param_name not in capture_template:
+            raise KeyError(f"A parameter with name '{param_name}' does not exist "
+                        f"in the capture template for the receiver '{receiver_name}' "
+                        f"operating in mode '{mode}'. Expected one of: "
+                        f"{list(capture_template.keys())}")
+        pprint_dict(capture_template[param_name])
 
     typer.Exit()
+
 
     
