@@ -103,6 +103,8 @@ def delete_chunk_files(tag: str,
     
     deleted_file_names = []
     for chunk in chunks:
+        if not extensions:
+            extensions = chunk.extensions
         for extension in extensions:
             if chunk.has_file(extension):
                 chunk_file = chunk.get_file(extension)
