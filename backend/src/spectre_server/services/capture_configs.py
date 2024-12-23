@@ -26,7 +26,7 @@ def get_capture_configs(
 @log_call
 def create_capture_config(tag: str,
                           receiver_name: str,
-                          mode: str,
+                          receiver_mode: str,
                           string_parameters: Optional[list[str]] = None,
                           force: bool = False
 ) -> str:
@@ -35,7 +35,7 @@ def create_capture_config(tag: str,
         string_parameters = []
         
     receiver = get_receiver(receiver_name, 
-                            mode = mode)
+                            mode = receiver_mode)
     
     parameters = make_parameters( parse_string_parameters(string_parameters) )
 

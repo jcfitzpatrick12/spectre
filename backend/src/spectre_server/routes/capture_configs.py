@@ -31,14 +31,14 @@ def create_capture_config(tag: str
 ):
     json = request.get_json()
     receiver_name     = json.get("receiver_name")
-    mode              = json.get("mode")
+    receiver_mode     = json.get("receiver_mode")
     string_parameters = json.get("string_parameters")
     force             = json.get("force")
     return capture_configs.create_capture_config(tag, 
-                                         receiver_name,
-                                         mode,
-                                         string_parameters,
-                                         force)
+                                                 receiver_name,
+                                                 receiver_mode,
+                                                 string_parameters,
+                                                 force)
 
 
 @capture_configs_blueprint.route("/<string:tag>", methods=["DELETE"])

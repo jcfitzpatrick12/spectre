@@ -33,13 +33,13 @@ def get_specs(receiver_name: str,
 
 @log_call
 def get_capture_template(receiver_name: str,
-                      mode: str
+                         receiver_mode: str
 ) -> dict[str, Any]:
     """Get the type template for a capture config for a receiver operating in a particular mode.
     
     Optionally, format the return as a command to create a capture config with the input tag.
     """
     receiver = get_receiver(receiver_name, 
-                            mode = mode)
+                            mode = receiver_mode)
     
     return receiver.capture_template.to_dict()

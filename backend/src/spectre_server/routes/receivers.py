@@ -35,9 +35,9 @@ def get_specs(receiver_name: str
 @jsendify_response
 def get_type_template(receiver_name: str
 ):
-    mode = request.args.get("mode")
+    receiver_mode = request.args.get("receiver_mode")
     return receivers.get_capture_template(receiver_name, 
-                                          mode)
+                                          receiver_mode)
 
 
 
