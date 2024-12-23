@@ -113,8 +113,8 @@ def modes(
                               "GET")
     receiver_modes = jsend_dict["data"]
 
-    for mode in receiver_modes:
-        typer.secho(mode)
+    for receiver_mode in receiver_modes:
+        typer.secho(receiver_mode)
 
     raise typer.Exit()
 
@@ -216,12 +216,12 @@ def log(
 )
 def capture_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
-    mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
+    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
     param_name: str = typer.Option(None, "--param", "-p", help=CliHelp.PARAMETER_NAME)
 ) -> None: 
     
     params = {
-        "mode": mode,
+        "receiver_mode": receiver_mode,
     }
     jsend_dict = safe_request(f"receivers/{receiver_name}/capture-template",
                               "GET",
@@ -234,7 +234,7 @@ def capture_template(
         if param_name not in capture_template:
             raise KeyError(f"A parameter with name '{param_name}' does not exist "
                         f"in the capture template for the receiver '{receiver_name}' "
-                        f"operating in mode '{mode}'. Expected one of: "
+                        f"operating in mode '{receiver_mode}'. Expected one of: "
                         f"{list(capture_template.keys())}")
         pprint_dict(capture_template[param_name])
 

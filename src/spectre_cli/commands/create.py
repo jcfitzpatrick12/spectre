@@ -18,14 +18,14 @@ create_app = typer.Typer(
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
-    mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
+    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
     params: List[str] = typer.Option([], "--param", "-p", help=CliHelp.PARAM, metavar="KEY=VALUE"),
     force: bool = typer.Option(False, "--force", help = CliHelp.FORCE, is_flag=True)
 ) -> None:
     
     json = {
         "receiver_name": receiver_name,
-        "mode": mode,
+        "receiver_mode": receiver_mode,
         "params": params,
         "force": force
     }
