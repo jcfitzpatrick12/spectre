@@ -5,8 +5,8 @@
 from typing import Any
 
 from spectre_core.logging import log_call
-from spectre_core.receivers.factory import get_receiver
-from spectre_core.receivers.receiver_register import list_all_receiver_names
+from spectre_core.receivers import get_receiver
+from spectre_core.receivers import list_all_receiver_names
 
 @log_call
 def get_receiver_names(

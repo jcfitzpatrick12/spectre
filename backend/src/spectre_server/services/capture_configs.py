@@ -8,12 +8,12 @@ _LOGGER = getLogger(__name__)
 from typing import List, Optional, Any
 from os import listdir
 
-from spectre_core.paths import get_configs_dir_path
+from spectre_core.config import get_configs_dir_path
 from spectre_core.chunks import Chunks
-from spectre_core.receivers.factory import get_receiver
+from spectre_core.receivers import get_receiver
 from spectre_core.logging import log_call
-from spectre_core.parameters import parse_string_parameters, make_parameters
-from spectre_core.capture_config import CaptureConfig
+from spectre_core.capture_configs import CaptureConfig, parse_string_parameters, make_parameters
+
 
 @log_call
 def get_capture_configs(

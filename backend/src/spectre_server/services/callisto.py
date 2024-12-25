@@ -5,8 +5,7 @@
 from typing import Optional
 
 from spectre_core.logging import log_call
-from spectre_core import wget
-from spectre_core.constants import CALLISTO_INSTRUMENT_CODES
+from spectre_core.wgetting import download_callisto_data, CALLISTO_INSTRUMENT_CODES
 
 @log_call
 def get_instrument_codes(
@@ -22,7 +21,7 @@ def download_callisto_data(
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> None:
-    wget.download_callisto_data(instrument_code, 
-                                year,
-                                month,
-                                day)
+    download_callisto_data(instrument_code, 
+                           year,
+                           month,
+                           day)

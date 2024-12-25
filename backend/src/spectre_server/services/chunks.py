@@ -12,9 +12,9 @@ from os import walk
 
 from spectre_core.logging import log_call
 from spectre_core.chunks import Chunks
-from spectre_core.paths import get_chunks_dir_path
-from spectre_core.capture_config import CaptureConfig
-from spectre_core.spectrograms.analytical import validate_analytically
+from spectre_core.config import get_chunks_dir_path
+from spectre_core.capture_configs import CaptureConfig
+from spectre_core.spectrograms import validate_analytically
 
 
 @log_call
