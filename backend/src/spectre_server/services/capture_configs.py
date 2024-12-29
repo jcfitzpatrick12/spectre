@@ -103,17 +103,16 @@ def update_capture_config(tag: str,
                     force)
 
     capture_config = CaptureConfig(tag)
-
-    receiver = get_receiver(capture_config.receiver_name,
-                            capture_config.receiver_mode)
     
     parameters = make_parameters( parse_string_parameters(string_parameters) )
     for parameter in parameters:
         capture_config.parameters.add_parameter(parameter, 
                                                 force=True)
 
+    receiver = get_receiver(capture_config.receiver_name,
+                            capture_config.receiver_mode)
     receiver.save_parameters(tag,
-                             parameters,
+                             capture_config.parameters,
                              force=True)
 
 
