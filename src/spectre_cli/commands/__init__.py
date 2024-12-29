@@ -48,6 +48,7 @@ class CliHelp:
         "keyword argument for np.isclose."
     )
     PER_SPECTRUM        = "Show validated status per spectrum."
+    PARAMETER_NAME      = "The name of the parameter"
 
 
 def _catch_response_errors(func: Callable):
