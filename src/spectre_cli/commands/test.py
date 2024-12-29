@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-from spectre_core.spectrograms.analytical import TestResults
+from spectre_core.spectrograms import TestResults
 
 from spectre_cli.commands import safe_request
 from spectre_cli.commands import CliHelp
