@@ -12,9 +12,9 @@ from typing import List, Callable, Tuple
 import multiprocessing
 
 from spectre_core.logging import log_call
-from spectre_core.receivers.factory import get_receiver
-from spectre_core.post_processing.post_processor import PostProcessor
-from spectre_core.file_handlers.configs import CaptureConfig
+from spectre_core.receivers import get_receiver
+from spectre_core.post_processing import PostProcessor
+from spectre_core.capture_configs import CaptureConfig
 from spectre_core.logging import (
     configure_root_logger, 
     log_call
@@ -151,13 +151,13 @@ def _start_capture(tag: str,
 
     # load the receiver and mode from the capture config file
     capture_config = CaptureConfig(tag)
-    receiver_name, mode = capture_config.get_receiver_metadata()
 
-    _LOGGER.info((f"Starting capture with the receiver `{receiver_name}` "
-                  f"operating in mode `{mode}` "
+    _LOGGER.info((f"Starting capture with the receiver `{capture_config.receiver_name}` "
+                  f"operating in mode `{capture_config.receiver_mode}` "
                   f"with tag `{tag}`"))
 
-    receiver = get_receiver(receiver_name, mode=mode)
+    receiver = get_receiver(capture_config.receiver_name, 
+                            mode=capture_config.receiver_mode)
     receiver.start_capture(tag)
 
 

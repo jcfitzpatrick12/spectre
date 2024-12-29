@@ -3,24 +3,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
+import yaml
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import (
-    PROCESS_TYPE_HELP,
-    YEAR_HELP,
-    MONTH_HELP,
-    DAY_HELP,
-    TAG_HELP,
-    EXTENSIONS_HELP,
-    RECEIVER_NAME_HELP,
-    PID_HELP,
-    MODE_HELP
-)
+from spectre_cli.commands import CliHelp
 
 get_app = typer.Typer(
     help = "Display one or many resources."
 )
 
+def pprint_dict(d: dict):
+    print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
 
 @get_app.command(
         help = ("List defined e-Callisto instrument codes.")
@@ -41,10 +34,10 @@ def callisto_instrument_codes(
 @get_app.command(
         help = ("List existing log files.")
 )
-def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_TYPE_HELP),
-         year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-         month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-         day: int = typer.Option(None, "--day", "-d", help=DAY_HELP)
+def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
+         year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+         month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
+         day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY)
 ) -> None:
     
     params = {
@@ -68,11 +61,11 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=PROCESS_T
         help = ("List existing chunk files.")
 )
 def chunk_files(
-    tag: list[str] = typer.Option([], "--tag", "-t", help=TAG_HELP),
-    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
-    extensions: list[str] = typer.Option(None, "--extension", "-e", help=EXTENSIONS_HELP)
+    tag: list[str] = typer.Option([], "--tag", "-t", help=CliHelp.TAG),
+    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
+    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
+    extensions: list[str] = typer.Option(None, "--extension", "-e", help=CliHelp.EXTENSIONS)
 ) -> None:
     
     params = {
@@ -113,15 +106,15 @@ def receivers(
         help = ("List defined receiver modes.")
 )
 def modes(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
+    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
 ) -> None:
     
     jsend_dict = safe_request(f"receivers/{receiver_name}/modes",
                               "GET")
     receiver_modes = jsend_dict["data"]
 
-    for mode in receiver_modes:
-        typer.secho(mode)
+    for receiver_mode in receiver_modes:
+        typer.secho(receiver_mode)
 
     raise typer.Exit()
 
@@ -129,40 +122,20 @@ def modes(
 @get_app.command(
         help = ("Print receiver hardware specifications.")
 )
-def specifications(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP)
+def specs(
+    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
 ) -> None:
     
     params = {
         "receiver_name": receiver_name
     }
-    jsend_dict = safe_request(f"receivers/{receiver_name}/specifications",
+    jsend_dict = safe_request(f"receivers/{receiver_name}/specs",
                               "GET",
                               params = params)
-    specifications = jsend_dict["data"]
+    specs = jsend_dict["data"]
 
-    for k, v in specifications.items():
+    for k, v in specs.items():
         typer.secho(f"{k}: {v}")
-
-    raise typer.Exit()
-
-
-@get_app.command(
-        help = ("List defined fits configs.")
-)
-def fits_configs(
-) -> None:
-    
-    jsend_dict = safe_request(f"spectre-data/configs/fits",
-                              "GET")
-    file_names = jsend_dict["data"]
-    
-    if not file_names:
-        typer.secho(f"No fits configs found")
-    
-    else:
-        for file_name in file_names:
-            typer.secho(file_name)
 
     raise typer.Exit()
 
@@ -173,16 +146,26 @@ def fits_configs(
 def capture_configs(
 ) -> None:
     
-    jsend_dict = safe_request(f"spectre-data/configs/capture",
+    jsend_dict = safe_request(f"spectre-data/capture-configs",
                               "GET")
     file_names = jsend_dict["data"]
     
-    if not file_names:
-        typer.secho(f"No capture configs found")
-    
-    else:
-        for file_name in file_names:
-            typer.secho(file_name)
+    for file_name in file_names:
+        typer.secho(file_name)
+
+    raise typer.Exit()
+
+
+@get_app.command(
+        help = ("Print capture config file contents.")
+)
+def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+) -> None:
+    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}",
+                              "GET")
+    capture_config = jsend_dict["data"]
+
+    pprint_dict(capture_config)
 
     raise typer.Exit()
 
@@ -191,9 +174,9 @@ def capture_configs(
         help = ("List tags with existing chunk files.")
 )
 def tags(
-    year: int = typer.Option(None, "--year", "-y", help=YEAR_HELP),
-    month: int = typer.Option(None, "--month", "-m", help=MONTH_HELP),
-    day: int = typer.Option(None, "--day", "-d", help=DAY_HELP),
+    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
+    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
+    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
     
 ) -> None:
     
@@ -207,12 +190,8 @@ def tags(
                               params = params)
     tags = jsend_dict["data"]
 
-    if not tags:
-        typer.secho("No tags found")
-
-    else:
-        for tag in tags:
-            typer.secho(tag)
+    for tag in tags:
+        typer.secho(tag)
     
     raise typer.Exit()
 
@@ -221,7 +200,7 @@ def tags(
         help = ("Print log file contents.")
 )
 def log(
-    pid: str = typer.Option(None, "--pid", help=PID_HELP),
+    pid: str = typer.Option(..., "--pid", help=CliHelp.PID),
 ) -> None:
     
     jsend_dict = safe_request(f"spectre-data/logs/{pid}",
@@ -233,56 +212,33 @@ def log(
 
 
 @get_app.command(
-        help = ("Print a capture config type template.")
+        help = ("Print a capture template.")
 )
-def type_template(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
-    mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
+def capture_template(
+    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
+    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
+    param_name: str = typer.Option(None, "--param", "-p", help=CliHelp.PARAMETER_NAME)
 ) -> None: 
     
     params = {
-        "mode": mode,
+        "receiver_mode": receiver_mode,
     }
-    jsend_dict = safe_request(f"receivers/{receiver_name}/type-template",
+    jsend_dict = safe_request(f"receivers/{receiver_name}/capture-template",
                               "GET",
                               params = params)
-    type_template = jsend_dict["data"]
+    capture_template = jsend_dict["data"]
 
-    for k, v in type_template.items():
-        typer.secho(f"{k}: {v}")
+    if param_name is None:
+        pprint_dict(capture_template)
+    else:
+        if param_name not in capture_template:
+            raise KeyError(f"A parameter with name '{param_name}' does not exist "
+                        f"in the capture template for the receiver '{receiver_name}' "
+                        f"operating in mode '{receiver_mode}'. Expected one of: "
+                        f"{list(capture_template.keys())}")
+        pprint_dict(capture_template[param_name])
 
     typer.Exit()
 
-
-@get_app.command(
-        help = ("Print fits config file contents.")
-)
-def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-) -> None:
-    
-    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}",
-                              "GET")
-    fits_config = jsend_dict["data"]
-
-    for k, v in fits_config.items():
-        typer.secho(f"{k}: {v}")
-
-    raise typer.Exit()
-
-
-@get_app.command(
-        help = ("Print capture config file contents.")
-)
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-) -> None:
-    
-    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}",
-                              "GET")
-    capture_config = jsend_dict["data"]
-
-    for k, v in capture_config.items():
-        typer.secho(f"{k}: {v}")
-
-    raise typer.Exit()
 
     

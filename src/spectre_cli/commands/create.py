@@ -6,55 +6,30 @@ import typer
 from typing import List
 
 from spectre_cli.commands import safe_request
-from spectre_cli.commands import (
-    RECEIVER_NAME_HELP,
-    MODE_HELP,
-    TAG_HELP,
-    PARAMS_HELP,
-    FORCE_HELP
-)
+from spectre_cli.commands import CliHelp
 
 create_app = typer.Typer(
     help = "Create resources."
 )
 
 @create_app.command(
-        help = ("Create a fits config.")
-)
-def fits_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-                params: List[str] = typer.Option([], "--param", "-p", help=PARAMS_HELP, metavar="KEY=VALUE",),
-                force: bool = typer.Option(False, "--force", help = FORCE_HELP, is_flag=True)
-) -> None:
-    
-    json = {
-        "params": params,
-        "force": force
-    }
-    jsend_dict = safe_request(f"spectre-data/configs/fits/{tag}", 
-                              "PUT", 
-                              json = json)
-    file_name = jsend_dict["data"]
-    typer.secho(f"Fits config created successfully with tag '{tag}': {file_name}")
-    raise typer.Exit()
-
-
-@create_app.command(
         help = ("Create a capture config.")
 )
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=TAG_HELP),
-                   receiver_name: str = typer.Option(..., "--receiver", "-r", help=RECEIVER_NAME_HELP),
-                   mode: str = typer.Option(..., "--mode", "-m", help=MODE_HELP),
-                   params: List[str] = typer.Option([], "--param", "-p", help=PARAMS_HELP, metavar="KEY=VALUE"),
-                   force: bool = typer.Option(False, "--force", help = FORCE_HELP, is_flag=True)
+def capture_config(
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
+    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
+    params: List[str] = typer.Option([], "--param", "-p", help=CliHelp.PARAM, metavar="KEY=VALUE"),
+    force: bool = typer.Option(False, "--force", help = CliHelp.FORCE, is_flag=True)
 ) -> None:
     
     json = {
         "receiver_name": receiver_name,
-        "mode": mode,
+        "receiver_mode": receiver_mode,
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/capture/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
                               "PUT", 
                               json = json)
     file_name = jsend_dict["data"]

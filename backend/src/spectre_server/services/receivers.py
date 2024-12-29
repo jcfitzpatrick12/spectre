@@ -5,8 +5,8 @@
 from typing import Any
 
 from spectre_core.logging import log_call
-from spectre_core.receivers.factory import get_receiver
-from spectre_core.receivers.receiver_register import list_all_receiver_names
+from spectre_core.receivers import get_receiver
+from spectre_core.receivers import list_all_receiver_names
 
 @log_call
 def get_receiver_names(
@@ -20,26 +20,26 @@ def get_modes(receiver_name: str,
 ) -> list[str]:
     """For the input receiver, get all the defined modes"""
     receiver = get_receiver(receiver_name)
-    return receiver.valid_modes
+    return receiver.modes
 
 
 @log_call
-def get_specifications(receiver_name: str,
+def get_specs(receiver_name: str,
 ) -> dict[str, Any]:
     """For the input receiver, get the corresponding specifications"""
     receiver = get_receiver(receiver_name)
-    return receiver.specifications
+    return receiver.specs
 
 
 @log_call
-def get_type_template(receiver_name: str,
-                      mode: str
+def get_capture_template(receiver_name: str,
+                         receiver_mode: str
 ) -> dict[str, Any]:
     """Get the type template for a capture config for a receiver operating in a particular mode.
     
     Optionally, format the return as a command to create a capture config with the input tag.
     """
     receiver = get_receiver(receiver_name, 
-                            mode = mode)
+                            mode = receiver_mode)
     
-    return {k: v.__name__ for k, v in receiver.type_template.items()}
+    return receiver.capture_template.to_dict()

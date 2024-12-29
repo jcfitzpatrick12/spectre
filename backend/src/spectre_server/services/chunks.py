@@ -12,9 +12,9 @@ from os import walk
 
 from spectre_core.logging import log_call
 from spectre_core.chunks import Chunks
-from spectre_core.cfg import get_chunks_dir_path
-from spectre_core.file_handlers.configs import CaptureConfig
-from spectre_core.spectrograms.analytical import TestResults, validate_analytically
+from spectre_core.config import get_chunks_dir_path
+from spectre_core.capture_configs import CaptureConfig
+from spectre_core.spectrograms import validate_analytically
 
 
 @log_call
@@ -103,6 +103,8 @@ def delete_chunk_files(tag: str,
     
     deleted_file_names = []
     for chunk in chunks:
+        if not extensions:
+            extensions = chunk.extensions
         for extension in extensions:
             if chunk.has_file(extension):
                 chunk_file = chunk.get_file(extension)
@@ -147,6 +149,6 @@ def get_analytical_test_results(
             test_results = validate_analytically(spectrogram, 
                                                  capture_config,
                                                  absolute_tolerance)
-            results_per_chunk[chunk_file.file_name] = test_results.jsonify()
+            results_per_chunk[chunk_file.file_name] = test_results.to_dict()
 
     return results_per_chunk

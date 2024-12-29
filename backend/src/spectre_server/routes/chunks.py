@@ -15,11 +15,11 @@ chunks_blueprint = Blueprint("chunks", __name__)
 @chunks_blueprint.route("", methods=["GET"])
 @jsendify_response
 def get_chunk_files():
-    tags = request.args.getlist("tag")
+    tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
-    year = request.args.get("year", type = int)
-    month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    year       = request.args.get("year" , type = int)
+    month      = request.args.get("month", type = int)
+    day        = request.args.get("day"  , type = int)
     return chunks.get_chunk_files(tags,
                                   extensions, 
                                   year,
@@ -31,9 +31,9 @@ def get_chunk_files():
 @jsendify_response
 def get_chunk_files_for_tag(tag: str):
     extensions = request.args.getlist("extension")
-    year = request.args.get("year", type = int)
-    month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    year       = request.args.get("year" , type = int)
+    month      = request.args.get("month", type = int)
+    day        = request.args.get("day"  , type = int)
     return chunks.get_chunk_files_for_tag(tag,
                                           extensions, 
                                           year,
@@ -45,9 +45,9 @@ def get_chunk_files_for_tag(tag: str):
 @jsendify_response
 def delete_chunk_files(tag: str):
     extensions = request.args.getlist("extension")
-    year = request.args.get("year", type = int)
+    year  = request.args.get("year" , type = int)
     month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    day   = request.args.get("day"  , type = int)
     return chunks.delete_chunk_files(tag,
                                      extensions, 
                                      year,
@@ -66,9 +66,9 @@ def get_analytical_test_results(tag: str):
 @chunks_blueprint.route("/tags", methods=["GET"])
 @jsendify_response
 def get_tags():
-    year = request.args.get("year", type = int)
+    year  = request.args.get("year" , type = int)
     month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    day   = request.args.get("day"  , type = int)
     return chunks.get_tags(year,
                            month,
                            day)

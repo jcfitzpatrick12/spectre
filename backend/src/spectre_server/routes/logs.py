@@ -17,9 +17,9 @@ logs_blueprint = Blueprint("logs", __name__)
 def get_logs(
 ):
     process_type = request.args.get("process-type", type = str)
-    year = request.args.get("year", type = int)
-    month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    year         = request.args.get("year", type = int)
+    month        = request.args.get("month", type = int)
+    day          = request.args.get("day", type = int)
     return logs.get_logs(process_type, 
                          year,
                          month,
@@ -31,9 +31,9 @@ def get_logs(
 def delete_logs(
 ):
     process_type = request.args.get("process-type", type = str)
-    year = request.args.get("year", type = int)
-    month = request.args.get("month", type = int)
-    day = request.args.get("day", type = int)
+    year         = request.args.get("year", type = int)
+    month        = request.args.get("month", type = int)
+    day          = request.args.get("day", type = int)
     return logs.delete_logs(process_type, 
                             year,
                             month,

@@ -59,5 +59,5 @@ def get_log(pid: Optional[str] = None
 ) -> str:
     """Get the contents of a log according to the process ID"""
     log_handlers = LogHandlers()
-    log_handler = log_handlers.get_log_handler_from_pid(pid)
+    log_handler = log_handlers.get_from_pid(pid)
     return log_handler.read()
