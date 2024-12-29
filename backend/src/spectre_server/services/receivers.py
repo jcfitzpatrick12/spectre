@@ -28,7 +28,7 @@ def get_specs(receiver_name: str,
 ) -> dict[str, Any]:
     """For the input receiver, get the corresponding specifications"""
     receiver = get_receiver(receiver_name)
-    return receiver.specs.to_dict()
+    return receiver.specs
 
 
 @log_call
