@@ -45,7 +45,10 @@ def create_capture_config(tag: str
 @jsendify_response
 def delete_capture_config(tag: str
 ):
-    return capture_configs.delete_capture_config(tag)
+    json              = request.get_json()
+    force             = json.get("force")
+    return capture_configs.delete_capture_config(tag,
+                                                 force)
 
 
 @capture_configs_blueprint.route("/<string:tag>", methods=["PATCH"])

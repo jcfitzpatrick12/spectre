@@ -59,17 +59,6 @@ def get_capture_config(tag: str
     return capture_config.dict
 
 
-
-@log_call
-def delete_capture_config(tag: str,
-) -> str:
-    capture_config = CaptureConfig(tag)
-    capture_config.delete()
-    _LOGGER.info(f"File deleted: {capture_config.file_name}")
-    
-    return capture_config.file_name
-
-
 def _has_batches(tag: str
 ) -> bool:
     """Returns True if any files exist under the input tag."""
@@ -98,7 +87,6 @@ def update_capture_config(tag: str,
                           string_parameters: list[str],
                           force: bool = False,
 ) -> str: 
-    
     _caution_update(tag, 
                     force)
     
@@ -120,4 +108,33 @@ def update_capture_config(tag: str,
 
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.file_name}")
 
+    return capture_config.file_name
+
+
+def _caution_delete(tag: str,
+                    force: bool
+) -> None:
+    """Caution the user if batches exist under the input tag."""
+    if _has_batches(tag):
+        if force:
+            _LOGGER.warning(f"Batches exist under the tag {tag}, forcing deletion")
+            return
+        else:
+            error_message = (f"Batches exist under the tag {tag}. Deleting the corresponding capture config "
+                             f"may lead to undefined behaviour. "
+                             f"It is recommended to keep capture configs if batches exist under the corresponding tag. " 
+                             f"Override this functionality with --force. Aborting deletion")
+            _LOGGER.error(error_message)
+            raise FileExistsError(error_message)
+        
+        
+@log_call
+def delete_capture_config(tag: str,
+                          force: bool
+) -> str:
+    _caution_delete(tag, force)
+    capture_config = CaptureConfig(tag)
+    capture_config.delete()
+    _LOGGER.info(f"File deleted: {capture_config.file_name}")
+    
     return capture_config.file_name
