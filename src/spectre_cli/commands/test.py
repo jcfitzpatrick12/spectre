@@ -5,8 +5,8 @@
 import typer
 from spectre_core.spectrograms import TestResults
 
-from spectre_cli.commands import safe_request
-from spectre_cli.commands import CliHelp
+from ._cli_help import CliHelp
+from ._safe_request import safe_request
 
 test_app = typer.Typer(
     help = "Run tests."

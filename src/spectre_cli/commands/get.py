@@ -5,8 +5,8 @@
 import typer
 import yaml
 
-from spectre_cli.commands import safe_request
-from spectre_cli.commands import CliHelp
+from ._cli_help import CliHelp
+from ._safe_request import safe_request
 
 get_app = typer.Typer(
     help = "Display one or many resources."
