@@ -88,9 +88,12 @@ def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
-    _caution_irreversible(force)
+    json = {
+        "force": force
+    }
     jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
-                              "DELETE")
+                              "DELETE",
+                              json=json)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()
