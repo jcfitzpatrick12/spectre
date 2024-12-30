@@ -9,7 +9,7 @@ from typing import List, Optional, Any
 from os import listdir
 
 from spectre_core.config import get_configs_dir_path
-from spectre_core.chunks import Chunks
+from spectre_core.batches import Batches
 from spectre_core.receivers import get_receiver
 from spectre_core.logging import log_call
 from spectre_core.capture_configs import CaptureConfig, parse_string_parameters, make_parameters
@@ -70,23 +70,23 @@ def delete_capture_config(tag: str,
     return capture_config.file_name
 
 
-def _has_chunks(tag: str
+def _has_batches(tag: str
 ) -> bool:
     """Returns True if any files exist under the input tag."""
-    chunks = Chunks(tag)
-    return (len(chunks.chunk_list) > 0)
+    batches = Batches(tag)
+    return (len(batches.batch_list) > 0)
 
 
 def _caution_update(tag: str,
                     force: bool
 ) -> None:
-    """Caution the user if chunks exist under the input tag."""
-    if _has_chunks(tag):
+    """Caution the user if batches exist under the input tag."""
+    if _has_batches(tag):
         if force:
-            _LOGGER.warning(f"Chunks exist under the tag {tag}, forcing update")
+            _LOGGER.warning(f"Batches exist under the tag {tag}, forcing update")
             return
         else:
-            error_message = (f"Chunks exist under the tag {tag}. Any updates may lead to undefined behaviour. "
+            error_message = (f"Batches exist under the tag {tag}. Any updates may lead to undefined behaviour. "
                              f"It is recommended to create a new tag for any configuration file updates. " 
                              f"Override this functionality with --force. Aborting update")
             _LOGGER.error(error_message)
@@ -101,6 +101,8 @@ def update_capture_config(tag: str,
     
     _caution_update(tag, 
                     force)
+    
+    new_parameters = make_parameters( parse_string_parameters(string_parameters) )
 
     capture_config = CaptureConfig(tag)
     

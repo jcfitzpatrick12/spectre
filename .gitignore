@@ -1,4 +1,4 @@
-.spectre-data/chunks/*
+.spectre-data/batches/*
 .spectre-data/configs/fits_config_*
 
 # Byte-compiled / optimized / DLL files

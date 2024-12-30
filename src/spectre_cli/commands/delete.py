@@ -4,8 +4,8 @@
 
 import typer
 
-from spectre_cli.commands import safe_request
-from spectre_cli.commands import CliHelp
+from ._cli_help import CliHelp
+from ._safe_request import safe_request
 
 delete_app = typer.Typer(
     help = "Delete resources."
@@ -56,9 +56,9 @@ def logs(
 
 
 @delete_app.command(
-        help = ("Delete chunk files.")
+        help = ("Delete batch files.")
 )
-def chunk_files(
+def batch_files(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     extension: list[str] = typer.Option([], "--extension", "-e", help=CliHelp.EXTENSIONS),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
@@ -73,7 +73,7 @@ def chunk_files(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request(f"spectre-data/chunks/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/batches/{tag}", 
                               "DELETE",
                               params = params)
     file_names = jsend_dict["data"]
@@ -88,9 +88,12 @@ def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
 ) -> None:
-    _caution_irreversible(force)
+    json = {
+        "force": force
+    }
     jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
-                              "DELETE")
+                              "DELETE",
+                              json=json)
     file_name = jsend_dict["data"]
     _secho_deleted_file(file_name)
     raise typer.Exit()

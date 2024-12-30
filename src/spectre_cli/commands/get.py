@@ -5,8 +5,8 @@
 import typer
 import yaml
 
-from spectre_cli.commands import safe_request
-from spectre_cli.commands import CliHelp
+from ._cli_help import CliHelp
+from ._safe_request import safe_request
 
 get_app = typer.Typer(
     help = "Display one or many resources."
@@ -58,9 +58,9 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
 
 
 @get_app.command(
-        help = ("List existing chunk files.")
+        help = ("List existing batch files.")
 )
-def chunk_files(
+def batch_files(
     tag: list[str] = typer.Option([], "--tag", "-t", help=CliHelp.TAG),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
     month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
@@ -75,7 +75,7 @@ def chunk_files(
         "day": day,
         "extension": extensions
     }
-    jsend_dict = safe_request("spectre-data/chunks",
+    jsend_dict = safe_request("spectre-data/batches",
                               "GET",
                               params = params)
     file_names = jsend_dict["data"]
@@ -171,7 +171,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
 
 
 @get_app.command(
-        help = ("List tags with existing chunk files.")
+        help = ("List tags with existing batch files.")
 )
 def tags(
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
@@ -185,7 +185,7 @@ def tags(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request("spectre-data/chunks/tags",
+    jsend_dict = safe_request("spectre-data/batches/tags",
                               "GET",
                               params = params)
     tags = jsend_dict["data"]

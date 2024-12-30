@@ -17,7 +17,7 @@ def get_instrument_codes():
     return callisto.get_instrument_codes()
 
 
-@callisto_blueprint.route("/chunks", methods=["POST"])
+@callisto_blueprint.route("/batches", methods=["POST"])
 @jsendify_response
 def download():
     json = request.get_json()

@@ -5,6 +5,6 @@
 
 # start the capture session
 spectre start session --tag rsp1a-fixed-example --hours 8 --force-restart
-# deletes all remnant bin and hdr chunk files in all chunks subdirectories
-spectre delete chunk-files --tag rsp1a-fixed-example --extension bin --extension hdr --force
+# deletes all remnant bin and hdr batch files in all batches subdirectories
+spectre delete batch-files --tag rsp1a-fixed-example --extension bin --extension hdr --force
 

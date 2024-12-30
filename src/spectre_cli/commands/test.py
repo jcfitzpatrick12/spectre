@@ -5,8 +5,8 @@
 import typer
 from spectre_core.spectrograms import TestResults
 
-from spectre_cli.commands import safe_request
-from spectre_cli.commands import CliHelp
+from ._cli_help import CliHelp
+from ._safe_request import safe_request
 
 test_app = typer.Typer(
     help = "Run tests."
@@ -49,11 +49,11 @@ def analytical(
     params = {
         "absolute_tolerance": absolute_tolerance,
     }
-    jsend_dict = safe_request(f"spectre-data/chunks/{tag}/analytical-test-results",
+    jsend_dict = safe_request(f"spectre-data/batches/{tag}/analytical-test-results",
                               "GET",
                               params = params)
-    results_per_chunk = jsend_dict["data"]
-    for file_name, test_results in results_per_chunk.items():
+    results_per_batch = jsend_dict["data"]
+    for file_name, test_results in results_per_batch.items():
         test_results = TestResults(test_results["times_validated"],
                                    test_results["frequencies_validated"],
                                    test_results["spectrum_validated"])
