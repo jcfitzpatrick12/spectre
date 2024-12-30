@@ -33,7 +33,7 @@ class CliHelp:
         "and restart."
     )
     FORCE_UPDATE        = (
-        "Force configuration files to update, even if chunks exist under "
+        "Force configuration files to update, even if batches exist under "
         "the given tag."
     )
     PARAM               = "Configuration file parameters as key-value pairs."

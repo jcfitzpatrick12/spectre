@@ -56,9 +56,9 @@ def logs(
 
 
 @delete_app.command(
-        help = ("Delete chunk files.")
+        help = ("Delete batch files.")
 )
-def chunk_files(
+def batch_files(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     extension: list[str] = typer.Option([], "--extension", "-e", help=CliHelp.EXTENSIONS),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
@@ -73,7 +73,7 @@ def chunk_files(
         "month": month,
         "day": day
     }
-    jsend_dict = safe_request(f"spectre-data/chunks/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/batches/{tag}", 
                               "DELETE",
                               params = params)
     file_names = jsend_dict["data"]

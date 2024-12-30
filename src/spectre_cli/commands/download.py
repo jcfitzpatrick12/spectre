@@ -26,7 +26,7 @@ def callisto(
         "month": month,
         "day": day
     }
-    _ = safe_request("callisto/chunks",
+    _ = safe_request("callisto/batches",
                      "POST",
                      json = json)
     
