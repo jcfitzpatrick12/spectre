@@ -16,12 +16,11 @@ BASE_URL = f"http://127.0.0.1:5000"
 
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class CliHelp:
     RECEIVER_NAME       = "The name of the receiver."
     MODE                = "The operating mode for the receiver."
-    TAG                 = "The capture config tag."
+    TAG                 = "The tag identifier for the data."
     SECONDS             = "Seconds component of the session duration."
     MINUTES             = "Minutes component of the session duration."
     HOURS               = "Hours component of the session duration."
