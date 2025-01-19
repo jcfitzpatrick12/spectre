@@ -8,7 +8,6 @@ from flask import Blueprint, request
 from spectre_server.services import callisto
 from spectre_server.routes._format_responses import jsendify_response
 
-
 callisto_blueprint = Blueprint("callisto", __name__)
 
 @callisto_blueprint.route("/instrument-codes", methods=["GET"])

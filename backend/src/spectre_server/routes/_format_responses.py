@@ -90,8 +90,8 @@ def jsendify_response(
         except:
             user_pid = os.getpid()
             return make_jsend_response(JsendStatus.FAIL,
-                                        message = (f"An internal server error has occured. "
-                                                   f"Received the following error: \n{traceback.format_exc()}"
-                                                   f"Please use 'spectre get log --pid {user_pid}` for more details"),
+                                        data = (f"An internal server error has occured. "
+                                                f"Received the following error: \n{traceback.format_exc()}"
+                                                f"Please use 'spectre get log --pid {user_pid}` for more details"),
                                         code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper
