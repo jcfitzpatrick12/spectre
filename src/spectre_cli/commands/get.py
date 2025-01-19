@@ -61,7 +61,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
         help = ("List existing batch files.")
 )
 def batch_files(
-    tag: list[str] = typer.Option([], "--tag", "-t", help=CliHelp.TAG),
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
     month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
     day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
@@ -69,13 +69,12 @@ def batch_files(
 ) -> None:
     
     params = {
-        "tag": tag,
         "year": year,
         "month": month,
         "day": day,
         "extension": extensions
     }
-    jsend_dict = safe_request("spectre-data/batches",
+    jsend_dict = safe_request(f"spectre-data/batches/{tag}",
                               "GET",
                               params = params)
     file_names = jsend_dict["data"]
@@ -146,7 +145,7 @@ def specs(
 def capture_configs(
 ) -> None:
     
-    jsend_dict = safe_request(f"spectre-data/capture-configs",
+    jsend_dict = safe_request(f"spectre-data/configs",
                               "GET")
     file_names = jsend_dict["data"]
     
