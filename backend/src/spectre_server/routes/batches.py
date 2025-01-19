@@ -6,25 +6,10 @@
 from flask import Blueprint, request
 
 from spectre_server.services import batches
-from spectre_server.routes import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response
 
 
 batches_blueprint = Blueprint("batches", __name__)
-
-
-@batches_blueprint.route("", methods=["GET"])
-@jsendify_response
-def get_batch_files():
-    tags       = request.args.getlist("tag")
-    extensions = request.args.getlist("extension")
-    year       = request.args.get("year" , type = int)
-    month      = request.args.get("month", type = int)
-    day        = request.args.get("day"  , type = int)
-    return batches.get_batch_files(tags,
-                                  extensions, 
-                                  year,
-                                  month,
-                                  day)
 
 
 @batches_blueprint.route("/<string:tag>", methods=["GET"])
@@ -35,10 +20,10 @@ def get_batch_files_for_tag(tag: str):
     month      = request.args.get("month", type = int)
     day        = request.args.get("day"  , type = int)
     return batches.get_batch_files_for_tag(tag,
-                                          extensions, 
-                                          year,
-                                          month,
-                                          day)
+                                           extensions, 
+                                           year,
+                                           month,
+                                           day)
 
 
 @batches_blueprint.route("/<string:tag>", methods=["DELETE"])
@@ -59,8 +44,10 @@ def delete_batch_files(tag: str):
 @jsendify_response
 def get_analytical_test_results(tag: str):
     absolute_tolerance = request.args.get("absolute_tolerance", type = float)
+    if absolute_tolerance is None:
+        raise ValueError(f"The absolute tolerance must be specified. Got {absolute_tolerance}")
     return batches.get_analytical_test_results(tag,
-                                              absolute_tolerance)
+                                               absolute_tolerance)
 
 
 @batches_blueprint.route("/tags", methods=["GET"])
@@ -70,5 +57,5 @@ def get_tags():
     month = request.args.get("month", type = int)
     day   = request.args.get("day"  , type = int)
     return batches.get_tags(year,
-                           month,
-                           day)
+                            month,
+                            day)

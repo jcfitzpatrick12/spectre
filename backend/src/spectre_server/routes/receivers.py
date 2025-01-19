@@ -5,7 +5,7 @@
 from flask import Blueprint, request
 
 from spectre_server.services import receivers
-from spectre_server.routes import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response
 
 
 receivers_blueprint = Blueprint("receivers", __name__)
@@ -14,7 +14,7 @@ receivers_blueprint = Blueprint("receivers", __name__)
 @jsendify_response
 def get_receivers(
 ):
-    return receivers.list_all_receiver_names()
+    return receivers.get_registered_receivers()
 
 
 @receivers_blueprint.route("/<string:receiver_name>/modes", methods=["GET"])
@@ -35,7 +35,9 @@ def get_specs(receiver_name: str
 @jsendify_response
 def get_type_template(receiver_name: str
 ):
-    receiver_mode = request.args.get("receiver_mode")
+    receiver_mode = request.args.get("receiver_mode", type=str)
+    if receiver_mode is None:
+        raise ValueError(f"The receiver mode must be specified. Got {receiver_mode}")
     return receivers.get_capture_template(receiver_name, 
                                           receiver_mode)
 

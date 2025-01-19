@@ -2,26 +2,32 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Optional
-
 from spectre_core.logging import log_call
 from spectre_core import wgetting
 
 @log_call
 def get_instrument_codes(
 ) -> list[str]:
-    """Get all defined CALLISTO instrument codes"""
-    return wgetting.CALLISTO_INSTRUMENT_CODES
+    """Get all defined e-Callisto network station codes."""
+    return [code.value for code in wgetting.CallistoInstrumentCode]
 
 
 @log_call
 def download_callisto_data(
     instrument_code: str,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
+    year: int, 
+    month: int,
+    day: int,
 ) -> None:
-    wgetting.download_callisto_data(instrument_code, 
+    """Download and decompress e-Callisto FITS files, saving them as `spectre` batch files.
+
+    :param instrument_code: e-Callisto station instrument code.
+    :param year: Year of the observation.
+    :param month: Month of the observation.
+    :param day: Day of the observation.
+    """
+    instr_code = wgetting.CallistoInstrumentCode(instrument_code)
+    wgetting.download_callisto_data(instr_code, 
                                     year,
                                     month,
                                     day)
