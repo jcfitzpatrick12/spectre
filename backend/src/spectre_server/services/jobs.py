@@ -12,7 +12,7 @@ def capture(tag: str,
             minutes: int = 0, 
             hours: int = 0, 
             force_restart: bool = False
-) -> None:
+) -> str:
     """Start capturing data from an SDR in real time.
 
     :param tag: The capture config tag.
@@ -21,6 +21,7 @@ def capture(tag: str,
     :param hours: The hours component of the total runtime, defaults to 0
     :param force_restart: If any worker encounters an error at runtime, force all
     the workers to restart their processes. Defaults to False
+    :return: A string indicating the job has completed.
     """
     total_runtime = jobs.calculate_total_runtime(seconds, 
                                                  minutes, 
@@ -30,6 +31,7 @@ def capture(tag: str,
     jobs.monitor_workers([capture_worker], 
                          total_runtime, 
                          force_restart)
+    return "Capture complete."
                        
 
 @log_call
@@ -38,7 +40,7 @@ def session(tag: str,
             minutes: int = 0, 
             hours: int = 0, 
             force_restart: bool = False
-) -> None:
+) -> str:
     """Start a `spectre` session.
     
     Start capturing data from an SDR, and post-process the data in real time into spectrograms.
@@ -59,4 +61,5 @@ def session(tag: str,
     jobs.monitor_workers([capture_worker, post_process_worker],
                          total_runtime,
                          force_restart)
+    return "Session complete."
     
