@@ -5,7 +5,7 @@
 from flask import Blueprint, request
 
 from spectre_server.services import capture_configs
-from spectre_server.routes import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response
 
 
 capture_configs_blueprint = Blueprint("capture-configs", __name__)

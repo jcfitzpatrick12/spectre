@@ -6,7 +6,7 @@
 from flask import Blueprint, request
 
 from spectre_server.services import logs
-from spectre_server.routes import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response
 
 
 logs_blueprint = Blueprint("logs", __name__)
