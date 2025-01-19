@@ -91,7 +91,7 @@ def capture_config(
     json = {
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "DELETE",
                               json=json)
     file_name = jsend_dict["data"]

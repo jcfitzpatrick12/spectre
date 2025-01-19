@@ -160,7 +160,7 @@ def capture_configs(
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}",
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "GET")
     capture_config = jsend_dict["data"]
 

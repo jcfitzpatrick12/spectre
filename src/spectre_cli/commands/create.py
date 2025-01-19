@@ -29,7 +29,7 @@ def capture_config(
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "PUT", 
                               json = json)
     file_name = jsend_dict["data"]
