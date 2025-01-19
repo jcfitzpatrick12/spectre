@@ -13,7 +13,7 @@ def capture(tag: str,
             hours: int = 0, 
             force_restart: bool = False
 ) -> None:
-    """Start capturing data from an SDR.
+    """Start capturing data from an SDR in real time.
 
     :param tag: The capture config tag.
     :param seconds: The seconds component of the total runtime, defaults to 0
