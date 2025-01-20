@@ -6,6 +6,15 @@
 from spectre_core.logging import log_call
 from spectre_core import jobs
 
+def _calculate_total_runtime(seconds: int = 0, 
+                             minutes: int = 0, 
+                             hours: int = 0
+) -> float:
+    total_duration = seconds + (minutes * 60) + (hours * 3600) # [s]
+    if total_duration <= 0:
+        raise ValueError(f"Total duration must be strictly positive")
+    return total_duration
+
 @log_call
 def capture(tag: str, 
             seconds: int = 0, 
@@ -23,14 +32,11 @@ def capture(tag: str,
     the workers to restart their processes. Defaults to False
     :return: A string indicating the job has completed.
     """
-    total_runtime = jobs.calculate_total_runtime(seconds, 
-                                                 minutes, 
-                                                 hours) 
-    capture_worker = jobs.capture(tag)
-    
-    jobs.monitor_workers([capture_worker], 
-                         total_runtime, 
-                         force_restart)
+    workers = [ jobs.do_capture(tag) ]
+    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
+    jobs.start_job(
+        workers, total_runtime, force_restart
+    )
     return "Capture complete."
                        
 
@@ -52,14 +58,10 @@ def session(tag: str,
     :param force_restart: If any worker encounters an error at runtime, force all
     the workers to restart their processes. Defaults to False
     """
-    total_runtime = jobs.calculate_total_runtime(seconds, 
-                                                 minutes, 
-                                                 hours)
-
-    capture_worker, post_process_worker = jobs.session(tag)
-
-    jobs.monitor_workers([capture_worker, post_process_worker],
-                         total_runtime,
-                         force_restart)
+    workers = [ jobs.do_post_processing(tag), jobs.do_capture(tag) ]
+    total_runtime = _calculate_total_runtime(seconds, minutes, hours)
+    jobs.start_job(
+        workers, total_runtime, force_restart
+    )
     return "Session complete."
     
