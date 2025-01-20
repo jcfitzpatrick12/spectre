@@ -78,7 +78,7 @@ def jsendify_response(
 ) -> Callable[P, Response]:
     """Wrap route calls for simplified responses.
     
-    Returns `jsend` formatted responses.
+    Returns `Jsend` formatted responses.
     """
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
