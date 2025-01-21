@@ -13,7 +13,7 @@ update_app = typer.Typer(
 )
 
 @update_app.command(
-        help = ("Update a capture config.")
+        help = "Update capture config parameters."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),

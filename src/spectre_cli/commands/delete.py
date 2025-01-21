@@ -11,16 +11,22 @@ delete_app = typer.Typer(
     help = "Delete resources."
 )
 
-def _secho_deleted_files(file_names: list[str]) -> None:    
+def _secho_deleted_files(
+    file_names: list[str]
+) -> None:    
     for file_name in file_names:
         typer.secho(f"Deleted '{file_name}'", fg="yellow")
 
 
-def _secho_deleted_file(file_name: str) -> None:
+def _secho_deleted_file(
+    file_name: str
+) -> None:
     typer.secho(f"Deleted '{file_name}'", fg="yellow")
 
 
-def _caution_irreversible(force: bool) -> None:
+def _caution_irreversible(
+    force: bool
+) -> None:
     if force:
         return
     typer.secho("This action is irreversible. Do you wish to continue? [y/n]", fg="red", bold=True)
@@ -31,7 +37,7 @@ def _caution_irreversible(force: bool) -> None:
 
 
 @delete_app.command(
-        help = ("Delete log files.")
+        help = "Delete log files."
 )
 def logs(
     process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
@@ -56,7 +62,7 @@ def logs(
 
 
 @delete_app.command(
-        help = ("Delete batch files.")
+        help = "Delete batch files."
 )
 def batch_files(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
@@ -82,7 +88,7 @@ def batch_files(
 
 
 @delete_app.command(
-        help = ("Delete a capture config.")
+        help = "Delete a capture config."
 )
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),

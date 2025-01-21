@@ -12,15 +12,17 @@ get_app = typer.Typer(
     help = "Display one or many resources."
 )
 
-def pprint_dict(d: dict):
+def pprint_dict(
+    d: dict
+) -> None:
     print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
 
+
 @get_app.command(
-        help = ("List defined e-Callisto instrument codes.")
+        help = "List supported e-Callisto instrument codes."
 )
 def callisto_instrument_codes(
 ) -> None:
-    
     jsend_dict = safe_request("callisto/instrument-codes",
                               "GET")
     callisto_instrument_codes = jsend_dict["data"]
@@ -32,14 +34,13 @@ def callisto_instrument_codes(
 
 
 @get_app.command(
-        help = ("List existing log files.")
+        help = "List existing log files."
 )
 def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
          year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
          month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
          day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY)
 ) -> None:
-    
     params = {
         "process-type": process_type,
         "year": year,
@@ -58,7 +59,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
 
 
 @get_app.command(
-        help = ("List existing batch files.")
+        help = "List existing batch files."
 )
 def batch_files(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
@@ -86,7 +87,7 @@ def batch_files(
 
 
 @get_app.command(
-        help = ("List defined receivers.")
+        help = "List supported receivers."
 )
 def receivers(
 ) -> None:
@@ -102,7 +103,7 @@ def receivers(
 
 
 @get_app.command(
-        help = ("List defined receiver modes.")
+        help = ("List the supported operating modes for a receiver.")
 )
 def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
@@ -119,7 +120,7 @@ def modes(
 
 
 @get_app.command(
-        help = ("Print receiver hardware specifications.")
+        help = "Print receiver hardware specifications."
 )
 def specs(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
@@ -140,7 +141,7 @@ def specs(
 
 
 @get_app.command(
-        help = ("List defined capture configs.")
+        help = "List existing capture configs."
 )
 def capture_configs(
 ) -> None:
@@ -156,7 +157,7 @@ def capture_configs(
 
 
 @get_app.command(
-        help = ("Print capture config file contents.")
+        help = "Print capture config file contents."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
 ) -> None:
@@ -170,7 +171,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
 
 
 @get_app.command(
-        help = ("List tags with existing batch files.")
+        help = "List tags with existing batch files."
 )
 def tags(
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
@@ -196,7 +197,7 @@ def tags(
 
     
 @get_app.command(
-        help = ("Print log file contents.")
+        help = "Print log file contents."
 )
 def log(
     pid: str = typer.Option(..., "--pid", help=CliHelp.PID),
@@ -211,7 +212,7 @@ def log(
 
 
 @get_app.command(
-        help = ("Print a capture template.")
+        help = "Print a capture template."
 )
 def capture_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
