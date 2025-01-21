@@ -12,7 +12,7 @@ start_app = typer.Typer(
 )
 
 @start_app.command(
-        help = "Start capturing data from an SDR in real time."
+        help = "Capture data from an SDR in real time."
 )
 def capture(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
@@ -35,7 +35,7 @@ def capture(
     raise typer.Exit()
 
 @start_app.command(
-        help = "Start capturing data from an SDR, and post-process the data in real time into spectrograms."
+        help = "Capture data from an SDR and post-process it into spectrograms in real time."
 )
 def session(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
