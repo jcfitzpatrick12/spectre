@@ -13,7 +13,7 @@ update_app = typer.Typer(
 )
 
 @update_app.command(
-        help = ("Update a capture config.")
+        help = "Update capture config parameters."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
                    params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
@@ -24,7 +24,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}",
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "PATCH",
                               json = json)
     file_name = jsend_dict["data"]

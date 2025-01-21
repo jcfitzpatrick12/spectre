@@ -12,13 +12,14 @@ start_app = typer.Typer(
 )
 
 @start_app.command(
-        help = ("Start a capture.")
+        help = "Capture data from an SDR in real time."
 )
-def capture(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-            seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
-            minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
-            hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
-            force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
+def capture(
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+    seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
+    minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
+    hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
+    force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
 ) -> None:
     json = {
         "tag": tag,
@@ -34,13 +35,14 @@ def capture(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     raise typer.Exit()
 
 @start_app.command(
-        help = ("Start a session.")
+        help = "Capture data from an SDR and post-process it into spectrograms in real time."
 )
-def session(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-            seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
-            minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
-            hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
-            force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
+def session(
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+    seconds: int = typer.Option(0, "--seconds", help=CliHelp.SECONDS),
+    minutes: int = typer.Option(0, "--minutes", help=CliHelp.MINUTES),
+    hours: int = typer.Option(0, "--hours", help=CliHelp.HOURS),
+    force_restart: bool = typer.Option(False, "--force-restart", help=CliHelp.FORCE_RESTART)
 ) -> None:
     json = {
         "tag": tag,

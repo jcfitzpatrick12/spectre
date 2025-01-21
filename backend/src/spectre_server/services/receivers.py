@@ -4,42 +4,55 @@
 
 from typing import Any
 
-from spectre_core.logging import log_call
-from spectre_core.receivers import get_receiver
-from spectre_core.receivers import list_all_receiver_names
+from spectre_core.logs import log_call
+from spectre_core.receivers import get_receiver, get_registered_receivers, ReceiverName
 
 @log_call
 def get_receiver_names(
 ) -> list[str]:
-    """Get all defined receiver names"""
-    return list_all_receiver_names()
+    """List the names of all registered receiver supported by `spectre`."""
+    return get_registered_receivers()
     
 
 @log_call
-def get_modes(receiver_name: str,
+def get_modes(
+    receiver_name: str,
 ) -> list[str]:
-    """For the input receiver, get all the defined modes"""
-    receiver = get_receiver(receiver_name)
+    """Get the defined operating modes for the input receiver.
+
+    :param receiver_name: The name of the receiver.
+    :return: All the defined operating modes for the receiver.
+    """
+    receiver = get_receiver( ReceiverName(receiver_name) )
     return receiver.modes
 
 
 @log_call
-def get_specs(receiver_name: str,
-) -> dict[str, Any]:
-    """For the input receiver, get the corresponding specifications"""
-    receiver = get_receiver(receiver_name)
-    return receiver.specs
+def get_specs(
+    receiver_name: str,
+) -> dict[str, float|int|list[float|int]]:
+    """Get the hardware specifications for the input receiver.
+
+    :param receiver_name: The name of the receiver.
+    :return: The hardware specifications for the receiver.
+    """
+    receiver = get_receiver( ReceiverName(receiver_name) )
+    return {k.value: v for k,v in receiver.specs.items()}
 
 
 @log_call
-def get_capture_template(receiver_name: str,
-                         receiver_mode: str
+def get_capture_template(
+    receiver_name: str,
+    receiver_mode: str
 ) -> dict[str, Any]:
-    """Get the type template for a capture config for a receiver operating in a particular mode.
-    
-    Optionally, format the return as a command to create a capture config with the input tag.
+    """Get the capture template for a receiver in a particular operating mode.
+
+    :param receiver_name: The name of the receiver.
+    :param receiver_mode: The operating mode for the receiver.
+    :return: The capture template converted to a serialisable dictionary.
     """
-    receiver = get_receiver(receiver_name, 
+    name = ReceiverName(receiver_name)
+    receiver = get_receiver(name, 
                             mode = receiver_mode)
     
     return receiver.capture_template.to_dict()

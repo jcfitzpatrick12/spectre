@@ -12,7 +12,7 @@ download_app = typer.Typer(
 )
 
 @download_app.command(
-        help = ("Download e-Callisto network spectrograms.")
+        help = "Download e-Callisto network spectrogram data."
 )
 def callisto(
     instrument_code: str = typer.Option(..., "--instrument-code", "-i", help=CliHelp.INSTRUMENT_CODE),
@@ -30,5 +30,5 @@ def callisto(
                      "POST",
                      json = json)
     
-    typer.secho(f"Successfully retrieved files for instrument code {instrument_code}")
+    typer.secho(f"Successfully retrieved files for the instrument code {instrument_code}")
     raise typer.Exit()

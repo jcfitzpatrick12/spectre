@@ -4,22 +4,19 @@
 
 import requests
 import os
-from typing import Callable
+from typing import Callable, Any, ParamSpec
 from functools import wraps
 from typing import Optional
 
 import typer
 
-# Base URL of the locally running spectre-server, specifying the loopback IP and port 5000
-_BASE_URL = f"http://127.0.0.1:5000"
-
-def _catch_response_errors(func: Callable):
-    """Standardised error handling on making a request.
-    
-    Assumes jsend formatted responses.
-    """
+P = ParamSpec('P')
+def _catch_response_errors(
+    func: Callable[P, Any]
+) -> Callable[P, dict[str, Any]]:
+    """Standardise error handling on making a request, assuming a `Jsend` compliant response."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
         try:
             jsend_dict = func(*args, **kwargs)
 
@@ -51,20 +48,28 @@ def _catch_response_errors(func: Callable):
 
 
 @_catch_response_errors
-def safe_request(route_url: str, 
-                 method: str,
-                 json: Optional[dict] = None,
-                 params: Optional[dict] = None
+def safe_request(
+    route_url: str, 
+    method: str,
+    json: Optional[dict] = None,
+    params: Optional[dict] = None
 ) -> dict:
-    """Request a response at the input route URL.
-    
-    Safety is enforce by the accompanying decorator.
+    """Send a request to the specified URL and return the JSON response.
+
+    Handles requests to the `spectre-server` running locally on the loopback IP (127.0.0.1:5000).
+
+    :param route_url: Endpoint path to append to the base URL.
+    :param method: HTTP method to use for the request (e.g., 'GET', 'POST').
+    :param json: Optional JSON payload for the request body.
+    :param params: Optional query parameters for the request.
+    :return: Parsed JSON response as a dictionary.
     """
 
     if route_url.startswith("/"):
         route_url.lstrip("/")
-    
-    full_url = os.path.join(_BASE_URL, route_url)
+        
+    # Use the base URL of the locally running spectre-server, specifying the loopback IP and port 5000
+    full_url = os.path.join("http://127.0.0.1:5000", route_url)
 
     response = requests.request(method,
                                 full_url,

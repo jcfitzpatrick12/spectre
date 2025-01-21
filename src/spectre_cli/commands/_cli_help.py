@@ -23,16 +23,16 @@ class CliHelp:
         "Force configuration files to update, even if batches exist under "
         "the given tag."
     )
-    PARAM               = "Configuration file parameters as key-value pairs."
+    PARAM               = "Capture config parameters as key-value pairs."
     PROCESS_TYPE        = "Specifies one of 'worker' or 'user'."
     EXTENSIONS          = "The file extension."
     FORCE               = "Forcibly ignore user warnings."
     PID                 = "The process ID."
-    INSTRUMENT_CODE     = "The case-sensitive CALLISTO instrument code."
+    INSTRUMENT_CODE     = "The case-sensitive e-Callisto station instrument codes."
     ABSOLUTE_TOLERANCE  = (
         "The absolute tolerance to which we consider 'agreement' with the "
         "analytical solution for each spectral component. See the 'atol' "
         "keyword argument for np.isclose."
     )
     PER_SPECTRUM        = "Show validated status per spectrum."
-    PARAMETER_NAME      = "The name of the parameter"
+    PARAMETER_NAME      = "The name of the parameter."

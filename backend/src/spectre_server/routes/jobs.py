@@ -5,7 +5,7 @@
 from flask import Blueprint, request
 
 from spectre_server.services import jobs
-from spectre_server.routes import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response
 
 
 jobs_blueprint = Blueprint("jobs", __name__)
@@ -14,7 +14,7 @@ jobs_blueprint = Blueprint("jobs", __name__)
 @jobs_blueprint.route("/capture", methods=["POST"])
 @jsendify_response
 def capture(
-):
+) -> str:
     json = request.get_json()
     tag           = json.get("tag")
     seconds       = json.get("seconds")
@@ -31,7 +31,7 @@ def capture(
 @jobs_blueprint.route("/session", methods=["POST"])
 @jsendify_response
 def session(
-):
+) -> str:
     json          = request.get_json()
     tag           = json.get("tag")
     seconds       = json.get("seconds")

@@ -13,7 +13,7 @@ create_app = typer.Typer(
 )
 
 @create_app.command(
-        help = ("Create a capture config.")
+        help = "Create a capture config."
 )
 def capture_config(
     tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
@@ -22,18 +22,17 @@ def capture_config(
     params: List[str] = typer.Option([], "--param", "-p", help=CliHelp.PARAM, metavar="KEY=VALUE"),
     force: bool = typer.Option(False, "--force", help = CliHelp.FORCE, is_flag=True)
 ) -> None:
-    
     json = {
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "PUT", 
-                              json = json)
+                              json=json)
     file_name = jsend_dict["data"]
-    typer.secho(f"Capture config created successfully with tag '{tag}': {file_name}")
+    typer.secho(f"Created '{file_name}'")
     raise typer.Exit()
         
 

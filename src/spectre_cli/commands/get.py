@@ -12,15 +12,17 @@ get_app = typer.Typer(
     help = "Display one or many resources."
 )
 
-def pprint_dict(d: dict):
+def pprint_dict(
+    d: dict
+) -> None:
     print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
 
+
 @get_app.command(
-        help = ("List defined e-Callisto instrument codes.")
+        help = "List supported e-Callisto instrument codes."
 )
 def callisto_instrument_codes(
 ) -> None:
-    
     jsend_dict = safe_request("callisto/instrument-codes",
                               "GET")
     callisto_instrument_codes = jsend_dict["data"]
@@ -32,14 +34,13 @@ def callisto_instrument_codes(
 
 
 @get_app.command(
-        help = ("List existing log files.")
+        help = "List existing log files."
 )
 def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
          year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
          month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
          day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY)
 ) -> None:
-    
     params = {
         "process-type": process_type,
         "year": year,
@@ -58,10 +59,10 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
 
 
 @get_app.command(
-        help = ("List existing batch files.")
+        help = "List existing batch files."
 )
 def batch_files(
-    tag: list[str] = typer.Option([], "--tag", "-t", help=CliHelp.TAG),
+    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
     month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
     day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
@@ -69,13 +70,12 @@ def batch_files(
 ) -> None:
     
     params = {
-        "tag": tag,
         "year": year,
         "month": month,
         "day": day,
         "extension": extensions
     }
-    jsend_dict = safe_request("spectre-data/batches",
+    jsend_dict = safe_request(f"spectre-data/batches/{tag}",
                               "GET",
                               params = params)
     file_names = jsend_dict["data"]
@@ -87,7 +87,7 @@ def batch_files(
 
 
 @get_app.command(
-        help = ("List defined receivers.")
+        help = "List supported receivers."
 )
 def receivers(
 ) -> None:
@@ -103,7 +103,7 @@ def receivers(
 
 
 @get_app.command(
-        help = ("List defined receiver modes.")
+        help = ("List the supported operating modes for a receiver.")
 )
 def modes(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
@@ -120,7 +120,7 @@ def modes(
 
 
 @get_app.command(
-        help = ("Print receiver hardware specifications.")
+        help = "Print receiver hardware specifications."
 )
 def specs(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
@@ -141,12 +141,12 @@ def specs(
 
 
 @get_app.command(
-        help = ("List defined capture configs.")
+        help = "List existing capture configs."
 )
 def capture_configs(
 ) -> None:
     
-    jsend_dict = safe_request(f"spectre-data/capture-configs",
+    jsend_dict = safe_request(f"spectre-data/configs",
                               "GET")
     file_names = jsend_dict["data"]
     
@@ -157,11 +157,11 @@ def capture_configs(
 
 
 @get_app.command(
-        help = ("Print capture config file contents.")
+        help = "Print capture config file contents."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/capture-configs/{tag}",
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "GET")
     capture_config = jsend_dict["data"]
 
@@ -171,7 +171,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
 
 
 @get_app.command(
-        help = ("List tags with existing batch files.")
+        help = "List tags with existing batch files."
 )
 def tags(
     year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
@@ -197,7 +197,7 @@ def tags(
 
     
 @get_app.command(
-        help = ("Print log file contents.")
+        help = "Print log file contents."
 )
 def log(
     pid: str = typer.Option(..., "--pid", help=CliHelp.PID),
@@ -212,7 +212,7 @@ def log(
 
 
 @get_app.command(
-        help = ("Print a capture template.")
+        help = "Print a capture template."
 )
 def capture_template(
     receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),

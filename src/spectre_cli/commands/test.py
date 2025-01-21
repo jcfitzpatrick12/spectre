@@ -12,9 +12,10 @@ test_app = typer.Typer(
     help = "Run tests."
 )
 
-def _pretty_print_test_results(file_name: str, 
-                               test_results: TestResults, 
-                               per_spectrum: bool
+def _pretty_print_test_results(
+    file_name: str, 
+    test_results: TestResults, 
+    per_spectrum: bool
 ) -> None:
     """Print test results with appropriate formatting and colours."""
     
