@@ -12,7 +12,7 @@
 - 💾 Live recording of radio spectrograms and I/Q data  
 - ⚙️ Flexible, configurable data capture  
 - 🐳 Containerised backend  
-- 🔧 Developer-friendly, extensible digital signal processing framework  
+- 🔧 Developer-friendly and extensible.
 
 
 
