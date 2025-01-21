@@ -7,7 +7,7 @@ _LOGGER = getLogger(__name__)
 
 from typing import Optional
 
-from spectre_core.logging import Logs, ProcessType, log_call
+from spectre_core.logs import Logs, ProcessType, log_call
 
 @log_call
 def delete_logs(

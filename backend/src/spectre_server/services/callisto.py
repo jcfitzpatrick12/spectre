@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from spectre_core.logging import log_call
+from spectre_core.logs import log_call
 from spectre_core import wgetting
 
 @log_call

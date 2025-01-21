@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from spectre_core.logging import log_call
+from spectre_core.logs import log_call
 from spectre_core import jobs
 
 def _calculate_total_runtime(seconds: int = 0, 

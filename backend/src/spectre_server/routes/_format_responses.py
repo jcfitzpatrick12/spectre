@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Optional, Callable, ParamSpec, TypeVar
+from typing import Optional, Callable, ParamSpec, TypeVar, Any
 from functools import wraps
 import os
 import traceback
@@ -71,14 +71,16 @@ def make_jsend_response(
 
 
 P = ParamSpec("P")
-T = TypeVar("T", bound=str|dict[str, object])
+# Loosen type hinting to support any JSON-compatible data structures.
+T = TypeVar("T", bound=None|str|list[Any]|dict[str, Any])
 
 def jsendify_response(
     func: Callable[P, T]
 ) -> Callable[P, Response]:
     """Wrap route calls for simplified responses.
     
-    Returns `Jsend` formatted responses.
+    :func param: A callable with JSON serialisable return.
+    :return: The input function wrapped such that it returns a `JSend` compliant response.
     """
     @wraps(func)  # Preserves the original function's name and metadata
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
@@ -87,11 +89,11 @@ def jsendify_response(
             return make_jsend_response(JsendStatus.SUCCESS,
                                        data = data,
                                        code = HTTPStatus.OK)
-        except:
+        except: # simplistic treatment, any exceptions are interpreted as JSend errors.
             user_pid = os.getpid()
-            return make_jsend_response(JsendStatus.FAIL,
-                                        data = (f"An internal server error has occured. "
-                                                f"Received the following error: \n{traceback.format_exc()}"
-                                                f"Please use 'spectre get log --pid {user_pid}` for more details"),
+            return make_jsend_response(JsendStatus.ERROR,
+                                        message = (f"An internal server error has occured. "
+                                                   f"Received the following error: \n{traceback.format_exc()}"
+                                                   f"Please use 'spectre get log --pid {user_pid}` for more details"),
                                         code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper

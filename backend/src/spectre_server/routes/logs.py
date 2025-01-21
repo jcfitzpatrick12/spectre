@@ -15,7 +15,7 @@ logs_blueprint = Blueprint("logs", __name__)
 @logs_blueprint.route("", methods=["GET"])
 @jsendify_response
 def get_logs(
-):
+) -> list[str]:
     process_type = request.args.get("process-type", type = str)
     year         = request.args.get("year", type = int)
     month        = request.args.get("month", type = int)
@@ -29,7 +29,7 @@ def get_logs(
 @logs_blueprint.route("", methods=["DELETE"])
 @jsendify_response
 def delete_logs(
-):
+) -> list[str]:
     process_type = request.args.get("process-type", type = str)
     year         = request.args.get("year", type = int)
     month        = request.args.get("month", type = int)
@@ -42,5 +42,5 @@ def delete_logs(
 @logs_blueprint.route("/<string:pid>", methods=["GET"])
 @jsendify_response
 def get_log(pid: str
-):
+) -> str:
     return logs.get_log(pid=pid)

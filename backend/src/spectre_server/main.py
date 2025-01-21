@@ -1,6 +1,6 @@
 from flask import Flask
-from spectre_core.logging import configure_root_logger
-from spectre_core.logging import ProcessType
+from spectre_core.logs import configure_root_logger
+from spectre_core.logs import ProcessType
 
 from spectre_server.routes.batches import batches_blueprint
 from spectre_server.routes.capture_configs import capture_configs_blueprint

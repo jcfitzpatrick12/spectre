@@ -11,7 +11,7 @@ from os import listdir
 from spectre_core.config import get_configs_dir_path
 from spectre_core.batches import Batches, get_batch_cls_from_tag
 from spectre_core.receivers import get_receiver, ReceiverName
-from spectre_core.logging import log_call
+from spectre_core.logs import log_call
 from spectre_core.capture_configs import CaptureConfig, parse_string_parameters, make_parameters
 
 

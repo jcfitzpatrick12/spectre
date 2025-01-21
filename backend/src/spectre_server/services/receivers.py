@@ -4,7 +4,7 @@
 
 from typing import Any
 
-from spectre_core.logging import log_call
+from spectre_core.logs import log_call
 from spectre_core.receivers import get_receiver, get_registered_receivers, ReceiverName
 
 @log_call

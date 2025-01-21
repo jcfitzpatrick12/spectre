@@ -10,7 +10,7 @@ from typing import Optional
 from os.path import splitext
 from os import walk
 
-from spectre_core.logging import log_call
+from spectre_core.logs import log_call
 from spectre_core.batches import Batches, BatchKey, get_batch_cls_from_tag
 from spectre_core.config import get_batches_dir_path
 from spectre_core.capture_configs import CaptureConfig
