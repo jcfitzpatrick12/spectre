@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-cli"
-version = "0.0.0"
+version = "0.0.3"
 maintainers = [
   { name="Jimmy Fitzpatrick", email="jcfitzpatrick12@gmail.com" },
 ]
@@ -23,4 +23,4 @@ dependencies = [
 
 # Define the entry point for the CLI application
 [project.scripts]
-spectre = "spectre_cli.main:app"
+spectre = "spectre_cli.__main__:app"
