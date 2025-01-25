@@ -6,7 +6,7 @@ file_fix() {
     mv "/usr/local/lib/$(uname -m)-linux-gnu/"* "/usr/lib/$(uname -m)-linux-gnu/"
 }
 
-build_repo() {
+build_from_repo() {
     local repo_url=$1
     local branch_or_tag=$2
     local repo_name=$(basename "$repo_url" .git)

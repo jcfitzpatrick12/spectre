@@ -126,9 +126,18 @@ COPY --from=gr_spectre /usr/lib /usr/lib
 
 
 # # Copy in the required spectre-server Python files
-COPY --from=spectre_server /tmp/.venv/lib/python3.10/site-packages /usr/local/lib/python3.1/dist-packages
+COPY --from=spectre_server /tmp/.venv/lib/python3.10/site-packages /usr/local/lib/python3.10/dist-packages
 
-CMD ["python3.11", "-m", "spectre_server"]
+WORKDIR /app
+
+# Copy in the final script which runs on start up
+COPY ./scripts/start.sh start.sh
+
+# Make it executable
+RUN chmod +x start.sh
+
+# Default executable for the container
+CMD ["./start.sh"]
 
 
 
