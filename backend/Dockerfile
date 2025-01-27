@@ -5,7 +5,8 @@
 # --------------------------------- # 
 # Build the base stage
 # --------------------------------- # 
-FROM ubuntu:22.04 AS base
+# Use an Ubuntu image (exact version of 22.04)
+FROM ubuntu@sha256:3d1556a8a18cf5307b121e0a98e93f1ddf1f3f8e092f1fddfd941254785b95d7 AS base
 
 # Stop interactive dialogue (only for the duration of the build)
 ARG DEBIAN_FRONTEND=noninteractive
@@ -14,12 +15,14 @@ ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /tmp
 
 # Update and upgrade the package index.
+# Additionally, install dependencies which are both required for all
+# the build stages, and will be present in the final runtime image.
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y \
-    gnuradio \
-    libudev-dev \
-    libusb-1.0-0 
+    gnuradio=3.10.1.1-2 \
+    libudev-dev=249.11-0ubuntu3.12 \
+    libusb-1.0-0=2:1.0.25-1ubuntu2
 
 # --------------------------------- # 
 # Installing GNU Radio OOT modules
@@ -28,11 +31,11 @@ FROM base AS gnuradio_oot_modules
 
 # Install OOT module build dependencies.
 RUN apt-get install -y \
-    sudo \
-    git \
-    cmake \
-    wget \
-    expect
+    sudo=1.9.9-1ubuntu2.4 \
+    git=1:2.34.1-1ubuntu1.12 \
+    cmake=3.22.1-1ubuntu1.22.04.2 \
+    wget=1.21.2-2ubuntu1.1 \
+    expect=5.45.4-2build1
 
 # Create /etc/udev directories manually, as they are not present in the base image.
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
@@ -43,7 +46,7 @@ RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
     ./rsp_api.sh
 
-# Install all the OOT modules
+# Install all the OOT modules.
 COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/fventuri/gr-sdrplay3.git message-passing && \
@@ -57,7 +60,7 @@ FROM base AS spectre_server
 
 # install dependencies required to install the rsp api in the image
 RUN apt-get install -y \ 
-    python3-pip
+    python3-pip=22.0.2+dfsg-1ubuntu0.5
 
 # Add the Python package source code
 ADD src src
@@ -77,9 +80,6 @@ FROM base AS final
 # Define the spectre data directory path as an environment variable inside the container
 ENV SPECTRE_DATA_DIR_PATH="/app/spectre/.spectre-data/"
 
-# Copy in the sdrplay api service executable.
-COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrplay_api/sdrplay_apiService
-
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /etc/lib/rules.d
@@ -90,6 +90,9 @@ COPY --from=gnuradio_oot_modules /usr/local/include /usr/local/include
 COPY --from=gnuradio_oot_modules /usr/include /usr/include
 COPY --from=gnuradio_oot_modules /usr/lib /usr/lib
 
+# Copy in the sdrplay api service executable.
+COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrplay_api/sdrplay_apiService
+
 # Copy in the required files to start the spectre server
 COPY --from=spectre_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
@@ -97,7 +100,7 @@ COPY --from=spectre_server /usr/local/lib/python3.10/dist-packages /usr/local/li
 WORKDIR /app
 
 # Copy the script and set permissions in one step
-COPY --chmod=0755 ./scripts/start.sh start.sh
+COPY --chmod=0755 ./scripts/start.sh ./start.sh
 
 # Default executable for the container
 CMD ["/app/start.sh"]
