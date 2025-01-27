@@ -1,12 +1,9 @@
 #!/bin/bash
 
-
 # Private: Fix an apparent bug installing OOT modules on ubuntu.
 file_fix() {
     mv "/usr/local/lib/$(uname -m)-linux-gnu/"* "/usr/lib/$(uname -m)-linux-gnu/"
 }
-
-
 
 # Public: Build a GNU Radio OOT module from a GitHub repository.
 #
