@@ -119,13 +119,13 @@ RUN apt-get install -y \
     git=1:2.34.1-1ubuntu1.12 \
     python3-pip=22.0.2+dfsg-1ubuntu0.5 \
     # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
-    libgtk-3-dev \
-    x11-apps \
+    libgtk-3-dev=3.24.33-1ubuntu2.2 \
+    x11-apps=7.7+8build2 \
     # libcanberra packages are installed to subdue some warnings flagged on starting gnuradio-companion
-    libcanberra-gtk-module \
-    libcanberra-gtk3-module \
+    libcanberra-gtk-module=0.30-10ubuntu1.22.04.1 \
+    libcanberra-gtk3-module=0.30-10ubuntu1.22.04.1 \
     # dbus x11 stops a warning when "opening from file" in gnuradio
-    dbus-x11 && \
+    dbus-x11=1.12.20-2ubuntu4.1 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
     build twine
