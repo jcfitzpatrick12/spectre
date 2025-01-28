@@ -7,4 +7,4 @@ ldconfig
 /opt/sdrplay_api/sdrplay_apiService &
 
 # Start the spectre server
-python3.10 -m spectre_server
+python3 -m spectre_server
