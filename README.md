@@ -17,7 +17,7 @@
 
 
 ## Solar Radio Observations ☀️
-As glimpse of what `spectre` can do, here's some recorded observations of the huge X9.0 solar flare on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow using an SDRPlay RSP1A, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
+As a glimpse of what `spectre` can do, here are some recorded observations of the huge X9.0 solar flare on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow using an SDRPlay RSP1A, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
 
 ![Solar flare observations comparison](docs/gallery/comparison.png)
 
@@ -81,7 +81,7 @@ To get going, you'll need the following installed on your machine:
 
 
 ### **Starting the spectre-server**
-The `spectre-server` container must be running to respond to spectre-cli requests. The following commands assume your present working directory is the root for this repository (wherever you cloned it on your system).
+The `spectre-server` container must be running to respond to `spectre-cli` requests. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
 
 1. Build the image (this can take a bit of time):    
    ```bash
@@ -98,7 +98,7 @@ The `spectre-server` container must be running to respond to spectre-cli request
                   --volume /dev/shm:/dev/shm \
                   --device /dev/bus/usb:/dev/bus/usb \
                   --detach \
-                  `spectre-server`
+                  spectre-server
    ```
 
  
@@ -116,7 +116,7 @@ The `spectre-server` container must be running to respond to spectre-cli request
 Any data stored in the directory specified by the SPECTRE_DATA_DIR_PATH environment variable will persist beyond the lifecycle of the `spectre-server` container.
 
 ### **Running the spectre-cli**
-The following commands assume your present working directory is the root for this repository (wherever you cloned it on your system).
+The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
 
 1. Create then activate a Python virtual environment: 
    ```bash
@@ -139,7 +139,7 @@ The following commands assume your present working directory is the root for thi
 Notably, the CLI commands will only work with the virtual environment activated.
 
 
-## **Quickstart for Developers**
+## **Quick Start for Developers**
 1. Use the development target to build the development image:    
    ```bash
       docker build --tag spectre-dev-server backend --target development
