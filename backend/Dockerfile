@@ -79,11 +79,11 @@ FROM base AS runtime
 WORKDIR /app
 
 # Define the spectre data directory path as an environment variable inside the container
-ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data/"
+ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
-COPY --from=gnuradio_oot_modules /lib/udev/rules.d /etc/lib/rules.d
+COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
 
 # Copy in the OOT module files.
 COPY --from=gnuradio_oot_modules /usr/local/lib /usr/local/lib
