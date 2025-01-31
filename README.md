@@ -8,16 +8,16 @@
 
 ### **Features**
 - 💻 Intuitive CLI tool  
+- 🐳 Simple installation with Docker
 - 🛰️ Wide receiver support  
 - 💾 Live recording of radio spectrograms and I/Q data  
-- ⚙️ Flexible, configurable data capture  
-- 🐳 Containerised backend  
+- ⚙️ Flexible, configurable data capture   
 - 🔧 Developer-friendly and extensible
 
 
 
 ## Solar Radio Observations ☀️
-As a glimpse of what `spectre` can do, here are some recorded observations of the huge X9.0 solar flare on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow using an SDRPlay RSP1A, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
+As a glimpse of what `spectre` can do, here are some recorded radio observations of the huge X9.0 solar flare which occurred on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
 
 ![Solar flare observations comparison](docs/gallery/comparison.png)
 
@@ -92,13 +92,13 @@ The `spectre-server` container must be running to respond to `spectre-cli` reque
 2. Run the `spectre-server` container:  
    ```bash
    docker run --rm \
-               --name spectre-server \
-               --publish 127.0.0.1:5000:5000 \
-               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
-               --volume /dev/shm:/dev/shm \
-               --device /dev/bus/usb:/dev/bus/usb \
-               --detach \
-               spectre-server
+              --name spectre-server \
+              --publish 127.0.0.1:5000:5000 \
+              --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
+              --volume /dev/shm:/dev/shm \
+              --device /dev/bus/usb:/dev/bus/usb \
+              --detach \
+              spectre-server
    ```
 
  
@@ -113,10 +113,10 @@ The `spectre-server` container must be running to respond to `spectre-cli` reque
    docker kill spectre-server
    ```
 
-Any data stored in the directory specified by the SPECTRE_DATA_DIR_PATH environment variable will persist beyond the lifecycle of the `spectre-server` container.
+All data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the lifecycle of the `spectre-server` container. You can refer to [Docker's official documentation](https://docs.docker.com/engine/storage/) to learn more about persistent storage in containers.
 
 ### **Running the spectre-cli**
-The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
+Run these steps after setting up and starting the `spectre-server`. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
 
 1. Create then activate a Python virtual environment: 
    ```bash
@@ -136,31 +136,32 @@ The following commands assume your present working directory is the root of this
    spectre --help
    ```
 
-Notably, the CLI commands will only work with the virtual environment activated.
+Notably, the CLI commands will only work when the virtual environment is activated.
 
 
 ## **Quick Start for Developers**
-1. Use the development target to build the development image:    
+1. Use the development stage as a target to build the development image:    
    ```bash
    docker build --tag spectre-dev-server backend --target development
    ```
 
-
 2. Run the spectre-dev-server container:  
    ```bash
    docker run --rm \
-               --interactive \
-               --tty \
-               --name spectre-dev-server \
-               --publish 127.0.0.1:5000:5000 \
-               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
-               --volume /dev/shm:/dev/shm \
-               --device /dev/bus/usb:/dev/bus/usb \
-               spectre-dev-server \
-               /bin/bash
+              --name spectre-dev-server \
+              --publish 127.0.0.1:5000:5000 \
+              --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
+              --volume /dev/shm:/dev/shm \
+              --device /dev/bus/usb:/dev/bus/usb \
+              --interactive \
+              --tty \
+              --env DISPLAY=$DISPLAY \
+              --volume /tmp/.X11-unix:/tmp/.X11-unix \
+              spectre-dev-server \
+              /bin/bash
    ```
 
-You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
+You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`. 
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
