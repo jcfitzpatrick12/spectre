@@ -161,7 +161,11 @@ Notably, the CLI commands will only work when the virtual environment is activat
               /bin/bash
    ```
 
-You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`. 
+You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`. If you are using SDRPlay devices, you will need to manually start the API in the background. From inside the container:  
+
+```bash
+/opt/sdrplay_api/sdrplay_apiService &
+```
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
