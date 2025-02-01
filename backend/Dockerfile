@@ -133,4 +133,7 @@ RUN apt-get install -y \
 COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
+# Copy in the OOT module grc files
+COPY --from=gnuradio_oot_modules /usr/local/share/gnuradio/grc/blocks /usr/local/share/gnuradio/grc/blocks
+
 CMD ["/bin/bash"]

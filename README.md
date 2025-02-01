@@ -81,39 +81,57 @@ To get going, you'll need the following installed on your machine:
 
 
 ### **Starting the spectre-server**
-The `spectre-server` container must be running to respond to `spectre-cli` requests. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
+The `spectre-server` container must be running to handle `spectre-cli` requests. The following commands assume your current working directory is the root of this repository (wherever you cloned it).
 
-1. Build the image (this can take a bit of time):    
+---
+
+1. **Build the Docker image** (this may take some time):  
    ```bash
    docker build --tag spectre-server backend --target runtime
    ```
 
+2. **Identify the USB device**  
+   Before starting the `spectre-server` container, determine the correct USB device path. Ensure your hardware device is connected to a USB port, then run:  
+   ```bash
+   lsusb
+   ```
+   This will list all connected USB devices. Locate your device in the output and **note the bus and device number**, as you will need them in the next step.
 
-2. Run the `spectre-server` container:  
+3. **Start the `spectre-server` container**  
+   Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values from the previous step:  
    ```bash
    docker run --rm \
               --name spectre-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
-              --device /dev/bus/usb:/dev/bus/usb \
               --detach \
+              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
               spectre-server
    ```
+   **Example:**  
+   If `lsusb` outputs:
+   ```
+   Bus 002 Device 006: ID 2500:0021 Ettus Research LLC USRP B200-mini
+   ```
+   Then the flag would be:
+   ```bash
+   --device=/dev/bus/usb/002/006
+   ```
 
- 
-3. You can check the `spectre-server` is running by using:  
+4. **Verify the container is running**  
+   Check the `spectre-server` is running with:  
    ```bash
    docker container list
    ```
 
-
-4. At any time, you can kill the ``spectre-server`` using:    
+5. **Stop the container**  
+   To stop the `spectre-server`, run:  
    ```bash
    docker kill spectre-server
    ```
 
-All data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the lifecycle of the `spectre-server` container. You can refer to [Docker's official documentation](https://docs.docker.com/engine/storage/) to learn more about persistent storage in containers.
+Any data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the container's lifecycle. For more information on persistent storage in containers, refer to [Docker's official documentation](https://docs.docker.com/engine/storage/).
 
 ### **Running the spectre-cli**
 Run these steps after setting up and starting the `spectre-server`. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
@@ -145,14 +163,14 @@ Notably, the CLI commands will only work when the virtual environment is activat
    docker build --tag spectre-dev-server backend --target development
    ```
 
-2. Run the `spectre-dev-server` container:  
+2. Run the `spectre-dev-server` container, replacing `BUS_NUMBER` and `DEVICE_NUMBER` as required:  
    ```bash
    docker run --rm \
               --name spectre-dev-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
-              --device /dev/bus/usb:/dev/bus/usb \
+              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
               --interactive \
               --tty \
               --env DISPLAY=$DISPLAY \
