@@ -5,8 +5,7 @@
 # --------------------------------- # 
 # Build the base stage
 # --------------------------------- # 
-# Use an Ubuntu image (exact version of 22.04)
-FROM ubuntu@sha256:3d1556a8a18cf5307b121e0a98e93f1ddf1f3f8e092f1fddfd941254785b95d7 AS base
+FROM ubuntu:22.04 AS base
 
 # Stop interactive dialogue, only for the duration of the build.
 ARG DEBIAN_FRONTEND=noninteractive
@@ -20,9 +19,9 @@ WORKDIR /tmp
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y \
-    gnuradio=3.10.1.1-2 \
-    libudev-dev=249.11-0ubuntu3.12 \
-    libusb-1.0-0=2:1.0.25-1ubuntu2
+    gnuradio \
+    libudev-dev \
+    libusb-1.0-0
 
 # --------------------------------- # 
 # Installing GNU Radio OOT modules
@@ -31,11 +30,11 @@ FROM base AS gnuradio_oot_modules
 
 # Install OOT module build dependencies.
 RUN apt-get install -y \
-    sudo=1.9.9-1ubuntu2.4 \
-    git=1:2.34.1-1ubuntu1.12 \
-    cmake=3.22.1-1ubuntu1.22.04.2 \
-    wget=1.21.2-2ubuntu1.1 \
-    expect=5.45.4-2build1
+    sudo \
+    git \
+    cmake \
+    wget \
+    expect 
 
 # Create /etc/udev directories manually, as they are not present in the base image.
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
@@ -66,7 +65,7 @@ COPY ./pyproject.toml ./pyproject.toml
 
 # Install the dependencies system-wide.
 RUN apt-get install -y \
-    python3-pip=22.0.2+dfsg-1ubuntu0.5 && \
+    python3-pip && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install .
 
@@ -116,16 +115,16 @@ ENV NO_AT_BRIDGE=1
 
 RUN apt-get install -y \
     # Install python3 and git, required for development.
-    git=1:2.34.1-1ubuntu1.12 \
-    python3-pip=22.0.2+dfsg-1ubuntu0.5 \
+    git \
+    python3-pip \
     # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
-    libgtk-3-dev=3.24.33-1ubuntu2.2 \
-    x11-apps=7.7+8build2 \
+    libgtk-3-dev \
+    x11-apps \
     # libcanberra packages are installed to subdue some warnings flagged on starting gnuradio-companion
-    libcanberra-gtk-module=0.30-10ubuntu1.22.04.1 \
-    libcanberra-gtk3-module=0.30-10ubuntu1.22.04.1 \
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module \
     # dbus x11 stops a warning when "opening from file" in gnuradio
-    dbus-x11=1.12.20-2ubuntu4.1 && \
+    dbus-x11 \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
     build twine
@@ -135,6 +134,3 @@ COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.s
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
 CMD ["/bin/bash"]
-
-
-
