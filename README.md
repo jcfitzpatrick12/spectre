@@ -83,7 +83,6 @@ To get going, you'll need the following installed on your machine:
 ### **Starting the spectre-server**
 The `spectre-server` container must be running to handle `spectre-cli` requests. The following commands assume your current working directory is the root of this repository (wherever you cloned it).
 
----
 
 1. **Build the Docker image** (this may take some time):  
    ```bash
