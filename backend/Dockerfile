@@ -124,7 +124,7 @@ RUN apt-get install -y \
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
     # dbus x11 stops a warning when "opening from file" in gnuradio
-    dbus-x11 \
+    dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
     build twine
