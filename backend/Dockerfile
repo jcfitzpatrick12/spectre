@@ -43,7 +43,7 @@ RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
 COPY --chmod=0755 ./scripts/rsp_api.sh ./rsp_api.sh
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
-    ./rsp_api.sh
+    expect rsp_api.sh
 
 # Install all the OOT modules.
 COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh
