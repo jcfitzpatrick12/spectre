@@ -80,6 +80,11 @@ WORKDIR /app
 # Define the spectre data directory path as an environment variable inside the container
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 
+# Install the USRP Hardware driver
+RUN apt-get install -y \
+    uhd-host && \
+    /usr/lib/uhd/utils/uhd_images_downloader.py
+
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
@@ -134,6 +139,6 @@ COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.s
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
 # Copy in the OOT module grc files
-COPY --from=gnuradio_oot_modules /usr/local/share/gnuradio/grc/blocks /usr/local/share/gnuradio/grc/blocks
+COPY --from=gnuradio_oot_modules /usr/share/gnuradio/grc/blocks /usr/share/gnuradio/grc/blocks
 
 CMD ["/bin/bash"]
