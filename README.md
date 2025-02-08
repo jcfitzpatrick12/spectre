@@ -89,7 +89,7 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 1. **Build the Docker image**  
    Build the docker image, which may take a couple of minutes to complete:  
    ```bash
-   docker build --tag spectre-server backend --target runtime
+   docker build --tag spectre-server --progress plain backend --target runtime 
    ```
 
 2. **Identify the USB device**  
@@ -166,7 +166,7 @@ Notably, the CLI commands will only work when the virtual environment is activat
 1. **Build the Docker image**  
    Use the development stage as a target to build the development image:    
    ```bash
-   docker build --tag spectre-dev-server backend --target development
+   docker build --tag spectre-dev-server --progress plain backend --target development
    ```
 
 2. **Run the `spectre-dev-server` container**   
