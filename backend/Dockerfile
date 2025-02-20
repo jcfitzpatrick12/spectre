@@ -119,9 +119,11 @@ ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 ENV NO_AT_BRIDGE=1
 
 RUN apt-get install -y \
-    # Install python3 and git, required for development.
+    # Install development tools.
     git \
     python3-pip \
+    vim \
+    tmux \
     # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
     libgtk-3-dev \
     x11-apps \
@@ -132,13 +134,14 @@ RUN apt-get install -y \
     dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
-    build twine
+    build \
+    twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
 COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
 # Copy in the OOT module grc files
-COPY --from=gnuradio_oot_modules /usr/share/gnuradio/grc/blocks /usr/share/gnuradio/grc/blocks
+COPY --from=gnuradio_oot_modules /usr/local/share/gnuradio/grc/blocks /usr/local/share/gnuradio/grc/blocks
 
 CMD ["/bin/bash"]
