@@ -40,10 +40,10 @@ RUN apt-get install -y \
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
 
 # Install the SDRPlay API, and auto accept the licence agreement
-COPY --chmod=0755 ./scripts/rsp_api.sh ./rsp_api.sh
+COPY --chmod=0755 ./scripts/rsp_api.expect ./rsp_api.expect
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
-    expect rsp_api.sh
+    expect rsp_api.expect
 
 # Install all the OOT modules.
 COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh

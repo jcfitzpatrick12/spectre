@@ -21,7 +21,7 @@ As a glimpse of what `spectre` can do, here are some recorded radio observations
 
 ## Supported Receivers
 
-The framework is in place to integrate a wide variety of receivers. If you have an unsupported receiver, reach out and we can work to support it!
+Our abstract framework can support any receiver with a source block in GNU Radio. If you have an unsupported receiver, reach out and we can work to support it!
 
 ### **Current Supported Receivers**
 - [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)  
