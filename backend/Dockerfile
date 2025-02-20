@@ -40,10 +40,10 @@ RUN apt-get install -y \
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
 
 # Install the SDRPlay API, and auto accept the licence agreement
-COPY --chmod=0755 ./scripts/rsp_api.sh ./rsp_api.sh
+COPY --chmod=0755 ./scripts/rsp_api.expect ./rsp_api.expect
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
-    expect rsp_api.sh
+    expect rsp_api.expect
 
 # Install all the OOT modules.
 COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh
@@ -80,6 +80,11 @@ WORKDIR /app
 # Define the spectre data directory path as an environment variable inside the container
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 
+# Install the USRP Hardware driver
+RUN apt-get install -y \
+    uhd-host && \
+    /usr/lib/uhd/utils/uhd_images_downloader.py
+
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
@@ -114,9 +119,11 @@ ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 ENV NO_AT_BRIDGE=1
 
 RUN apt-get install -y \
-    # Install python3 and git, required for development.
+    # Install development tools.
     git \
     python3-pip \
+    vim \
+    tmux \
     # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
     libgtk-3-dev \
     x11-apps \
@@ -127,7 +134,8 @@ RUN apt-get install -y \
     dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
-    build twine
+    build \
+    twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
 COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
