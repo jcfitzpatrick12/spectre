@@ -24,16 +24,17 @@ As a glimpse of what `spectre` can do, here are some recorded radio observations
 
 ## Supported Receivers
 
-Initial support is focused on the SDRplay RSP* series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). A wide range of receiver support is planned.
+Initial support is focused on the SDRplay RSP series via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3). A wide range of receiver support is planned.
 
 ### **Current Supported Receivers**
 - [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)  
 - [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)  
+- [USRP B200mini (from Ettus Research)](https://www.ettus.com/all-products/usrp-b200mini/)
 
 ### **Planned Future Support**
 The framework is in place to integrate the following receivers:
 - RSP1, RSP1B, RSP2, RSPdx (via [`gr-sdrplay3`](https://github.com/fventuri/gr-sdrplay3))  
-- USRP SDRs (e.g., the [b200-mini](https://www.ettus.com/all-products/usrp-b200mini/))  
+- Any other USRP SDR 
 - RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))  
 
 **⚠️ Note:**  
