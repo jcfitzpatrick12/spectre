@@ -13,6 +13,6 @@ pip install -e backend
 
 cd ..
 git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core
-git checkout main
+git checkout usrp-sweep-support 
 pip install -e .
 
