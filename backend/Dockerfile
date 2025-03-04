@@ -34,13 +34,18 @@ RUN apt-get install -y \
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
 
 # Install the SDRPlay API, and auto accept the licence agreement
-COPY --chmod=0755 ./scripts/rsp_api.expect ./rsp_api.expect
+COPY --chmod=0755 ./scripts/expect/rsp_api.expect ./rsp_api.expect
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
     expect rsp_api.expect
 
+# Create an executable to more easily see if the container detects sdrplay devices
+COPY ./scripts/cpp/sdrplay_find_devices sdrplay_find_devices.cpp
+RUN g++ sdrplay_find_devices.cpp -o /usr/local/bin/sdrplay_find_devices -l sdrplay_api
+
+
 # Install all the OOT modules.
-COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh
+COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/fventuri/gr-sdrplay3.git message-passing && \
     build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v0.0.2
@@ -97,7 +102,7 @@ COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrpla
 COPY --from=flask_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
 # Copy the script and set permissions in one step
-COPY --chmod=0755 ./scripts/start.sh ./start.sh
+COPY --chmod=0755 ./scripts/bash/start.sh ./start.sh
 
 # Default executable for the container
 CMD ["./start.sh"]
@@ -128,7 +133,7 @@ RUN apt-get install -y \
     build twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
-COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
+COPY --chmod=0755 ./scripts/bash/install_spectre_latest.sh ./install_spectre_latest.sh 
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
 # Copy in the OOT module grc files
