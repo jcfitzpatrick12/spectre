@@ -1,10 +1,12 @@
 # **SPECTRE: Process, Explore and Capture Transient Radio Emissions**
+![](docs/gallery/spectre_logo.png)
 
 ## Overview
 
 📢 **This project is under active development. Contributors welcome!** 📢
 
 `spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
+
 
 ### **Features**
 - 💻 Intuitive CLI tool  
@@ -17,12 +19,12 @@
 ## Solar Radio Observations ☀️
 Comparing a `spectre` spectrogram captured with an SDRplay RSP1A in the West End of Glasgow, to that taken by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria.
 
-![Solar flare observations comparison](docs/gallery/comparison.png)
+![Solar flare observations spectrograms](docs/gallery/comparison.png)
 
 ## Explore the FM Band :radio:
 BBC Radio 4 in Glagow, at 95.8MHz visualised using a USRP b200mini.
 
-![Solar flare observations comparison](docs/gallery/fm_radio.png)
+![BBC Radio 4 spectrogram](docs/gallery/fm_radio.png)
 
 ## Supported Receivers
 
