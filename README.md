@@ -163,7 +163,7 @@ Notably, the CLI commands will only work when the virtual environment is activat
 1. **Build the Docker image**  
    Use the development stage as a target to build the development image:    
    ```bash
-   docker build --tag spectre-server --target development backend
+   docker build --tag spectre-dev-server --target development backend
    ```
 
 2. **Run the `spectre-dev-server` container**   
