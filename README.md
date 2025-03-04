@@ -84,17 +84,10 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 1. **Build the Docker image**  
    Build the docker image, which may take a couple of minutes to complete:  
    ```bash
-   docker build --tag spectre-server --progress plain backend --target runtime 
+   docker build --tag spectre-server --target runtime backend
    ```
 
-2. **Identify the USB device**  
-   Before starting the `spectre-server` container, determine the correct USB device path. Ensure your hardware device is connected to a USB port, then run:  
-   ```bash
-   lsusb
-   ```
-   This will list all connected USB devices. Locate your device in the output and **note the bus and device number**, as you will need them in the next step.
-
-3. **Run the `spectre-server` container**  
+2. **Run the `spectre-server` container**  
    Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values from the previous step:  
    ```bash
    docker run --rm \
@@ -103,32 +96,37 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
               --detach \
-              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
+              --device=/dev/bus/usb \
               spectre-server
    ```
-   **Example:**  
-   If `lsusb` outputs:
-   ```
-   Bus 002 Device 006: ID 2500:0021 Ettus Research LLC USRP B200-mini
-   ```
-   Then the flag would be:
-   ```bash
-   --device=/dev/bus/usb/002/006
-   ```
 
-4. **Verify the container is running**  
+3. **Verify the container is running**  
    Check the `spectre-server` is running with:  
    ```bash
    docker container list
    ```
 
-5. **Stop the container**  
+4. **Stop the container**  
    To stop the `spectre-server`, run:  
    ```bash
    docker kill spectre-server
    ```
 
 Any data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the container's lifecycle. For more information on persistent storage in containers, refer to [Docker's official documentation](https://docs.docker.com/engine/storage/).
+
+
+### **Post-setup steps**
+- If you are using an SDRplay receiver, start the API service in the container as a background process:  
+   ```bash
+   docker exec spectre-server /opt/sdrplay_api/sdrplay_apiService &
+   ```
+
+- If you are using a USRP receiver, check that the container can see the receiver with:  
+   ```bash
+   docker exec spectre-server uhd_find_devices
+   ```
+   If there's any trouble, restart the container and try again.
+
 
 ### **Running the spectre-cli**
 Run these steps after setting up and starting the `spectre-server`. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
@@ -160,19 +158,18 @@ Notably, the CLI commands will only work when the virtual environment is activat
 1. **Build the Docker image**  
    Use the development stage as a target to build the development image:    
    ```bash
-   docker build --tag spectre-dev-server --progress plain backend --target development
+   docker build --tag spectre-server --target development backend
    ```
 
 2. **Run the `spectre-dev-server` container**   
-   Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values according to the USB
-   device you would like to mount:  
+   Run the following command:  
    ```bash
    docker run --rm \
               --name spectre-dev-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
-              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
+              --device=/dev/bus/usb \
               --interactive \
               --tty \
               --env DISPLAY=$DISPLAY \
@@ -181,11 +178,7 @@ Notably, the CLI commands will only work when the virtual environment is activat
               /bin/bash
    ```
 
-You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`. If you are using SDRPlay devices, you will need to manually start the API in the background. From inside the container:  
-
-```bash
-/opt/sdrplay_api/sdrplay_apiService &
-```
+You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
