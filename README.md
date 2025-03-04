@@ -139,7 +139,7 @@ Run these steps after setting up and starting the `spectre-server`. The followin
 2. **Install dependencies**  
    Install the required dependencies:  
    ```bash
-   pip install .
+   pip install ./cli
    ```
 
 3. **Ready-to-go: try the `spectre-cli`**  
