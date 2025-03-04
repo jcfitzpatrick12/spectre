@@ -39,7 +39,7 @@ RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
     expect rsp_api.expect
 
-# Create an executable to more easily see if the container detects sdrplay devices
+# Create an executable which can be used to detect sdrplay devices, as seen by the container
 COPY ./scripts/cpp/sdrplay_find_devices.cpp sdrplay_find_devices.cpp
 RUN g++ sdrplay_find_devices.cpp -o /usr/local/bin/sdrplay_find_devices -l sdrplay_api
 
