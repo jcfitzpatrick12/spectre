@@ -1,5 +1,4 @@
-.spectre-data/batches/*
-.spectre-data/configs/fits_config_*
+.spectre-data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
