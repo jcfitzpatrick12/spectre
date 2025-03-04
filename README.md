@@ -2,9 +2,11 @@
   SPECTRE: Process, Explore and Capture Transient Radio Emissions
 </h1>
 
-<p align="center">
-  <img src="docs/gallery/spectre_logo.png" alt="SPECTRE Logo" width="250">
-</p>
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img src="docs/gallery/solar_radio.png" width="300" alt="Solar Radio Observations">
+  <img src="docs/gallery/spectre_logo.png" width="300" alt="SPECTRE Logo" style="margin: 0 20px;">
+  <img src="docs/gallery/fm_radio.png" width="300" alt="FM Band">
+</div>
 
 ## Overview
 
@@ -20,16 +22,6 @@
 - 💾 Live recording of radio spectrograms and I/Q data  
 - ⚙️ Flexible, configurable data capture   
 - 🔧 Developer-friendly and extensible
-
-## Solar Radio Observations ☀️
-Comparing a `spectre` spectrogram captured with an SDRplay RSP1A in the West End of Glasgow, to that taken by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria.
-
-![Solar flare observations spectrograms](docs/gallery/comparison.png)
-
-## Explore the FM Band :radio:
-BBC Radio 4 in Glagow, at 95.8MHz visualised using a USRP b200mini.
-
-![BBC Radio 4 spectrogram](docs/gallery/fm_radio.png)
 
 ## Supported Receivers
 
