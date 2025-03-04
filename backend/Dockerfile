@@ -19,9 +19,7 @@ WORKDIR /tmp
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y \
-    gnuradio \
-    libudev-dev \
-    libusb-1.0-0
+    gnuradio libudev-dev libusb-1.0-0 wget 
 
 # --------------------------------- # 
 # Installing GNU Radio OOT modules
@@ -30,11 +28,7 @@ FROM base AS gnuradio_oot_modules
 
 # Install OOT module build dependencies.
 RUN apt-get install -y \
-    sudo \
-    git \
-    cmake \
-    wget \
-    expect 
+    sudo git cmake expect 
 
 # Create /etc/udev directories manually, as they are not present in the base image.
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
@@ -85,6 +79,7 @@ RUN apt-get install -y \
     uhd-host && \
     /usr/lib/uhd/utils/uhd_images_downloader.py
 
+
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
@@ -120,22 +115,17 @@ ENV NO_AT_BRIDGE=1
 
 RUN apt-get install -y \
     # Install development tools.
-    git \
-    python3-pip \
-    vim \
-    tmux \
-    # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
-    libgtk-3-dev \
-    x11-apps \
-    # libcanberra packages are installed to subdue some warnings flagged on starting gnuradio-companion
+    git python3-pip vim \
+    # Required for the gnuradio GUI to run inside the container
+    libgtk-3-dev x11-apps \
+    # Subdue some warnings flagged on starting gnuradio-companion
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
-    # dbus x11 stops a warning when "opening from file" in gnuradio
+    # Subdue a warning when "opening from file" in gnuradio
     dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
-    build \
-    twine
+    build twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
 COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
