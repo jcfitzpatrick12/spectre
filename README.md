@@ -59,8 +59,8 @@ macOS compatibility will be explored in the future.
 To get going, you'll need the following installed on your machine:  
 | Prerequisite      | How to Install | Do I Already Have It? |
 |------------------|---------------|-----------------------|
-| **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run docker --version |
-| **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run git --version |
+| **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run `docker --version` |
+| **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run `git --version` |
 
 ### **Initial setup**
 1. **Clone the repository**  
@@ -88,7 +88,7 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
    ```
 
 2. **Run the `spectre-server` container**  
-   Run the container (you can omit the `--detach` flag if you are happy with it running in the foreground):   
+   First ensuring any receivers are plugged in, run the container:  
    ```bash
    docker run --rm \
               --name spectre-server \
@@ -99,6 +99,7 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
               --detach \
               spectre-server
    ```
+   You can omit the `--detach` flag if you are happy with it running in the foreground.
 
 3. **Verify the container is running**  
    Check the `spectre-server` is running with:  
@@ -115,17 +116,21 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 Any data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the container's lifecycle. For more information on persistent storage in containers, refer to [Docker's official documentation](https://docs.docker.com/engine/storage/).
 
 
-### **Post-setup steps**
-- If you are using an SDRplay receiver, start the API service in the container as a background process:  
+### **Post-Setup Steps**  
+If you have a physical receiver connected, it's a good idea to verify that `spectre-server` can detect it.
+
+- For SDRplay receivers, run:  
    ```bash
-   docker exec spectre-server /opt/sdrplay_api/sdrplay_apiService &
+   docker exec spectre-server sdrplay_find_devices
    ```
 
-- If you are using a USRP receiver, check that the container can see the receiver with:  
+- For USRP receivers, run:  
    ```bash
    docker exec spectre-server uhd_find_devices
    ```
-   If there's any trouble, restart the container and try again.
+
+If the container fails to detect your device, try stopping and restarting it.
+
 
 
 ### **Running the spectre-cli**
