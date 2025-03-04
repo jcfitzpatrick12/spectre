@@ -15,9 +15,14 @@
 - 🔧 Developer-friendly and extensible
 
 ## Solar Radio Observations ☀️
-As a glimpse of what `spectre` can do, here are some recorded radio observations of the huge X9.0 solar flare which occurred on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
+Comparing a `spectre` spectrogram captured with an SDRplay RSP1A in the West End of Glasgow, to that taken by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria.
 
 ![Solar flare observations comparison](docs/gallery/comparison.png)
+
+## Explore the FM Band :radio:
+BBC Radio 4 in Glagow, at 95.8MHz visualised using a USRP b200mini.
+
+![Solar flare observations comparison](docs/gallery/fm_radio.png)
 
 ## Supported Receivers
 
