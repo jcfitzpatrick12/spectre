@@ -3,9 +3,9 @@
 </h1>
 
 <div style="display: flex; justify-content: center; align-items: center;">
-  <img src="docs/gallery/solar_radio.png" width="300" alt="Solar Radio Observations">
-  <img src="docs/gallery/spectre_logo.png" width="300" alt="SPECTRE Logo" style="margin: 0 20px;">
-  <img src="docs/gallery/fm_radio.png" width="300" alt="FM Band">
+  <img src="docs/gallery/solar_radio.png" width="200" alt="Solar Radio Observations">
+  <img src="docs/gallery/spectre_logo.png" width="200" alt="SPECTRE Logo" style="margin: 0 20px;">
+  <img src="docs/gallery/fm_radio.png" width="200" alt="FM Band">
 </div>
 
 ## Overview
