@@ -1,5 +1,10 @@
-# **SPECTRE: Process, Explore and Capture Transient Radio Emissions**
-![](docs/gallery/spectre_logo.png)
+<h1 align="center">
+  SPECTRE: Process, Explore and Capture Transient Radio Emissions
+</h1>
+
+<p align="center">
+  <img src="docs/gallery/spectre_logo.png" alt="SPECTRE Logo" width="250">
+</p>
 
 ## Overview
 
