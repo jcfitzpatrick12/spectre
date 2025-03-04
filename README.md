@@ -2,11 +2,12 @@
   SPECTRE: Process, Explore and Capture Transient Radio Emissions
 </h1>
 
-<div align="centre" style="display: flex; justify-content: center; align-items: center;">
-  <img src="docs/gallery/solar_radio.png" width="200" alt="Solar Radio Observations">
-  <img src="docs/gallery/spectre_logo.png" width="200" alt="SPECTRE Logo" style="margin: 0 20px;">
-  <img src="docs/gallery/fm_radio.png" width="200" alt="FM Band">
+<div align="center">
+  <img src="docs/gallery/solar_radio.png" width="30%" hspace="10" alt="Solar Radio Observations">
+  <img src="docs/gallery/spectre_logo.png" width="30%" hspace="10" alt="SPECTRE Logo">
+  <img src="docs/gallery/fm_radio.png" width="30%" hspace="10" alt="FM Band">
 </div>
+
 
 ## Overview
 
