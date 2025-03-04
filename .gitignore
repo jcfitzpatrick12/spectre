@@ -1,4 +1,5 @@
 .spectre-data
+scrap.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
