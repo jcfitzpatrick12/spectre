@@ -28,7 +28,8 @@ RUN apt-get update -y && \
     libcodec2-dev libgsm1-dev libusb-1.0-0 libusb-1.0-0-dev libudev-dev python3-setuptools \
     pybind11-dev python3-matplotlib libsndfile1-dev \
     libsoapysdr-dev soapysdr-tools python3-pygccxml python3-pyqtgraph \
-    libiio-dev libad9361-dev libspdlog-dev python3-packaging python3-jsonschema python3-qtpy
+    libiio-dev libad9361-dev libspdlog-dev python3-packaging python3-jsonschema python3-qtpy \
+    wget
 
 # First install UHD from source. 
 RUN git clone https://github.com/EttusResearch/uhd.git && \
