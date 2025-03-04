@@ -4,7 +4,7 @@
 
 <div align="center">
   <img src="docs/gallery/solar_radio.png" width="30%" hspace="10" alt="Solar Radio Observations">
-  <img src="docs/gallery/spectre_logo.png" width="30%" hspace="10" alt="SPECTRE Logo">
+  <img src="docs/gallery/spectre.png" width="30%" hspace="10" alt="SPECTRE Logo">
   <img src="docs/gallery/fm_radio.png" width="30%" hspace="10" alt="FM Band">
 </div>
 
@@ -88,15 +88,15 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
    ```
 
 2. **Run the `spectre-server` container**  
-   Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values from the previous step:  
+   Run the container (you can omit the `--detach` flag if you are happy with it running in the foreground):   
    ```bash
    docker run --rm \
               --name spectre-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
-              --detach \
               --device=/dev/bus/usb \
+              --detach \
               spectre-server
    ```
 
@@ -170,10 +170,10 @@ Notably, the CLI commands will only work when the virtual environment is activat
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
               --device=/dev/bus/usb \
-              --interactive \
-              --tty \
               --env DISPLAY=$DISPLAY \
               --volume /tmp/.X11-unix:/tmp/.X11-unix \
+              --interactive \
+              --tty \
               spectre-dev-server \
               /bin/bash
    ```
