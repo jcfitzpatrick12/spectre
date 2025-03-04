@@ -26,9 +26,9 @@
 
 ## Supported Receivers
 
-Our abstract framework can support any receiver with a source block in GNU Radio. If you have an unsupported receiver, reach out and we can work to support it!
+Our abstract framework can support any receiver with a source block in GNU Radio. If you have a receiver that isn't supported, reach out, and we can look into adding support for it!
 
-### **Current Supported Receivers**
+### **Currently Supported Receivers**
 - [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)  
 - [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)  
 - [USRP B200mini (from Ettus Research)](https://www.ettus.com/all-products/usrp-b200mini/)
@@ -116,8 +116,8 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 Any data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the container's lifecycle. For more information on persistent storage in containers, refer to [Docker's official documentation](https://docs.docker.com/engine/storage/).
 
 
-### **Post-Setup Steps**  
-If you have a physical receiver connected, it's a good idea to verify that `spectre-server` can detect it.
+### **Checking your receiver is detected**  
+If you have a physical receiver connected, it's a good idea to verify that the `spectre-server` can detect it.
 
 - For SDRplay receivers, run:  
    ```bash
@@ -129,7 +129,7 @@ If you have a physical receiver connected, it's a good idea to verify that `spec
    docker exec spectre-server uhd_find_devices
    ```
 
-If the container fails to detect your device, try stopping and restarting it.
+If this is the first time you're running the container since plugging in the device, it may not be detected. Ensure the receiver is still connected, then try stopping and restarting the container.
 
 
 
@@ -137,7 +137,7 @@ If the container fails to detect your device, try stopping and restarting it.
 Run these steps after setting up and starting the `spectre-server`. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
 
 1. **Activate a Python virtual environment**  
-   Create then activate a Python virtual environment: 
+   Create and activate a Python virtual environment: 
    ```bash
    python3 -m venv ./.venv && \
    . ./.venv/bin/activate
