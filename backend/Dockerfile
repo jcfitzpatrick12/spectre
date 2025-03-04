@@ -40,7 +40,7 @@ RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     expect rsp_api.expect
 
 # Create an executable to more easily see if the container detects sdrplay devices
-COPY ./scripts/cpp/sdrplay_find_devices sdrplay_find_devices.cpp
+COPY ./scripts/cpp/sdrplay_find_devices.cpp sdrplay_find_devices.cpp
 RUN g++ sdrplay_find_devices.cpp -o /usr/local/bin/sdrplay_find_devices -l sdrplay_api
 
 
@@ -95,8 +95,9 @@ COPY --from=gnuradio_oot_modules /usr/local/include /usr/local/include
 COPY --from=gnuradio_oot_modules /usr/include /usr/include
 COPY --from=gnuradio_oot_modules /usr/lib /usr/lib
 
-# Copy in the sdrplay api service executable.
+# Copy in the sdrplay executables
 COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrplay_api/sdrplay_apiService
+COPY --from=gnuradio_oot_modules /usr/local/bin/sdrplay_find_devices /usr/local/bin/sdrplay_find_devices
 
 # Copy in system-wide python packages for the flask server.
 COPY --from=flask_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
