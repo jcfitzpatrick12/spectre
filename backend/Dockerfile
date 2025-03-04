@@ -19,9 +19,7 @@ WORKDIR /tmp
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y \
-    gnuradio \
-    libudev-dev \
-    libusb-1.0-0
+    gnuradio libudev-dev libusb-1.0-0 wget 
 
 # --------------------------------- # 
 # Installing GNU Radio OOT modules
@@ -30,23 +28,24 @@ FROM base AS gnuradio_oot_modules
 
 # Install OOT module build dependencies.
 RUN apt-get install -y \
-    sudo \
-    git \
-    cmake \
-    wget \
-    expect 
+    sudo git cmake expect 
 
 # Create /etc/udev directories manually, as they are not present in the base image.
 RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
 
 # Install the SDRPlay API, and auto accept the licence agreement
-COPY --chmod=0755 ./scripts/rsp_api.expect ./rsp_api.expect
+COPY --chmod=0755 ./scripts/expect/rsp_api.expect ./rsp_api.expect
 RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
     chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
     expect rsp_api.expect
 
+# Create an executable which can be used to detect sdrplay devices, as seen by the container
+COPY ./scripts/cpp/sdrplay_find_devices.cpp sdrplay_find_devices.cpp
+RUN g++ sdrplay_find_devices.cpp -o /usr/local/bin/sdrplay_find_devices -l sdrplay_api
+
+
 # Install all the OOT modules.
-COPY --chmod=0755 ./scripts/build_oot_module.sh build_oot_module.sh
+COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/fventuri/gr-sdrplay3.git message-passing && \
     build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v0.0.2
@@ -85,6 +84,7 @@ RUN apt-get install -y \
     uhd-host && \
     /usr/lib/uhd/utils/uhd_images_downloader.py
 
+
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
@@ -95,14 +95,15 @@ COPY --from=gnuradio_oot_modules /usr/local/include /usr/local/include
 COPY --from=gnuradio_oot_modules /usr/include /usr/include
 COPY --from=gnuradio_oot_modules /usr/lib /usr/lib
 
-# Copy in the sdrplay api service executable.
+# Copy in the sdrplay executables
 COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrplay_api/sdrplay_apiService
+COPY --from=gnuradio_oot_modules /usr/local/bin/sdrplay_find_devices /usr/local/bin/sdrplay_find_devices
 
 # Copy in system-wide python packages for the flask server.
 COPY --from=flask_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
 # Copy the script and set permissions in one step
-COPY --chmod=0755 ./scripts/start.sh ./start.sh
+COPY --chmod=0755 ./scripts/bash/start.sh ./start.sh
 
 # Default executable for the container
 CMD ["./start.sh"]
@@ -120,25 +121,20 @@ ENV NO_AT_BRIDGE=1
 
 RUN apt-get install -y \
     # Install development tools.
-    git \
-    python3-pip \
-    vim \
-    tmux \
-    # lbgtk-3-dev and x11-apps are required for the gnuradio GUI to run inside the container
-    libgtk-3-dev \
-    x11-apps \
-    # libcanberra packages are installed to subdue some warnings flagged on starting gnuradio-companion
+    git python3-pip vim \
+    # Required for the gnuradio GUI to run inside the container
+    libgtk-3-dev x11-apps \
+    # Subdue some warnings flagged on starting gnuradio-companion
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
-    # dbus x11 stops a warning when "opening from file" in gnuradio
+    # Subdue a warning when "opening from file" in gnuradio
     dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
-    build \
-    twine
+    build twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
-COPY --chmod=0755 ./scripts/install_spectre_latest.sh ./install_spectre_latest.sh 
+COPY --chmod=0755 ./scripts/bash/install_spectre_latest.sh ./install_spectre_latest.sh 
 RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
 
 # Copy in the OOT module grc files

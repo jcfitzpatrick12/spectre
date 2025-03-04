@@ -1,10 +1,20 @@
-# **SPECTRE: Process, Explore and Capture Transient Radio Emissions**
+<h1 align="center">
+  SPECTRE: Process, Explore and Capture Transient Radio Emissions
+</h1>
+
+<div align="center">
+  <img src="docs/gallery/solar_radio.png" width="30%" hspace="10" alt="Solar Radio Observations">
+  <img src="docs/gallery/spectre.png" width="30%" hspace="10" alt="SPECTRE Logo">
+  <img src="docs/gallery/fm_radio.png" width="30%" hspace="10" alt="FM Band">
+</div>
+
 
 ## Overview
 
 📢 **This project is under active development. Contributors welcome!** 📢
 
 `spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
+
 
 ### **Features**
 - 💻 Intuitive CLI tool  
@@ -14,16 +24,11 @@
 - ⚙️ Flexible, configurable data capture   
 - 🔧 Developer-friendly and extensible
 
-## Solar Radio Observations ☀️
-As a glimpse of what `spectre` can do, here are some recorded radio observations of the huge X9.0 solar flare which occurred on October 3rd 2024. The figure below compares a `spectre` spectrogram (second panel) captured in the West End of Glasgow, to that observed by a [CALLISTO](https://e-callisto.org/) spectrometer stationed in Egypt, Alexandria (top panel).
-
-![Solar flare observations comparison](docs/gallery/comparison.png)
-
 ## Supported Receivers
 
-Our abstract framework can support any receiver with a source block in GNU Radio. If you have an unsupported receiver, reach out and we can work to support it!
+Our abstract framework can support any receiver with a source block in GNU Radio. If you have a receiver that isn't supported, reach out, and we can look into adding support for it!
 
-### **Current Supported Receivers**
+### **Currently Supported Receivers**
 - [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)  
 - [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)  
 - [USRP B200mini (from Ettus Research)](https://www.ettus.com/all-products/usrp-b200mini/)
@@ -54,8 +59,8 @@ macOS compatibility will be explored in the future.
 To get going, you'll need the following installed on your machine:  
 | Prerequisite      | How to Install | Do I Already Have It? |
 |------------------|---------------|-----------------------|
-| **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run docker --version |
-| **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run git --version |
+| **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run `docker --version` |
+| **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run `git --version` |
 
 ### **Initial setup**
 1. **Clone the repository**  
@@ -79,45 +84,30 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 1. **Build the Docker image**  
    Build the docker image, which may take a couple of minutes to complete:  
    ```bash
-   docker build --tag spectre-server --progress plain backend --target runtime 
+   docker build --tag spectre-server --target runtime backend
    ```
 
-2. **Identify the USB device**  
-   Before starting the `spectre-server` container, determine the correct USB device path. Ensure your hardware device is connected to a USB port, then run:  
-   ```bash
-   lsusb
-   ```
-   This will list all connected USB devices. Locate your device in the output and **note the bus and device number**, as you will need them in the next step.
-
-3. **Run the `spectre-server` container**  
-   Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values from the previous step:  
+2. **Run the `spectre-server` container**  
+   First ensuring any receivers are plugged in, run the container:  
    ```bash
    docker run --rm \
               --name spectre-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
+              --device=/dev/bus/usb \
               --detach \
-              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
               spectre-server
    ```
-   **Example:**  
-   If `lsusb` outputs:
-   ```
-   Bus 002 Device 006: ID 2500:0021 Ettus Research LLC USRP B200-mini
-   ```
-   Then the flag would be:
-   ```bash
-   --device=/dev/bus/usb/002/006
-   ```
+   You can omit the `--detach` flag if you are happy with it running in the foreground.
 
-4. **Verify the container is running**  
+3. **Verify the container is running**  
    Check the `spectre-server` is running with:  
    ```bash
    docker container list
    ```
 
-5. **Stop the container**  
+4. **Stop the container**  
    To stop the `spectre-server`, run:  
    ```bash
    docker kill spectre-server
@@ -125,11 +115,29 @@ The `spectre-server` container must be running to handle `spectre-cli` requests.
 
 Any data stored in the directory specified by the `SPECTRE_DATA_DIR_PATH` environment variable will persist beyond the container's lifecycle. For more information on persistent storage in containers, refer to [Docker's official documentation](https://docs.docker.com/engine/storage/).
 
+
+### **Checking your receiver is detected**  
+If you have a physical receiver connected, it's a good idea to verify that the `spectre-server` can detect it.
+
+- For SDRplay receivers, run:  
+   ```bash
+   docker exec spectre-server sdrplay_find_devices
+   ```
+
+- For USRP receivers, run:  
+   ```bash
+   docker exec spectre-server uhd_find_devices
+   ```
+
+If this is the first time you're running the container since plugging in the device, it may not be detected. Ensure the receiver is still connected, then try stopping and restarting the container.
+
+
+
 ### **Running the spectre-cli**
 Run these steps after setting up and starting the `spectre-server`. The following commands assume your present working directory is the root of this repository (wherever you cloned it on your system).
 
 1. **Activate a Python virtual environment**  
-   Create then activate a Python virtual environment: 
+   Create and activate a Python virtual environment: 
    ```bash
    python3 -m venv ./.venv && \
    . ./.venv/bin/activate
@@ -139,7 +147,7 @@ Run these steps after setting up and starting the `spectre-server`. The followin
 2. **Install dependencies**  
    Install the required dependencies:  
    ```bash
-   pip install .
+   pip install ./cli
    ```
 
 3. **Ready-to-go: try the `spectre-cli`**  
@@ -155,32 +163,27 @@ Notably, the CLI commands will only work when the virtual environment is activat
 1. **Build the Docker image**  
    Use the development stage as a target to build the development image:    
    ```bash
-   docker build --tag spectre-dev-server --progress plain backend --target development
+   docker build --tag spectre-dev-server --target development backend
    ```
 
 2. **Run the `spectre-dev-server` container**   
-   Run the following command, replacing `BUS_NUMBER` and `DEVICE_NUMBER` with the values according to the USB
-   device you would like to mount:  
+   Run the following command:  
    ```bash
    docker run --rm \
               --name spectre-dev-server \
               --publish 127.0.0.1:5000:5000 \
               --volume $SPECTRE_DATA_DIR_PATH:/app/.spectre-data \
               --volume /dev/shm:/dev/shm \
-              --device=/dev/bus/usb/BUS_NUMBER/DEVICE_NUMBER \
-              --interactive \
-              --tty \
+              --device=/dev/bus/usb \
               --env DISPLAY=$DISPLAY \
               --volume /tmp/.X11-unix:/tmp/.X11-unix \
+              --interactive \
+              --tty \
               spectre-dev-server \
               /bin/bash
    ```
 
-You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`. If you are using SDRPlay devices, you will need to manually start the API in the background. From inside the container:  
-
-```bash
-/opt/sdrplay_api/sdrplay_apiService &
-```
+You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
