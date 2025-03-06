@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-cli"
-version = "0.0.6"
+version = "0.0.7"
 maintainers = [
   { name="Jimmy Fitzpatrick", email="jcfitzpatrick12@gmail.com" },
 ]
@@ -17,7 +17,7 @@ classifiers = [
 dependencies = [
     "typer-slim==0.13.1",
     "requests==2.31.0",
-    "spectre-core==0.0.16"
+    "spectre-core==0.0.18"
 ]
 
 
