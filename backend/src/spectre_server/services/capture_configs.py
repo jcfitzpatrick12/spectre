@@ -159,10 +159,8 @@ def delete_capture_config(
     :return: The file path of the successfully deleted capture config, relative to `SPECTRE_DATA_DIR_PATH`.
     """
     if _has_batches(tag):
-        error_message = (f"Batches exist under the tag {tag}. Deleting the corresponding capture config "
-                            f"may lead to undefined behaviour. "
-                            f"It is recommended to keep capture configs if batches exist under the corresponding tag. " 
-                            f"Override this functionality with --force. Aborting deletion")
+        error_message = (f"Batches exist under the tag {tag}, and deleting the corresponding capture config "
+                         f"would lead to undefined behaviour.")
         _LOGGER.error(error_message)
         raise FileExistsError(error_message)
     
