@@ -8,7 +8,7 @@ import yaml
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-get_app = typer.Typer(
+get_typer = typer.Typer(
     help = "Display one or many resources."
 )
 
@@ -18,7 +18,7 @@ def pprint_dict(
     print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
 
 
-@get_app.command(
+@get_typer.command(
         help = "List supported e-Callisto instrument codes."
 )
 def callisto_instrument_codes(
@@ -33,7 +33,7 @@ def callisto_instrument_codes(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "List existing log files."
 )
 def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
@@ -58,7 +58,7 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "List existing batch files."
 )
 def batch_files(
@@ -86,7 +86,7 @@ def batch_files(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "List supported receivers."
 )
 def receivers(
@@ -102,7 +102,7 @@ def receivers(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = ("List the supported operating modes for a receiver.")
 )
 def modes(
@@ -119,7 +119,7 @@ def modes(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "Print receiver hardware specifications."
 )
 def specs(
@@ -140,7 +140,7 @@ def specs(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "List existing capture configs."
 )
 def capture_configs(
@@ -156,7 +156,7 @@ def capture_configs(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "Print capture config file contents."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
@@ -170,7 +170,7 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "List tags with existing batch files."
 )
 def tags(
@@ -196,7 +196,7 @@ def tags(
     raise typer.Exit()
 
     
-@get_app.command(
+@get_typer.command(
         help = "Print log file contents."
 )
 def log(
@@ -211,7 +211,7 @@ def log(
     raise typer.Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "Print a capture template."
 )
 def capture_template(

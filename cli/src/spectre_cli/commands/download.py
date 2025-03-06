@@ -7,11 +7,11 @@ import typer
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-download_app = typer.Typer(
+download_typer = typer.Typer(
     help = "Download external spectrogram data."
 )
 
-@download_app.command(
+@download_typer.command(
         help = "Download e-Callisto network spectrogram data."
 )
 def callisto(

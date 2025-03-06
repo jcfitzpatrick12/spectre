@@ -8,11 +8,11 @@ from typing import List
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-create_app = typer.Typer(
+create_typer = typer.Typer(
     help = "Create resources."
 )
 
-@create_app.command(
+@create_typer.command(
         help = "Create a capture config."
 )
 def capture_config(

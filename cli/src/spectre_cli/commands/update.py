@@ -8,11 +8,11 @@ from typing import List
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-update_app = typer.Typer(
+update_typer = typer.Typer(
     help = "Update resources."
 )
 
-@update_app.command(
+@update_typer.command(
         help = "Update capture config parameters."
 )
 def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),

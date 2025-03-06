@@ -7,7 +7,7 @@ import typer
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-delete_app = typer.Typer(
+delete_typer = typer.Typer(
     help = "Delete resources."
 )
 
@@ -36,7 +36,7 @@ def _caution_irreversible(
         raise typer.Exit()
 
 
-@delete_app.command(
+@delete_typer.command(
         help = "Delete log files."
 )
 def logs(
@@ -61,7 +61,7 @@ def logs(
     raise typer.Exit()
 
 
-@delete_app.command(
+@delete_typer.command(
         help = "Delete batch files."
 )
 def batch_files(
@@ -87,7 +87,7 @@ def batch_files(
     raise typer.Exit()
 
 
-@delete_app.command(
+@delete_typer.command(
         help = "Delete a capture config."
 )
 def capture_config(

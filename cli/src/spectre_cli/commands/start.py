@@ -7,11 +7,11 @@ import typer
 from ._cli_help import CliHelp
 from ._safe_request import safe_request
 
-start_app = typer.Typer(
+start_typer = typer.Typer(
     help = "Start a job."
 )
 
-@start_app.command(
+@start_typer.command(
         help = "Capture data from an SDR in real time."
 )
 def capture(
@@ -34,7 +34,7 @@ def capture(
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
 
-@start_app.command(
+@start_typer.command(
         help = "Capture data from an SDR and post-process it into spectrograms in real time."
 )
 def session(
