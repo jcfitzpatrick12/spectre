@@ -8,7 +8,7 @@ _LOGGER = getLogger(__name__)
 from typing import Optional, Any
 from os import listdir
 
-from spectre_core.config import get_configs_dir_path
+from spectre_core.config import get_configs_dir_path, trim_spectre_data_dir_path
 from spectre_core.batches import Batches, get_batch_cls_from_tag
 from spectre_core.receivers import get_receiver, ReceiverName
 from spectre_core.logs import log_call
@@ -39,7 +39,7 @@ def create_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, overwrites the existing capture config if it already exists, defaults to False
-    :return: The file name of the freshly created capture config.
+    :return: The file path of the capture config, relative to `SPECTRE_DATA_DIR_PATH`.
     """
     if string_parameters is None:
         string_parameters = []
@@ -59,7 +59,7 @@ def create_capture_config(
     
     _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
 
-    return capture_config.file_name
+    return trim_spectre_data_dir_path(capture_config.file_path)
 
 
 @log_call
@@ -122,7 +122,7 @@ def update_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
-    :return: The file name of the successfully updated capture config.
+    :return: The file path of the successfully updated capture config, relative to `SPECTRE_DATA_DIR_PATH`.
     """
     _caution_update(tag, 
                     force)
@@ -146,45 +146,28 @@ def update_capture_config(
 
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.file_name}")
 
-    return capture_config.file_name
-
-
-def _caution_delete(tag: str,
-                    force: bool
-) -> None:
-    """Caution users if batches exist with the input tag.
-
-    :param tag: The batch tag.
-    :param force: If True, warn the user, suppress the explicit error and continue with the deletion.
-    :raises FileExistsError: Raised if `force` is False, and batches exist with the input tag.
-    """
-    if _has_batches(tag):
-        if force:
-            _LOGGER.warning(f"Batches exist under the tag {tag}, forcing deletion")
-            return
-        else:
-            error_message = (f"Batches exist under the tag {tag}. Deleting the corresponding capture config "
-                             f"may lead to undefined behaviour. "
-                             f"It is recommended to keep capture configs if batches exist under the corresponding tag. " 
-                             f"Override this functionality with --force. Aborting deletion")
-            _LOGGER.error(error_message)
-            raise FileExistsError(error_message)
-        
+    return trim_spectre_data_dir_path(capture_config.file_path)
+  
         
 @log_call
 def delete_capture_config(
     tag: str,
-    force: bool = False
 ) -> str:
     """Delete a capture config.
 
     :param tag: The tag of the capture config.
-    :param force: If True, force the deletion even if batches exist under the input tag. Defaults to False.
-    :return: The file name of the successfully deleted capture config.
+    :return: The file path of the successfully deleted capture config, relative to `SPECTRE_DATA_DIR_PATH`.
     """
-    _caution_delete(tag, force)
+    if _has_batches(tag):
+        error_message = (f"Batches exist under the tag {tag}. Deleting the corresponding capture config "
+                            f"may lead to undefined behaviour. "
+                            f"It is recommended to keep capture configs if batches exist under the corresponding tag. " 
+                            f"Override this functionality with --force. Aborting deletion")
+        _LOGGER.error(error_message)
+        raise FileExistsError(error_message)
+    
     capture_config = CaptureConfig(tag)
     capture_config.delete()
     _LOGGER.info(f"File deleted: {capture_config.file_name}")
     
-    return capture_config.file_name
+    return trim_spectre_data_dir_path(capture_config.file_path)
