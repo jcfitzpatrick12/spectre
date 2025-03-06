@@ -2,24 +2,35 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
-import yaml
+from typer import Typer, Option, Exit, secho
+import os
 
-from ._cli_help import CliHelp
+from spectre_core.config import get_spectre_data_dir_path
+
 from ._safe_request import safe_request
+from ._pprint import pprint_dict
 
-get_app = typer.Typer(
+
+get_typer = Typer(
     help = "Display one or many resources."
 )
 
-def pprint_dict(
-    d: dict
+def _secho_file(
+    rel_path: str
 ) -> None:
-    print( yaml.dump(d, sort_keys=True, default_flow_style=False) )
+    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
+    secho(abs_path)
+    
+    
+def _secho_files(
+    rel_paths: list[str]
+) -> None:    
+    for rel_path in rel_paths:
+        _secho_file(rel_path)
+        
 
-
-@get_app.command(
-        help = "List supported e-Callisto instrument codes."
+@get_typer.command(
+    help = "List supported e-Callisto instrument codes."
 )
 def callisto_instrument_codes(
 ) -> None:
@@ -28,18 +39,29 @@ def callisto_instrument_codes(
     callisto_instrument_codes = jsend_dict["data"]
 
     for instrument_code in callisto_instrument_codes:
-        typer.secho(instrument_code)
+        secho(instrument_code)
 
-    raise typer.Exit()
+    raise Exit()
 
 
-@get_app.command(
-        help = "List existing log files."
+@get_typer.command(
+    help = "List existing log files."
 )
-def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
-         year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
-         month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
-         day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY)
+def logs(process_type: str = Option(None, 
+                                    "--process-type", 
+                                    help="Specifies one of 'worker' or 'user'."),
+         year: int = Option(None, 
+                            "--year", 
+                            "-y", 
+                            help="Filter for log files under this numeric year."),
+         month: int = Option(None, 
+                             "--month", 
+                             "-m", 
+                             help="Filter for log files under this numeric month."),
+         day: int = Option(None, 
+                           "--day", 
+                           "-d", 
+                           help="Filter for log files under this numeric day.")
 ) -> None:
     params = {
         "process-type": process_type,
@@ -50,23 +72,36 @@ def logs(process_type: str = typer.Option(None, "--process-type", help=CliHelp.P
     jsend_dict = safe_request("spectre-data/logs",
                               "GET",
                               params = params)
-    file_names = jsend_dict["data"]
+    rel_paths = jsend_dict["data"]
 
-    for file_name in file_names:
-        typer.secho(file_name)
-
-    raise typer.Exit()
+    _secho_files(rel_paths)
+    raise Exit()
 
 
-@get_app.command(
-        help = "List existing batch files."
+@get_typer.command(
+    help = "List existing batch files."
 )
 def batch_files(
-    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
-    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
-    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
-    extensions: list[str] = typer.Option(None, "--extension", "-e", help=CliHelp.EXTENSIONS)
+    tag: str = Option(..., 
+                    "--tag", 
+                    "-t", 
+                    help="The tag used to capture the data."),
+    year: int = Option(None, 
+                       "--year", 
+                       "-y", 
+                       help="Filter for batch files under this numeric year."),
+    month: int = Option(None, 
+                        "--month", 
+                        "-m", 
+                        help="Filter for batch files under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Filter for batch files under this numeric day."),
+    extensions: list[str] = Option(None, 
+                                   "--extension", 
+                                   "-e", 
+                                   help="Filter for batch files with this file extension.")
 ) -> None:
     
     params = {
@@ -78,16 +113,14 @@ def batch_files(
     jsend_dict = safe_request(f"spectre-data/batches/{tag}",
                               "GET",
                               params = params)
-    file_names = jsend_dict["data"]
+    rel_paths = jsend_dict["data"]
 
-    for file_name in file_names:
-        typer.secho(file_name)
-
-    raise typer.Exit()
+    _secho_files(rel_paths)
+    raise Exit()
 
 
-@get_app.command(
-        help = "List supported receivers."
+@get_typer.command(
+    help = "List supported receivers."
 )
 def receivers(
 ) -> None:
@@ -97,16 +130,19 @@ def receivers(
     receiver_names = jsend_dict["data"]
     
     for receiver_name in receiver_names:
-        typer.secho(receiver_name)
+        secho(receiver_name)
         
-    raise typer.Exit()
+    raise Exit()
 
 
-@get_app.command(
-        help = ("List the supported operating modes for a receiver.")
+@get_typer.command(
+    help = ("List the supported operating modes for a receiver.")
 )
 def modes(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
+    receiver_name: str = Option(..., 
+                                "--receiver", 
+                                "-r", 
+                                help="The name of the receiver.")
 ) -> None:
     
     jsend_dict = safe_request(f"receivers/{receiver_name}/modes",
@@ -114,16 +150,19 @@ def modes(
     receiver_modes = jsend_dict["data"]
 
     for receiver_mode in receiver_modes:
-        typer.secho(receiver_mode)
+        secho(receiver_mode)
+        
+    raise Exit()
 
-    raise typer.Exit()
 
-
-@get_app.command(
-        help = "Print receiver hardware specifications."
+@get_typer.command(
+    help = "Print receiver hardware specifications."
 )
 def specs(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME)
+    receiver_name: str = Option(..., 
+                                "--receiver", 
+                                "-r", 
+                                help="The name of the receiver.")
 ) -> None:
     
     params = {
@@ -135,31 +174,33 @@ def specs(
     specs = jsend_dict["data"]
 
     for k, v in specs.items():
-        typer.secho(f"{k}: {v}")
+        secho(f"{k}: {v}")
 
-    raise typer.Exit()
+    raise Exit()
 
 
-@get_app.command(
-        help = "List existing capture configs."
+@get_typer.command(
+    help = "List existing capture configs."
 )
 def capture_configs(
 ) -> None:
     
     jsend_dict = safe_request(f"spectre-data/configs",
                               "GET")
-    file_names = jsend_dict["data"]
+    rel_paths = jsend_dict["data"]
     
-    for file_name in file_names:
-        typer.secho(file_name)
+    _secho_files(rel_paths)
 
-    raise typer.Exit()
+    raise Exit()
 
 
-@get_app.command(
-        help = "Print capture config file contents."
+@get_typer.command(
+    help = "Print capture config file contents."
 )
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
+def capture_config(tag: str = Option(..., 
+                                     "--tag", 
+                                     "-t", 
+                                     help="Unique identifier for the capture config."),
 ) -> None:
     jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "GET")
@@ -167,19 +208,27 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
 
     pprint_dict(capture_config)
 
-    raise typer.Exit()
+    raise Exit()
 
 
-@get_app.command(
-        help = "List tags with existing batch files."
+@get_typer.command(
+    help = "List tags with existing batch files."
 )
 def tags(
-    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
-    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
-    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
+    year: int = Option(None, 
+                       "--year", 
+                       "-y", 
+                       help="Find tags with existing batch files under this numeric year."),
+    month: int = Option(None, 
+                        "--month", 
+                        "-m", 
+                        help="Find tags with existing batch files under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Find tags with existing batch files under this numeric day."),
     
 ) -> None:
-    
     params = {
         "year": year,
         "month": month,
@@ -191,33 +240,44 @@ def tags(
     tags = jsend_dict["data"]
 
     for tag in tags:
-        typer.secho(tag)
+        secho(tag)
     
-    raise typer.Exit()
+    raise Exit()
 
     
-@get_app.command(
+@get_typer.command(
         help = "Print log file contents."
 )
 def log(
-    pid: str = typer.Option(..., "--pid", help=CliHelp.PID),
+    pid: str = Option(..., 
+                      "--pid", 
+                      help="The process ID."),
 ) -> None:
     
     jsend_dict = safe_request(f"spectre-data/logs/{pid}",
                               "GET")
     file_contents = jsend_dict["data"]
 
-    typer.secho(file_contents)
-    raise typer.Exit()
+    secho(file_contents)
+    raise Exit()
 
 
-@get_app.command(
+@get_typer.command(
         help = "Print a capture template."
 )
 def capture_template(
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
-    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
-    param_name: str = typer.Option(None, "--param", "-p", help=CliHelp.PARAMETER_NAME)
+    receiver_name: str = Option(..., 
+                                "--receiver", 
+                                "-r", 
+                                help="The name of the receiver."),
+    receiver_mode: str = Option(..., 
+                                "--mode", 
+                                "-m", 
+                                help="The operating mode of the receiver."),
+    param_name: str = Option(None, 
+                             "--param", 
+                             "-p", 
+                             help="Filter for a particular parameter template.")
 ) -> None: 
     
     params = {
@@ -233,12 +293,12 @@ def capture_template(
     else:
         if param_name not in capture_template:
             raise KeyError(f"A parameter with name '{param_name}' does not exist "
-                        f"in the capture template for the receiver '{receiver_name}' "
-                        f"operating in mode '{receiver_mode}'. Expected one of: "
-                        f"{list(capture_template.keys())}")
+                           f"in the capture template for the receiver '{receiver_name}' "
+                           f"operating in mode '{receiver_mode}'. Expected one of: "
+                           f"{list(capture_template.keys())}")
         pprint_dict(capture_template[param_name])
 
-    typer.Exit()
+    Exit()
 
 
     
