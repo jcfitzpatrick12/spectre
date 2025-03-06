@@ -12,7 +12,7 @@ from os import walk
 
 from spectre_core.logs import log_call
 from spectre_core.batches import Batches, BatchKey, get_batch_cls_from_tag
-from spectre_core.config import get_batches_dir_path
+from spectre_core.config import get_batches_dir_path, trim_spectre_data_dir_path
 from spectre_core.capture_configs import CaptureConfig
 from spectre_core.spectrograms import validate_analytically
 
@@ -62,7 +62,8 @@ def get_batch_files_for_tag(
     :param year: Filter batch files by the numeric year, defaults to None
     :param month: Filter batch files by the numeric month, defaults to None
     :param day: Filter batch files by the numeric day, defaults to None
-    :return: A list of all batch files with the input tag which exist in the file system.
+    :return: The file paths of all batch files under the input tag which exist in the file system,
+    relative to `SPECTRE_DATA_DIR_PATH`.
     """
     if extensions is None:
         extensions = []
@@ -83,7 +84,7 @@ def get_batch_files_for_tag(
         for extension in extensions:
             if batch.has_file(extension):
                 batch_file = batch.get_file(extension)
-                batch_files.append(batch_file.file_name)
+                batch_files.append( trim_spectre_data_dir_path(batch_file.file_path) )
     return batch_files
 
 
@@ -106,7 +107,9 @@ def delete_batch_files(
     specified but not a month, all files from that year will be deleted.
     :param day: Delete only batch files from this numeric day. Defaults to None. If both year and month 
     are specified but not a day, all files from that year and month will be deleted.
-    :return: The file names of batch files which have been successfully deleted.
+    :return: The file paths of batch files which have been successfully deleted,
+    relative to `SPECTRE_DATA_DIR_PATH`.
+    
     """
     batch_cls = get_batch_cls_from_tag(tag)
     batches = Batches(tag, 
@@ -124,7 +127,7 @@ def delete_batch_files(
                 batch_file = batch.get_file(extension)
                 batch_file.delete()
                 _LOGGER.info(f"File deleted: {batch_file.file_name}")
-                deleted_file_names.append(batch_file.file_name)
+                deleted_file_names.append( trim_spectre_data_dir_path(batch_file.file_path) )
 
     return deleted_file_names
 
@@ -154,6 +157,7 @@ def get_analytical_test_results(
             test_results = validate_analytically(spectrogram, 
                                                  capture_config,
                                                  absolute_tolerance)
-            results_per_batch[batch.spectrogram_file.file_name] = test_results.to_dict()
+            rel_path = trim_spectre_data_dir_path(batch.spectrogram_file.file_name)
+            results_per_batch[rel_path] = test_results.to_dict()
 
     return results_per_batch

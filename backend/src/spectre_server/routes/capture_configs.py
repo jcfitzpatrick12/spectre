@@ -49,10 +49,7 @@ def create_capture_config(
 def delete_capture_config(
     tag: str
 ) -> str:
-    json              = request.get_json()
-    force             = json.get("force")
-    return capture_configs.delete_capture_config(tag,
-                                                 force)
+    return capture_configs.delete_capture_config(tag)
 
 
 @capture_configs_blueprint.route("/<string:tag>", methods=["PATCH"])

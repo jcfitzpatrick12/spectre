@@ -12,7 +12,7 @@ def _calculate_total_runtime(seconds: int = 0,
 ) -> float:
     total_duration = seconds + (minutes * 60) + (hours * 3600) # [s]
     if total_duration <= 0:
-        raise ValueError(f"Total duration must be strictly positive")
+        raise ValueError(f"Total duration must be strictly positive.")
     return total_duration
 
 @log_call

@@ -8,6 +8,7 @@ _LOGGER = getLogger(__name__)
 from typing import Optional
 
 from spectre_core.logs import Logs, ProcessType, log_call
+from spectre_core.config import trim_spectre_data_dir_path
 
 @log_call
 def delete_logs(
@@ -26,7 +27,7 @@ def delete_logs(
     specified but not a month, all files from that year will be deleted.
     :param day: Delete only log files from this numeric day. Defaults to None. If both year and month 
     are specified but not a day, all files from that year and month will be deleted.
-    :return: The file names of all logs which were deleted.
+    :return: The file paths of all logs which were deleted, relative to `SPECTRE_DATA_DIR_PATH`.
     """
     proc_type = ProcessType(process_type) if process_type is not None else None
     logs = Logs(proc_type,
@@ -40,7 +41,7 @@ def delete_logs(
             continue
         log.delete()
         _LOGGER.info(f"File deleted: {log.file_path}")
-        deleted_file_names.append(log.file_name)
+        deleted_file_names.append( trim_spectre_data_dir_path(log.file_path) )
 
     return deleted_file_names
 
@@ -58,14 +59,14 @@ def get_logs(
     :param year: Filter logs by the numeric year, defaults to None
     :param month: Filter logs by the numeric month, defaults to None
     :param day: Filter logs by the numeric day, defaults to None
-    :return: The file names of logs which exist in the file system.
+    :return: The file paths of logs which exist in the file system, relative to `SPECTRE_DATA_DIR_PATH`.
     """
     proc_type = ProcessType(process_type) if process_type is not None else None
     logs = Logs(proc_type,
                 year,
                 month,
                 day)
-    return [log.file_name for log in logs.log_list]
+    return [trim_spectre_data_dir_path(log.file_path) for log in logs.log_list]
 
 
 @log_call
