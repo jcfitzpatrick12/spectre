@@ -2,25 +2,51 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
+import os
+from typer import Typer, Option, Exit, secho
 from typing import List
 
-from ._cli_help import CliHelp
+from spectre_core.config import get_spectre_data_dir_path
+
 from ._safe_request import safe_request
 
-create_typer = typer.Typer(
+create_typer = Typer(
     help = "Create resources."
 )
 
+def _secho_created_file(
+    rel_path: str
+) -> None:    
+    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
+    secho(f"Created '{abs_path}'", fg="green")
+
+
 @create_typer.command(
-        help = "Create a capture config."
+    help = "Create a capture config."
 )
 def capture_config(
-    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-    receiver_name: str = typer.Option(..., "--receiver", "-r", help=CliHelp.RECEIVER_NAME),
-    receiver_mode: str = typer.Option(..., "--mode", "-m", help=CliHelp.MODE),
-    params: List[str] = typer.Option([], "--param", "-p", help=CliHelp.PARAM, metavar="KEY=VALUE"),
-    force: bool = typer.Option(False, "--force", help = CliHelp.FORCE, is_flag=True)
+    tag: str = Option(..., 
+                      "--tag", 
+                      "-t", 
+                      help="Unique identifier for the capture config."),
+    receiver_name: str = Option(..., 
+                               "--receiver",
+                               "-r", 
+                               help="The name of the receiver."),
+    receiver_mode: str = Option(..., 
+                                "--mode", 
+                                "-m", 
+                                help="The operating mode for the receiver."),
+    params: List[str] = Option([], 
+                               "--param", 
+                               "-p", 
+                               help="Parameters as key-value pairs.", 
+                               metavar="KEY=VALUE"),
+    force: bool = Option(False, 
+                         "--force", 
+                         help="If a capture config already exists with the same tag, "
+                              "overwrite it.", 
+                         is_flag=True)
 ) -> None:
     json = {
         "receiver_name": receiver_name,
@@ -31,9 +57,9 @@ def capture_config(
     jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "PUT", 
                               json=json)
-    file_name = jsend_dict["data"]
-    typer.secho(f"Created '{file_name}'")
-    raise typer.Exit()
+    rel_path = jsend_dict["data"]
+    _secho_created_file(rel_path)
+    raise Exit()
         
 
     

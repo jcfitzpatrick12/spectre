@@ -2,77 +2,92 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
+from typer import Typer, secho, Option, Exit
+import os
 
-from ._cli_help import CliHelp
+from spectre_core.config import get_spectre_data_dir_path
+
 from ._safe_request import safe_request
 
-delete_typer = typer.Typer(
+
+delete_typer = Typer(
     help = "Delete resources."
 )
 
-def _secho_deleted_files(
-    file_names: list[str]
-) -> None:    
-    for file_name in file_names:
-        typer.secho(f"Deleted '{file_name}'", fg="yellow")
-
 
 def _secho_deleted_file(
-    file_name: str
+    rel_path: str
 ) -> None:
-    typer.secho(f"Deleted '{file_name}'", fg="yellow")
-
-
-def _caution_irreversible(
-    force: bool
-) -> None:
-    if force:
-        return
-    typer.secho("This action is irreversible. Do you wish to continue? [y/n]", fg="red", bold=True)
-    confirmation = input().strip().lower()
-    if confirmation not in ("y", "yes"):
-        typer.secho("Operation cancelled.", fg="yellow")
-        raise typer.Exit()
+    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
+    secho(f"Deleted '{abs_path}'", fg="yellow")
+    
+    
+def _secho_deleted_files(
+    rel_paths: list[str]
+) -> None:    
+    for rel_path in rel_paths:
+        _secho_deleted_file(rel_path)
 
 
 @delete_typer.command(
-        help = "Delete log files."
+    help = "Delete log files."
 )
 def logs(
-    process_type: str = typer.Option(None, "--process-type", help=CliHelp.PROCESS_TYPE),
-    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
-    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MONTH),
-    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
-    force: bool = typer.Option(False, "--force", help=CliHelp.FORCE),
+    process_type: str = Option(None, 
+                               "--process-type", 
+                               help="Specifies one of 'worker' or 'user'."),
+    year: int = Option(None, 
+                       "--year", 
+                       "-y", 
+                       help="Delete all logs under this numeric year."),
+    month: int = Option(None, 
+                       "--month", 
+                       "-m", 
+                      help="Delete all logs under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Delete all logs under this numeric day.")
 ) -> None:
-    _caution_irreversible(force)
     params = {
         "process_type": process_type,
         "year": year,
         "month": month,
-        "day": day
+        "day": day,
     }
     jsend_dict = safe_request("spectre-data/logs", 
                               "DELETE", 
                               params = params)
-    file_names = jsend_dict["data"]
-    _secho_deleted_files(file_names)
-    raise typer.Exit()
+    rel_paths = jsend_dict["data"]
+    _secho_deleted_files(rel_paths)
+    raise Exit()
 
 
 @delete_typer.command(
-        help = "Delete batch files."
+    help = "Delete batch files."
 )
 def batch_files(
-    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-    extension: list[str] = typer.Option([], "--extension", "-e", help=CliHelp.EXTENSIONS),
-    year: int = typer.Option(None, "--year", "-y", help=CliHelp.YEAR),
-    month: int = typer.Option(None, "--month", "-m", help=CliHelp.MINUTES),
-    day: int = typer.Option(None, "--day", "-d", help=CliHelp.DAY),
-    force: bool = typer.Option(False, "--force", help=CliHelp.FORCE),
+    tag: str = Option(..., 
+                      "--tag", 
+                      "-t", 
+                      help="The tag used to capture the data."),
+    extension: list[str] = Option([], 
+                                  "--extension", 
+                                  "-e", 
+                                  help="Delete all batch files with this file extension."),
+    year: int = Option(None, 
+                      "--year", 
+                      "-y", 
+                      help="Delete all batch files under this numeric year."),
+    month: int = Option(None, 
+                        "--month", 
+                        "-m", 
+                        help="Delete all batch files under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Delete all batch files under this numeric day."),
 ) -> None:
-    _caution_irreversible(force)
     params = {
         "extension": extension,
         "year": year,
@@ -82,24 +97,22 @@ def batch_files(
     jsend_dict = safe_request(f"spectre-data/batches/{tag}", 
                               "DELETE",
                               params = params)
-    file_names = jsend_dict["data"]
-    _secho_deleted_files(file_names)
-    raise typer.Exit()
+    rel_paths = jsend_dict["data"]
+    _secho_deleted_files(rel_paths)
+    raise Exit()
 
 
 @delete_typer.command(
-        help = "Delete a capture config."
+    help = "Delete a capture config."
 )
 def capture_config(
-    tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-    force: bool = typer.Option(False, "--force", help="Bypass the irreversible action warning."),
+    tag: str = Option(..., 
+                      "--tag", 
+                      "-t", 
+                      help="Unique identifier for the capture config."),
 ) -> None:
-    json = {
-        "force": force
-    }
     jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
-                              "DELETE",
-                              json=json)
-    file_name = jsend_dict["data"]
-    _secho_deleted_file(file_name)
-    raise typer.Exit()
+                              "DELETE")
+    rel_path = jsend_dict["data"]
+    _secho_deleted_file(rel_path)
+    raise Exit()

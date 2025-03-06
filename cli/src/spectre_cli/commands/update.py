@@ -2,22 +2,44 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
+from typer import Typer, Option, Exit, secho
 from typing import List
+import os
 
-from ._cli_help import CliHelp
+from spectre_core.config import get_spectre_data_dir_path
+
 from ._safe_request import safe_request
 
-update_typer = typer.Typer(
+
+update_typer = Typer(
     help = "Update resources."
 )
+
+def _secho_updated_file(
+    rel_path: str
+) -> None:    
+    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
+    secho(f"Updated '{abs_path}'", fg="green")
+
 
 @update_typer.command(
         help = "Update capture config parameters."
 )
-def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG),
-                   params: List[str] = typer.Option(..., "--param", "-p", help="Pass arbitrary key-value pairs.", metavar="KEY=VALUE"),
-                   force: bool = typer.Option(False, "--force", is_flag = True, help = CliHelp.FORCE_UPDATE)
+def capture_config(tag: str = Option(..., 
+                                     "--tag", 
+                                     "-t", 
+                                     help="Unique identifier for the capture config."),
+                   params: List[str] = Option(..., 
+                                              "--param", 
+                                              "-p", 
+                                              help="Pass arbitrary key-value pairs.", 
+                                              metavar="KEY=VALUE"),
+                   force: bool = Option(False, 
+                                        "--force", 
+                                        is_flag=True, 
+                                        help="Force the update even if data has already been collected under this capture config. "
+                                             "Use with caution: existing data may no longer align with the updated configuration, "
+                                             "potentially leading to misleading results.")
 ) -> None:
     
     json = {
@@ -27,8 +49,6 @@ def capture_config(tag: str = typer.Option(..., "--tag", "-t", help=CliHelp.TAG)
     jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "PATCH",
                               json = json)
-    file_name = jsend_dict["data"]
-
-    typer.secho(f"Successfully updated `{file_name}`")
-
-    raise typer.Exit()
+    rel_path = jsend_dict["data"]
+    _secho_updated_file(rel_path)
+    raise Exit()
