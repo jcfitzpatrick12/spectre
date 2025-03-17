@@ -25,7 +25,7 @@ def download_callisto_data(
     :param year: Year of the observation.
     :param month: Month of the observation.
     :param day: Day of the observation.
-    :return: A list of file paths of all newly created batch files, relative to `SPECTRE_DATA_DIR_PATH`.
+    :return: A list of file paths of all newly created batch files, relative to the mounted volume.
     """
     instr_code = wgetting.CallistoInstrumentCode(instrument_code)
     return wgetting.download_callisto_data(instr_code, 
