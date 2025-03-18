@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
       target: runtime
     container_name: spectre-server
+    image: spectre-server
     shm_size: 4gb
     networks:
       - spectre-network
@@ -23,6 +24,7 @@ services:
       context: ./cli
       dockerfile: Dockerfile
     container_name: spectre-cli
+    image: spectre-cli
     networks:
       - spectre-network
     depends_on:
