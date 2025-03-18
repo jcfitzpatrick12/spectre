@@ -6,7 +6,7 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 from typing import Optional, Any
-from os import listdir
+from os import scandir
 
 from spectre_core.config import get_configs_dir_path, trim_spectre_data_dir_path
 from spectre_core.batches import Batches, get_batch_cls_from_tag
@@ -18,8 +18,9 @@ from spectre_core.capture_configs import CaptureConfig, parse_string_parameters,
 @log_call
 def get_capture_configs(
 ) -> list[str]:
-    """Get the file names for all capture configs."""
-    return listdir( get_configs_dir_path() )
+    """Get the full file paths for all capture configs."""
+    config_dir = get_configs_dir_path()
+    return [trim_spectre_data_dir_path(entry.path) for entry in scandir(config_dir)]
  
 
 @log_call
@@ -39,7 +40,7 @@ def create_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, overwrites the existing capture config if it already exists, defaults to False
-    :return: The file path of the capture config, relative to `SPECTRE_DATA_DIR_PATH`.
+    :return: The file path of the capture config, relative to the mounted volume.
     """
     if string_parameters is None:
         string_parameters = []
@@ -122,7 +123,7 @@ def update_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
-    :return: The file path of the successfully updated capture config, relative to `SPECTRE_DATA_DIR_PATH`.
+    :return: The file path of the successfully updated capture config, relative to the mounted volume.
     """
     _caution_update(tag, 
                     force)
@@ -156,7 +157,7 @@ def delete_capture_config(
     """Delete a capture config.
 
     :param tag: The tag of the capture config.
-    :return: The file path of the successfully deleted capture config, relative to `SPECTRE_DATA_DIR_PATH`.
+    :return: The file path of the successfully deleted capture config, relative to the mounted volume.
     """
     if _has_batches(tag):
         error_message = (f"Batches exist under the tag {tag}, and deleting the corresponding capture config "

@@ -68,8 +68,8 @@ def safe_request(
     if route_url.startswith("/"):
         route_url.lstrip("/")
         
-    # Use the base URL of the locally running spectre-server, specifying the loopback IP and port 5000
-    full_url = os.path.join("http://127.0.0.1:5000", route_url)
+    # Use the base URL of the spectre-server running on the spectre-network
+    full_url = os.path.join("http://spectre-server:5000", route_url)
 
     response = requests.request(method,
                                 full_url,

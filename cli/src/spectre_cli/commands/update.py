@@ -4,9 +4,6 @@
 
 from typer import Typer, Option, Exit, secho
 from typing import List
-import os
-
-from spectre_core.config import get_spectre_data_dir_path
 
 from ._safe_request import safe_request
 
@@ -16,9 +13,8 @@ update_typer = Typer(
 )
 
 def _secho_updated_file(
-    rel_path: str
+    abs_path: str
 ) -> None:    
-    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
     secho(f"Updated '{abs_path}'", fg="green")
 
 
@@ -49,6 +45,6 @@ def capture_config(tag: str = Option(...,
     jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "PATCH",
                               json = json)
-    rel_path = jsend_dict["data"]
-    _secho_updated_file(rel_path)
+    abs_path = jsend_dict["data"]
+    _secho_updated_file(abs_path)
     raise Exit()

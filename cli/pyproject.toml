@@ -17,10 +17,9 @@ classifiers = [
 dependencies = [
     "typer-slim==0.13.1",
     "requests==2.31.0",
-    "spectre-core==0.0.18"
+    "pyyaml==6.0.2"
 ]
 
 
-# Define the entry point for the CLI application
 [project.scripts]
 spectre = "spectre_cli.__main__:app"

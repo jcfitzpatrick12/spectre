@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-
 
 from typer import Typer, Option, Exit, secho
-import os
-
-from spectre_core.config import get_spectre_data_dir_path
 
 from ._safe_request import safe_request
 
@@ -14,17 +11,16 @@ download_typer = Typer(
 )
 
 def _secho_downloaded_file(
-    rel_path: str
+    abs_path: str
 ) -> None:
-    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
     secho(f"Downloaded '{abs_path}'", fg="green")
     
     
 def _secho_downloaded_files(
-    rel_paths: list[str]
+    abs_paths: list[str]
 ) -> None:    
-    for rel_path in rel_paths:
-        _secho_downloaded_file(rel_path)
+    for abs_path in abs_paths:
+        _secho_downloaded_file(abs_path)
     
 @download_typer.command(
     help = "Download e-Callisto network spectrogram data."
@@ -57,6 +53,6 @@ def callisto(
     jsend_dict = safe_request("callisto/batches",
                               "POST",
                               json=json)
-    rel_paths = jsend_dict["data"]
-    _secho_downloaded_files( rel_paths )
+    abs_paths = jsend_dict["data"]
+    _secho_downloaded_files( abs_paths )
     raise Exit()

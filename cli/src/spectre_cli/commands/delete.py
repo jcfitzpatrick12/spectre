@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from typer import Typer, secho, Option, Exit
-import os
-
-from spectre_core.config import get_spectre_data_dir_path
 
 from ._safe_request import safe_request
 
@@ -16,17 +13,16 @@ delete_typer = Typer(
 
 
 def _secho_deleted_file(
-    rel_path: str
+    abs_path: str
 ) -> None:
-    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
     secho(f"Deleted '{abs_path}'", fg="yellow")
     
     
 def _secho_deleted_files(
-    rel_paths: list[str]
+    abs_paths: list[str]
 ) -> None:    
-    for rel_path in rel_paths:
-        _secho_deleted_file(rel_path)
+    for abs_path in abs_paths:
+        _secho_deleted_file(abs_path)
 
 
 @delete_typer.command(
@@ -58,8 +54,8 @@ def logs(
     jsend_dict = safe_request("spectre-data/logs", 
                               "DELETE", 
                               params = params)
-    rel_paths = jsend_dict["data"]
-    _secho_deleted_files(rel_paths)
+    abs_paths = jsend_dict["data"]
+    _secho_deleted_files(abs_paths)
     raise Exit()
 
 
@@ -97,8 +93,8 @@ def batch_files(
     jsend_dict = safe_request(f"spectre-data/batches/{tag}", 
                               "DELETE",
                               params = params)
-    rel_paths = jsend_dict["data"]
-    _secho_deleted_files(rel_paths)
+    abs_paths = jsend_dict["data"]
+    _secho_deleted_files(abs_paths)
     raise Exit()
 
 
@@ -113,6 +109,6 @@ def capture_config(
 ) -> None:
     jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "DELETE")
-    rel_path = jsend_dict["data"]
-    _secho_deleted_file(rel_path)
+    abs_path = jsend_dict["data"]
+    _secho_deleted_file(abs_path)
     raise Exit()
