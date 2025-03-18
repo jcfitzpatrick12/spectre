@@ -71,12 +71,12 @@ To get going, you'll need the following installed on your machine:
    ```
 
 2. **Start the containers**  
-   Ensure any connected receivers are plugged in, then create and run the containers:  
+   Ensure any receivers are connected, then create and run the containers:  
    ```bash
    docker compose up --build
    ```
 
-3. **Set up an alias for the CLI**  
+3. **Create an alias for the CLI**  
    In a new terminal tab, set up the following alias:    
    ```bash
    echo "alias spectre='docker exec spectre-cli spectre'" >> ~/.bashrc && . ~/.bashrc
@@ -84,13 +84,13 @@ To get going, you'll need the following installed on your machine:
    This lets you run `spectre-cli` commands as if they were executed directly on the host.
 
 4. **Good to go!**  
-   Verify everything is up and running by calling:    
+   Verify everything is up and running with:    
    ```bash
    spectre --help
    ```
 
 
-### **Checking your receiver is detected**  
+### **Check your receiver is detected**  
 If you have a physical receiver connected, it's a good idea to verify that the `spectre-server` can detect it.
 
 - For SDRplay receivers, run:  
@@ -107,15 +107,15 @@ If this is the first time you're running the containers since plugging in the de
 
 
 ## **Quick Start for Developers**
-To get set up with development, simply point docker to the development compose file:   
+For development, use the development Compose file:    
    ```bash
    docker compose --file docker-compose.dev.yml up --build
    ```
 
-[spectre](https://github.com/jcfitzpatrick12/spectre) is the primary application repository, with server-side implementations available in a seperate Python package called [spectre-core](https://github.com/jcfitzpatrick12/spectre-core). Once the containers are running, you can use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
+[spectre](https://github.com/jcfitzpatrick12/spectre) is the primary application repository, with server-side implementations available in a separate Python package called [spectre-core](https://github.com/jcfitzpatrick12/spectre-core). Once the containers are running, you can use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
 
 **⚠️ Note:**  
-You will have to start the SDRPlay API manually when working with SDRPlay receivers.
+If you're working with SDRPlay receivers, you will have to start the SDRPlay API manually.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
