@@ -124,8 +124,11 @@ RUN apt-get install -y \
     git python3-pip vim \
     # Required for the gnuradio GUI to run inside the container
     libgtk-3-dev x11-apps \
-    # Subdue some warnings in gnuradio-companion
-    libcanberra-gtk-module libcanberra-gtk3-module dbus-x11 && \
+    # Subdue some warnings flagged on starting gnuradio-companion
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module \
+    # Subdue a warning when "opening from file" in gnuradio
+    dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
     pip install --upgrade \
     build twine

@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
       target: development
     container_name: spectre-server
+    shm_size: 4gb
     networks:
       - spectre-network
     volumes:
@@ -20,7 +21,6 @@ services:
     environment:
       # Enable GUI functionality
       - DISPLAY=${DISPLAY}
-    shm_size: "8g"
     # Keep the container running on start-up
     tty: true
     stop_signal: SIGKILL

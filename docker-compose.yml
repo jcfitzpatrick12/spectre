@@ -9,13 +9,13 @@ services:
       dockerfile: Dockerfile
       target: runtime
     container_name: spectre-server
+    shm_size: 4gb
     networks:
       - spectre-network
     volumes:
       - spectre-data:/app/.spectre-data
     devices:
       - "/dev/bus/usb"
-    shm_size: "8g"
     stop_signal: SIGKILL
 
   cli:

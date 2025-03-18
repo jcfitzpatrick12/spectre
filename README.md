@@ -62,10 +62,10 @@ To get going, you'll need the following installed on your machine:
 | **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run `docker --version` |
 | **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run `git --version` |
 
-### **Starting Spectre**
+### **Getting started**
 
 1. **Clone the repository**  
-   Clone the \`spectre\` GitHub repository and navigate to its root directory:  
+   Clone the `spectre` GitHub repository and navigate to its root directory:  
    ```bash
    git clone https://github.com/jcfitzpatrick12/spectre.git && cd spectre
    ```
@@ -77,11 +77,17 @@ To get going, you'll need the following installed on your machine:
    ```
 
 3. **Set up an alias for the CLI**  
-   In a new terminal tab, set up an alias for \`spectre\` on your host machine:  
+   In a new terminal tab, set up the following alias:    
    ```bash
    echo "alias spectre='docker exec spectre-cli spectre'" >> ~/.bashrc && . ~/.bashrc
    ```
-   This allows you to run \`spectre\` directly from the host.
+   This lets you run `spectre-cli` commands as if they were executed directly on the host.
+
+4. **Good to go!**  
+   Verify everything is up and running by calling:    
+   ```bash
+   spectre --help
+   ```
 
 
 ### **Checking your receiver is detected**  
@@ -97,17 +103,19 @@ If you have a physical receiver connected, it's a good idea to verify that the `
    docker exec spectre-server uhd_find_devices
    ```
 
-If this is the first time you're running the container since plugging in the device, it may not be detected. Ensure the receiver is still connected, then try restarting the containers again.
+If this is the first time you're running the containers since plugging in the device, it may not be detected. Ensure the receiver is still connected, then try restarting the containers again.
 
 
 ## **Quick Start for Developers**
-1. **Start the containers**  
-   Ensure any connected receivers are plugged in before running the containers, pointing to the development compose file:  
+To get set up with development, simply point docker to the development compose file:   
    ```bash
-   docker compose -f docker-compose.dev.yml up --build
+   docker compose --file docker-compose.dev.yml up --build
    ```
 
-You can then use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
+[spectre](https://github.com/jcfitzpatrick12/spectre) is the primary application repository, with server-side implementations available in a seperate Python package called [spectre-core](https://github.com/jcfitzpatrick12/spectre-core). Once the containers are running, you can use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
+
+**⚠️ Note:**  
+You will have to start the SDRPlay API manually when working with SDRPlay receivers.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
