@@ -1,0 +1,42 @@
+networks:
+  spectre-network:
+    driver: bridge
+
+services:
+  server:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: spectre-server
+    shm_size: 4gb
+    networks:
+      - spectre-network
+    volumes:
+      - spectre-data:/app/.spectre-data
+      # Enable GUI functionality
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      - "/dev/bus/usb"
+    environment:
+      # Enable GUI functionality
+      - DISPLAY=${DISPLAY}
+    # Keep the container running on start-up
+    tty: true
+    stop_signal: SIGKILL
+
+  cli:
+    build:
+      context: ./cli
+      dockerfile: Dockerfile
+    container_name: spectre-cli
+    networks:
+      - spectre-network
+    depends_on:
+      - server
+    # Keep the container running on start-up
+    tty: true 
+    stop_signal: SIGKILL
+
+volumes:
+  spectre-data:

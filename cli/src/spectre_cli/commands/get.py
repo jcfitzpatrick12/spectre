@@ -3,12 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from typer import Typer, Option, Exit, secho
-import os
-
-from spectre_core.config import get_spectre_data_dir_path
 
 from ._safe_request import safe_request
-from ._pprint import pprint_dict
+from ._shared import pprint_dict
 
 
 get_typer = Typer(
@@ -16,17 +13,16 @@ get_typer = Typer(
 )
 
 def _secho_file(
-    rel_path: str
+    abs_path: str
 ) -> None:
-    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
     secho(abs_path)
     
     
 def _secho_files(
-    rel_paths: list[str]
+    abs_paths: list[str]
 ) -> None:    
-    for rel_path in rel_paths:
-        _secho_file(rel_path)
+    for abs_path in abs_paths:
+        _secho_file(abs_path)
         
 
 @get_typer.command(
@@ -72,9 +68,9 @@ def logs(process_type: str = Option(None,
     jsend_dict = safe_request("spectre-data/logs",
                               "GET",
                               params = params)
-    rel_paths = jsend_dict["data"]
+    abs_paths = jsend_dict["data"]
 
-    _secho_files(rel_paths)
+    _secho_files(abs_paths)
     raise Exit()
 
 
@@ -113,9 +109,9 @@ def batch_files(
     jsend_dict = safe_request(f"spectre-data/batches/{tag}",
                               "GET",
                               params = params)
-    rel_paths = jsend_dict["data"]
+    abs_paths = jsend_dict["data"]
 
-    _secho_files(rel_paths)
+    _secho_files(abs_paths)
     raise Exit()
 
 
@@ -187,9 +183,9 @@ def capture_configs(
     
     jsend_dict = safe_request(f"spectre-data/configs",
                               "GET")
-    rel_paths = jsend_dict["data"]
+    abs_paths = jsend_dict["data"]
     
-    _secho_files(rel_paths)
+    _secho_files(abs_paths)
 
     raise Exit()
 

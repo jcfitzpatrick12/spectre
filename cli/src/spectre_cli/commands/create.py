@@ -2,11 +2,8 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import os
 from typer import Typer, Option, Exit, secho
 from typing import List
-
-from spectre_core.config import get_spectre_data_dir_path
 
 from ._safe_request import safe_request
 
@@ -15,9 +12,8 @@ create_typer = Typer(
 )
 
 def _secho_created_file(
-    rel_path: str
+    abs_path: str
 ) -> None:    
-    abs_path = os.path.join(get_spectre_data_dir_path(), rel_path)
     secho(f"Created '{abs_path}'", fg="green")
 
 
@@ -57,8 +53,8 @@ def capture_config(
     jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "PUT", 
                               json=json)
-    rel_path = jsend_dict["data"]
-    _secho_created_file(rel_path)
+    abs_path = jsend_dict["data"]
+    _secho_created_file(abs_path)
     raise Exit()
         
 
