@@ -31,7 +31,7 @@ services:
       context: ./cli
       dockerfile: Dockerfile
     container_name: spectre-cli
-    image: image: spectre-cli
+    image: spectre-cli
     networks:
       - spectre-network
     depends_on:
