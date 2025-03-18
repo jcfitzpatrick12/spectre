@@ -157,7 +157,7 @@ def get_analytical_test_results(
             test_results = validate_analytically(spectrogram, 
                                                  capture_config,
                                                  absolute_tolerance)
-            rel_path = trim_spectre_data_dir_path(batch.spectrogram_file.file_name)
+            rel_path = trim_spectre_data_dir_path( batch.spectrogram_file.file_path )
             results_per_batch[rel_path] = test_results.to_dict()
 
     return results_per_batch
