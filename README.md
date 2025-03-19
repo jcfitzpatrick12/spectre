@@ -103,7 +103,10 @@ If you have a physical receiver connected, it's a good idea to verify that the `
    docker exec spectre-server uhd_find_devices
    ```
 
-If this is the first time you're running the containers since plugging in the device, it may not be detected. Ensure the receiver is still connected, then try restarting the containers again.
+If this is the first time you're running the containers since plugging in the device, it may not be detected. Ensure the receiver is still connected, then restart the `spectre-server` with:  
+   ```bash
+   docker compose restart spectre-server
+   ```
 
 
 ## **Quick Start for Developers**

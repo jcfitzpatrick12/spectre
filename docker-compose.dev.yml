@@ -3,12 +3,13 @@ networks:
     driver: bridge
 
 services:
-  server:
+  spectre-server:
     build:
       context: backend
       dockerfile: Dockerfile
       target: development
     container_name: spectre-server
+    image: spectre-server
     shm_size: 4gb
     networks:
       - spectre-network
@@ -25,15 +26,16 @@ services:
     tty: true
     stop_signal: SIGKILL
 
-  cli:
+  spectre-cli:
     build:
       context: ./cli
       dockerfile: Dockerfile
     container_name: spectre-cli
+    image: spectre-cli
     networks:
       - spectre-network
     depends_on:
-      - server
+      - spectre-server
     # Keep the container running on start-up
     tty: true 
     stop_signal: SIGKILL
