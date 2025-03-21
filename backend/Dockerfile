@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # --------------------------------- # 
-# Build the base stage
+# Create the base stage
 # --------------------------------- # 
 FROM ubuntu:22.04 AS base
 
@@ -84,7 +84,6 @@ RUN apt-get install -y \
     uhd-host && \
     /usr/lib/uhd/utils/uhd_images_downloader.py
 
-
 # Copy in the udev rules
 COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
 COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
@@ -102,10 +101,8 @@ COPY --from=gnuradio_oot_modules /usr/local/bin/sdrplay_find_devices /usr/local/
 # Copy in system-wide python packages for the flask server.
 COPY --from=flask_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
-# Copy the script and set permissions in one step
+# Copy in the start script, and set it as the default executable for the container
 COPY --chmod=0755 ./scripts/bash/start.sh ./start.sh
-
-# Default executable for the container
 CMD ["./start.sh"]
 
 
@@ -125,13 +122,11 @@ RUN apt-get install -y \
     # Required for the gnuradio GUI to run inside the container
     libgtk-3-dev x11-apps \
     # Subdue some warnings flagged on starting gnuradio-companion
-    libcanberra-gtk-module \
-    libcanberra-gtk3-module \
+    libcanberra-gtk-module libcanberra-gtk3-module \
     # Subdue a warning when "opening from file" in gnuradio
     dbus-x11 && \
     # Upgrade packages for building and distributing `spectre-core`.
-    pip install --upgrade \
-    build twine
+    pip install --upgrade build twine
 
 # Clone then install the latest `spectre` and `spectre-core` code, ready for development.
 COPY --chmod=0755 ./scripts/bash/install_spectre_latest.sh ./install_spectre_latest.sh 
