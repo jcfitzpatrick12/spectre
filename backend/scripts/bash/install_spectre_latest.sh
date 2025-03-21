@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Cloning the freshest copy of the `spectre` and `spectre-core` repositories, and 
-# pip installing them system-wide in editable mode.
-
-git clone https://github.com/jcfitzpatrick12/spectre.git && cd spectre
-git checkout main
+# pip installing them system-wide.
+git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre
+git sparse-checkout init --no-cone
+git sparse-checkout set backend/
+git checkout
 pip install -e backend
 
 
