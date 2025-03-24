@@ -16,7 +16,7 @@ from spectre_core.batches import (
     Batches, BatchKey, get_batch_cls_from_tag
 )
 from spectre_core.config import (
-    get_batches_dir_path, trim_spectre_data_dir_path, TimeFormat
+    get_batches_dir_path, TimeFormat
 )
 from spectre_core.capture_configs import CaptureConfig
 from spectre_core.spectrograms import (
@@ -268,7 +268,7 @@ def get_analytical_test_results(
             test_results = validate_analytically(spectrogram, 
                                                  capture_config,
                                                  absolute_tolerance)
-            rel_path = trim_spectre_data_dir_path( batch.spectrogram_file.file_path )
-            results_per_batch[rel_path] = test_results.to_dict()
+            abs_path = batch.spectrogram_file.file_path
+            results_per_batch[abs_path] = test_results.to_dict()
 
     return results_per_batch

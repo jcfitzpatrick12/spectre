@@ -8,7 +8,6 @@ _LOGGER = getLogger(__name__)
 from typing import Optional
 
 from spectre_core.logs import Logs, ProcessType, log_call
-from spectre_core.config import trim_spectre_data_dir_path
 
 @log_call
 def delete_logs(
@@ -41,7 +40,7 @@ def delete_logs(
             continue
         log.delete()
         _LOGGER.info(f"File deleted: {log.file_path}")
-        deleted_file_names.append( trim_spectre_data_dir_path(log.file_path) )
+        deleted_file_names.append(log.file_path)
 
     return deleted_file_names
 

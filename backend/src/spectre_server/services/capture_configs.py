@@ -8,7 +8,7 @@ _LOGGER = getLogger(__name__)
 from typing import Optional, Any
 from os import scandir
 
-from spectre_core.config import get_configs_dir_path, trim_spectre_data_dir_path
+from spectre_core.config import get_configs_dir_path
 from spectre_core.batches import Batches, get_batch_cls_from_tag
 from spectre_core.receivers import get_receiver, ReceiverName
 from spectre_core.logs import log_call
