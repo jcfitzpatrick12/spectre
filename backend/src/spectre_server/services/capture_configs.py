@@ -18,9 +18,9 @@ from spectre_core.capture_configs import CaptureConfig, parse_string_parameters,
 @log_call
 def get_capture_configs(
 ) -> list[str]:
-    """Get the full file paths for all capture configs."""
+    """Get the file paths for all capture configs, as absolute paths within the container's file system."""
     config_dir = get_configs_dir_path()
-    return [trim_spectre_data_dir_path(entry.path) for entry in scandir(config_dir)]
+    return [entry.path for entry in scandir(config_dir)]
  
 
 @log_call
