@@ -97,12 +97,12 @@ def plot(
     vmax: float = Option(None,
                          "--vmax",
                          help="The minimum value for the colormap. Only applies if `dBb` is True."),
-    figsize_x : float = Option(None,
-                               "--figsize-x",
-                               help="The horizontal size of the plot."),
-    figsize_y: float = Option(None,
-                              "--figsize-y",
-                              help="The vertical size of the plot.")
+    figsize_x : int = Option(None,
+                            "--figsize-x",
+                            help="The horizontal size of the plot."),
+    figsize_y: int = Option(None,
+                            "--figsize-y",
+                            help="The vertical size of the plot.")
 ) -> None:
     primary_tag, tags = tags[0], tags[1:]
     json = {
