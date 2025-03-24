@@ -18,14 +18,15 @@ def download_callisto_data(
     year: int, 
     month: int,
     day: int,
-) -> None:
+) -> list[str]:
     """Download and decompress e-Callisto FITS files, saving them as `spectre` batch files.
 
     :param instrument_code: e-Callisto station instrument code.
     :param year: Year of the observation.
     :param month: Month of the observation.
     :param day: Day of the observation.
-    :return: A list of file paths of all newly created batch files, relative to the mounted volume.
+    :return: A list of file paths of all newly created batch files, as absolute paths within 
+    the container's file system.
     """
     instr_code = wgetting.CallistoInstrumentCode(instrument_code)
     return wgetting.download_callisto_data(instr_code, 

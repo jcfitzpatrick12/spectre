@@ -23,6 +23,7 @@ services:
     build:
       context: ./cli
       dockerfile: Dockerfile
+      target: runtime
     container_name: spectre-cli
     image: spectre-cli
     networks:
