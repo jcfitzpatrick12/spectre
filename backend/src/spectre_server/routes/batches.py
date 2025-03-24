@@ -40,6 +40,7 @@ def create_plot(
     elif figsize_x_specified and figsize_y_specifed:
         figsize = (figsize_x, figsize_y)
     else:
+        # If nothing is specified, set an arbitrary default value.
         figsize = (15, 8)
         
     return batches.create_plot(tags,
