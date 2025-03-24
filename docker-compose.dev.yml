@@ -19,9 +19,6 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
     devices:
       - "/dev/bus/usb"
-    environment:
-      # Enable GUI functionality
-      - DISPLAY=${DISPLAY}
     # Keep the container running on start-up
     tty: true
     stop_signal: SIGKILL
