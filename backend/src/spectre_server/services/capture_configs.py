@@ -40,7 +40,7 @@ def create_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, overwrites the existing capture config if it already exists, defaults to False
-    :return: The file path of the capture config, relative to the mounted volume.
+    :return: The file path of the capture config, as an absolute paths within the container's file system.
     """
     if string_parameters is None:
         string_parameters = []
@@ -60,7 +60,7 @@ def create_capture_config(
     
     _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
 
-    return trim_spectre_data_dir_path(capture_config.file_path)
+    return capture_config.file_path
 
 
 @log_call
@@ -123,7 +123,8 @@ def update_capture_config(
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
-    :return: The file path of the successfully updated capture config, relative to the mounted volume.
+    :return: The file path of the successfully updated capture config, as an absolute path within 
+    the container's file system
     """
     _caution_update(tag, 
                     force)
@@ -147,7 +148,7 @@ def update_capture_config(
 
     _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.file_name}")
 
-    return trim_spectre_data_dir_path(capture_config.file_path)
+    return capture_config.file_path
   
         
 @log_call
@@ -157,7 +158,8 @@ def delete_capture_config(
     """Delete a capture config.
 
     :param tag: The tag of the capture config.
-    :return: The file path of the successfully deleted capture config, relative to the mounted volume.
+    :return: The file path of the successfully deleted capture config, as an absolute path within the container's 
+    file system.
     """
     if _has_batches(tag):
         error_message = (f"Batches exist under the tag {tag}, and deleting the corresponding capture config "
@@ -169,4 +171,4 @@ def delete_capture_config(
     capture_config.delete()
     _LOGGER.info(f"File deleted: {capture_config.file_name}")
     
-    return trim_spectre_data_dir_path(capture_config.file_path)
+    return capture_config.file_path

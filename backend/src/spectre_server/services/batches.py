@@ -174,7 +174,7 @@ def get_batch_files_for_tag(
     :param month: Filter batch files by the numeric month, defaults to None
     :param day: Filter batch files by the numeric day, defaults to None
     :return: The file paths of all batch files under the input tag which exist in the file system,
-    relative to the mounted volume
+    as absolute paths within the container's file system.
     """
     if extensions is None:
         extensions = []
@@ -195,7 +195,7 @@ def get_batch_files_for_tag(
         for extension in extensions:
             if batch.has_file(extension):
                 batch_file = batch.get_file(extension)
-                batch_files.append( trim_spectre_data_dir_path(batch_file.file_path) )
+                batch_files.append(batch_file.file_path)
     return batch_files
 
 
@@ -219,7 +219,7 @@ def delete_batch_files(
     :param day: Delete only batch files from this numeric day. Defaults to None. If both year and month 
     are specified but not a day, all files from that year and month will be deleted.
     :return: The file paths of batch files which have been successfully deleted,
-    relative to the mounted volume.
+    as absolute paths within the container's file system.
     
     """
     batch_cls = get_batch_cls_from_tag(tag)
@@ -238,7 +238,7 @@ def delete_batch_files(
                 batch_file = batch.get_file(extension)
                 batch_file.delete()
                 _LOGGER.info(f"File deleted: {batch_file.file_name}")
-                deleted_file_names.append( trim_spectre_data_dir_path(batch_file.file_path) )
+                deleted_file_names.append(batch_file.file_path)
 
     return deleted_file_names
 

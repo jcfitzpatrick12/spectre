@@ -27,7 +27,7 @@ def delete_logs(
     specified but not a month, all files from that year will be deleted.
     :param day: Delete only log files from this numeric day. Defaults to None. If both year and month 
     are specified but not a day, all files from that year and month will be deleted.
-    :return: The file paths of all logs which were deleted, relative to the mounted volume.
+    :return: The file paths of all logs which were deleted, as absolute paths within the container's file system.
     """
     proc_type = ProcessType(process_type) if process_type is not None else None
     logs = Logs(proc_type,
@@ -59,14 +59,14 @@ def get_logs(
     :param year: Filter logs by the numeric year, defaults to None
     :param month: Filter logs by the numeric month, defaults to None
     :param day: Filter logs by the numeric day, defaults to None
-    :return: The file paths of logs which exist in the file system, relative to the mounted volume.
+    :return: The file paths of logs which exist in the file system, as absolute paths within the container's file system.
     """
     proc_type = ProcessType(process_type) if process_type is not None else None
     logs = Logs(proc_type,
                 year,
                 month,
                 day)
-    return [trim_spectre_data_dir_path(log.file_path) for log in logs.log_list]
+    return [log.file_path for log in logs.log_list]
 
 
 @log_call
