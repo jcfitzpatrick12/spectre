@@ -18,7 +18,7 @@ def download_callisto_data(
     year: int, 
     month: int,
     day: int,
-) -> None:
+) -> list[str]:
     """Download and decompress e-Callisto FITS files, saving them as `spectre` batch files.
 
     :param instrument_code: e-Callisto station instrument code.
