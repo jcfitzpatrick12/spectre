@@ -6,15 +6,126 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-from typing import Optional
+from typing import Optional, cast
 from os.path import splitext
 from os import walk
+from datetime import date, time, datetime
 
 from spectre_core.logs import log_call
-from spectre_core.batches import Batches, BatchKey, get_batch_cls_from_tag
-from spectre_core.config import get_batches_dir_path, trim_spectre_data_dir_path
+from spectre_core.batches import (
+    Batches, BatchKey, get_batch_cls_from_tag
+)
+from spectre_core.config import (
+    get_batches_dir_path, trim_spectre_data_dir_path, TimeFormat
+)
 from spectre_core.capture_configs import CaptureConfig
-from spectre_core.spectrograms import validate_analytically
+from spectre_core.spectrograms import (
+    validate_analytically, frequency_chop, Spectrogram, TimeType
+)
+from spectre_core.plotting import (
+    PanelStack, SpectrogramPanel
+)
+
+
+def _make_batches(
+    tag: str,
+    obs_date: date,
+):
+    return Batches(tag, 
+                   get_batch_cls_from_tag(tag),
+                   obs_date.year,
+                   obs_date.month,
+                   obs_date.day)
+
+
+def _get_spectrogram(
+    batches: Batches,
+    obs_date: date,
+    start_time: time,
+    end_time: time,
+    lower_freq: Optional[float],
+    upper_freq: Optional[float]
+) -> Spectrogram:
+    start_datetime = datetime.combine(obs_date, start_time)
+    end_datetime   = datetime.combine(obs_date, end_time)
+    s = batches.get_spectrogram(start_datetime, end_datetime)
+    
+    if lower_freq is not None and upper_freq is not None:
+        return frequency_chop(s, lower_freq, upper_freq)
+    elif lower_freq is not None and upper_freq is None:
+        return frequency_chop(s, lower_freq, s.frequencies[-1])
+    elif lower_freq is None and upper_freq is not None:
+        return frequency_chop(s, s.frequencies[0], upper_freq)
+    else:
+        return s
+
+ 
+@log_call
+def create_plot(
+    tags: list[str],
+    figsize: tuple[int, int],
+    obs_date: str,
+    start_time: str,
+    end_time: str,
+    lower_freq: Optional[float] = None,
+    upper_freq: Optional[float] = None,
+    log_norm: bool = False,
+    dBb: bool = False,
+    vmin: Optional[float] = None,
+    vmax: Optional[float] = None,
+) -> str:
+    """
+    Create a plot visualising spectrogram data over a specified time interval and optional frequency range.
+
+    :param tags: A list of spectrogram tags to plot. The first tag is used to save the resulting batch file.
+    :param figsize: The `matplotlib` figure size as a tuple of (width, height).
+    :param obs_date: The observation start date, in the format `%Y-%m-%d`.
+    :param start_time: The observation start time (UTC), in the format `%H:%M:%S`.
+    :param end_time: The observation end time (UTC), in the format `%H:%M:%S`.
+    :param lower_freq: The lower bound of the frequency range in Hz. If not specified, the minimum available 
+    frequency is used for each spectrogram. Defaults to None.
+    :param upper_freq: The upper bound of the frequency range in Hz. If not specified, the maximum available 
+    frequency is used for each spectrogram. Defaults to None.
+    :param log_norm: If True, normalises the spectrograms to the 0-1 range on a logarithmic scale. Defaults to False.
+    :param dBb: If True, plots the spectrograms in decibels above the background. Defaults to False.
+    :param vmin: The minimum value for the colourmap. Applies only if `dBb` is True.
+    :param vmax: The maximum value for the colourmap. Applies only if `dBb` is True.
+    :return: The file path of the newly created batch file containing the plot.
+    """
+    # Parse the datetimes
+    obs_date_as_date   = datetime.strptime(obs_date, TimeFormat.DATE).date()
+    start_time_as_time = datetime.strptime(start_time, TimeFormat.TIME).time()
+    end_time_as_time   = datetime.strptime(end_time, TimeFormat.TIME).time()
+    
+    # Filter the batch files for each tag.
+    batches = {tag: _make_batches(tag, obs_date_as_date) for tag in tags}
+    
+    # Create the spectrograms.
+    spectrograms = []
+    for tag in tags:
+        spectrograms.append( 
+            _get_spectrogram(batches[tag], 
+                             obs_date_as_date, 
+                             start_time_as_time, 
+                             end_time_as_time,
+                             lower_freq,
+                             upper_freq) 
+        )
+    
+    
+    # Create the plot, and save it as a batch file.
+    # TODO: Permit relative time type too.
+    panel_stack = PanelStack(time_type=TimeType.DATETIMES, 
+                             non_interactive=True,
+                             figsize=figsize)
+    for spectrogram in spectrograms:
+        panel_stack.add_panel( SpectrogramPanel(spectrogram,
+                                                log_norm=log_norm,
+                                                dBb=dBb,
+                                                vmin=vmin,
+                                                vmax=vmax) )   
+    return panel_stack.save()
+
 
 @log_call
 def get_tags(

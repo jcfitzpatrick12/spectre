@@ -28,7 +28,7 @@ class JsendStatus(Enum):
 
 def make_jsend_response(
     status: JsendStatus,
-    data: Optional[str|dict[str, object]] = None,
+    data: None|str|list[Any]|dict[str, Any] = None,
     message: Optional[str] = None,
     code: Optional[int] = None
 ) -> Response:
@@ -41,7 +41,7 @@ def make_jsend_response(
     :param message: The value for the `message` key, as per the Jsend specification, defaults to None.
     :code: The value of the `code` key, as per the Jsend specification, defaults to None.
     """
-    jsend_dict: dict[str, str|dict[str, object]] = {"status": status.value}
+    jsend_dict: dict[str, None|str|list[Any]|dict[str, Any]] = {"status": status.value}
 
     # Handle success status
     if status == JsendStatus.SUCCESS or status == JsendStatus.FAIL:
