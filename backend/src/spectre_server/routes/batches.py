@@ -56,20 +56,36 @@ def create_plot(
                                vmax=vmax)
 
 
-@batches_blueprint.route("/<string:tag>", methods=["GET"])
+@batches_blueprint.route("/<string:tag>/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@send_from_directory
+def get_batch_file(
+    tag: str,
+    year: int,
+    month: int,
+    day: int,
+    file_name: str
+) -> str:
+    return batches.get_batch_file(string,
+                                  year,
+                                  month,
+                                  day,
+                                  file_name)
+
+
+@batches_blueprint.route("/<string:tag>/<int:year>/<int:month>/<int:day>", methods=["GET"])
 @jsendify_response
-def get_batch_files_for_tag(
-    tag: str
+def get_batch_files(
+    tag: str,
+    year: int,
+    month: int,
+    day: int
 ) -> list[str]:
     extensions = request.args.getlist("extension")
-    year       = request.args.get("year" , type = int)
-    month      = request.args.get("month", type = int)
-    day        = request.args.get("day"  , type = int)
-    return batches.get_batch_files_for_tag(tag,
-                                           extensions, 
-                                           year,
-                                           month,
-                                           day)
+    return batches.get_batch_files(tag,
+                                   extensions, 
+                                   year,
+                                   month,
+                                   day)
 
 
 @batches_blueprint.route("/<string:tag>", methods=["DELETE"])

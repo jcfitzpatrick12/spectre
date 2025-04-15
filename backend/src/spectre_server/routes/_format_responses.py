@@ -97,3 +97,34 @@ def jsendify_response(
                                                    f"Please use 'spectre get log --pid {user_pid}` for more details"),
                                         code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper
+
+
+def send_from_directory(
+
+)
+    def decorator(
+        func: Callable[P, T]
+    ) -> Callable[P, Response]:
+        """Wrap route calls to return a Flask response using `send_from_directory`"""
+        @wraps(func)  # Preserves the original function's name and metadata
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
+            file_path = func(*args, **kwargs)
+            parent_dir, file_name = os.path.split(file_path)
+            return send_from_directory( 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
