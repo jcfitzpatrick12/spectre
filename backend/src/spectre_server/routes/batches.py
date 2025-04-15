@@ -3,16 +3,118 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from flask import Blueprint, request
+from flask import Blueprint, request, url_for
+from os.path import basename
 
 from spectre_server.services import batches
-from spectre_server.routes._format_responses import jsendify_response
+from spectre_server.routes._format_responses import jsendify_response, serve_from_directory
 
 
-batches_blueprint = Blueprint("batches", __name__)
+batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/batches")
 
 
-@batches_blueprint.route("/<string:tag>", methods=["PUT"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@serve_from_directory
+def get_batch_file(
+    year: int,
+    month: int,
+    day: int,
+    file_name: str
+) -> str:
+    return batches.get_batch_file(year,
+                                  month,
+                                  day,
+                                  file_name)
+
+
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
+@jsendify_response
+def get_batch_files(
+    year: int,
+    month: int,
+    day: int
+) -> list[str]:
+    extensions = request.args.getlist("extension")
+    tags       = request.args.getlist("tag")
+    
+    # Get the absolute file paths w.r.t. the container's file system.
+    batch_files = batches.get_batch_files(year,
+                                          month,
+                                          day,
+                                          tags,
+                                          extensions)
+    # Convert the absolute file path's to endpoints the user can use to get each file.
+    resource_endpoints = []
+    for batch_file in batch_files:
+         resource_endpoint = url_for("batches.get_batch_file", 
+                                     year=year,
+                                     month=month,
+                                     day=day,
+                                     file_name=basename(batch_file),
+                                     _external=True)
+         resource_endpoints.append( resource_endpoint  )
+    return resource_endpoints
+
+
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["DELETE"])
+@jsendify_response
+def delete_batch_file(
+    year: int,
+    month: int,
+    day: int,
+    file_name: str
+) -> str:
+    return batches.delete_batch_file(year,
+                                     month,
+                                     day,
+                                     file_name)
+
+
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["DELETE"])
+@jsendify_response
+def delete_batch_files(
+    year: int,
+    month: int,
+    day: int
+) -> list[str]:
+    extensions = request.args.getlist("extension")
+    tags       = request.args.getlist("tag")
+    return batches.delete_batch_files(year,
+                                      month,
+                                      day,
+                                      tags,
+                                      extensions)
+
+
+@batches_blueprint.route("/analytical-test-results/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@jsendify_response
+def get_analytical_test_results(
+    year: int,
+    month: int,
+    day: int,
+    file_name: str,
+) -> dict[str, dict[str, bool | dict[float, bool]]]:
+    absolute_tolerance = request.args.get("absolute_tolerance", type = float, default=1e-5)
+    return batches.get_analytical_test_results(year,
+                                               month,
+                                               day,
+                                               file_name,
+                                               absolute_tolerance)
+
+
+@batches_blueprint.route("/tags/<int:year>/<int:month>/<int:day>", methods=["GET"])
+@jsendify_response
+def get_tags(
+    year: int,
+    month: int,
+    day: int
+) -> list[str]:
+    return batches.get_tags(year,
+                            month,
+                            day)
+
+
+@batches_blueprint.route("/plots/<string:tag>", methods=["PUT"])
 @jsendify_response
 def create_plot(
     tag: str
@@ -54,73 +156,3 @@ def create_plot(
                                dBb=dBb,
                                vmin=vmin,
                                vmax=vmax)
-
-
-@batches_blueprint.route("/<string:tag>/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
-@send_from_directory
-def get_batch_file(
-    tag: str,
-    year: int,
-    month: int,
-    day: int,
-    file_name: str
-) -> str:
-    return batches.get_batch_file(string,
-                                  year,
-                                  month,
-                                  day,
-                                  file_name)
-
-
-@batches_blueprint.route("/<string:tag>/<int:year>/<int:month>/<int:day>", methods=["GET"])
-@jsendify_response
-def get_batch_files(
-    tag: str,
-    year: int,
-    month: int,
-    day: int
-) -> list[str]:
-    extensions = request.args.getlist("extension")
-    return batches.get_batch_files(tag,
-                                   extensions, 
-                                   year,
-                                   month,
-                                   day)
-
-
-@batches_blueprint.route("/<string:tag>", methods=["DELETE"])
-@jsendify_response
-def delete_batch_files(
-    tag: str
-) -> list[str]:
-    extensions = request.args.getlist("extension")
-    year  = request.args.get("year" , type = int)
-    month = request.args.get("month", type = int)
-    day   = request.args.get("day"  , type = int)
-    return batches.delete_batch_files(tag,
-                                      extensions, 
-                                      year,
-                                      month,
-                                      day)
-
-
-@batches_blueprint.route("/<string:tag>/analytical-test-results", methods=["GET"])
-@jsendify_response
-def get_analytical_test_results(
-    tag: str
-) -> dict[str, dict[str, bool | dict[float, bool]]]:
-    absolute_tolerance = request.args.get("absolute_tolerance", type = float, default=1e-5)
-    return batches.get_analytical_test_results(tag,
-                                               absolute_tolerance)
-
-
-@batches_blueprint.route("/tags", methods=["GET"])
-@jsendify_response
-def get_tags(
-) -> list[str]:
-    year  = request.args.get("year" , type = int)
-    month = request.args.get("month", type = int)
-    day   = request.args.get("day"  , type = int)
-    return batches.get_tags(year,
-                            month,
-                            day)

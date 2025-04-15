@@ -8,7 +8,7 @@ import os
 import traceback
 from enum import Enum
 
-from flask import jsonify, Response
+from flask import jsonify, Response, send_from_directory, current_app
 from http import HTTPStatus
 
 """This module implements the JSend specification. For more information, please refer
@@ -99,22 +99,23 @@ def jsendify_response(
     return wrapper
 
 
-def send_from_directory(
-
-)
-    def decorator(
-        func: Callable[P, T]
-    ) -> Callable[P, Response]:
-        """Wrap route calls to return a Flask response using `send_from_directory`"""
-        @wraps(func)  # Preserves the original function's name and metadata
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
-            file_path = func(*args, **kwargs)
-            parent_dir, file_name = os.path.split(file_path)
-            return send_from_directory( 
+def serve_from_directory(
+    func: Callable[P, T]
+) -> Callable[P, Response]:
+    """Wrap route calls to return a Flask response using `send_from_directory`"""
+    @wraps(func)  # Preserves the original function's name and metadata
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
+        file_path = func(*args, **kwargs)
+        parent_dir, file_name = os.path.split(file_path)
+        return send_from_directory(parent_dir, file_name, as_attachment=True)
+    return wrapper
 
 
-
-
+# def get_base_url(
+# ) -> str:
+#     host = current_app.config["HOST"]
+#     port = current_app.config["PORT"]
+#     return f"http://{host}:{port}" 
 
 
 

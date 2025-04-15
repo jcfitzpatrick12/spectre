@@ -2,18 +2,17 @@ from flask import Flask
 from spectre_core.logs import configure_root_logger
 from spectre_core.logs import ProcessType
 
-from spectre_server.routes.batches import batches_blueprint
-from spectre_server.routes.capture_configs import capture_configs_blueprint
-from spectre_server.routes.receivers import receivers_blueprint
-from spectre_server.routes.jobs import jobs_blueprint
-from spectre_server.routes.logs import logs_blueprint
-from spectre_server.routes.callisto import callisto_blueprint
+from .routes.batches import batches_blueprint
+from .routes.capture_configs import capture_configs_blueprint
+from .routes.receivers import receivers_blueprint
+from .routes.jobs import jobs_blueprint
+from .routes.logs import logs_blueprint
+from .routes.callisto import callisto_blueprint
 
 app = Flask(__name__)
 
 # Register blueprints
-app.register_blueprint(batches_blueprint, 
-                       url_prefix = "/spectre-data/batches")
+app.register_blueprint(batches_blueprint)
 app.register_blueprint(capture_configs_blueprint, 
                        url_prefix = "/spectre-data/configs")
 app.register_blueprint(logs_blueprint, 
