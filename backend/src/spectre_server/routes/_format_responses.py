@@ -100,32 +100,12 @@ def jsendify_response(
 
 
 def serve_from_directory(
-    func: Callable[P, T]
+    func: Callable[P, str]
 ) -> Callable[P, Response]:
     """Wrap route calls to return a Flask response using `send_from_directory`"""
-    @wraps(func)  # Preserves the original function's name and metadata
+    @wraps(func)  
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
         file_path = func(*args, **kwargs)
         parent_dir, file_name = os.path.split(file_path)
         return send_from_directory(parent_dir, file_name, as_attachment=True)
     return wrapper
-
-
-# def get_base_url(
-# ) -> str:
-#     host = current_app.config["HOST"]
-#     port = current_app.config["PORT"]
-#     return f"http://{host}:{port}" 
-
-
-
-
-
-
-
-
-
-
-
-
-
