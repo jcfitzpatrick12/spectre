@@ -39,7 +39,7 @@ def get_batch_file(
     :param year: Search for a batch files under this numeric year.
     :param month: Search for a batch file under this numeric month.
     :param day: Search for a batch file under this numeric day.
-    :param file_name: Search for a batch file with this file name (including the extension)
+    :param file_name: Search for a batch file with this file name.
     :return: The file path of the batch file if it exists in the file system, as an absolute path within the container's file system.
     """
     start_time, tag, extension = parse_batch_file_name(file_name)
@@ -110,7 +110,7 @@ def delete_batch_file(
     :param month: Delete a batch file under this numeric month.
     :param day: Delete a batch file under this numeric day.
     :param file_name: Delete a batch file with this file name.
-    :return: The file name of the deleted batch file.
+    :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
     start_time, tag, extension = parse_batch_file_name(file_name)
     batch_cls = get_batch_cls_from_tag(tag)
@@ -194,7 +194,7 @@ def get_analytical_test_results(
     :param day: The numeric day of the batch file.
     :param file_name: The batch file name.
     :param absolute_tolerance: Tolerance level for numerical comparisons.
-    :return: The test results per spectrogram file, as a serialisable dictionary.
+    :return: The test results for the spectrogram file, as a serialisable dictionary.
     """
     start_time, tag, extension = parse_batch_file_name(file_name)
     batch_cls = get_batch_cls_from_tag(tag)
