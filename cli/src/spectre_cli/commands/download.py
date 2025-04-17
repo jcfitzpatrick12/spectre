@@ -10,17 +10,17 @@ download_typer = Typer(
     help = "Download external spectrogram data."
 )
 
-def _secho_downloaded_file(
-    abs_path: str
+def _secho_downloaded_resource(
+    resource_endpoint: str
 ) -> None:
-    secho(f"Downloaded '{abs_path}'", fg="green")
+    secho(resource_endpoint, fg="green")
     
     
-def _secho_downloaded_files(
-    abs_paths: list[str]
+def _secho_downloaded_resources(
+    resource_endpoints: list[str]
 ) -> None:    
-    for abs_path in abs_paths:
-        _secho_downloaded_file(abs_path)
+    for resource_endpoint in resource_endpoints:
+        _secho_downloaded_resource(resource_endpoint)
     
 @download_typer.command(
     help = "Download e-Callisto network spectrogram data."
@@ -53,6 +53,6 @@ def callisto(
     jsend_dict = safe_request("callisto/batches",
                               "POST",
                               json=json)
-    abs_paths = jsend_dict["data"]
-    _secho_downloaded_files( abs_paths )
+    resource_endpoints = jsend_dict["data"]
+    _secho_downloaded_resources( resource_endpoints )
     raise Exit()

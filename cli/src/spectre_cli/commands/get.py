@@ -12,17 +12,17 @@ get_typer = Typer(
     help = "Display one or many resources."
 )
 
-def _secho_file(
-    abs_path: str
+def _secho_resource(
+    resource_endpoint: str
 ) -> None:
-    secho(abs_path)
+    secho(resource_endpoint)
     
     
-def _secho_files(
-    abs_paths: list[str]
+def _secho_resources(
+    resource_endpoints: list[str]
 ) -> None:    
-    for abs_path in abs_paths:
-        _secho_file(abs_path)
+    for resource_endpoint in resource_endpoints:
+        _secho_resource(resource_endpoint)
         
 
 @get_typer.command(
@@ -68,9 +68,9 @@ def logs(process_type: str = Option(None,
     jsend_dict = safe_request("spectre-data/logs",
                               "GET",
                               params = params)
-    abs_paths = jsend_dict["data"]
+    resource_endpoints = jsend_dict["data"]
 
-    _secho_files(abs_paths)
+    _secho_resources(resource_endpoints)
     raise Exit()
 
 
@@ -78,40 +78,38 @@ def logs(process_type: str = Option(None,
     help = "List existing batch files."
 )
 def batch_files(
-    tag: str = Option(..., 
-                    "--tag", 
-                    "-t", 
-                    help="The tag used to capture the data."),
-    year: int = Option(None, 
+    year: int = Option(..., 
                        "--year", 
                        "-y", 
                        help="Filter for batch files under this numeric year."),
-    month: int = Option(None, 
+    month: int = Option(..., 
                         "--month", 
                         "-m", 
                         help="Filter for batch files under this numeric month."),
-    day: int = Option(None, 
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
                       help="Filter for batch files under this numeric day."),
     extensions: list[str] = Option(None, 
                                    "--extension", 
                                    "-e", 
-                                   help="Filter for batch files with this file extension.")
+                                   help="Filter for batch files with this file extension."),
+    tags: list[str] = Option(None, 
+                            "--tag", 
+                            "-t", 
+                            help="Filter batch files with this tag."),
+
 ) -> None:
-    
     params = {
-        "year": year,
-        "month": month,
-        "day": day,
-        "extension": extensions
+        "extension": extensions,
+        "tag": tags
     }
-    jsend_dict = safe_request(f"spectre-data/batches/{tag}",
+    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}",
                               "GET",
                               params = params)
-    abs_paths = jsend_dict["data"]
+    resource_endpoints = jsend_dict["data"]
 
-    _secho_files(abs_paths)
+    _secho_resources(resource_endpoints)
     raise Exit()
 
 
@@ -183,9 +181,9 @@ def capture_configs(
     
     jsend_dict = safe_request(f"spectre-data/configs",
                               "GET")
-    abs_paths = jsend_dict["data"]
+    resource_endpoints = jsend_dict["data"]
     
-    _secho_files(abs_paths)
+    _secho_resources(resource_endpoints)
 
     raise Exit()
 
@@ -211,28 +209,22 @@ def capture_config(tag: str = Option(...,
     help = "List tags with existing batch files."
 )
 def tags(
-    year: int = Option(None, 
+    year: int = Option(..., 
                        "--year", 
                        "-y", 
                        help="Find tags with existing batch files under this numeric year."),
-    month: int = Option(None, 
+    month: int = Option(..., 
                         "--month", 
                         "-m", 
                         help="Find tags with existing batch files under this numeric month."),
-    day: int = Option(None, 
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
                       help="Find tags with existing batch files under this numeric day."),
     
 ) -> None:
-    params = {
-        "year": year,
-        "month": month,
-        "day": day
-    }
-    jsend_dict = safe_request("spectre-data/batches/tags",
-                              "GET",
-                              params = params)
+    jsend_dict = safe_request(f"spectre-data/batches/tags/{year}/{month}/{day}",
+                              "GET")
     tags = jsend_dict["data"]
 
     for tag in tags:

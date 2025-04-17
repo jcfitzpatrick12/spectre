@@ -11,10 +11,10 @@ create_typer = Typer(
     help = "Create resources."
 )
 
-def _secho_created_file(
-    abs_path: str
+def _secho_created_resource(
+    resource_endpoint: str
 ) -> None:    
-    secho(f"Created '{abs_path}'", fg="green")
+    secho(resource_endpoint, fg="green")
 
 
 @create_typer.command(
@@ -53,8 +53,8 @@ def capture_config(
     jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
                               "PUT", 
                               json=json)
-    abs_path = jsend_dict["data"]
-    _secho_created_file(abs_path)
+    resource_endpoint = jsend_dict["data"]
+    _secho_created_resource(resource_endpoint)
     raise Exit()
         
 
@@ -119,11 +119,11 @@ def plot(
         "figsize_x": figsize_x,
         "figsize_y": figsize_y
     }
-    jsend_dict = safe_request(f"spectre-data/batches/{primary_tag}", 
+    jsend_dict = safe_request(f"spectre-data/batches/plots/{primary_tag}", 
                               "PUT", 
                               json=json)
-    abs_path = jsend_dict["data"]
-    _secho_created_file(abs_path)
+    resource_endpoint = jsend_dict["data"]
+    _secho_created_resource(resource_endpoint)
     raise Exit()
 
     
