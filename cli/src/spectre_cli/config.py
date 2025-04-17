@@ -1,4 +1,4 @@
-"""Configure environment variables for the CLI"""
+"""Configure environment variables."""
 
 import os
 

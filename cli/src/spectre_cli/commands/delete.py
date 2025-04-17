@@ -105,7 +105,7 @@ def capture_config(
                       "-t", 
                       help="Unique identifier for the capture config."),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "DELETE")
     resource_endpoint = jsend_dict["data"]
     _secho_deleted_resource(resource_endpoint)

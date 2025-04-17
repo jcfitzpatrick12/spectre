@@ -196,7 +196,7 @@ def capture_config(tag: str = Option(...,
                                      "-t", 
                                      help="Unique identifier for the capture config."),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}",
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json/raw",
                               "GET")
     capture_config = jsend_dict["data"]
 
