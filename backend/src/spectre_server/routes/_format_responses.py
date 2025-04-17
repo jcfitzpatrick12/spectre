@@ -8,7 +8,7 @@ import os
 import traceback
 from enum import Enum
 
-from flask import jsonify, Response
+from flask import jsonify, Response, send_from_directory, current_app
 from http import HTTPStatus
 
 """This module implements the JSend specification. For more information, please refer
@@ -86,6 +86,11 @@ def jsendify_response(
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
         try:
             data = func(*args, **kwargs)
+            # Handle the case where the data returned is from Flask's `send_from_directory`.
+            # Here, we want the response to propagate through unchanged if it succeeds, and
+            # create a fails JSend compliant response if it fails.
+            if isinstance(data, Response):
+                return data
             return make_jsend_response(JsendStatus.SUCCESS,
                                        data = data,
                                        code = HTTPStatus.OK)
@@ -97,3 +102,11 @@ def jsendify_response(
                                                    f"Please use 'spectre get log --pid {user_pid}` for more details"),
                                         code = HTTPStatus.INTERNAL_SERVER_ERROR)
     return wrapper
+
+
+def serve_from_directory(
+    file_path: str,
+) -> Response:
+    """Light wrapper for Flask's `send_from_directory`."""
+    parent_dir, file_name = os.path.split(file_path)
+    return send_from_directory(parent_dir, file_name, as_attachment=True)
