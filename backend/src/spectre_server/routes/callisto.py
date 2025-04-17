@@ -2,13 +2,15 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from os.path import basename
+
 from flask import Blueprint, request, url_for
+from os.path import basename
 
-from spectre_server.services import callisto
-from spectre_server.routes._format_responses import jsendify_response
+from ..services import callisto
+from ._format_responses import jsendify_response
 
-callisto_blueprint = Blueprint("callisto", __name__)
+
+callisto_blueprint = Blueprint("callisto", __name__, url_prefix="/callisto")
 
 
 @callisto_blueprint.route("/instrument-codes", methods=["GET"])

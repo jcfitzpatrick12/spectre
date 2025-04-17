@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from flask import Blueprint, request, url_for
+from flask import Blueprint, request, url_for, Response
 from os.path import basename
 
 from ..services import batches
@@ -14,12 +14,13 @@ batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/bat
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@jsendify_response
 def get_batch_file(
     year: int,
     month: int,
     day: int,
     file_name: str
-) -> str:
+) -> Response:
     return serve_from_directory(batches.get_batch_file(year,
                                                        month,
                                                        day,
@@ -107,7 +108,7 @@ def delete_batch_files(
     return resource_endpoints
    
 
-@batches_blueprint.route("/analytical-test-results/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>/analytical-test-results", methods=["GET"])
 @jsendify_response
 def get_analytical_test_results(
     year: int,
@@ -123,7 +124,7 @@ def get_analytical_test_results(
                                                absolute_tolerance)
 
 
-@batches_blueprint.route("/tags/<int:year>/<int:month>/<int:day>", methods=["GET"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/tags", methods=["GET"])
 @jsendify_response
 def get_tags(
     year: int,
@@ -167,7 +168,7 @@ def create_plot(
         figsize = (15, 8)
 
     # Create the plot and return the name of the batch file containing the plot.    
-    batch_file, batch_start_time =  batches.create_plot(tags,
+    batch_file, batch_start_date =  batches.create_plot(tags,
                                                         figsize,
                                                         obs_date,
                                                         start_time,
@@ -179,9 +180,9 @@ def create_plot(
                                                         vmin=vmin,
                                                         vmax=vmax)
     return url_for("batches.get_batch_file",
-                   year=batch_start_time.year,
-                   month=batch_start_time.month,
-                   day=batch_start_time.day,
+                   year=batch_start_date.year,
+                   month=batch_start_date.month,
+                   day=batch_start_date.day,
                    file_name=basename(batch_file),
                    _external=True)
 

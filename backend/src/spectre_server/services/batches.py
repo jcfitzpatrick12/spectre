@@ -110,6 +110,7 @@ def delete_batch_file(
     :param month: Delete a batch file under this numeric month.
     :param day: Delete a batch file under this numeric day.
     :param file_name: Delete a batch file with this file name.
+    :return: The file name of the deleted batch file.
     """
     start_time, tag, extension = parse_batch_file_name(file_name)
     batch_cls = get_batch_cls_from_tag(tag)
