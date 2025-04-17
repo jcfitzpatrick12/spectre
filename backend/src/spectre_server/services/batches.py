@@ -6,7 +6,7 @@
 from logging import getLogger
 _LOGGER = getLogger(__name__)
 
-from typing import Optional, cast
+from typing import Optional, cast, Tuple
 from os.path import splitext
 from os import walk
 from datetime import date, time, datetime
@@ -281,7 +281,7 @@ def create_plot(
     dBb: bool = False,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
-) -> str:
+) -> Tuple[str, date]:
     """
     Create a plot visualising spectrogram data over a specified time interval and optional frequency range.
 
@@ -298,7 +298,7 @@ def create_plot(
     :param dBb: If True, plots the spectrograms in decibels above the background. Defaults to False.
     :param vmin: The minimum value for the colourmap. Applies only if `dBb` is True.
     :param vmax: The maximum value for the colourmap. Applies only if `dBb` is True.
-    :return: The file path of the newly created batch file containing the plot, as an absolute path in the container's file system.
+    :return: The file path of the newly created batch file containing the plot, as an absolute path in the container's file system. Additionally, the batch file's start time. 
     """
     # Parse the datetimes
     obs_date_as_date   = datetime.strptime(obs_date, TimeFormat.DATE).date()
@@ -332,4 +332,4 @@ def create_plot(
                                                 dBb=dBb,
                                                 vmin=vmin,
                                                 vmax=vmax) )   
-    return panel_stack.save()
+    return panel_stack.save(), obs_date_as_date

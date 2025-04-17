@@ -100,12 +100,9 @@ def jsendify_response(
 
 
 def serve_from_directory(
-    func: Callable[P, str]
-) -> Callable[P, Response]:
-    """Wrap route calls to return a Flask response using `send_from_directory`"""
-    @wraps(func)  
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Response:
-        file_path = func(*args, **kwargs)
-        parent_dir, file_name = os.path.split(file_path)
-        return send_from_directory(parent_dir, file_name, as_attachment=True)
-    return wrapper
+    file_path: str,
+    as_attachment: bool = True
+) -> Response:
+    """Light wrapper for Flask's `send_from_directory`."""
+    parent_dir, file_name = os.path.split(file_path)
+    return send_from_directory(parent_dir, file_name, as_attachment=as_attachment)

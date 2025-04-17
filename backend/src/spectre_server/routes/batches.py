@@ -6,25 +6,24 @@
 from flask import Blueprint, request, url_for
 from os.path import basename
 
-from spectre_server.services import batches
-from spectre_server.routes._format_responses import jsendify_response, serve_from_directory
+from ..services import batches
+from ._format_responses import jsendify_response, serve_from_directory
 
 
 batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/batches")
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
-@serve_from_directory
 def get_batch_file(
     year: int,
     month: int,
     day: int,
     file_name: str
 ) -> str:
-    return batches.get_batch_file(year,
-                                  month,
-                                  day,
-                                  file_name)
+    return serve_from_directory(batches.get_batch_file(year,
+                                                       month,
+                                                       day,
+                                                       file_name))
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
@@ -64,10 +63,18 @@ def delete_batch_file(
     day: int,
     file_name: str
 ) -> str:
-    return batches.delete_batch_file(year,
-                                     month,
-                                     day,
-                                     file_name)
+    # Delete the batch file, and get the absolute file path of the file deleted w.r.t. the container's file system.
+    batch_file = batches.delete_batch_file(year,
+                                           month,
+                                           day,
+                                           file_name)
+    # Convert the absolute path into the endpoint for the deleted resource.
+    return url_for("batches.get_file",
+                   year=year,
+                   month=month,
+                   day=day,
+                   file_name=basename(batch_file),
+                   _external=True)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["DELETE"])
@@ -79,12 +86,26 @@ def delete_batch_files(
 ) -> list[str]:
     extensions = request.args.getlist("extension")
     tags       = request.args.getlist("tag")
-    return batches.delete_batch_files(year,
-                                      month,
-                                      day,
-                                      tags,
-                                      extensions)
 
+    # Delete each batch file, and get a list of absolute paths of each batch file which has been deleted w.r.t. the container's file system 
+    batch_files =  batches.delete_batch_files(year,
+                                              month,
+                                              day,
+                                              tags,
+                                              extensions)
+
+    # Convert the absolute file path's to endpoints the user can use to get each file.
+    resource_endpoints = []
+    for batch_file in batch_files:
+         resource_endpoint = url_for("batches.delete_batch_file", 
+                                     year=year,
+                                     month=month,
+                                     day=day,
+                                     file_name=basename(batch_file),
+                                     _external=True)
+         resource_endpoints.append( resource_endpoint  )
+    return resource_endpoints
+   
 
 @batches_blueprint.route("/analytical-test-results/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
 @jsendify_response
@@ -93,7 +114,7 @@ def get_analytical_test_results(
     month: int,
     day: int,
     file_name: str,
-) -> dict[str, dict[str, bool | dict[float, bool]]]:
+) -> dict[str, bool | dict[float, bool]]:
     absolute_tolerance = request.args.get("absolute_tolerance", type = float, default=1e-5)
     return batches.get_analytical_test_results(year,
                                                month,
@@ -144,15 +165,24 @@ def create_plot(
     else:
         # If nothing is specified, set an arbitrary default value.
         figsize = (15, 8)
-        
-    return batches.create_plot(tags,
-                               figsize,
-                               obs_date,
-                               start_time,
-                               end_time,
-                               lower_freq=lower_freq,
-                               upper_freq=upper_freq,
-                               log_norm=log_norm,
-                               dBb=dBb,
-                               vmin=vmin,
-                               vmax=vmax)
+
+    # Create the plot and return the name of the batch file containing the plot.    
+    batch_file, batch_start_time =  batches.create_plot(tags,
+                                                        figsize,
+                                                        obs_date,
+                                                        start_time,
+                                                        end_time,
+                                                        lower_freq=lower_freq,
+                                                        upper_freq=upper_freq,
+                                                        log_norm=log_norm,
+                                                        dBb=dBb,
+                                                        vmin=vmin,
+                                                        vmax=vmax)
+    return url_for("batches.get_batch_file",
+                   year=batch_start_time.year,
+                   month=batch_start_time.month,
+                   day=batch_start_time.day,
+                   file_name=basename(batch_file),
+                   _external=True)
+
+                   
