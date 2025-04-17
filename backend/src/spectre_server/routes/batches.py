@@ -37,13 +37,12 @@ def get_batch_files(
     extensions = request.args.getlist("extension")
     tags       = request.args.getlist("tag")
     
-    # Get the absolute file paths w.r.t. the container's file system.
     batch_files = batches.get_batch_files(year,
                                           month,
                                           day,
                                           tags,
                                           extensions)
-    # Convert the absolute file path's to endpoints the user can use to get each file.
+
     resource_endpoints = []
     for batch_file in batch_files:
          resource_endpoint = url_for("batches.get_batch_file", 
@@ -53,6 +52,7 @@ def get_batch_files(
                                      file_name=basename(batch_file),
                                      _external=True)
          resource_endpoints.append( resource_endpoint  )
+         
     return resource_endpoints
 
 
@@ -64,12 +64,12 @@ def delete_batch_file(
     day: int,
     file_name: str
 ) -> str:
-    # Delete the batch file, and get the absolute file path of the file deleted w.r.t. the container's file system.
+    
     batch_file = batches.delete_batch_file(year,
                                            month,
                                            day,
                                            file_name)
-    # Convert the absolute path into the endpoint for the deleted resource.
+
     return url_for("batches.get_file",
                    year=year,
                    month=month,
@@ -88,14 +88,14 @@ def delete_batch_files(
     extensions = request.args.getlist("extension")
     tags       = request.args.getlist("tag")
 
-    # Delete each batch file, and get a list of absolute paths of each batch file which has been deleted w.r.t. the container's file system 
+
     batch_files =  batches.delete_batch_files(year,
                                               month,
                                               day,
                                               tags,
                                               extensions)
 
-    # Convert the absolute file path's to endpoints the user can use to get each file.
+    
     resource_endpoints = []
     for batch_file in batch_files:
          resource_endpoint = url_for("batches.delete_batch_file", 
@@ -105,6 +105,7 @@ def delete_batch_files(
                                      file_name=basename(batch_file),
                                      _external=True)
          resource_endpoints.append( resource_endpoint  )
+
     return resource_endpoints
    
 

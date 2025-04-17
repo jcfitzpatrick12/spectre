@@ -41,6 +41,7 @@ def get_capture_configs(
                                     file_name=basename(file_name),
                                     _external=True)
         resource_endpoints.append(resource_endpoint)
+        
     return resource_endpoints
 
 
@@ -72,6 +73,7 @@ def delete_capture_config(
     file_name: str
 ) -> str:
     capture_configs.delete_capture_config(file_name)
+    
     return url_for("capture_configs.get_capture_config",
                    file_name=file_name,
                    _external=True)
@@ -85,9 +87,11 @@ def update_capture_config(
     json              = request.get_json()
     string_parameters = json.get("params")
     force             = json.get("force")
+
     capture_configs.update_capture_config(file_name, 
                                           string_parameters,
                                           force)
+    
     return url_for("capture_configs.get_capture_config", 
                    file_name=file_name,
                    _external=True)

@@ -29,10 +29,12 @@ def download(
     year            = json.get("year")
     month           = json.get("month")
     day             = json.get("day")
+
     batch_files, start_date = callisto.download_callisto_data(instrument_code,
                                                               year,
                                                               month,
                                                               day)
+    
     resource_endpoints = []
     for batch_file in batch_files:
         resource_endpoint =  url_for("batches.get_batch_file",
@@ -42,4 +44,5 @@ def download(
                                      file_name=basename(batch_file),
                                      _external=True)
         resource_endpoints.append(resource_endpoint)
+        
     return resource_endpoints
