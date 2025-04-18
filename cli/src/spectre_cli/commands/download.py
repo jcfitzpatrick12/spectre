@@ -21,7 +21,8 @@ def _secho_downloaded_resources(
 ) -> None:    
     for resource_endpoint in resource_endpoints:
         _secho_downloaded_resource(resource_endpoint)
-    
+
+
 @download_typer.command(
     help = "Download e-Callisto network spectrogram data."
 )

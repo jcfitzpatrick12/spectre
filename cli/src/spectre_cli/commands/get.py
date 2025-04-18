@@ -43,29 +43,28 @@ def callisto_instrument_codes(
 @get_typer.command(
     help = "List existing log files."
 )
-def logs(process_type: str = Option(None, 
-                                    "--process-type", 
-                                    help="Specifies one of 'worker' or 'user'."),
-         year: int = Option(None, 
-                            "--year", 
-                            "-y", 
-                            help="Filter for log files under this numeric year."),
-         month: int = Option(None, 
-                             "--month", 
-                             "-m", 
-                             help="Filter for log files under this numeric month."),
-         day: int = Option(None, 
-                           "--day", 
-                           "-d", 
-                           help="Filter for log files under this numeric day.")
+def logs(
+   year: int = Option(..., 
+                      "--year", 
+                      "-y", 
+                      help="List log files under this numeric year."),
+   month: int = Option(..., 
+                       "--month", 
+                       "-m", 
+                       help="List log files under this numeric month."),
+   day: int = Option(..., 
+                     "--day", 
+                     "-d", 
+                     help="List log files under this numeric day."),
+   process_types: str = Option([], 
+                               "--process-type", 
+                               help="Specifies one of 'worker' or 'user'."),
+
 ) -> None:
     params = {
-        "process-type": process_type,
-        "year": year,
-        "month": month,
-        "day": day
+        "process_type": process_types,
     }
-    jsend_dict = safe_request("spectre-data/logs",
+    jsend_dict = safe_request(f"spectre-data/logs/{year}/{month}/{day}",
                               "GET",
                               params = params)
     resource_endpoints = jsend_dict["data"]
@@ -90,11 +89,11 @@ def batch_files(
                       "--day", 
                       "-d", 
                       help="Filter for batch files under this numeric day."),
-    extensions: list[str] = Option(None, 
+    extensions: list[str] = Option([], 
                                    "--extension", 
                                    "-e", 
                                    help="Filter for batch files with this file extension."),
-    tags: list[str] = Option(None, 
+    tags: list[str] = Option([], 
                             "--tag", 
                             "-t", 
                             help="Filter batch files with this tag."),
@@ -191,17 +190,24 @@ def capture_configs(
 @get_typer.command(
     help = "Print capture config file contents."
 )
-def capture_config(tag: str = Option(..., 
-                                     "--tag", 
-                                     "-t", 
-                                     help="Unique identifier for the capture config."),
+def capture_config(
+    base_file_name: str = Option(None, 
+                                 "-f", 
+                                 help="The base file name of the capture config"),
+    tag: str = Option(None,
+                      "--tag",
+                      "-t",
+                      help="The unique identifier for the capture config")
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json/raw",
+
+    if not (base_file_name is None) ^ (tag is None):
+        raise ValueError("Specify either the tag or file name, not both.")
+
+    base_file_name = base_file_name or tag
+    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}/raw",
                               "GET")
     capture_config = jsend_dict["data"]
-
     pprint_dict(capture_config)
-
     raise Exit()
 
 
@@ -223,7 +229,7 @@ def tags(
                       help="Find tags with existing batch files under this numeric day."),
     
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/batches/tags/{year}/{month}/{day}",
+    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}/tags",
                               "GET")
     tags = jsend_dict["data"]
 
@@ -233,23 +239,6 @@ def tags(
     raise Exit()
 
     
-@get_typer.command(
-        help = "Print log file contents."
-)
-def log(
-    pid: str = Option(..., 
-                      "--pid", 
-                      help="The process ID."),
-) -> None:
-    
-    jsend_dict = safe_request(f"spectre-data/logs/{pid}",
-                              "GET")
-    file_contents = jsend_dict["data"]
-
-    secho(file_contents)
-    raise Exit()
-
-
 @get_typer.command(
         help = "Print a capture template."
 )
