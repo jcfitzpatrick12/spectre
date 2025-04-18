@@ -8,7 +8,7 @@ from spectre_server.services import jobs
 from spectre_server.routes._format_responses import jsendify_response
 
 
-jobs_blueprint = Blueprint("jobs", __name__)
+jobs_blueprint = Blueprint("jobs", __name__, url_prefix="/jobs")
 
 
 @jobs_blueprint.route("/capture", methods=["POST"])

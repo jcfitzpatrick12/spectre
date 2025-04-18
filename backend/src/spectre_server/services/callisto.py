@@ -2,6 +2,9 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import Tuple
+from datetime import date
+
 from spectre_core.logs import log_call
 from spectre_core import wgetting
 
@@ -18,7 +21,7 @@ def download_callisto_data(
     year: int, 
     month: int,
     day: int,
-) -> list[str]:
+) -> Tuple[list[str], date]:
     """Download and decompress e-Callisto FITS files, saving them as `spectre` batch files.
 
     :param instrument_code: e-Callisto station instrument code.
@@ -26,7 +29,7 @@ def download_callisto_data(
     :param month: Month of the observation.
     :param day: Day of the observation.
     :return: A list of file paths of all newly created batch files, as absolute paths within 
-    the container's file system.
+    the container's file system. Additionally, return the start date shared by all batch files.
     """
     instr_code = wgetting.CallistoInstrumentCode(instrument_code)
     return wgetting.download_callisto_data(instr_code, 

@@ -12,50 +12,48 @@ delete_typer = Typer(
 )
 
 
-def _secho_deleted_file(
-    abs_path: str
+def _secho_deleted_resource(
+    resource_endpoint: str
 ) -> None:
-    secho(f"Deleted '{abs_path}'", fg="yellow")
+    secho(resource_endpoint, fg="yellow")
     
     
-def _secho_deleted_files(
-    abs_paths: list[str]
+def _secho_deleted_resources(
+    resource_endpoints: list[str]
 ) -> None:    
-    for abs_path in abs_paths:
-        _secho_deleted_file(abs_path)
+    for resource_endpoint in resource_endpoints:
+        _secho_deleted_resource(resource_endpoint)
 
 
 @delete_typer.command(
     help = "Delete log files."
 )
 def logs(
-    process_type: str = Option(None, 
-                               "--process-type", 
-                               help="Specifies one of 'worker' or 'user'."),
-    year: int = Option(None, 
+    year: int = Option(..., 
                        "--year", 
                        "-y", 
-                       help="Delete all logs under this numeric year."),
-    month: int = Option(None, 
+                       help="Delete logs under this numeric year."),
+    month: int = Option(..., 
                        "--month", 
                        "-m", 
-                      help="Delete all logs under this numeric month."),
-    day: int = Option(None, 
+                       help="Delete logs under this numeric month."),
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
-                      help="Delete all logs under this numeric day.")
+                      help="Delete  logs under this numeric day."),
+    process_types: list[str] = Option([], 
+                                     "--process-type",                                
+                                     help="Specifies one of 'worker' or 'user'."),
+
 ) -> None:
     params = {
-        "process_type": process_type,
-        "year": year,
-        "month": month,
-        "day": day,
+        "process_type": process_types,
     }
-    jsend_dict = safe_request("spectre-data/logs", 
+    jsend_dict = safe_request(f"spectre-data/logs/{year}/{month}/{day}", 
                               "DELETE", 
                               params = params)
-    abs_paths = jsend_dict["data"]
-    _secho_deleted_files(abs_paths)
+    resource_endpoints = jsend_dict["data"]
+    _secho_deleted_resources(resource_endpoints)
     raise Exit()
 
 
@@ -63,38 +61,36 @@ def logs(
     help = "Delete batch files."
 )
 def batch_files(
-    tag: str = Option(..., 
-                      "--tag", 
-                      "-t", 
-                      help="The tag used to capture the data."),
-    extension: list[str] = Option([], 
-                                  "--extension", 
-                                  "-e", 
-                                  help="Delete all batch files with this file extension."),
-    year: int = Option(None, 
+    year: int = Option(..., 
                       "--year", 
                       "-y", 
                       help="Delete all batch files under this numeric year."),
-    month: int = Option(None, 
+    month: int = Option(..., 
                         "--month", 
                         "-m", 
                         help="Delete all batch files under this numeric month."),
-    day: int = Option(None, 
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
                       help="Delete all batch files under this numeric day."),
+    tags: list[str] = Option([], 
+                             "--tag", 
+                             "-t", 
+                             help="The tag used to capture the data."),
+    extensions: list[str] = Option([], 
+                                  "--extension", 
+                                  "-e", 
+                                  help="Delete all batch files with this file extension."),
 ) -> None:
     params = {
-        "extension": extension,
-        "year": year,
-        "month": month,
-        "day": day
+        "extension": extensions,
+        "tag": tags
     }
-    jsend_dict = safe_request(f"spectre-data/batches/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}", 
                               "DELETE",
                               params = params)
-    abs_paths = jsend_dict["data"]
-    _secho_deleted_files(abs_paths)
+    resource_endpoints = jsend_dict["data"]
+    _secho_deleted_resources(resource_endpoints)
     raise Exit()
 
 
@@ -107,8 +103,8 @@ def capture_config(
                       "-t", 
                       help="Unique identifier for the capture config."),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "DELETE")
-    abs_path = jsend_dict["data"]
-    _secho_deleted_file(abs_path)
+    resource_endpoint = jsend_dict["data"]
+    _secho_deleted_resource(resource_endpoint)
     raise Exit()

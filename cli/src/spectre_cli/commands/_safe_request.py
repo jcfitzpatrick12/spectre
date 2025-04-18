@@ -10,6 +10,8 @@ from typing import Optional
 
 import typer
 
+from ..config import SPECTRE_SERVER
+
 P = ParamSpec('P')
 def _catch_response_errors(
     func: Callable[P, Any]
@@ -54,11 +56,9 @@ def safe_request(
     json: Optional[dict] = None,
     params: Optional[dict] = None
 ) -> dict:
-    """Send a request to the specified URL and return the JSON response.
+    """Send a request to the `spectre-server` and return the JSON response.
 
-    Handles requests to the `spectre-server` running locally on the loopback IP (127.0.0.1:5000).
-
-    :param route_url: Endpoint path to append to the base URL.
+    :param route_url: Endpoint path to append to the `spectre-server` base URL. This base url is defined by the environment variables `SPECTRE_SERVICE_HOST`, `SPECTRE_SERVICE_PORT` or `SPECTRE_SERVER`.
     :param method: HTTP method to use for the request (e.g., 'GET', 'POST').
     :param json: Optional JSON payload for the request body.
     :param params: Optional query parameters for the request.
@@ -69,7 +69,7 @@ def safe_request(
         route_url.lstrip("/")
         
     # Use the base URL of the spectre-server running on the spectre-network
-    full_url = os.path.join("http://spectre-server:5000", route_url)
+    full_url = os.path.join(SPECTRE_SERVER, route_url)
 
     response = requests.request(method,
                                 full_url,

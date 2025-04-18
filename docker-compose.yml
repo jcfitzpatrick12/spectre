@@ -8,6 +8,9 @@ services:
       context: backend
       dockerfile: Dockerfile
       target: runtime
+    environment:
+      - SPECTRE_SERVICE_HOST=0.0.0.0
+      - SPECTRE_SERVICE_PORT=5000
     container_name: spectre-server
     image: spectre-server
     shm_size: 4gb
@@ -18,12 +21,16 @@ services:
     devices:
       - "/dev/bus/usb"
     stop_signal: SIGKILL
-
+    ports:
+      - 127.0.0.1:5000:5000
   spectre-cli:
     build:
       context: ./cli
       dockerfile: Dockerfile
       target: runtime
+    environment:
+      - SPECTRE_SERVICE_HOST=spectre-server
+      - SPECTRE_SERVICE_PORT=5000
     container_name: spectre-cli
     image: spectre-cli
     networks:
