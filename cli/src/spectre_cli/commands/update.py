@@ -12,10 +12,10 @@ update_typer = Typer(
     help = "Update resources."
 )
 
-def _secho_updated_file(
-    abs_path: str
+def _secho_updated_resource(
+    resource_endpoint: str
 ) -> None:    
-    secho(f"Updated '{abs_path}'", fg="green")
+    secho(resource_endpoint, fg="green")
 
 
 @update_typer.command(
@@ -45,6 +45,6 @@ def capture_config(tag: str = Option(...,
     jsend_dict = safe_request(f"spectre-data/configs/{tag}",
                               "PATCH",
                               json = json)
-    abs_path = jsend_dict["data"]
-    _secho_updated_file(abs_path)
+    resource_endpoint = jsend_dict["data"]
+    _secho_updated_resource(resource_endpoint)
     raise Exit()
