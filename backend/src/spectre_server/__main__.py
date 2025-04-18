@@ -16,9 +16,9 @@ app = Flask(__name__)
 app.register_blueprint(batches_blueprint)
 app.register_blueprint(callisto_blueprint)
 app.register_blueprint(capture_configs_blueprint)
-# app.register_blueprint(logs_blueprint) 
-# app.register_blueprint(receivers_blueprint) 
-# app.register_blueprint(jobs_blueprint)
+app.register_blueprint(logs_blueprint) 
+app.register_blueprint(receivers_blueprint) 
+app.register_blueprint(jobs_blueprint)
 
 
 if __name__ == "__main__":

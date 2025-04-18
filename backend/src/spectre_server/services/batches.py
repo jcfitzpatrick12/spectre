@@ -13,7 +13,7 @@ from datetime import date, time, datetime
 
 from spectre_core.logs import log_call
 from spectre_core.batches import (
-    Batches, BatchKey, get_batch_cls_from_tag, parse_batch_file_name
+    Batches, BatchFile,BatchKey, get_batch_cls_from_tag, parse_batch_base_file_name, BaseBatch
 )
 from spectre_core.config import (
     get_batches_dir_path, TimeFormat
@@ -27,27 +27,47 @@ from spectre_core.plotting import (
 )
 
 
+def _get_batch(
+   year: int,
+   month: int,
+   day: int,
+   base_file_name: str
+) -> BaseBatch:
+    """Get the `BaseBatch` subclass instance corresponding to the input file."""
+    start_time, tag, extension = parse_batch_base_file_name(base_file_name)
+    batch_cls = get_batch_cls_from_tag(tag)
+    batches = Batches(tag, batch_cls, year, month, day)
+    return batches[start_time]
+
+
+def _get_batch_file(
+    year: int,
+    month: int,
+    day: int,
+    base_file_name: str
+) -> BatchFile:
+    """Get the `BatchFile` instance corresponding to the input file."""
+    start_time, tag, extension = parse_batch_base_file_name(base_file_name)
+    batch = _get_batch(year, month, day, base_file_name) 
+    return batch.get_file(extension)
+
+
 @log_call
 def get_batch_file(
     year: int,
     month: int,
     day: int,
-    file_name: str
+    base_file_name: str
 ) -> str:
     """Look for a batch file in the file system with a given file name.
     
-    :param year: Search for a batch files under this numeric year.
+    :param year: Search for a batch file under this numeric year.
     :param month: Search for a batch file under this numeric month.
     :param day: Search for a batch file under this numeric day.
-    :param file_name: Search for a batch file with this file name.
+    :param base_file_name: Search for a batch file with this file name.
     :return: The file path of the batch file if it exists in the file system, as an absolute path within the container's file system.
     """
-    start_time, tag, extension = parse_batch_file_name(file_name)
-    batch_cls = get_batch_cls_from_tag(tag)
-    batches = Batches(tag, batch_cls, year, month, day)
-
-    batch = batches[start_time]
-    batch_file = batch.get_file(extension)
+    batch_file = _get_batch_file(year, month, day, base_file_name) 
     return batch_file.file_path
 
 
@@ -56,10 +76,10 @@ def get_batch_files(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
-    tags: Optional[list[str]] = None,
-    extensions: Optional[list[str]] = None,
+    tags: list[str] = [],
+    extensions: list[str] = [],
 ) -> list[str]:
-    """Look for batch files in the file system.
+    """Get the file paths of batch files which exist in the file system.
    
     :param year: Search for batch files under this numeric year, defaults to None. If year, month and day are unspecified, look for batch files under any year.
     :param month: Search for batch files under this numeric month, defaults to None. If year is specified, but not month and day, look for batch files under that year. 
@@ -69,11 +89,7 @@ def get_batch_files(
     
     :return: The file paths of all batch files under the input tag which exist in the file system, as absolute paths within the container's file system.
     """
-    
-    if not extensions: 
-        extensions = []
-   
-    if not tags: 
+    if not tags:
         tags = get_tags(year, month, day)
 
     batch_files = []
@@ -102,24 +118,19 @@ def delete_batch_file(
     year: int,
     month: int,
     day: int,
-    file_name: str
+    base_file_name: str
 ) -> str:
     """Delete a batch file in the file system.
     
     :param year: Delete a batch file under this numeric year.
     :param month: Delete a batch file under this numeric month.
     :param day: Delete a batch file under this numeric day.
-    :param file_name: Delete a batch file with this file name.
+    :param base_file_name: Delete a batch file with this file name.
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
-    start_time, tag, extension = parse_batch_file_name(file_name)
-    batch_cls = get_batch_cls_from_tag(tag)
-    batches = Batches(tag, batch_cls, year, month, day)
-                                                                  
-    batch = batches[start_time]
-    batch_file = batch.get_file(extension)
+    batch_file = _get_batch_file(year, month, day, base_file_name)
     batch_file.delete()
-    _LOGGER.info(f"File deleted: {batch_file.file_name}")
+    _LOGGER.info(f"File deleted: {batch_file.file_path}")
     return batch_file.file_path
 
 
@@ -128,8 +139,8 @@ def delete_batch_files(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
-    tags: Optional[list[str]] = None,
-    extensions: Optional[list[str]]= None
+    tags: list[str] = [],
+    extensions: list[str]= [] 
 ) -> list[str]:
     """Delete batch files. Use with caution, the current implementation contains little safeguarding.
 
@@ -140,14 +151,7 @@ def delete_batch_files(
     :param extensions: Delete only batch files with specific extensions. If no extensions are specified, batch files with any valid extension will be deleted.
     :return: The file paths of batch files which have been successfully deleted, as absolute paths within the container's file system.
     """
-    
-    if tags is None:
-        tags = [] 
-
-    if extensions is None:
-        extensions = []
-
-    deleted_file_names = []
+    deleted_base_file_names = []
     for tag in tags:
 
         batch_cls = get_batch_cls_from_tag(tag)
@@ -164,10 +168,10 @@ def delete_batch_files(
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     batch_file.delete()
-                    _LOGGER.info(f"File deleted: {batch_file.file_name}")
-                    deleted_file_names.append(batch_file.file_path)
+                    _LOGGER.info(f"File deleted: {batch_file.base_file_name}")
+                    deleted_base_file_names.append(batch_file.file_path)
 
-    return deleted_file_names
+    return deleted_base_file_names
 
 
 @log_call
@@ -182,7 +186,7 @@ def get_analytical_test_results(
     year: int,
     month: int,
     day: int,
-    file_name: str,
+    base_file_name: str,
     absolute_tolerance: float
 ) -> dict[str, bool | dict[float, bool]]:
     """Compare all spectrograms with the input tag to analytically derived solutions.
@@ -192,17 +196,15 @@ def get_analytical_test_results(
     :param year: The numeric year of the batch file.
     :param month: The numeric month of the batch file.
     :param day: The numeric day of the batch file.
-    :param file_name: The batch file name.
+    :param base_file_name: The batch file name.
     :param absolute_tolerance: Tolerance level for numerical comparisons.
     :return: The test results for the spectrogram file, as a serialisable dictionary.
     """
-    start_time, tag, extension = parse_batch_file_name(file_name)
-    batch_cls = get_batch_cls_from_tag(tag)
-    batches = Batches(tag, batch_cls, year, month, day)
-    batch = batches[start_time]
+    batch = _get_batch(year, month, day, base_file_name) 
+    start_time, tag, extension = parse_batch_base_file_name(base_file_name)
 
     if batch.spectrogram_file.file_path != batch.get_file(extension).file_path:
-        raise ValueError(f"{file_name} is not the designated spectrogram file for this batch")
+        raise ValueError(f"{base_file_name} is not the designated spectrogram file for this batch")
 
     spectrogram = batch.read_spectrogram()
     capture_config = CaptureConfig(tag)
