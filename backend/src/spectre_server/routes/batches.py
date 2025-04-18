@@ -13,18 +13,18 @@ from ._format_responses import jsendify_response, serve_from_directory
 batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/batches")
 
 
-@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"])
 @jsendify_response
 def get_batch_file(
     year: int,
     month: int,
     day: int,
-    file_name: str
+    base_file_name: str
 ) -> Response:
     return serve_from_directory(batches.get_batch_file(year,
                                                        month,
                                                        day,
-                                                       file_name))
+                                                       base_file_name))
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
@@ -36,7 +36,6 @@ def get_batch_files(
 ) -> list[str]:
     extensions = request.args.getlist("extension")
     tags       = request.args.getlist("tag")
-    
     batch_files = batches.get_batch_files(year,
                                           month,
                                           day,
@@ -49,32 +48,32 @@ def get_batch_files(
                                      year=year,
                                      month=month,
                                      day=day,
-                                     file_name=basename(batch_file),
+                                     base_file_name=basename(batch_file),
                                      _external=True)
          resource_endpoints.append( resource_endpoint  )
          
     return resource_endpoints
 
 
-@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["DELETE"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["DELETE"])
 @jsendify_response
 def delete_batch_file(
     year: int,
     month: int,
     day: int,
-    file_name: str
+    base_file_name: str
 ) -> str:
     
     batch_file = batches.delete_batch_file(year,
                                            month,
                                            day,
-                                           file_name)
+                                           base_file_name)
 
-    return url_for("batches.get_file",
+    return url_for("batches.get_batch_file",
                    year=year,
                    month=month,
                    day=day,
-                   file_name=basename(batch_file),
+                   base_file_name=basename(batch_file),
                    _external=True)
 
 
@@ -98,30 +97,30 @@ def delete_batch_files(
     
     resource_endpoints = []
     for batch_file in batch_files:
-         resource_endpoint = url_for("batches.delete_batch_file", 
+         resource_endpoint = url_for("batches.get_batch_file", 
                                      year=year,
                                      month=month,
                                      day=day,
-                                     file_name=basename(batch_file),
+                                     base_file_name=basename(batch_file),
                                      _external=True)
          resource_endpoints.append( resource_endpoint  )
 
     return resource_endpoints
    
 
-@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:file_name>/analytical-test-results", methods=["GET"])
+@batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>/analytical-test-results", methods=["GET"])
 @jsendify_response
 def get_analytical_test_results(
     year: int,
     month: int,
     day: int,
-    file_name: str,
+    base_file_name: str,
 ) -> dict[str, bool | dict[float, bool]]:
     absolute_tolerance = request.args.get("absolute_tolerance", type = float, default=1e-5)
     return batches.get_analytical_test_results(year,
                                                month,
                                                day,
-                                               file_name,
+                                               base_file_name,
                                                absolute_tolerance)
 
 
@@ -184,7 +183,7 @@ def create_plot(
                    year=batch_start_date.year,
                    month=batch_start_date.month,
                    day=batch_start_date.day,
-                   file_name=basename(batch_file),
+                   base_file_name=basename(batch_file),
                    _external=True)
 
                    

@@ -17,36 +17,36 @@ from spectre_core.capture_configs import CaptureConfig, parse_string_parameters,
 
 
 def _get_capture_config(
-    file_name: str
+    base_file_name: str
 ) -> CaptureConfig:
     """Get a capture config instance from it's file name."""
-    tag, _ = splitext(file_name)
+    tag, _ = splitext(base_file_name)
     return CaptureConfig(tag)
 
 
 @log_call
 def get_capture_config(
-    file_name: str,
+    base_file_name: str,
 ) -> str:
     """Look for a capture config in the file system with a given file name.
 
-    :param file_name: Search for a capture config with this file name.
+    :param base_file_name: Search for a capture config with this file name.
     :return: The file path of the capture config if it exists in the file system, as an absolute path within the container's file system. 
     """
-    capture_config = _get_capture_config(file_name)
+    capture_config = _get_capture_config(base_file_name)
     return capture_config.file_path
 
 
 @log_call
 def read_capture_config(
-    file_name: str
+    base_file_name: str
 ) -> dict[str, Any]:
     """Read the contents of a capture config.
 
-    :param file_name: The file name of the capture config.
+    :param base_file_name: The file name of the capture config.
     :return: The contents of the capture config.
     """
-    capture_config = _get_capture_config(file_name) 
+    capture_config = _get_capture_config(base_file_name) 
     return capture_config.read()
 
 
@@ -60,7 +60,7 @@ def get_capture_configs(
 
 @log_call
 def create_capture_config(
-    file_name: str,
+    base_file_name: str,
     receiver_name: str,
     receiver_mode: str,
     string_parameters: Optional[list[str]] = None,
@@ -68,14 +68,14 @@ def create_capture_config(
 ) -> str:
     """Create a capture config.
 
-    :param file_name: The file name of the capture config. 
+    :param base_file_name: The file name of the capture config. 
     :param receiver_name: The name of the receiver used for capture.
     :param receiver_mode: The operating mode for the receiver to be used for capture.
     :param string_parameters: The parameters to store in the capture config. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, overwrites the existing capture config if it already exists, defaults to False
-    :return: The file name of the successfully created capture config.
+    :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
     """
     if string_parameters is None:
         string_parameters = []
@@ -86,17 +86,17 @@ def create_capture_config(
     
     parameters = make_parameters( parse_string_parameters(string_parameters) )
 
-    tag, _ = splitext(file_name)
+    tag, _ = splitext(base_file_name)
     receiver.save_parameters(tag,
                              parameters,
                              force)
     
     # create an instance of the newly created capture config
-    capture_config = _get_capture_config(file_name)
+    capture_config = _get_capture_config(base_file_name)
     
-    _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}")
+    _LOGGER.info(f"The capture-config for tag '{tag}' has been created: {capture_config.base_file_name}")
     
-    return capture_config.file_name
+    return capture_config.file_path
 
 
 def _has_batches(
@@ -132,7 +132,7 @@ def _caution_update(
 
 @log_call
 def update_capture_config(
-    file_name: str,
+    base_file_name: str,
     string_parameters: list[str],
     force: bool = False,
 ) -> str: 
@@ -141,20 +141,20 @@ def update_capture_config(
     Any parameters passed in via `string_parameters` will overwrite the corresponding parameters
     already existing in the capture config.
 
-    :param file_name: The file name of the capture config to update.
+    :param base_file_name: The file name of the capture config to update.
     :param string_parameters: The parameters to update in the capture config. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter 
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
-    :return: The file name of the successfully updated capture config.
+    :return: The file path of the successfully updated capture config, as an absolute path in the container's file system.
     """
-    tag, _ = splitext(file_name)
+    tag, _ = splitext(base_file_name)
     _caution_update(tag, 
                     force)
     
     new_parameters = make_parameters( parse_string_parameters(string_parameters) )
 
-    capture_config = _get_capture_config(file_name) 
+    capture_config = _get_capture_config(base_file_name) 
 
     for existing_parameter in capture_config.parameters:
         if existing_parameter.name in new_parameters.name_list:
@@ -169,28 +169,28 @@ def update_capture_config(
                              new_parameters,
                              force=True)
 
-    _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.file_name}")
+    _LOGGER.info(f"Capture config for tag: {tag} has been successfully updated: {capture_config.base_file_name}")
 
-    return capture_config.file_name
+    return capture_config.file_path
   
         
 @log_call
 def delete_capture_config(
-    file_name: str,
+    base_file_name: str,
 ) -> str:
     """Delete a capture config.
 
-    :param file_name: The file_name of the capture config.
-    :return: The file name of the successfully deleted capture config.
+    :param base_file_name: The base_file_name of the capture config.
+    :return: The file path of the successfully deleted capture config, as an absolute path within the container's file system.
     """
-    tag, _ = splitext(file_name)
+    tag, _ = splitext(base_file_name)
     if _has_batches(tag):
         error_message = (f"Batches exist under the tag {tag}, and deleting the corresponding capture config "
                          f"would lead to undefined behaviour.")
         _LOGGER.error(error_message)
         raise FileExistsError(error_message)
     
-    capture_config = _get_capture_config(file_name) 
+    capture_config = _get_capture_config(base_file_name) 
     capture_config.delete()
-    _LOGGER.info(f"File deleted: {capture_config.file_name}")
-    return capture_config.file_name
+    _LOGGER.info(f"File deleted: {capture_config.base_file_name}")
+    return capture_config.file_path

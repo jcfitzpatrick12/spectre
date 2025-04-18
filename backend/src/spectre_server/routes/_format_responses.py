@@ -72,7 +72,8 @@ def make_jsend_response(
 
 P = ParamSpec("P")
 # Loosen type hinting to support any JSON-compatible data structures.
-T = TypeVar("T", bound=None|str|list[Any]|dict[str, Any])
+# Additionally, permit `Response` objects, under the assumption they are produced by `send_from_directory`.
+T = TypeVar("T", bound=None|str|list[Any]|dict[str, Any]|Response)
 
 def jsendify_response(
     func: Callable[P, T]
