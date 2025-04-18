@@ -129,7 +129,7 @@ If this is the first time you're running the containers since plugging in the de
 ### **Run the CLI without Docker**
 You can also run the CLI locally, without the `spectre-cli` container.
 
-1. **Create and activate a Python virtual environment**
+1. **Create and activate a Python virtual environment**  
    Create and activate a Python virtual environment dedicated for the `spectre-cli`:  
    ```bash
    python3 -m venv ./.venv && . ./.venv/bin/activate
