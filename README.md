@@ -11,19 +11,36 @@
 
 ## Overview
 
-📢 **This project is under active development. Contributors welcome!** 📢
+📢 **This project is under active development, expect breaking changes. Contributors welcome!** 📢
 
 `spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
 
 
 ### **Features**
-- 💻 Intuitive CLI tool  
+- 💻 Intuitive CLI tool
 - 🐳 Simple installation with Docker
 - 🛰️ Wide receiver support  
 - 💾 Live recording of radio spectrograms and I/Q data  
-- ⚙️ Flexible, configurable data capture   
+- ⚙️ Flexible, configurable data capture
+- ✏️ Services exposed with a discoverable RESTful API
 - 🔧 Developer-friendly and extensible
 
+
+### **Demo**
+Capture data from SDRs, simply.
+
+1. **Create a configuration file**  
+   Write a new configuration file to collect data from the SDRPlay RSP1A at a fixed center frequency:  
+   ```bash
+   spectre create capture-config --receiver rsp1a --mode fixed_center_frequency --tag rsp1a-example
+   ```
+   
+2. **Capture data**  
+   Start streaming I/Q samples from the receiver, and automatically post process the data into radio spectrograms:  
+   ```bash
+   spectre start session --tag rsp1a-example --seconds 30
+   ```
+   
 ## Supported Receivers
 
 Our abstract framework can support any receiver with a source block in GNU Radio. If you have a receiver that isn't supported, reach out, and we can look into adding support for it!
@@ -88,8 +105,7 @@ To get going, you'll need the following installed on your machine:
    ```bash
    spectre --help
    ```
-
-
+   
 ### **Check your receiver is detected**  
 If you have a physical receiver connected, it's a good idea to verify that the `spectre-server` can detect it.
 
@@ -108,6 +124,24 @@ If this is the first time you're running the containers since plugging in the de
    docker compose restart spectre-server
    ```
 
+### **Run the CLI without Docker**
+You can also run the CLI locally, without the `spectre-cli` container.
+
+1. **Create and activate a Python virtual environment**
+   Create and activate a Python virtual environment dedicated for the `spectre-cli`:  
+   ```bash
+   python3 -m venv ./.venv && . ./.venv/bin/activate
+   ```
+2. **Install the dependencies**  
+   Install the dependencies into the newly activated virtual environment.:  
+   ```bash
+   pip install ./cli
+   ```
+3. **Good to go!**  
+   Verify everything is up and running with:      
+   ```bash
+   spectre --help
+   ```
 
 ## **Quick Start for Developers**
 For development, use the development Compose file:    
