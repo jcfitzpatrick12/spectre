@@ -29,10 +29,12 @@
 ### **Demo**
 Capture data from SDRs, simply.
 
-1. **Create a configuration file**  
-   Write a new configuration file to collect data from the SDRPlay RSP1A at a fixed center frequency:  
+1. **Create a capture config**  
+   Create a new configuration file to collect data from the SDRPlay RSP1A receiver at a fixed center frequency:  
    ```bash
-   spectre create capture-config --receiver rsp1a --mode fixed_center_frequency --tag rsp1a-example
+   spectre create capture-config --receiver rsp1a \
+                                 --mode fixed_center_frequency \
+                                 --tag rsp1a-example
    ```
    
 2. **Capture data**  
