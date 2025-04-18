@@ -29,29 +29,27 @@ def _secho_deleted_resources(
     help = "Delete log files."
 )
 def logs(
-    process_type: str = Option(None, 
-                               "--process-type", 
-                               help="Specifies one of 'worker' or 'user'."),
-    year: int = Option(None, 
+    year: int = Option(..., 
                        "--year", 
                        "-y", 
-                       help="Delete all logs under this numeric year."),
-    month: int = Option(None, 
+                       help="Delete logs under this numeric year."),
+    month: int = Option(..., 
                        "--month", 
                        "-m", 
-                      help="Delete all logs under this numeric month."),
-    day: int = Option(None, 
+                       help="Delete logs under this numeric month."),
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
-                      help="Delete all logs under this numeric day.")
+                      help="Delete  logs under this numeric day."),
+    process_types: list[str] = Option([], 
+                                     "--process-type",                                
+                                     help="Specifies one of 'worker' or 'user'."),
+
 ) -> None:
     params = {
-        "process_type": process_type,
-        "year": year,
-        "month": month,
-        "day": day,
+        "process_type": process_types,
     }
-    jsend_dict = safe_request("spectre-data/logs", 
+    jsend_dict = safe_request(f"spectre-data/logs/{year}/{month}/{day}", 
                               "DELETE", 
                               params = params)
     resource_endpoints = jsend_dict["data"]
@@ -105,7 +103,7 @@ def capture_config(
                       "-t", 
                       help="Unique identifier for the capture config."),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "DELETE")
     resource_endpoint = jsend_dict["data"]
     _secho_deleted_resource(resource_endpoint)

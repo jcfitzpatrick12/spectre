@@ -45,10 +45,21 @@ def _pretty_print_test_results(
                 "to known analytically derived solutions.")
 )
 def analytical(
-    tag: str = Option(..., 
-                      "--tag", 
-                      "-t", 
-                      help="The tag used to capture the data."),
+    year: int = Option(..., 
+                      "--year", 
+                      "-y", 
+                      help="Test a spectrogram file under this numeric year."),
+    month: int = Option(...,
+                        "--month",
+                        "-m",
+                        help="Test a spectrogram file under this numeric month."),
+    day: int = Option(...,
+                      "--day",
+                      "-d",
+                      help="Test a spectrogram file under this numeric day."),
+    base_file_name: str = Option(...,
+                                 "-f",
+                                 help="Test a spectrogram file with this base file name."),
     absolute_tolerance: float = Option(1e-3, 
                                        "--atol", 
                                        "--absolute-tolerance", 
@@ -63,15 +74,14 @@ def analytical(
     params = {
         "absolute_tolerance": absolute_tolerance,
     }
-    jsend_dict = safe_request(f"spectre-data/batches/{tag}/analytical-test-results",
+    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}/{base_file_name}/analytical-test-results",
                               "GET",
                               params = params)
-    results_per_batch = jsend_dict["data"]
-    for file_name, test_results in results_per_batch.items():
-        _pretty_print_test_results(file_name,
-                                   test_results["times_validated"],
-                                   test_results["frequencies_validated"],
-                                   test_results["spectrum_validated"],
-                                   per_spectrum)
-        
+    test_results = jsend_dict["data"]
+    _pretty_print_test_results(base_file_name,
+                               test_results["times_validated"],
+                               test_results["frequencies_validated"],
+                               test_results["spectrum_validated"],
+                               per_spectrum)
+    
     raise Exit()

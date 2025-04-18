@@ -50,7 +50,7 @@ def capture_config(
         "string_parameters": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "PUT", 
                               json=json)
     resource_endpoint = jsend_dict["data"]

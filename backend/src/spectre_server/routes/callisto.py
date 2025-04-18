@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from flask import Blueprint, request
+from flask import Blueprint, request, url_for
+from os.path import basename
 
-from spectre_server.services import callisto
-from spectre_server.routes._format_responses import jsendify_response
+from ..services import callisto
+from ._format_responses import jsendify_response
 
-callisto_blueprint = Blueprint("callisto", __name__)
+
+callisto_blueprint = Blueprint("callisto", __name__, url_prefix="/callisto")
 
 
 @callisto_blueprint.route("/instrument-codes", methods=["GET"])
@@ -27,7 +29,20 @@ def download(
     year            = json.get("year")
     month           = json.get("month")
     day             = json.get("day")
-    return callisto.download_callisto_data(instrument_code,
-                                           year,
-                                           month,
-                                           day)
+
+    batch_files, start_date = callisto.download_callisto_data(instrument_code,
+                                                              year,
+                                                              month,
+                                                              day)
+    
+    resource_endpoints = []
+    for batch_file in batch_files:
+        resource_endpoint =  url_for("batches.get_batch_file",
+                                     year=year,
+                                     month=month,
+                                     day=day,
+                                     file_name=basename(batch_file),
+                                     _external=True)
+        resource_endpoints.append(resource_endpoint)
+        
+    return resource_endpoints
