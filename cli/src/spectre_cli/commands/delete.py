@@ -102,7 +102,15 @@ def capture_config(
                       "--tag", 
                       "-t", 
                       help="Unique identifier for the capture config."),
+    base_file_name: str = Option(...,
+                                 "-f",
+                                 help="The base file name of the capture config.")
 ) -> None:
+    if not (base_file_name is None) ^ (tag is None):
+        raise ValueError("Specify either the tag or file name, not both.")
+                                                                           
+    base_file_name = base_file_name or f"{tag}.json"
+
     jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "DELETE")
     resource_endpoint = jsend_dict["data"]

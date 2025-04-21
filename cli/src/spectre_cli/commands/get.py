@@ -56,7 +56,7 @@ def logs(
                      "--day", 
                      "-d", 
                      help="List log files under this numeric day."),
-   process_types: str = Option([], 
+   process_types: list[str] = Option([], 
                                "--process-type", 
                                help="Specifies one of 'worker' or 'user'."),
 
@@ -70,6 +70,32 @@ def logs(
     resource_endpoints = jsend_dict["data"]
 
     _secho_resources(resource_endpoints)
+    raise Exit()
+
+@get_typer.command(
+    help = "Print the contents of a log file."
+)
+def log(
+    year: int = Option(..., 
+                       "--year", 
+                       "-y", 
+                       help="Read a log file under this numeric year."),
+    month: int = Option(..., 
+                        "--month", 
+                        "-m", 
+                        help="Read a log file under this numeric month."),
+    day: int = Option(..., 
+                      "--day", 
+                      "-d", 
+                      help="Read a log file under this numeric day."),
+    base_file_name: str = Option(...,
+                                 "-f",
+                                 help="The base file name of the log file.")
+) -> None:
+    jsend_dict = safe_request(f"spectre-data/logs/{year}/{month}/{day}/{base_file_name}/raw",
+                              "GET")
+    log_contents = jsend_dict["data"]
+    print( log_contents )
     raise Exit()
 
 
@@ -203,7 +229,8 @@ def capture_config(
     if not (base_file_name is None) ^ (tag is None):
         raise ValueError("Specify either the tag or file name, not both.")
 
-    base_file_name = base_file_name or tag
+    base_file_name = base_file_name or f"{tag}.json"
+    
     jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}/raw",
                               "GET")
     capture_config = jsend_dict["data"]
