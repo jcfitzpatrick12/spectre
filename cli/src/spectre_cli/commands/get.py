@@ -56,7 +56,7 @@ def logs(
                      "--day", 
                      "-d", 
                      help="List log files under this numeric day."),
-   process_types: str = Option([], 
+   process_types: list[str] = Option([], 
                                "--process-type", 
                                help="Specifies one of 'worker' or 'user'."),
 
