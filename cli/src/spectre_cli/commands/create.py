@@ -21,10 +21,13 @@ def _secho_created_resource(
     help = "Create a capture config."
 )
 def capture_config(
-    tag: str = Option(..., 
+    tag: str = Option(None, 
                       "--tag", 
                       "-t", 
                       help="Unique identifier for the capture config."),
+    base_file_name: str = Option(None,
+                                 "-f",
+                                 help="The base file name for the capture config."),
     receiver_name: str = Option(..., 
                                "--receiver",
                                "-r", 
@@ -44,13 +47,18 @@ def capture_config(
                               "overwrite it.", 
                          is_flag=True)
 ) -> None:
+    if not (base_file_name is None) ^ (tag is None):
+        raise ValueError("Specify either the tag or file name, not both.")
+                                                                           
+    base_file_name = base_file_name or f"{tag}.json"
+
     json = {
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
         "string_parameters": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
+    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}", 
                               "PUT", 
                               json=json)
     resource_endpoint = jsend_dict["data"]
