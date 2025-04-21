@@ -21,10 +21,13 @@ def _secho_updated_resource(
 @update_typer.command(
         help = "Update capture config parameters."
 )
-def capture_config(tag: str = Option(..., 
+def capture_config(tag: str = Option(None, 
                                      "--tag", 
                                      "-t", 
                                      help="Unique identifier for the capture config."),
+                   base_file_name: str = Option(None, 
+                                                "-f", 
+                                                help="The base file name of the capture config"),
                    params: List[str] = Option(..., 
                                               "--param", 
                                               "-p", 
@@ -37,12 +40,17 @@ def capture_config(tag: str = Option(...,
                                              "Use with caution: existing data may no longer align with the updated configuration, "
                                              "potentially leading to misleading results.")
 ) -> None:
+   
+    if not (base_file_name is None) ^ (tag is None):
+        raise ValueError("Specify either the tag or file name, not both.")
+                                                                           
+    base_file_name = base_file_name or f"{tag}.json"
     
     json = {
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/{tag}",
+    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}",
                               "PATCH",
                               json = json)
     resource_endpoint = jsend_dict["data"]
