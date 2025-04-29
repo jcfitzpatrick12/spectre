@@ -86,7 +86,11 @@ def create_capture_config(
     
     parameters = make_parameters( parse_string_parameters(string_parameters) )
 
-    tag, _ = splitext(base_file_name)
+    tag, extension = splitext(base_file_name)
+
+    if extension != ".json":
+        raise ValueError("Capture config base file names must be of the form <tag>.json")
+
     receiver.save_parameters(tag,
                              parameters,
                              force)
