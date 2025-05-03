@@ -20,9 +20,9 @@ def get_date_from_batch_file_path(
 
 
 def validate_date(
-    year: Optional[int],
-    month: Optional[int],
-    day: Optional[int],
+    year: Optional[int]=None,
+    month: Optional[int]=None,
+    day: Optional[int]=None,
 ) -> None:
     """
     Validate that the provided date components follow one of the allowed patterns and do not represent a future date.

@@ -55,7 +55,7 @@ def delete_batch_file(
     month: int,
     day: int,
     base_file_name: str
-) -> Response:
+) -> str:
     validate_date(year, month, day)
     batch_file_path = batches.delete_batch_file(base_file_name, year, month, day)
     return _get_batch_file_endpoint(batch_file_path)
@@ -96,7 +96,7 @@ def get_batch_files_year(
 ) -> list[str]:
     tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
-    validate_date(year_)
+    validate_date(year)
     batch_files = batches.get_batch_files(tags, extensions, year=year)
     return _get_batch_file_endpoints(batch_files)
 
@@ -193,20 +193,17 @@ def create_plot(
         figsize = (15, 8)
 
     # Create the plot and return the name of the batch file containing the plot.    
-    batch_file, batch_start_date =  batches.create_plot(tags,
-                                                        figsize,
-                                                        obs_date,
-                                                        start_time,
-                                                        end_time,
-                                                        lower_freq=lower_freq,
-                                                        upper_freq=upper_freq,
-                                                        log_norm=log_norm,
-                                                        dBb=dBb,
-                                                        vmin=vmin,
-                                                        vmax=vmax)
-    return _get_batch_file_endpoint(batch_file,
-                                    year=batch_start_date.year,
-                                    month=batch_start_date.month,
-                                    day=batch_start_date.day)
+    batch_file  =  batches.create_plot(tags,
+                                       figsize,
+                                       obs_date,
+                                       start_time,
+                                       end_time,
+                                       lower_freq=lower_freq,
+                                       upper_freq=upper_freq,
+                                       log_norm=log_norm,
+                                       dBb=dBb,
+                                       vmin=vmin,
+                                       vmax=vmax)
+    return _get_batch_file_endpoint(batch_file)
 
                    

@@ -268,7 +268,7 @@ def create_plot(
     dBb: bool = False,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
-) -> Tuple[str, date]:
+) -> str:
     """
     Create a plot visualising spectrogram data over a specified time interval and optional frequency range.
 
@@ -319,4 +319,4 @@ def create_plot(
                                                 dBb=dBb,
                                                 vmin=vmin,
                                                 vmax=vmax) )   
-    return panel_stack.save(), obs_date_as_date
+    return panel_stack.save()
