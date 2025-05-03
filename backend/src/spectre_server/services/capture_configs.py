@@ -127,9 +127,9 @@ def _caution_update(
             _LOGGER.warning(f"Batches exist under the tag {tag}, forcing update")
             return
         else:
-            error_message = (f"Batches exist under the tag {tag}. Any updates may lead to undefined behaviour. "
-                             f"It is recommended to create a new tag for any configuration file updates. " 
-                             f"Override this functionality with `force`. Aborting update")
+            error_message = (f"Batches exist under the tag {tag}. Any updates to the capture config may lead to undefined behaviour. "
+                             f"For any changes, it is recommended to create a new capture config, or to first delete existing batch files "
+                             f"if they are no longer required. This warning can be overridden.")
             _LOGGER.error(error_message)
             raise FileExistsError(error_message)
         
