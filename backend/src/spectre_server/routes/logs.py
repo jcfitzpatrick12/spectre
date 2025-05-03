@@ -28,10 +28,10 @@ def _get_log_file_endpoint(
 
 
 def _get_log_file_endpoints(
-    log_files: list[str]
+    log_file_paths: list[str]
 ) -> list[str]:
     """Return the API endpoints corresponding to the input log file paths."""
-    return [_get_log_file_endpoint(log_file) for log_file in log_files]
+    return [_get_log_file_endpoint(log_file) for log_file in log_file_paths]
 
 
 @logs_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"])

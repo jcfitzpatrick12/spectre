@@ -28,10 +28,10 @@ def get_batch_file_endpoint(
 
 
 def get_batch_file_endpoints(
-    batch_files: list[str]
+    batch_file_paths: list[str]
 ) -> list[str]:
     """Return the API endpoints corresponding to the input batch file paths."""
-    return [get_batch_file_endpoint(batch_file) for batch_file in batch_files]
+    return [get_batch_file_endpoint(batch_file) for batch_file in batch_file_paths]
     
     
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"])
