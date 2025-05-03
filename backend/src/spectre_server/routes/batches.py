@@ -14,7 +14,7 @@ from ._format_responses import jsendify_response, serve_from_directory
 batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/batches")
 
 
-def _get_batch_file_endpoint(
+def get_batch_file_endpoint(
     batch_file_path: str,
 ) -> str:
     """Return the API endpoint corresponding to the batch file at the input path."""
@@ -27,11 +27,11 @@ def _get_batch_file_endpoint(
                     _external=True)
 
 
-def _get_batch_file_endpoints(
+def get_batch_file_endpoints(
     batch_files: list[str]
 ) -> list[str]:
     """Return the API endpoints corresponding to the input batch file paths."""
-    return [_get_batch_file_endpoint(batch_file) for batch_file in batch_files]
+    return [get_batch_file_endpoint(batch_file) for batch_file in batch_files]
     
     
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"])
@@ -59,7 +59,7 @@ def delete_batch_file(
 ) -> str:
     validate_date(year, month, day)
     batch_file_path = batches.delete_batch_file(base_file_name, year, month, day)
-    return _get_batch_file_endpoint(batch_file_path)
+    return get_batch_file_endpoint(batch_file_path)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
@@ -73,7 +73,7 @@ def get_batch_files_year_month_day(
     extensions = request.args.getlist("extension")
     validate_date(year, month, day)
     batch_files = batches.get_batch_files(tags, extensions, year=year, month=month, day=day)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>", methods=["GET"])
@@ -86,7 +86,7 @@ def get_batch_files_year_month(
     extensions = request.args.getlist("extension")
     validate_date(year, month)
     batch_files = batches.get_batch_files(tags, extensions, year=year, month=month)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 
@@ -99,7 +99,7 @@ def get_batch_files_year(
     extensions = request.args.getlist("extension")
     validate_date(year)
     batch_files = batches.get_batch_files(tags, extensions, year=year)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/", methods=["GET"])
@@ -109,7 +109,7 @@ def get_batch_files(
     tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
     batch_files = batches.get_batch_files(tags, extensions)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["DELETE"])
@@ -127,7 +127,7 @@ def delete_batch_files_year_month_day(
                                               year,
                                               month,
                                               day)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>", methods=["DELETE"])
@@ -143,7 +143,7 @@ def delete_batch_files_year_month(
                                               extensions,
                                               year,
                                               month)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/<int:year>", methods=["DELETE"])
@@ -157,7 +157,7 @@ def delete_batch_files_year(
     batch_files =  batches.delete_batch_files(tags,
                                               extensions,
                                               year)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("", methods=["DELETE"])
@@ -168,7 +168,7 @@ def delete_batch_files(
     tags       = request.args.getlist("tag")
     batch_files =  batches.delete_batch_files(tags,
                                               extensions)
-    return _get_batch_file_endpoints(batch_files)
+    return get_batch_file_endpoints(batch_files)
 
    
 
@@ -190,14 +190,40 @@ def get_analytical_test_results(
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>/tags", methods=["GET"])
 @jsendify_response
-def get_tags(
+def get_tags_year_month_day(
     year: int,
     month: int,
     day: int
 ) -> list[str]:
+    validate_date(year, month, day)
     return batches.get_tags(year,
                             month,
                             day)
+    
+@batches_blueprint.route("/<int:year>/<int:month>/tags", methods=["GET"])
+@jsendify_response
+def get_tags_year_month(
+    year: int,
+    month: int,
+) -> list[str]:
+    validate_date(year, month)
+    return batches.get_tags(year,
+                            month)
+    
+@batches_blueprint.route("/<int:year>/tags", methods=["GET"])
+@jsendify_response
+def get_tags_year(
+    year: int,
+) -> list[str]:
+    validate_date(year)
+    return batches.get_tags(year)
+    
+    
+@batches_blueprint.route("/tags", methods=["GET"])
+@jsendify_response
+def get_tags(
+) -> list[str]:
+    return batches.get_tags()
 
 
 @batches_blueprint.route("/plots", methods=["PUT"])
@@ -242,6 +268,6 @@ def create_plot(
                                        dBb=dBb,
                                        vmin=vmin,
                                        vmax=vmax)
-    return _get_batch_file_endpoint(batch_file)
+    return get_batch_file_endpoint(batch_file)
 
                    

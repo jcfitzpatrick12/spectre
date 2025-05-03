@@ -200,9 +200,9 @@ def get_analytical_test_results(
 
 @log_call
 def get_tags(
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
+    year: Optional[int]=None,
+    month: Optional[int]=None,
+    day: Optional[int]=None,
 ) -> list[str]:
     """Look for tags with existing batch files in the file system.
 
