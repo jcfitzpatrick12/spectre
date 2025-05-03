@@ -160,7 +160,7 @@ def delete_batch_files_year(
     return get_batch_file_endpoints(batch_files)
 
 
-@batches_blueprint.route("", methods=["DELETE"])
+@batches_blueprint.route("/", methods=["DELETE"])
 @jsendify_response
 def delete_batch_files(
 ) -> list[str]:
