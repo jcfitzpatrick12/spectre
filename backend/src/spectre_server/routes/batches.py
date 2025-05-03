@@ -199,14 +199,13 @@ def get_tags(
                             day)
 
 
-@batches_blueprint.route("/plots/<string:tag>", methods=["PUT"])
+@batches_blueprint.route("/plots", methods=["PUT"])
 @jsendify_response
 def create_plot(
-    tag: str
 ) -> str:
     json = request.get_json()
     # Data from multiple batch files can be compared, by passing extra `tags` through the request body.
-    tags         = [tag] + json.get("tags")
+    tags         = json.get("tags")
     figsize_x    = json.get("figsize_x")
     figsize_y    = json.get("figsize_y")
     obs_date     = json.get("obs_date")
