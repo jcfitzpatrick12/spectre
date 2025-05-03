@@ -30,7 +30,7 @@ def safe_request(
     json: Optional[dict] = None,
     params: Optional[dict] = None,
     require_confirmation: bool = False,
-    suppress_confirmation: bool = False
+    non_interactive: bool = True
 ) -> dict:
     """Send a request to the `spectre-server` and handle jsend-style responses.
 
@@ -42,7 +42,7 @@ def safe_request(
     :param suppress_confirmation: If True, ignore the `require_confirmation` flag, and continue with the request.
     :return: Parsed JSON response as a dictionary.
     """
-    if require_confirmation and not suppress_confirmation:
+    if require_confirmation and not non_interactive:
         confirm_with_user()
         
     if route_url.startswith("/"):

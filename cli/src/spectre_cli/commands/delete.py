@@ -32,9 +32,9 @@ def logs(
                       "--day", 
                       "-d", 
                       help="Delete  logs under this numeric day."),
-    suppress_confirmation: bool = Option(False, 
-                                         "--suppress-confirmation", 
-                                         help="Suppress any user confirmation.")
+    non_interactive: bool = Option(False, 
+                                  "--non-interactive", 
+                                  help="Suppress any interactive prompts.")
     
 ) -> None:
     params = {
@@ -44,7 +44,7 @@ def logs(
                               "DELETE", 
                               params=params,
                               require_confirmation=True,
-                              suppress_confirmation=suppress_confirmation)
+                              non_interactive=non_interactive)
     endpoints = jsend_dict["data"]
     secho_stale_resources(endpoints)
     raise Exit()
@@ -74,9 +74,9 @@ def batch_files(
                       "--day", 
                       "-d", 
                       help="Delete all batch files under this numeric day."),
-    suppress_confirmation: bool = Option(False, 
-                                         "--suppress-confirmation", 
-                                         help="Suppress any user confirmation.")
+    non_interactive: bool = Option(False, 
+                                   "--non-interactive", 
+                                   help="Suppress any interactive prompts.")
 ) -> None:
     params = {
         "extension": extensions,
@@ -86,7 +86,7 @@ def batch_files(
                               "DELETE",
                               params = params,
                               require_confirmation=True,
-                              suppress_confirmation=suppress_confirmation)
+                              non_interactive=non_interactive)
     endpoints = jsend_dict["data"]
     secho_stale_resources(endpoints)
     raise Exit()
@@ -103,9 +103,9 @@ def capture_config(
     file_name: str = Option(None,
                             "-f",
                             help="The file name of the capture config."),
-    suppress_confirmation: bool = Option(False, 
-                         "--suppress-confirmation", 
-                         help="Suppress any user confirmation.")
+    non_interactive: bool = Option(False, 
+                                  "--non-interactive", 
+                                  help="Suppress any interactive prompts.")
 ) -> None:
     
                                                                            
@@ -114,7 +114,7 @@ def capture_config(
     jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
                               "DELETE",
                               require_confirmation=True,
-                              suppress_confirmation=suppress_confirmation)
+                              non_interactive=non_interactive)
     endpoint = jsend_dict["data"]
     secho_stale_resource(endpoint)
     raise Exit()
