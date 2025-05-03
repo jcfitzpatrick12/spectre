@@ -30,7 +30,7 @@ def safe_request(
     json: Optional[dict] = None,
     params: Optional[dict] = None,
     require_confirmation: bool = False,
-    non_interactive: bool = True
+    non_interactive: bool = False
 ) -> dict:
     """Send a request to the `spectre-server` and handle jsend-style responses.
 
