@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional
 from os.path import basename
 
@@ -46,7 +46,7 @@ def validate_date(
     Raises:
         ValueError: If components are out of order, invalid, or in the future.
     """
-    today = date.today()
+    today = datetime.now(timezone.utc).date()
 
     if day is not None and month is None:
         raise ValueError("Day cannot be specified without month.")
