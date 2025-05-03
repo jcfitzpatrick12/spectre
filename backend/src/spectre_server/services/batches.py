@@ -92,11 +92,11 @@ def get_batch_files(
                           day=day)
         
         for batch in batches:
-            # if no extensions are specified, look for batch files with any (defined) extension.
-            if not extensions:
-                extensions = batch.extensions
+            # If no extensions are specified, look for batch files with any (defined) extension.
+            # Relabel to something that's not `extensions` to stop shadowing
+            exts = extensions or batch.extensions
 
-            for extension in extensions:
+            for extension in exts:
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     batch_files.append(batch_file.file_path)
