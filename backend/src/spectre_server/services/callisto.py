@@ -36,5 +36,5 @@ def download_callisto_data(
     for code in codes:
         # TODO: Remove redundant date object return from `download_callisto_data` return
         new_batch_files, _ = wgetting.download_callisto_data(code, year, month, day) 
-        batch_file_paths.append( new_batch_files )
+        batch_file_paths +=  new_batch_files 
     return batch_file_paths

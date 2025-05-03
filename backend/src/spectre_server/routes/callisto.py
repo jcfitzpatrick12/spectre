@@ -29,9 +29,9 @@ def download(
 ) -> list[str]:
     instrument_codes = request.args.getlist("instrument_codes")
 
-    batch_files, _ = callisto.download_callisto_data(instrument_codes,
-                                                     year,
-                                                     month,
-                                                     day)
+    batch_files = callisto.download_callisto_data(instrument_codes,
+                                                  year,
+                                                  month,
+                                                  day)
     
     return get_batch_file_endpoints( batch_files )
