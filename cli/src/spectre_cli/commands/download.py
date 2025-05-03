@@ -4,56 +4,43 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._safe_request import safe_request
+from ._utils import safe_request, build_date_path
+from ._secho_resources import secho_new_resources
+
 
 download_typer = Typer(
     help = "Download external spectrogram data."
 )
-
-def _secho_downloaded_resource(
-    resource_endpoint: str
-) -> None:
-    secho(resource_endpoint, fg="green")
-    
-    
-def _secho_downloaded_resources(
-    resource_endpoints: list[str]
-) -> None:    
-    for resource_endpoint in resource_endpoints:
-        _secho_downloaded_resource(resource_endpoint)
 
 
 @download_typer.command(
     help = "Download e-Callisto network spectrogram data."
 )
 def callisto(
-    instrument_code: str = Option(..., 
-                                  "--instrument-code", 
-                                  "-i", 
-                                  help="The case-sensitive e-Callisto station instrument codes."),
-    year: int = Option(None, 
+    instrument_codes: list[str] = Option(..., 
+                                        "--instrument-code", 
+                                        "-i", 
+                                        help="The case-sensitive e-Callisto station instrument code."),
+    year: int = Option(..., 
                        "--year", 
                        "-y", 
                        help="Download files under this numeric year."),
-    month: int = Option(None, 
+    month: int = Option(..., 
                         "--month", 
                         "-m", 
                         help="Download files under this numeric month."),
-    day: int = Option(None, 
+    day: int = Option(..., 
                       "--day", 
                       "-d", 
                       help="Download files under this numeric day."),
 ) -> None:
     json = {
-        "instrument_code": instrument_code,
-        "year": year,
-        "month": month,
-        "day": day
+        "instrument_code": instrument_codes,
     }
     secho(f"Download in progress...", fg="yellow")
-    jsend_dict = safe_request("callisto/batches",
+    jsend_dict = safe_request(f"callisto/batches/{build_date_path(year, month, day)}",
                               "POST",
                               json=json)
-    resource_endpoints = jsend_dict["data"]
-    _secho_downloaded_resources( resource_endpoints )
+    endpoints = jsend_dict["data"]
+    secho_new_resources( endpoints )
     raise Exit()

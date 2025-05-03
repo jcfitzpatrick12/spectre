@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._safe_request import safe_request
+from ._utils import safe_request
 
 test_typer = Typer(
     help = "Run tests."
