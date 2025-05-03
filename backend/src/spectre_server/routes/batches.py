@@ -42,6 +42,7 @@ def get_batch_file(
     day: int,
     base_file_name: str
 ) -> Response:
+    validate_date(year, month, day)
     return serve_from_directory(batches.get_batch_file(base_file_name,
                                                        year,
                                                        month,
