@@ -90,7 +90,8 @@ def jsendify_response(
             
             # Handle the case where the data returned is from Flask's `send_from_directory`.
             # Here, we want the response to propagate through unchanged if it succeeds, and
-            # create a fails JSend compliant response if it fails.
+            # create a fails JSend compliant response if it fails. 
+            # TODO: Do a stricter check on the `Response` object to ensure this is the case.
             if isinstance(data, Response):
                 return data
             
