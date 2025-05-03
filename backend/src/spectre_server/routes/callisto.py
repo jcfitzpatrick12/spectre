@@ -20,7 +20,7 @@ def get_instrument_codes(
     return callisto.get_instrument_codes()
 
 
-@callisto_blueprint.route("/batches/<year:int>/<month:int>/<day:int>", methods=["POST"])
+@callisto_blueprint.route("/batches/<int:year>/<int:month>/<int:day>", methods=["POST"])
 @jsendify_response
 def download(
     year: int,
