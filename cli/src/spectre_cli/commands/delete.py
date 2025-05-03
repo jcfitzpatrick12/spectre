@@ -2,58 +2,51 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typer import Typer, secho, Option, Exit
+from typer import Typer, Option, Exit
 
-from ._safe_request import safe_request
+from ._utils import safe_request, build_date_path, get_capture_config_file_name
+from ._secho_resources import secho_stale_resource, secho_stale_resources
 
 
 delete_typer = Typer(
     help = "Delete resources."
 )
-
-
-def _secho_deleted_resource(
-    resource_endpoint: str
-) -> None:
-    secho(resource_endpoint, fg="yellow")
-    
-    
-def _secho_deleted_resources(
-    resource_endpoints: list[str]
-) -> None:    
-    for resource_endpoint in resource_endpoints:
-        _secho_deleted_resource(resource_endpoint)
-
+        
 
 @delete_typer.command(
     help = "Delete log files."
 )
 def logs(
-    year: int = Option(..., 
-                       "--year", 
-                       "-y", 
-                       help="Delete logs under this numeric year."),
-    month: int = Option(..., 
-                       "--month", 
-                       "-m", 
-                       help="Delete logs under this numeric month."),
-    day: int = Option(..., 
-                      "--day", 
-                      "-d", 
-                      help="Delete  logs under this numeric day."),
     process_types: list[str] = Option([], 
                                      "--process-type",                                
                                      help="Specifies one of 'worker' or 'user'."),
-
+    year: int = Option(None, 
+                       "--year", 
+                       "-y", 
+                       help="Delete logs under this numeric year."),
+    month: int = Option(None, 
+                       "--month", 
+                       "-m", 
+                       help="Delete logs under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Delete  logs under this numeric day."),
+    suppress_confirmation: bool = Option(False, 
+                                         "--suppress-confirmation", 
+                                         help="Suppress any user confirmation.")
+    
 ) -> None:
     params = {
         "process_type": process_types,
     }
-    jsend_dict = safe_request(f"spectre-data/logs/{year}/{month}/{day}", 
+    jsend_dict = safe_request(f"spectre-data/logs/{build_date_path(year, month, day)}", 
                               "DELETE", 
-                              params = params)
-    resource_endpoints = jsend_dict["data"]
-    _secho_deleted_resources(resource_endpoints)
+                              params=params,
+                              require_confirmation=True,
+                              suppress_confirmation=suppress_confirmation)
+    endpoints = jsend_dict["data"]
+    secho_stale_resources(endpoints)
     raise Exit()
 
 
@@ -61,18 +54,6 @@ def logs(
     help = "Delete batch files."
 )
 def batch_files(
-    year: int = Option(..., 
-                      "--year", 
-                      "-y", 
-                      help="Delete all batch files under this numeric year."),
-    month: int = Option(..., 
-                        "--month", 
-                        "-m", 
-                        help="Delete all batch files under this numeric month."),
-    day: int = Option(..., 
-                      "--day", 
-                      "-d", 
-                      help="Delete all batch files under this numeric day."),
     tags: list[str] = Option([], 
                              "--tag", 
                              "-t", 
@@ -81,16 +62,33 @@ def batch_files(
                                   "--extension", 
                                   "-e", 
                                   help="Delete all batch files with this file extension."),
+    year: int = Option(None, 
+                      "--year", 
+                      "-y", 
+                      help="Delete all batch files under this numeric year."),
+    month: int = Option(None, 
+                        "--month", 
+                        "-m", 
+                        help="Delete all batch files under this numeric month."),
+    day: int = Option(None, 
+                      "--day", 
+                      "-d", 
+                      help="Delete all batch files under this numeric day."),
+    suppress_confirmation: bool = Option(False, 
+                                         "--suppress-confirmation", 
+                                         help="Suppress any user confirmation.")
 ) -> None:
     params = {
         "extension": extensions,
         "tag": tags
     }
-    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}", 
+    jsend_dict = safe_request(f"spectre-data/batches/{build_date_path(year, month, day)}", 
                               "DELETE",
-                              params = params)
-    resource_endpoints = jsend_dict["data"]
-    _secho_deleted_resources(resource_endpoints)
+                              params = params,
+                              require_confirmation=True,
+                              suppress_confirmation=suppress_confirmation)
+    endpoints = jsend_dict["data"]
+    secho_stale_resources(endpoints)
     raise Exit()
 
 
@@ -98,21 +96,25 @@ def batch_files(
     help = "Delete a capture config."
 )
 def capture_config(
-    tag: str = Option(..., 
+    tag: str = Option(None, 
                       "--tag", 
                       "-t", 
                       help="Unique identifier for the capture config."),
-    base_file_name: str = Option(...,
-                                 "-f",
-                                 help="The base file name of the capture config.")
+    file_name: str = Option(None,
+                            "-f",
+                            help="The file name of the capture config."),
+    suppress_confirmation: bool = Option(False, 
+                         "--suppress-confirmation", 
+                         help="Suppress any user confirmation.")
 ) -> None:
-    if not (base_file_name is None) ^ (tag is None):
-        raise ValueError("Specify either the tag or file name, not both.")
+    
                                                                            
-    base_file_name = base_file_name or f"{tag}.json"
+    file_name = get_capture_config_file_name(file_name, tag)
 
     jsend_dict = safe_request(f"spectre-data/configs/{tag}.json", 
-                              "DELETE")
-    resource_endpoint = jsend_dict["data"]
-    _secho_deleted_resource(resource_endpoint)
+                              "DELETE",
+                              require_confirmation=True,
+                              suppress_confirmation=suppress_confirmation)
+    endpoint = jsend_dict["data"]
+    secho_stale_resource(endpoint)
     raise Exit()

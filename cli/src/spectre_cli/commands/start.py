@@ -4,7 +4,7 @@
 
 import typer
 
-from ._safe_request import safe_request
+from ._utils import safe_request
 
 
 start_typer = typer.Typer(
@@ -46,6 +46,7 @@ def capture(
                      json = json)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
     raise typer.Exit()
+
 
 @start_typer.command(
     help = "Capture data from an SDR and post-process it into spectrograms in real time."

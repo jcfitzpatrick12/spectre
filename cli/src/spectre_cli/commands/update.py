@@ -5,7 +5,7 @@
 from typer import Typer, Option, Exit, secho
 from typing import List
 
-from ._safe_request import safe_request
+from ._utils import safe_request
 
 
 update_typer = Typer(
@@ -13,9 +13,9 @@ update_typer = Typer(
 )
 
 def _secho_updated_resource(
-    resource_endpoint: str
+    endpoint: str
 ) -> None:    
-    secho(resource_endpoint, fg="green")
+    secho(endpoint, fg="green")
 
 
 @update_typer.command(
@@ -53,6 +53,6 @@ def capture_config(tag: str = Option(None,
     jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}",
                               "PATCH",
                               json = json)
-    resource_endpoint = jsend_dict["data"]
-    _secho_updated_resource(resource_endpoint)
+    endpoint = jsend_dict["data"]
+    _secho_updated_resource(endpoint)
     raise Exit()
