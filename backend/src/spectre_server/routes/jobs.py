@@ -4,8 +4,8 @@
 
 from flask import Blueprint, request
 
-from spectre_server.services import jobs
-from spectre_server.routes._format_responses import jsendify_response
+from ..services import jobs
+from ._format_responses import jsendify_response
 
 
 jobs_blueprint = Blueprint("jobs", __name__, url_prefix="/jobs")

@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from flask import Blueprint, request, url_for
-from os.path import basename
+from flask import Blueprint, request
 
 from ..services import callisto
+from .batches import get_batch_file_endpoints
 from ._format_responses import jsendify_response
 
 
@@ -20,29 +20,18 @@ def get_instrument_codes(
     return callisto.get_instrument_codes()
 
 
-@callisto_blueprint.route("/batches", methods=["POST"])
+@callisto_blueprint.route("/batches/<int:year>/<int:month>/<int:day>", methods=["POST"])
 @jsendify_response
 def download(
+    year: int,
+    month: int,
+    day: int
 ) -> list[str]:
-    json = request.get_json()
-    instrument_code = json.get("instrument_code")
-    year            = json.get("year")
-    month           = json.get("month")
-    day             = json.get("day")
+    instrument_codes = request.args.getlist("instrument_codes")
 
-    batch_files, start_date = callisto.download_callisto_data(instrument_code,
-                                                              year,
-                                                              month,
-                                                              day)
+    batch_files = callisto.download_callisto_data(instrument_codes,
+                                                  year,
+                                                  month,
+                                                  day)
     
-    resource_endpoints = []
-    for batch_file in batch_files:
-        resource_endpoint =  url_for("batches.get_batch_file",
-                                     year=year,
-                                     month=month,
-                                     day=day,
-                                     file_name=basename(batch_file),
-                                     _external=True)
-        resource_endpoints.append(resource_endpoint)
-        
-    return resource_endpoints
+    return get_batch_file_endpoints( batch_files )

@@ -2,20 +2,15 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typer import Typer, Option, Exit, secho
+from typer import Typer, Option, Exit
 from typing import List
 
-from ._safe_request import safe_request
+from ._secho_resources import secho_new_resource
+from ._utils import safe_request, get_capture_config_file_name
 
 create_typer = Typer(
     help = "Create resources."
 )
-
-def _secho_created_resource(
-    resource_endpoint: str
-) -> None:    
-    secho(resource_endpoint, fg="green")
-
 
 @create_typer.command(
     help = "Create a capture config."
@@ -24,10 +19,10 @@ def capture_config(
     tag: str = Option(None, 
                       "--tag", 
                       "-t", 
-                      help="Unique identifier for the capture config."),
-    base_file_name: str = Option(None,
-                                 "-f",
-                                 help="The base file name for the capture config."),
+                      help="Unique tag identifier for the capture config."),
+    file_name: str = Option(None,
+                            "-f",
+                            help="The file name for the capture config."),
     receiver_name: str = Option(..., 
                                "--receiver",
                                "-r", 
@@ -43,14 +38,11 @@ def capture_config(
                                metavar="KEY=VALUE"),
     force: bool = Option(False, 
                          "--force", 
-                         help="If a capture config already exists with the same tag, "
-                              "overwrite it.", 
+                         help="If a capture config already exists with the same tag, overwrite it.", 
                          is_flag=True)
 ) -> None:
-    if not (base_file_name is None) ^ (tag is None):
-        raise ValueError("Specify either the tag or file name, not both.")
-                                                                           
-    base_file_name = base_file_name or f"{tag}.json"
+    
+    file_name = get_capture_config_file_name(file_name, tag)
 
     json = {
         "receiver_name": receiver_name,
@@ -58,11 +50,11 @@ def capture_config(
         "string_parameters": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}", 
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}", 
                               "PUT", 
                               json=json)
-    resource_endpoint = jsend_dict["data"]
-    _secho_created_resource(resource_endpoint)
+    endpoint = jsend_dict["data"]
+    secho_new_resource(endpoint)
     raise Exit()
         
 
@@ -112,7 +104,6 @@ def plot(
                             "--figsize-y",
                             help="The vertical size of the plot.")
 ) -> None:
-    primary_tag, tags = tags[0], tags[1:]
     json = {
         "tags": tags,
         "obs_date": obs_date,
@@ -127,11 +118,11 @@ def plot(
         "figsize_x": figsize_x,
         "figsize_y": figsize_y
     }
-    jsend_dict = safe_request(f"spectre-data/batches/plots/{primary_tag}", 
+    jsend_dict = safe_request(f"spectre-data/batches/plots", 
                               "PUT", 
                               json=json)
-    resource_endpoint = jsend_dict["data"]
-    _secho_created_resource(resource_endpoint)
+    endpoint = jsend_dict["data"]
+    secho_new_resource(endpoint)
     raise Exit()
 
     
