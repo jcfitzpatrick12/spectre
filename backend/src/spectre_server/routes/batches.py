@@ -30,7 +30,7 @@ def _get_batch_file_endpoint(
 def _get_batch_file_endpoints(
     batch_files: list[str]
 ) -> list[str]:
-    """Return the API endpoints to all batch files which exist in the container's file system."""
+    """Return the API endpoints corresponding to the input batch file paths."""
     return [_get_batch_file_endpoint(batch_file) for batch_file in batch_files]
     
     
