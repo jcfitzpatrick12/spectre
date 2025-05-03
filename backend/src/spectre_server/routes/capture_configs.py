@@ -16,7 +16,7 @@ capture_configs_blueprint = Blueprint("capture_configs", __name__, url_prefix="/
 def _get_capture_config_endpoint(
     capture_config_file_path: str,
 ) -> str:
-    """Return the API endpoint corresponding to the capture config at the input path."""
+    """Return the URL endpoint corresponding to the capture config at the input path."""
     return url_for("capture_configs.get_capture_config",
                     base_file_name=basename(capture_config_file_path),
                     _external=True)
@@ -25,7 +25,7 @@ def _get_capture_config_endpoint(
 def _get_capture_config_file_endpoints(
     capture_config_file_paths: list[str]
 ) -> list[str]:
-    """Return the API endpoints corresponding to the input capture config paths."""
+    """Return the URL endpoints corresponding to the input capture config paths."""
     return [_get_capture_config_endpoint(capture_config_file_path) for capture_config_file_path in capture_config_file_paths]
 
 

@@ -17,7 +17,7 @@ logs_blueprint = Blueprint("logs", __name__, url_prefix="/spectre-data/logs")
 def _get_log_file_endpoint(
     log_file_path: str,
 ) -> str:
-    """Return the API endpoint corresponding to the log file at the input path."""
+    """Return the URL endpoint corresponding to the log file at the input path."""
     log_file_date = get_date_from_log_file_path(log_file_path)
     return url_for("logs.get_log", 
                     base_file_name=basename(log_file_path),
@@ -30,7 +30,7 @@ def _get_log_file_endpoint(
 def _get_log_file_endpoints(
     log_file_paths: list[str]
 ) -> list[str]:
-    """Return the API endpoints corresponding to the input log file paths."""
+    """Return the URL endpoints corresponding to the input log file paths."""
     return [_get_log_file_endpoint(log_file) for log_file in log_file_paths]
 
 

@@ -30,7 +30,7 @@ def get_capture_config(
 ) -> str:
     """Look for a capture config in the file system with a given file name.
 
-    :param base_file_name: Search for a capture config with this file name.
+    :param base_file_name: Look for a capture config with this file name.
     :return: The file path of the capture config if it exists in the file system, as an absolute path within the container's file system. 
     """
     capture_config = _get_capture_config(base_file_name)

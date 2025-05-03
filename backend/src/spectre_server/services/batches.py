@@ -51,10 +51,10 @@ def get_batch_file(
 ) -> str:
     """Look for a batch file in the file system with a given file name.
     
-    :param base_file_name: Search for a batch file with this file name.
-    :param year: Search for a batch file under this numeric year. Defaults to None
-    :param month: Search for a batch file under this numeric month. Defaults to None.
-    :param day: Search for a batch file under this numeric day. Defaults to None.
+    :param base_file_name: Look for a batch file with this file name.
+    :param year: Look for a batch file under this numeric year. Defaults to None
+    :param month: Look for a batch file under this numeric month. Defaults to None.
+    :param day: Look for a batch file under this numeric day. Defaults to None.
     :return: The file path of the batch file if it exists in the file system, as an absolute path within the container's file system.
     """
     batch_file = _get_batch_file(base_file_name, year, month, day) 
@@ -71,11 +71,11 @@ def get_batch_files(
 ) -> list[str]:
     """Get the file paths of batch files which exist in the file system.
    
-    :param tags: Filter batch files with these tags. If no tags are specified, look for batch files with any tag.
-    :param extensions: Filter batch files with this extension. If no extensions are specified, look for batch files with any extension.
-    :param year: Search for batch files under this numeric year, defaults to None. If year, month and day are unspecified, look for batch files under any year.
-    :param month: Search for batch files under this numeric month, defaults to None. If year is specified, but not month and day, look for batch files under that year. 
-    :param day: Search for batch files under this numeric day, defaults to None. If year and month are specified, but not day, look for batch files under that month and year.
+    :param tags: Look for batch files with these tags. If no tags are specified, look for batch files with any tag.
+    :param extensions: Look for batch files with this extension. If no extensions are specified, look for batch files with any extension.
+    :param year: Look for batch files under this numeric year, defaults to None. If year, month and day are unspecified, look for batch files under any year.
+    :param month: Look for batch files under this numeric month, defaults to None. If year is specified, but not month and day, look for batch files under that year. 
+    :param day: Look for batch files under this numeric day, defaults to None. If year and month are specified, but not day, look for batch files under that month and year.
     
     :return: The file paths of all batch files under the input tag which exist in the file system, as absolute paths within the container's file system.
     """
@@ -113,9 +113,9 @@ def delete_batch_file(
     """Delete a batch file in the file system.
     
     :param base_file_name: Delete a batch file with this file name.
-    :param year: Delete a batch file under this numeric year.
-    :param month: Delete a batch file under this numeric month.
-    :param day: Delete a batch file under this numeric day.
+    :param year: Delete a batch file under this numeric year. Defaults to None.
+    :param month: Delete a batch file under this numeric month. Defaults to None.
+    :param day: Delete a batch file under this numeric day. Defaults to None.
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
     batch_file = _get_batch_file(base_file_name, year, month, day)
@@ -127,14 +127,14 @@ def delete_batch_file(
 def delete_batch_files(
     tags: list[str],
     extensions: list[str],
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None
+    year: Optional[int]=None,
+    month: Optional[int]=None,
+    day: Optional[int]=None
 ) -> list[str]:
     """Delete batch files. Use with caution, the current implementation contains little safeguarding.
 
-    :param tags: Only batch files with these tags will be deleted.
-    :param extensions: Only batch files with these extensions will be deleted.
+    :param tags: Only batch files with these tags will be deleted. If no tags are provided, no batch files will be deleted.
+    :param extensions: Only batch files with these extensions will be deleted. If no extensions are provided, no batch files will be deleted.
     :param year: Delete batch files under only numeric year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
     :param month: Delete batch files under only this numeric month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
     :param day: Delete batch files under only this numeric day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.

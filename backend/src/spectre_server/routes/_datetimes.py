@@ -14,7 +14,7 @@ from spectre_core.config import TimeFormat
 def get_date_from_batch_file_path(
     batch_file_path: str
 ) -> date:
-    """Given a batch file path, parse the date it belongs to."""
+    """Given a batch file path, get the date it belongs to."""
     base_file_name  = basename(batch_file_path)
     start_time, _, _ = parse_batch_base_file_name(base_file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
@@ -23,7 +23,7 @@ def get_date_from_batch_file_path(
 def get_date_from_log_file_path(
     log_file_path: str
 ) -> date:
-    """Given a batch file path, parse the date it belongs to."""
+    """Given a batch file path, get the date it belongs to."""
     base_file_name  = basename(log_file_path)
     start_time, _, _ = parse_log_base_file_name(base_file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
@@ -42,9 +42,6 @@ def validate_date(
     - Year only
     - Year and month
     - Full date (year, month, day)
-
-    Raises:
-        ValueError: If components are out of order, invalid, or in the future.
     """
     today = datetime.now(timezone.utc).date()
 
@@ -58,8 +55,7 @@ def validate_date(
         return
 
     try:
-        # Fill in default values to construct a date.
-        # Makes validation simpler.
+        # Fill in default values to construct a date. Makes validation simpler.
         d = day if day is not None else 1
         m = month if month is not None else 1
         constructed = date(year, m, d)

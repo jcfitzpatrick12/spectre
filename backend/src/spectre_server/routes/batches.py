@@ -17,7 +17,7 @@ batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/bat
 def get_batch_file_endpoint(
     batch_file_path: str,
 ) -> str:
-    """Return the API endpoint corresponding to the batch file at the input path."""
+    """Return the URL endpoint corresponding to the input batch file path,"""
     batch_file_date = get_date_from_batch_file_path(batch_file_path)
     return url_for("batches.get_batch_file", 
                     base_file_name=basename(batch_file_path),
@@ -30,7 +30,7 @@ def get_batch_file_endpoint(
 def get_batch_file_endpoints(
     batch_file_paths: list[str]
 ) -> list[str]:
-    """Return the API endpoints corresponding to the input batch file paths."""
+    """Return the URL endpoints corresponding to the input batch file paths."""
     return [get_batch_file_endpoint(batch_file) for batch_file in batch_file_paths]
     
     

@@ -34,10 +34,10 @@ def get_log(
 ) -> str:
     """Get the file path of a log written by a specific process.
     
-    :param base_file_name: Search for a log file with this base file name.
-    :param year: Search for a log file under this numeric year.
-    :param month: Search for a log file under this numeric month.
-    :param day: Search for a log file under this numeric day.
+    :param base_file_name: Look for a log file with this base file name.
+    :param year: Look for a log file under this numeric year. Defaults to None.
+    :param month: Look for a log file under this numeric month. Defaults to None.
+    :param day: Look for a log file under this numeric day. Defaults to None.
     :return: The file path of the log file if it exists in the file system, as an absolute path within the container's file system. 
     """
     log = _get_log(base_file_name, year, month, day) 
@@ -103,10 +103,10 @@ def delete_log(
 ) -> str:
     """Delete a log in the file system.
 
-    :param year: Delete a log under this numeric year.
-    :param month: Delete a log under this numeric month.
-    :param day: Delete a log under this numeric day.
     :param base_file_name: Delete a batch file with this file name.
+    :param year: Delete a log under this numeric year. Defaults to None.
+    :param month: Delete a log under this numeric month. Defaults to None.
+    :param day: Delete a log under this numeric day. Defaults to None.
     :return: The file path of the deleted log file, as an absolute path in the container's file system.
     """
     log = _get_log(base_file_name, year, month, day)
@@ -124,12 +124,12 @@ def delete_logs(
     """Delete log files. Use with caution, the current implementation contains little safeguarding.
 
     :param process_types: Delete logs with these process types. If no process type is given, then no logs will be deleted.
-    :param year: Delete only log files from this numeric year. Defaults to None. If no year, month, 
-    or day is specified, files from any year will be deleted.
-    :param month: Delete only log files from this numeric month. Defaults to None. If a year is 
-    specified but not a month, all files from that year will be deleted.
-    :param day: Delete only log files from this numeric day. Defaults to None. If both year and month 
-    are specified but not a day, all files from that year and month will be deleted.
+    :param year: Delete only log files from this numeric year. Defaults to None. If no year, month,  or day is specified, 
+    files from any year will be deleted.
+    :param month: Delete only log files from this numeric month. Defaults to None. If a year is  specified but not a month, 
+    all files from that year will be deleted.
+    :param day: Delete only log files from this numeric day. Defaults to None. If both year and month  are specified but not 
+    a day, all files from that year and month will be deleted.
     :return: The file paths of all logs which were deleted, as absolute paths within the container's file system.
     """    
     deleted_file_paths = []

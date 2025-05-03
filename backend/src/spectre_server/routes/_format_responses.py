@@ -80,7 +80,8 @@ def jsendify_response(
 ) -> Callable[P, Response]:
     """Wrap route calls for simplified responses.
     
-    :func param: A callable with JSON serialisable return.
+    :func param: A callable with JSON serialisable return. As an exception, if the return is a `Response` type object,
+    it gets propagated through unchanged.
     :return: The input function wrapped such that it returns a `JSend` compliant response.
     """
     @wraps(func)  # Preserves the original function's name and metadata
