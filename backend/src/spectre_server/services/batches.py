@@ -112,10 +112,10 @@ def delete_batch_file(
 ) -> str:
     """Delete a batch file in the file system.
     
+    :param base_file_name: Delete a batch file with this file name.
     :param year: Delete a batch file under this numeric year.
     :param month: Delete a batch file under this numeric month.
     :param day: Delete a batch file under this numeric day.
-    :param base_file_name: Delete a batch file with this file name.
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
     batch_file = _get_batch_file(base_file_name, year, month, day)
@@ -133,11 +133,11 @@ def delete_batch_files(
 ) -> list[str]:
     """Delete batch files. Use with caution, the current implementation contains little safeguarding.
 
+    :param tags: Delete batch files with these tags. Defaults to None. If no tags are specified, no batch files will be deleted. 
+    :param extensions: Delete only batch files with specific extensions. If no extensions are specified, no batch files will be deleted.
     :param year: Delete batch files under only numeric year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
     :param month: Delete batch files under only this numeric month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
     :param day: Delete batch files under only this numeric day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
-    :param tags: Delete batch files with these tags. Defaults to None. If no tags are specified, no batch files will be deleted. 
-    :param extensions: Delete only batch files with specific extensions. If no extensions are specified, no batch files will be deleted.
     :return: The file paths of batch files which have been successfully deleted, as absolute paths within the container's file system.
     """
     deleted_batch_files = []
