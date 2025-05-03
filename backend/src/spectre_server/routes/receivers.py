@@ -5,8 +5,8 @@
 from flask import Blueprint, request
 from typing import Any
 
-from spectre_server.services import receivers
-from spectre_server.routes._format_responses import jsendify_response
+from ..services import receivers
+from ._format_responses import jsendify_response
 
 
 receivers_blueprint = Blueprint("receivers", __name__, url_prefix="/receivers")
