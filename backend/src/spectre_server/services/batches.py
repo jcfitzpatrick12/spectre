@@ -133,8 +133,8 @@ def delete_batch_files(
 ) -> list[str]:
     """Delete batch files. Use with caution, the current implementation contains little safeguarding.
 
-    :param tags: Delete batch files with these tags. If no tags are specified, no batch files will be deleted. 
-    :param extensions: Delete batch files with specific extensions. If no extensions are specified, no batch files will be deleted.
+    :param tags: Only batch files with these tags will be deleted.
+    :param extensions: Only batch files with these extensions will be deleted.
     :param year: Delete batch files under only numeric year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
     :param month: Delete batch files under only this numeric month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
     :param day: Delete batch files under only this numeric day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
