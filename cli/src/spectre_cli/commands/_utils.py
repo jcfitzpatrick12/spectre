@@ -124,7 +124,7 @@ def build_date_path(
 def get_capture_config_file_name(
     file_name: Optional[str],
     tag: Optional[str]
-) -> None:
+) -> str:
     """Given either a file name, or the tag, build the capture config file name.
     
     Primarily used for input validation, where the user can specify either or via the CLI.
