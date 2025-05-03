@@ -13,6 +13,22 @@ from ._format_responses import jsendify_response, serve_from_directory
 capture_configs_blueprint = Blueprint("capture_configs", __name__, url_prefix="/spectre-data/configs")
 
 
+def _get_capture_config_endpoint(
+    capture_config_file_path: str,
+) -> str:
+    """Return the API endpoint corresponding to the capture config at the input path."""
+    return url_for("capture_configs.get_capture_config",
+                    base_file_name=basename(capture_config_file_path),
+                    _external=True)
+
+
+def _get_capture_config_file_endpoints(
+    capture_config_file_paths: list[str]
+) -> list[str]:
+    """Return the API endpoints corresponding to the input capture config paths."""
+    return [_get_capture_config_endpoint(capture_config_file_path) for capture_config_file_path in capture_config_file_paths]
+
+
 @capture_configs_blueprint.route("/<string:base_file_name>/raw", methods=["GET"])
 @jsendify_response
 def get_capture_config_raw(
@@ -33,16 +49,8 @@ def get_capture_config(
 @jsendify_response
 def get_capture_configs(
 ) -> list[str]:
-    base_file_names = capture_configs.get_capture_configs()
-
-    resource_endpoints = []
-    for base_file_name in base_file_names:
-        resource_endpoint = url_for("capture_configs.get_capture_config",
-                                    base_file_name=basename(base_file_name),
-                                    _external=True)
-        resource_endpoints.append(resource_endpoint)
-        
-    return resource_endpoints
+    capture_config_file_paths = capture_configs.get_capture_configs()
+    return _get_capture_config_file_endpoints(capture_config_file_paths)
 
 
 @capture_configs_blueprint.route("/<string:base_file_name>", methods=["PUT"])
@@ -56,15 +64,13 @@ def create_capture_config(
     string_parameters = json.get("string_parameters")
     force             = json.get("force")
 
-    capture_configs.create_capture_config(base_file_name, 
-                                          receiver_name,
-                                          receiver_mode,
-                                          string_parameters,
-                                          force)
+    capture_config_file_path = capture_configs.create_capture_config(base_file_name, 
+                                                                     receiver_name,
+                                                                     receiver_mode,
+                                                                     string_parameters,
+                                                                     force)
 
-    return url_for("capture_configs.get_capture_config",
-                   base_file_name=base_file_name,
-                   _external=True)
+    return _get_capture_config_endpoint(capture_config_file_path)
 
 
 @capture_configs_blueprint.route("/<string:base_file_name>", methods=["DELETE"])
@@ -72,11 +78,8 @@ def create_capture_config(
 def delete_capture_config(
     base_file_name: str
 ) -> str:
-    capture_configs.delete_capture_config(base_file_name)
-    
-    return url_for("capture_configs.get_capture_config",
-                   base_file_name=base_file_name,
-                   _external=True)
+    capture_config_file_path = capture_configs.delete_capture_config(base_file_name)
+    return _get_capture_config_endpoint(capture_config_file_path)
 
 
 @capture_configs_blueprint.route("/<string:base_file_name>", methods=["PATCH"])
@@ -88,10 +91,8 @@ def update_capture_config(
     string_parameters = json.get("params")
     force             = json.get("force")
 
-    capture_configs.update_capture_config(base_file_name, 
-                                          string_parameters,
-                                          force)
+    capture_config_file_path = capture_configs.update_capture_config(base_file_name, 
+                                                                     string_parameters,
+                                                                     force)
     
-    return url_for("capture_configs.get_capture_config", 
-                   base_file_name=base_file_name,
-                   _external=True)
+    return _get_capture_config_endpoint(capture_config_file_path)
