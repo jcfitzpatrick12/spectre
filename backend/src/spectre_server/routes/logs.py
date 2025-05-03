@@ -8,7 +8,7 @@ from os.path import basename
 
 from ..services import logs
 from ._format_responses import jsendify_response, serve_from_directory
-from ._datetimes import get_date_from_log_file_path
+from ._datetimes import get_date_from_log_file_path, validate_date
 
 
 logs_blueprint = Blueprint("logs", __name__, url_prefix="/spectre-data/logs")
@@ -42,6 +42,7 @@ def get_log(
     day: int,
     base_file_name: str
 ) -> Response:
+    validate_date(year, month, day)
     return serve_from_directory(logs.get_log(base_file_name,
                                              year,
                                              month,
@@ -56,6 +57,7 @@ def get_log_raw(
     day: int,
     base_file_name: str
 ) -> str:
+    validate_date(year, month, day)
     return logs.get_log_raw(base_file_name,
                             year,
                             month,
@@ -70,6 +72,7 @@ def get_logs_year_month_day(
     day: int
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
+    validate_date(year, month, day)
     log_files = logs.get_logs(process_types,
                               year,
                               month,
@@ -84,6 +87,7 @@ def get_logs_year_month(
     month: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
+    validate_date(year, month)
     log_files = logs.get_logs(process_types,
                               year,
                               month)
@@ -96,6 +100,7 @@ def get_logs_year(
     year: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
+    validate_date(year)
     log_files = logs.get_logs(process_types,
                               year)
     return _get_log_file_endpoints(log_files)
@@ -118,6 +123,7 @@ def delete_log(
     day: int,
     base_file_name: str
 ) -> str:
+    validate_date(year, month, day)
     log_file = logs.delete_log(base_file_name,
                                year,
                                month,
@@ -132,6 +138,7 @@ def delete_logs_year_month_day(
     month: int,
     day: int
 ) -> list[str]:
+    validate_date(year, month, day)
     process_types = request.args.getlist("process_type")
     
     log_files =  logs.delete_logs(process_types,
@@ -149,7 +156,7 @@ def delete_logs_year_month(
     month: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
-    
+    validate_date(year, month)
     log_files =  logs.delete_logs(process_types,
                                   year,
                                   month)
@@ -163,7 +170,7 @@ def delete_logs_year(
     year: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
-    
+    validate_date(year)
     log_files =  logs.delete_logs(process_types,
                                   year)
     
