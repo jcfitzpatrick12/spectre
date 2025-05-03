@@ -5,7 +5,6 @@
 
 from flask import Blueprint, request, url_for, Response
 from os.path import basename
-from typing import Optional
 
 from ..services import batches
 from ._datetimes import validate_date, get_date_from_batch_file_path
@@ -29,13 +28,9 @@ def _get_batch_file_endpoint(
 
 
 def _get_batch_file_endpoints(
-    batch_files: list[str],
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    batch_files: list[str]
 ) -> list[str]:
     """Return the API endpoints to all batch files which exist in the container's file system."""
-    validate_date(year, month, day)
     return [_get_batch_file_endpoint(batch_file) for batch_file in batch_files]
     
     
@@ -61,8 +56,9 @@ def delete_batch_file(
     day: int,
     base_file_name: str
 ) -> Response:
+    validate_date(year, month, day)
     batch_file_path = batches.delete_batch_file(base_file_name, year, month, day)
-    return _get_batch_file_endpoint(batch_file_path, year, month, day)
+    return _get_batch_file_endpoint(batch_file_path)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
@@ -74,8 +70,9 @@ def get_batch_files_year_month_day(
 ) -> list[str]:
     tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
+    validate_date(year, month, day)
     batch_files = batches.get_batch_files(tags, extensions, year=year, month=month, day=day)
-    return _get_batch_file_endpoints(batch_files, year=year, month=month, day=day)
+    return _get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/<int:year>/<int:month>", methods=["GET"])
@@ -86,8 +83,9 @@ def get_batch_files_year_month(
 ) -> list[str]:
     tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
+    validate_date(year, month)
     batch_files = batches.get_batch_files(tags, extensions, year=year, month=month)
-    return _get_batch_file_endpoints(batch_files, year=year, month=month)
+    return _get_batch_file_endpoints(batch_files)
 
 
 
@@ -98,8 +96,9 @@ def get_batch_files_year(
 ) -> list[str]:
     tags       = request.args.getlist("tag")
     extensions = request.args.getlist("extension")
+    validate_date(year_)
     batch_files = batches.get_batch_files(tags, extensions, year=year)
-    return _get_batch_file_endpoints(batch_files, year=year)
+    return _get_batch_file_endpoints(batch_files)
 
 
 @batches_blueprint.route("/", methods=["GET"])
@@ -130,7 +129,7 @@ def delete_batch_files(
                                               day)
 
     
-    return _get_batch_file_endpoints(batch_files, year, month, day)
+    return _get_batch_file_endpoints(batch_files)
 
    
 
