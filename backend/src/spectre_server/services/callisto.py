@@ -17,22 +17,24 @@ def get_instrument_codes(
 
 @log_call
 def download_callisto_data(
-    instrument_code: str,
+    instrument_codes: list[str],
     year: int, 
     month: int,
     day: int,
-) -> Tuple[list[str], date]:
+) -> list[str]:
     """Download and decompress e-Callisto FITS files, saving them as `spectre` batch files.
 
-    :param instrument_code: e-Callisto station instrument code.
+    :param instrument_codes: A list of e-Callisto station instrument codes.
     :param year: Year of the observation.
     :param month: Month of the observation.
     :param day: Day of the observation.
-    :return: A list of file paths of all newly created batch files, as absolute paths within 
-    the container's file system. Additionally, return the start date shared by all batch files.
+    :return: A list of file paths of all newly created batch files, as absolute paths within the container's file system.
     """
-    instr_code = wgetting.CallistoInstrumentCode(instrument_code)
-    return wgetting.download_callisto_data(instr_code, 
-                                           year,
-                                           month,
-                                           day)
+    codes = [wgetting.CallistoInstrumentCode(code) for code in instrument_codes]
+    
+    batch_file_paths = []
+    for code in codes:
+        # TODO: Remove redundant date object return from `download_callisto_data` return
+        new_batch_files, _ = wgetting.download_callisto_data(code, year, month, day) 
+        batch_file_paths.append( new_batch_files )
+    return batch_file_paths
