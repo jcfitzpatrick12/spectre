@@ -113,22 +113,60 @@ def get_batch_files(
 
 @batches_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["DELETE"])
 @jsendify_response
-def delete_batch_files(
+def delete_batch_files_year_month_day(
     year: int,
     month: int,
     day: int
 ) -> list[str]:
     extensions = request.args.getlist("extension")
     tags       = request.args.getlist("tag")
-
-
+    validate_date(year, month, day)
     batch_files =  batches.delete_batch_files(tags,
                                               extensions,
                                               year,
                                               month,
                                               day)
+    return _get_batch_file_endpoints(batch_files)
 
-    
+
+@batches_blueprint.route("/<int:year>/<int:month>", methods=["DELETE"])
+@jsendify_response
+def delete_batch_files_year_month(
+    year: int,
+    month: int,
+) -> list[str]:
+    extensions = request.args.getlist("extension")
+    tags       = request.args.getlist("tag")
+    validate_date(year, month)
+    batch_files =  batches.delete_batch_files(tags,
+                                              extensions,
+                                              year,
+                                              month)
+    return _get_batch_file_endpoints(batch_files)
+
+
+@batches_blueprint.route("/<int:year>", methods=["DELETE"])
+@jsendify_response
+def delete_batch_files_year(
+    year: int,
+) -> list[str]:
+    extensions = request.args.getlist("extension")
+    tags       = request.args.getlist("tag")
+    validate_date(year)
+    batch_files =  batches.delete_batch_files(tags,
+                                              extensions,
+                                              year)
+    return _get_batch_file_endpoints(batch_files)
+
+
+@batches_blueprint.route("", methods=["DELETE"])
+@jsendify_response
+def delete_batch_files(
+) -> list[str]:
+    extensions = request.args.getlist("extension")
+    tags       = request.args.getlist("tag")
+    batch_files =  batches.delete_batch_files(tags,
+                                              extensions)
     return _get_batch_file_endpoints(batch_files)
 
    
