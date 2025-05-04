@@ -10,7 +10,7 @@ FROM python:3.10-slim AS base
 # Set a default working directory for each stage.
 WORKDIR /app
 
-# Explictly set the user to root for the duration of the build. 
+# Explictly set the user to root by default for each stage.
 USER root
 
 # --------------------------------- # 
@@ -18,10 +18,10 @@ USER root
 # --------------------------------- # 
 FROM base AS build
 
-# Copy in the build requirements, and the application code.
+# Copy in the build requirements, and the CLI application code.
 COPY src pyproject.toml ./
 
-# Install the dependencies system-wide.
+# Install the build dependencies and CLI application system-wide.
 RUN pip install .
 
 # --------------------------------- # 
@@ -31,7 +31,7 @@ FROM base AS runtime
 
 WORKDIR /app
 
-# Copy in the system-wide packages, and the CLI executable.
+# Copy in the system-wide packages, and the CLI application executable.
 COPY --from=build /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=build /usr/local/bin/spectre /usr/local/bin/spectre
 
@@ -42,7 +42,7 @@ RUN groupadd --gid 1000 appgroup && \
 # Change ownership of the application directory to the non-root user.
 RUN chown -R appuser:appgroup /app
 
-# Switch to the non-root user.
+# Switch to the non-root user, to improve security.
 USER appuser
 
 # --------------------------------- # 
