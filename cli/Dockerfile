@@ -45,7 +45,6 @@ RUN chown -R appuser:appgroup /app
 # Switch to the non-root user.
 USER appuser
 
-
 # --------------------------------- # 
 # Development stage.
 # --------------------------------- # 
