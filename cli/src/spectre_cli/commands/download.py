@@ -35,7 +35,7 @@ def callisto(
                       help="Download files under this numeric day."),
 ) -> None:
     json = {
-        "instrument_code": instrument_codes,
+        "instrument_codes": instrument_codes,
     }
     secho(f"Download in progress...", fg="yellow")
     jsend_dict = safe_request(f"callisto/batches/{build_date_path(year, month, day)}",
