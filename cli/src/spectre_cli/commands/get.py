@@ -229,21 +229,22 @@ def capture_config(
     help = "List tags with existing batch files."
 )
 def tags(
-    year: int = Option(..., 
+    year: int = Option(None, 
                        "--year", 
                        "-y", 
                        help="Find tags with existing batch files under this numeric year."),
-    month: int = Option(..., 
+    month: int = Option(None, 
                         "--month", 
                         "-m", 
                         help="Find tags with existing batch files under this numeric month."),
-    day: int = Option(..., 
+    day: int = Option(None, 
                       "--day", 
                       "-d", 
                       help="Find tags with existing batch files under this numeric day."),
     
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/batches/{year}/{month}/{day}/tags",
+    url = f"spectre-data/batches/{build_date_path(year, month, day)}/tags" if year is not None else "spectre-data/batches/tags"
+    jsend_dict = safe_request(url,
                               "GET")
     tags = jsend_dict["data"]
 
