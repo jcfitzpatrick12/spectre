@@ -130,5 +130,5 @@ def get_capture_config_file_name(
     Primarily used for input validation, where the user can specify either or via the CLI.
     """
     if not (file_name is None) ^ (tag is None):
-        raise ValueError("Specify either the tag or file name, not both.")
+        raise ValueError("Specify exactly one of the tag or file name.")
     return file_name or f"{tag}.json"

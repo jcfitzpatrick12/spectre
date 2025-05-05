@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._utils import safe_request, build_date_path
+from ._utils import safe_request, build_date_path, get_capture_config_file_name
 from ._secho_resources import pprint_dict, secho_existing_resources
 
 
@@ -204,21 +204,18 @@ def capture_configs(
     help = "Print capture config file contents."
 )
 def capture_config(
-    base_file_name: str = Option(None, 
+    file_name: str = Option(None, 
                                  "-f", 
-                                 help="The base file name of the capture config"),
+                                 help="The file name of the capture config"),
     tag: str = Option(None,
                       "--tag",
                       "-t",
                       help="The unique identifier for the capture config")
 ) -> None:
 
-    if not (base_file_name is None) ^ (tag is None):
-        raise ValueError("Specify either the tag or file name, not both.")
-
-    base_file_name = base_file_name or f"{tag}.json"
+    file_name = get_capture_config_file_name(file_name, tag)
     
-    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}/raw",
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw",
                               "GET")
     capture_config = jsend_dict["data"]
     pprint_dict(capture_config)

@@ -5,7 +5,7 @@
 from typer import Typer, Option, Exit, secho
 from typing import List
 
-from ._utils import safe_request
+from ._utils import safe_request, get_capture_config_file_name
 
 
 update_typer = Typer(
@@ -25,9 +25,9 @@ def capture_config(tag: str = Option(None,
                                      "--tag", 
                                      "-t", 
                                      help="Unique identifier for the capture config."),
-                   base_file_name: str = Option(None, 
+                   file_name: str = Option(None, 
                                                 "-f", 
-                                                help="The base file name of the capture config"),
+                                                help="The file name of the capture config"),
                    params: List[str] = Option(..., 
                                               "--param", 
                                               "-p", 
@@ -41,16 +41,13 @@ def capture_config(tag: str = Option(None,
                                              "potentially leading to misleading results.")
 ) -> None:
    
-    if not (base_file_name is None) ^ (tag is None):
-        raise ValueError("Specify either the tag or file name, not both.")
-                                                                           
-    base_file_name = base_file_name or f"{tag}.json"
+    file_name = get_capture_config_file_name(file_name, tag)
     
     json = {
         "params": params,
         "force": force
     }
-    jsend_dict = safe_request(f"spectre-data/configs/{base_file_name}",
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}",
                               "PATCH",
                               json = json)
     endpoint = jsend_dict["data"]
