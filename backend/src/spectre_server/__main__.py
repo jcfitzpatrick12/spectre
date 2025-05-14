@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2024 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from flask import Flask
 from spectre_core.logs import configure_root_logger
 from spectre_core.logs import ProcessType

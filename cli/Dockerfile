@@ -62,5 +62,3 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd
     git checkout && \
     pip install -e cli/
 
-CMD ["/bin/bash"]
-

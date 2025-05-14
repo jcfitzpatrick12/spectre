@@ -3,136 +3,220 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # --------------------------------- # 
-# Create the base stage
+# Create the base stage.
 # --------------------------------- # 
 FROM ubuntu:22.04 AS base
 
 # Stop interactive dialogue, only for the duration of the build.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# By default, use `tmp` as the working directory for each stage.
+# By default, we use the /tmp directory to hold build artifacts.
 WORKDIR /tmp
 
-# Update and upgrade the package index.
-# Additionally, install dependencies which are both required for all
-# the build stages, and will be present in the final runtime image.
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    gnuradio libudev-dev libusb-1.0-0 wget 
+# Explictly set the user to root by default for each stage.
+USER root
+
+# Install dependencies which are both required for all the build stages, and will be present in the final runtime image.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnuradio \
+    libudev-dev \
+    libusb-1.0-0 \
+    wget \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # --------------------------------- # 
-# Installing GNU Radio OOT modules
+# Install build dependencies.
 # --------------------------------- # 
-FROM base AS gnuradio_oot_modules
+FROM base AS build
 
-# Install OOT module build dependencies.
-RUN apt-get install -y \
-    sudo git cmake expect 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    cmake \
+    make \
+    libboost-all-dev \
+    gnuradio-dev \
+    python3-setuptools \
+    libusb-1.0-0-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create /etc/udev directories manually, as they are not present in the base image.
-RUN mkdir -p /etc/udev/rules.d /lib/udev/rules.d
+# --------------------------------- #
+# Install SDRPlay API.
+# --------------------------------- #
+FROM base AS sdrplay_api
 
-# Install the SDRPlay API, and auto accept the licence agreement
-COPY --chmod=0755 ./scripts/expect/rsp_api.expect ./rsp_api.expect
-RUN wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run && \
-    chmod +x SDRplay_RSP_API-Linux-3.15.2.run && \
-    expect rsp_api.expect
+WORKDIR /tmp/sdrplay_api
 
-# Create an executable which can be used to detect sdrplay devices, as seen by the container
+ARG SDRPLAY_API_MAJ_MIN=3.15
+ARG SDRPLAY_API_PATCH=2
+ARG SDRPLAY_VERSION=${SDRPLAY_API_MAJ_MIN}.${SDRPLAY_API_PATCH}
+ARG SDRPLAY_API_LIB=libsdrplay_api
+
+# Install the SDRplay API.
+RUN mkdir -p /opt/sdrplay_api/include \
+             /opt/sdrplay_api/lib \
+             /opt/sdrplay_api/bin \
+             /opt/sdrplay_api/share/doc/ && \
+    wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run && \
+    sh SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run --tar xf && \
+    ARCH=$(uname -m | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/') && \
+    cp ${ARCH}/${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/ && \
+    cp ${ARCH}/sdrplay_apiService /opt/sdrplay_api/bin/ && \
+    cp inc/* /opt/sdrplay_api/include/ && \
+    cp sdrplay_license.txt /opt/sdrplay_api/share/doc/ && \
+    ln --symbolic ${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/${SDRPLAY_API_LIB}.so.3 && \
+    ln --symbolic ${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/${SDRPLAY_API_LIB}.so
+
+# --------------------------------------------- #
+# Create an executable to find SDRplay devices.
+# --------------------------------------------- #
+FROM build AS sdrplay_find_devices
+
+WORKDIR /tmp/sdrplay_find_devices
+
+COPY --from=sdrplay_api /opt/sdrplay_api/include/ /usr/include/
+COPY --from=sdrplay_api /opt/sdrplay_api/lib/ /usr/lib/
 COPY ./scripts/cpp/sdrplay_find_devices.cpp sdrplay_find_devices.cpp
-RUN g++ sdrplay_find_devices.cpp -o /usr/local/bin/sdrplay_find_devices -l sdrplay_api
+
+RUN mkdir -p /opt/sdrplay_find_devices/bin && \
+    g++ sdrplay_find_devices.cpp -l sdrplay_api -o /opt/sdrplay_find_devices/bin/sdrplay_find_devices
 
 
-# Install all the OOT modules.
+# --------------------------------------------- #
+# Install UHD dependencies.
+# --------------------------------------------- #
+FROM build AS uhd
+
+WORKDIR /tmp/uhd
+
+RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && \
+    cd uhd/host && \
+    mkdir build && \
+    cd build  && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/uhd \
+          -DENABLE_B200=ON \
+          -DENABLE_USB=ON \
+          -DENABLE_LIBUHD=ON \
+          -DENABLE_PYTHON_API=ON \
+          -DENABLE_UTILS=ON \
+          -DENABLE_EXAMPLES=OFF \
+          -DENABLE_TESTS=OFF \
+          -DENABLE_MAN_PAGES=OFF \
+          -DENABLE_DOXYGEN=OFF \
+          -DENABLE_MANUAL=OFF \
+          -DENABLE_C_API=OFF \
+          -DENABLE_E320=OFF \
+          -DENABLE_E300=OFF \
+          -DENABLE_N230=OFF \
+          -DENABLE_OCTOCLOCK=OFF \
+          -DINSTALL_UDEV_RULES=OFF \
+    .. && \
+    make && \
+    make install
+
+RUN uhd_images_downloader --install-location=/opt/uhd \
+                          --types=b200mini
+
+# --------------------------------------------- #
+# Install the gr-sdrplay3 OOT module.
+# --------------------------------------------- #
+FROM build AS gr_sdrplay3
+
+WORKDIR /tmp
+
+COPY --from=sdrplay_api /opt/sdrplay_api/include/ /usr/include/
+COPY --from=sdrplay_api /opt/sdrplay_api/lib/ /usr/lib/
+
 COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/fventuri/gr-sdrplay3.git message-passing && \
+    build_from_repo https://github.com/jcfitzpatrick12/gr-sdrplay3.git message-passing 
+
+# --------------------------------------------- #
+# Install the gr-spectre OOT module.
+# --------------------------------------------- #
+FROM build AS gr_spectre
+
+WORKDIR /tmp
+
+COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
+RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v0.0.2
 
-
 # --------------------------------- # 
-# Install the flask server
+# Install the spectre server.
 # --------------------------------- # 
-FROM base AS flask_server
+FROM base AS spectre_server
 
-# Copy in the flask server source code.
-ADD src src
+# Set up a working directory for the Python build
+WORKDIR /tmp/spectre_server
 
-# Copy in the build requirements.
-COPY ./pyproject.toml ./pyproject.toml
-
-# Install the dependencies system-wide.
-RUN apt-get install -y \
+# Install Python build dependencies.
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip && \
     python3 -m pip install --upgrade pip && \
-    python3 -m pip install .
+    rm -rf /var/lib/apt/lists/*
 
-# ------------------------------- # 
-# Create the final runtime stage
-# ------------------------------- # 
+# Copy in the source code and build requirements.
+COPY pyproject.toml gunicorn.conf.py ./
+COPY src src
+
+# Finally, install the Python dependencies into the virtual environment.
+RUN pip install .
+
+# --------------------------------- # 
+# Create the final runtime stage.
+# --------------------------------- # 
 FROM base AS runtime
 
-# Set the working directory for the final runtime image.
 WORKDIR /app
 
-# Define the spectre data directory path as an environment variable inside the container
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
+ENV MPLCONFIGDIR="/app/.mplconfigdir"
+ENV HOME="/app"
 
-# Install the USRP Hardware driver
-RUN apt-get install -y \
-    uhd-host && \
-    /usr/lib/uhd/utils/uhd_images_downloader.py
+# Copy in the SDRplay runtime dependencies.
+COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
+COPY --from=sdrplay_api /opt/sdrplay_api/include /usr/include
+COPY --from=sdrplay_api /opt/sdrplay_api/lib /usr/lib
+COPY --from=sdrplay_api /opt/sdrplay_api/share /usr/share
+COPY --from=sdrplay_find_devices /opt/sdrplay_find_devices/bin /usr/bin
 
-# Copy in the udev rules
-COPY --from=gnuradio_oot_modules /etc/udev/rules.d /etc/udev/rules.d
-COPY --from=gnuradio_oot_modules /lib/udev/rules.d /lib/udev/rules.d
+# Copy in the UHD runtime dependencies.
+COPY --from=uhd /opt/uhd/include /usr/include
+COPY --from=uhd /opt/uhd/lib /usr/lib
+COPY --from=uhd /opt/uhd/bin /usr/bin
 
-# Copy in the OOT module files.
-COPY --from=gnuradio_oot_modules /usr/local/lib /usr/local/lib
-COPY --from=gnuradio_oot_modules /usr/local/include /usr/local/include
-COPY --from=gnuradio_oot_modules /usr/include /usr/include
-COPY --from=gnuradio_oot_modules /usr/lib /usr/lib
+# Copy in the gr-sdrplay3 OOT module runtime dependencies.
+COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/include/ /usr/include/
+COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/lib/ /usr/lib
+COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/local/ /usr/local/
+COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/share/ /usr/share/
 
-# Copy in the sdrplay executables
-COPY --from=gnuradio_oot_modules /opt/sdrplay_api/sdrplay_apiService /opt/sdrplay_api/sdrplay_apiService
-COPY --from=gnuradio_oot_modules /usr/local/bin/sdrplay_find_devices /usr/local/bin/sdrplay_find_devices
+# Copy in the gr-spectre OOT module runtime dependencies.
+COPY --from=gr_spectre /opt/gr_spectre/include/ /usr/include/
+COPY --from=gr_spectre /opt/gr_spectre/lib/ /usr/lib
+COPY --from=gr_spectre /opt/gr_spectre/local/ /usr/local/
+COPY --from=gr_spectre /opt/gr_spectre/share/ /usr/share/
 
-# Copy in system-wide python packages for the flask server.
-COPY --from=flask_server /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
+# Copy in the spectre server runtime dependencies.
+COPY --from=spectre_server /usr/local/lib/python3.10/dist-packages/ /usr/local/lib/python3.10/dist-packages/
+COPY --from=spectre_server /opt/spectre_server/gunicorn.conf.py /app/gunicorn.conf.py
 
-# Copy in the start script, and set it as the default executable for the container
-COPY --chmod=0755 ./scripts/bash/start.sh ./start.sh
-CMD ["./start.sh"]
+# Copy in the scripts which will run when the container starts.
+COPY --chmod=0755 scripts/bash/entrypoint.sh entrypoint.sh
+COPY --chmod=0755 scripts/bash/cmd.sh cmd.sh
 
+# Create an arbitrary group and non-root user to run the application.
+# Update the home directory, so that the user can write to it.
+RUN groupadd --gid 1000 appgroup && \
+    useradd -u 1000 -g appgroup appuser && \
+    usermod -d /app appuser
 
-# ------------------------------- # 
-# Create the development stage
-# ------------------------------- # 
-FROM runtime AS development
-
-# Set environment variables required to enable gui functionality.
-ENV DISPLAY=:0
-ENV XDG_RUNTIME_DIR=/tmp/runtime-root
-ENV NO_AT_BRIDGE=1
-
-RUN apt-get install -y \
-    # Install development tools.
-    git python3-pip vim \
-    # Required for the gnuradio GUI to run inside the container
-    libgtk-3-dev x11-apps \
-    # Subdue some warnings flagged on starting gnuradio-companion
-    libcanberra-gtk-module libcanberra-gtk3-module \
-    # Subdue a warning when "opening from file" in gnuradio
-    dbus-x11 && \
-    # Upgrade packages for building and distributing `spectre-core`.
-    pip install --upgrade build twine
-
-# Clone then install the latest `spectre` and `spectre-core` code, ready for development.
-COPY --chmod=0755 ./scripts/bash/install_spectre_latest.sh ./install_spectre_latest.sh 
-RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
-
-# Copy in the OOT module grc files
-COPY --from=gnuradio_oot_modules /usr/local/share/gnuradio/grc/blocks /usr/local/share/gnuradio/grc/blocks
-
-CMD ["/bin/bash"]
+# We cannot use the `USER` directive, since non-root user running the application can't write to the mounted volume.
+# So, the container starts as root to change ownership of the /app directory,  then drops privileges and runs as the 
+# non-root user to execute the application.
+# See https://stackoverflow.com/questions/65574334/docker-is-it-safe-to-switch-to-non-root-user-in-entrypoint for 
+# some discussion on this approach.
+ENTRYPOINT ["/bin/sh", "entrypoint.sh", "/app/cmd.sh"]
+CMD ["cmd.sh"]
