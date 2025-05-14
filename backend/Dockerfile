@@ -26,9 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # --------------------------------- # 
-# Install build dependencies.
+# Install shared build dependencies.
 # --------------------------------- # 
-FROM base AS build
+FROM base AS cpp_build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -36,8 +36,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     libboost-all-dev \
     gnuradio-dev \
-    python3-setuptools \
-    libusb-1.0-0-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # --------------------------------- #
@@ -70,7 +68,7 @@ RUN mkdir -p /opt/sdrplay_api/include \
 # --------------------------------------------- #
 # Create an executable to find SDRplay devices.
 # --------------------------------------------- #
-FROM build AS sdrplay_find_devices
+FROM cpp_build AS sdrplay_find_devices
 
 WORKDIR /tmp/sdrplay_find_devices
 
@@ -85,9 +83,15 @@ RUN mkdir -p /opt/sdrplay_find_devices/bin && \
 # --------------------------------------------- #
 # Install UHD dependencies.
 # --------------------------------------------- #
-FROM build AS uhd
+FROM cpp_build AS uhd
 
 WORKDIR /tmp/uhd
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-requests \
+    python3-setuptools \
+    libusb-1.0-0-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && \
     cd uhd/host && \
@@ -121,13 +125,13 @@ RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && 
     make && \
     make install
 
-RUN uhd_images_downloader --install-location=/opt/uhd \
-                          --types=b200mini
+RUN /opt/uhd/lib/uhd/utils/uhd_images_downloader.py --install-location=/opt/uhd/share/uhd/images/ \
+                                                    --types b200mini
 
 # --------------------------------------------- #
 # Install the gr-sdrplay3 OOT module.
 # --------------------------------------------- #
-FROM build AS gr_sdrplay3
+FROM cpp_build AS gr_sdrplay3
 
 WORKDIR /tmp
 
@@ -141,7 +145,7 @@ RUN . ./build_oot_module.sh && \
 # --------------------------------------------- #
 # Install the gr-spectre OOT module.
 # --------------------------------------------- #
-FROM build AS gr_spectre
+FROM cpp_build AS gr_spectre
 
 WORKDIR /tmp
 
@@ -164,16 +168,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Copy in the source code and build requirements.
-COPY pyproject.toml gunicorn.conf.py ./
+COPY pyproject.toml ./
 COPY src src
 
 # Finally, install the Python dependencies into the virtual environment.
-RUN pip install .
+RUN python3 -m pip install --upgrade pip && \
+    pip install .
+
+COPY gunicorn.conf.py /opt/spectre_server/
 
 # --------------------------------- # 
 # Create the final runtime stage.
 # --------------------------------- # 
 FROM base AS runtime
+
+LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+      version="0.0.8" \
+      description="Docker image for running the `spectre-server`." \
+      license="GPL-3.0-or-later"
 
 WORKDIR /app
 
@@ -192,6 +204,7 @@ COPY --from=sdrplay_find_devices /opt/sdrplay_find_devices/bin /usr/bin
 COPY --from=uhd /opt/uhd/include /usr/include
 COPY --from=uhd /opt/uhd/lib /usr/lib
 COPY --from=uhd /opt/uhd/bin /usr/bin
+COPY --from=uhd /opt/uhd/share /usr/share
 
 # Copy in the gr-sdrplay3 OOT module runtime dependencies.
 COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/include/ /usr/include/
@@ -234,10 +247,14 @@ CMD ["cmd.sh"]
 FROM runtime AS development
 
 # Install development tools.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     git \
-    vim && \
-    rm -rf /var/lib/apt/lists/*
+    python3-venv \
+    python3-setuptools \
+    python3-pip \
+    python3-wheel \
+    twine \
+    vim 
 
 # Clone the `spectre` repository and install the server in editable mode
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
