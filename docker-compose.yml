@@ -7,7 +7,7 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
-      target: uhd
+      target: runtime
     environment:
       - SPECTRE_SERVICE_HOST=0.0.0.0
       - SPECTRE_SERVICE_PORT=5000
