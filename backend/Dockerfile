@@ -111,6 +111,12 @@ RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && 
           -DENABLE_N230=OFF \
           -DENABLE_OCTOCLOCK=OFF \
           -DINSTALL_UDEV_RULES=OFF \
+          -DENABLE_B100=OFF \
+          -DENABLE_USRP1=OFF \
+          -DENABLE_RFNOC=OFF \
+          -DENABLE_FPGA_MANAGER=OFF \
+          -DENABLE_BLADE=OFF \
+          -DENABLE_MPM=OFF \
     .. && \
     make && \
     make install
@@ -220,3 +226,37 @@ RUN groupadd --gid 1000 appgroup && \
 # some discussion on this approach.
 ENTRYPOINT ["/bin/sh", "entrypoint.sh", "/app/cmd.sh"]
 CMD ["cmd.sh"]
+
+
+# --------------------------------- # 
+# Create the development stage.
+# --------------------------------- # 
+FROM runtime AS development
+
+# Install development tools.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    vim && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone the `spectre` repository and install the server in editable mode
+RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
+    git sparse-checkout init --no-cone && \
+    git sparse-checkout set backend/ && \
+    git checkout && \
+    pip install -e backend/
+
+# Get the latest version of `spectre-core` and install it in editable mode
+RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
+    git checkout main && \
+    pip install -e .
+
+# Get the latest version of `gr-spectre` and install it in editable mode.
+# Developers can rebuild again, if required.
+RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git && cd gr-spectre && \
+    git checkout main
+    
+# Disable the existing entrypoint and start up commands, and run as root.
+ENTRYPOINT [ ]
+CMD [ ]
+
