@@ -29,6 +29,12 @@ RUN pip install .
 # --------------------------------- # 
 FROM base AS runtime
 
+LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+      version="0.0.8" \
+      description="Docker image for running the `spectre-cli`." \
+      license="GPL-3.0-or-later"
+
+
 WORKDIR /app
 
 # Copy in the system-wide packages, and the CLI application executable.
@@ -51,10 +57,9 @@ USER appuser
 FROM base AS development
 
 # Install development tools.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     git \
-    vim && \
-    rm -rf /var/lib/apt/lists/*
+    vim 
 
 # Clone the `spectre` repository and install the CLI in editable mode.
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
