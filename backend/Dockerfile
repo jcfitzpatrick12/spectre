@@ -173,8 +173,7 @@ COPY pyproject.toml ./
 COPY src src
 
 # Finally, install the Python dependencies into the virtual environment.
-RUN python3 -m pip install --upgrade pip && \
-    pip install .
+RUN pip install .
 
 COPY gunicorn.conf.py /opt/spectre_server/
 
