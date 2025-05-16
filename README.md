@@ -89,18 +89,25 @@ To get going, you'll need the following installed on your machine:
    git clone https://github.com/jcfitzpatrick12/spectre.git && cd spectre
    ```
 
-2. **Start the containers**  
+2. **Configure your host**  
+   Grant the `spectre-server` permission to access USB devices on your system:  
+   ```bash
+   chmod +x setup.sh && sudo ./setup.sh
+   ```
+
+3. **Start the containers**  
    Ensure any receivers are connected, then create and run the containers:  
    ```bash
    docker compose up --build
    ```
 
-3. **Create an alias for the CLI**  
+4. **Create an alias for the CLI**  
    In a new terminal tab, set up the following alias:    
    ```bash
    echo "alias spectre='docker exec spectre-cli spectre'" >> ~/.bashrc && . ~/.bashrc
    ```
    This lets you run `spectre-cli` commands as if they were executed directly on the host.
+
 
 4. **Good to go!**  
    Verify everything is up and running with:    
@@ -113,12 +120,12 @@ If you have a physical receiver connected, it's a good idea to verify that the `
 
 - For SDRplay receivers, run:  
    ```bash
-   docker exec spectre-server sdrplay_find_devices
+   docker exec --user appuser spectre-server sdrplay_find_devices
    ```
 
 - For USRP receivers, run:  
    ```bash
-   docker exec spectre-server uhd_find_devices
+   docker exec --user appuser spectre-server uhd_find_devices
    ```
 
 If this is the first time you're running the containers since plugging in the device, it may not be detected. Ensure the receiver is still connected, then restart the `spectre-server` with:  

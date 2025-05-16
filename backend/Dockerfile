@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libudev-dev \
     libusb-1.0-0 \
     wget \
+    gosu \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
@@ -104,6 +105,7 @@ RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && 
           -DENABLE_LIBUHD=ON \
           -DENABLE_PYTHON_API=ON \
           -DENABLE_UTILS=ON \
+          -DINSTALL_UDEV_RULES=ON \
           -DENABLE_EXAMPLES=OFF \
           -DENABLE_TESTS=OFF \
           -DENABLE_MAN_PAGES=OFF \
@@ -114,7 +116,6 @@ RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && 
           -DENABLE_E300=OFF \
           -DENABLE_N230=OFF \
           -DENABLE_OCTOCLOCK=OFF \
-          -DINSTALL_UDEV_RULES=OFF \
           -DENABLE_B100=OFF \
           -DENABLE_USRP1=OFF \
           -DENABLE_RFNOC=OFF \
@@ -126,7 +127,7 @@ RUN git clone --depth 1 -b v4.8.0.0 https://github.com/EttusResearch/uhd.git && 
     make install
 
 RUN /opt/uhd/lib/uhd/utils/uhd_images_downloader.py --install-location=/opt/uhd/share/uhd/images/ \
-                                                    --types b200mini
+                                                    --types b2xx
 
 # --------------------------------------------- #
 # Install the gr-sdrplay3 OOT module.
@@ -191,7 +192,7 @@ WORKDIR /app
 
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 ENV MPLCONFIGDIR="/app/.mplconfigdir"
-ENV HOME="/app"
+ENV UHD_IMAGES_DIR="/usr/share/uhd/images"
 
 # Copy in the SDRplay runtime dependencies.
 COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
@@ -205,6 +206,7 @@ COPY --from=uhd /opt/uhd/include /usr/include
 COPY --from=uhd /opt/uhd/lib /usr/lib
 COPY --from=uhd /opt/uhd/bin /usr/bin
 COPY --from=uhd /opt/uhd/share /usr/share
+COPY --from=uhd /opt/uhd/lib/uhd/utils/uhd-usrp.rules /etc/udev/rules.d/
 
 # Copy in the gr-sdrplay3 OOT module runtime dependencies.
 COPY --from=gr_sdrplay3 /opt/gr_sdrplay3/include/ /usr/include/
@@ -226,19 +228,26 @@ COPY --from=spectre_server /opt/spectre_server/gunicorn.conf.py /app/gunicorn.co
 COPY --chmod=0755 scripts/bash/entrypoint.sh entrypoint.sh
 COPY --chmod=0755 scripts/bash/cmd.sh cmd.sh
 
-# Create an arbitrary group and non-root user to run the application.
-# Update the home directory, so that the user can write to it.
-RUN groupadd --gid 1000 appgroup && \
-    useradd -u 1000 -g appgroup appuser && \
-    usermod -d /app appuser
+# Add a non-root user to run the application.
+RUN useradd -u 1000 -M -d /app appuser
 
 # We cannot use the `USER` directive, since non-root user running the application can't write to the mounted volume.
 # So, the container starts as root to change ownership of the /app directory,  then drops privileges and runs as the 
 # non-root user to execute the application.
 # See https://stackoverflow.com/questions/65574334/docker-is-it-safe-to-switch-to-non-root-user-in-entrypoint for 
 # some discussion on this approach.
-ENTRYPOINT ["/bin/sh", "entrypoint.sh", "/app/cmd.sh"]
-CMD ["cmd.sh"]
+ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+CMD ["/app/cmd.sh"]
+
+
+# ----------------------------------------------------------- # 
+# Optional target, where you can run the application as root.
+# ----------------------------------------------------------- # 
+FROM runtime AS root_runtime
+
+# Return to the default entrypoint and run the application as root.
+ENTRYPOINT [ ]
+CMD ["/app/cmd.sh"]
 
 
 # --------------------------------- # 
