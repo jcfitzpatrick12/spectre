@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 SPECTRE_GROUP=spectre-group
-SPECTRE_SERVICE_PORT=5000
-SPECTRE_SERVICE_HOST="0.0.0.0"
 UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
 DOTENV_FILE="./.env"
 
@@ -42,8 +40,6 @@ GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
 echo "📦 Writing environment variables to .env"
 {
     echo "SPECTRE_GID=$GID" 
-    echo "SPECTRE_SERVICE_PORT=$SPECTRE_SERVICE_PORT"
-    echo "SPECTRE_SERVICE_HOST=$SPECTRE_SERVICE_HOST"
 } > "$DOTENV_FILE"
 echo "✅ $DOTENV_FILE written"
 

@@ -10,14 +10,14 @@ services:
       target: runtime
     environment:
       - SPECTRE_GID=${SPECTRE_GID}
-      - SPECTRE_SERVICE_HOST=${SPECTRE_SERVICE_HOST}
-      - SPECTRE_SERVICE_PORT=${SPECTRE_SERVICE_PORT}
+      - SPECTRE_SERVICE_HOST=0.0.0.0
+      - SPECTRE_SERVICE_PORT=5000
     container_name: spectre-server
     group_add:
       - "${SPECTRE_GID}"
     image: spectre-server
     mem_limit: 8g 
-    shm_size: 4g
+    shm_size: 8g
     networks:
       - spectre-network
     volumes:
