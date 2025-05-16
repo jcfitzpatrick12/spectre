@@ -10,3 +10,4 @@ SPECTRE_SERVICE_PORT = int(os.environ.get("SPECTRE_SERVICE_PORT", "5000"))
 
 bind = f"{SPECTRE_SERVICE_HOST}:{SPECTRE_SERVICE_PORT}"
 workers = multiprocessing.cpu_count() * 2 + 1 
+timeout=0
