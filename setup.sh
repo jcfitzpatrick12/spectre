@@ -3,11 +3,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-GROUP=spectre-group
+SPECTRE_GROUP=spectre-group
 SPECTRE_SERVICE_PORT=5000
 SPECTRE_SERVICE_HOST="0.0.0.0"
 UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
-DOTENV_FILE=".env"
+DOTENV_FILE="./.env"
 
 # Check if the script is run with root privileges.
 if [ "$EUID" -ne 0 ]; then
@@ -16,18 +16,18 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Create the group if it doesn't exist.
-if getent group "$GROUP" > /dev/null; then
-    echo "✅ Group '$GROUP' already exists"
+if getent group "$SPECTRE_GROUP" > /dev/null; then
+    echo "✅ Group '$SPECTRE_GROUP' already exists"
 else
-    echo "➕ Creating group '$GROUP'"
-    groupadd "$GROUP"
-    echo "✅ Group '$GROUP' created"
+    echo "➕ Creating group '$SPECTRE_GROUP'"
+    groupadd "$SPECTRE_GROUP"
+    echo "✅ Group '$SPECTRE_GROUP' created"
 fi
 
-# Add udev rule for USB access
+# Add udev rule for USB access. The `SPECTRE_GROUP` group will have read/write access to USB devices.
 echo "📝 Writing udev rule to $UDEV_FILE"
 tee "$UDEV_FILE" > /dev/null <<EOF
-SUBSYSTEM=="usb", MODE="0660", GROUP="$GROUP"
+SUBSYSTEM=="usb", MODE="0660", GROUP="$SPECTRE_GROUP"
 EOF
 echo "✅ Udev rule written"
 
@@ -38,13 +38,13 @@ udevadm trigger
 echo "✅ Udev rules reloaded"
 
 # Get the group ID and write .env file for Docker Compose
-GID=$(getent group "$GROUP" | cut -d: -f3)
+GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
 echo "📦 Writing environment variables to .env"
 {
     echo "SPECTRE_GID=$GID" 
     echo "SPECTRE_SERVICE_PORT=$SPECTRE_SERVICE_PORT"
     echo "SPECTRE_SERVICE_HOST=$SPECTRE_SERVICE_HOST"
-} > $DOTENV_FILE
+} > "$DOTENV_FILE"
 echo "✅ $DOTENV_FILE written"
 
 echo "🎉 Setup complete!"
