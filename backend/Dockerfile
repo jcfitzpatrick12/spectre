@@ -244,7 +244,7 @@ CMD ["/app/cmd.sh"]
 # ----------------------------------------------------------- # 
 FROM runtime AS root_runtime
 
-# Return to the default entrypoint and run the application as root.
+# Override inherited entrypoint to allow running as root without privilege drop.
 ENTRYPOINT [ ]
 CMD ["/app/cmd.sh"]
 
