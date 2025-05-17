@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # --------------------------------- #
-# Install SDRPlay API.
+# Install SDRplay API.
 # --------------------------------- #
 FROM base AS sdrplay_api
 
