@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   spectre-server:
     container_name: spectre-server
@@ -12,8 +10,6 @@ services:
       - SPECTRE_GID=${SPECTRE_GID}
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
       - SPECTRE_BIND_PORT=${SPECTRE_BIND_PORT}
-    group_add:
-      - "${SPECTRE_GID}"
     networks:
       - spectre-network
     volumes:
