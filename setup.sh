@@ -38,17 +38,9 @@ tee "$UDEV_FILE" > /dev/null <<EOF
 SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="2500", MODE="0660", GROUP="$SPECTRE_GROUP"
 
 # SDRplay
-# SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", MODE="0660", GROUP="$SPECTRE_GROUP"
-
+SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", MODE="0660", GROUP="$SPECTRE_GROUP"
 EOF
 echo "✅ Udev rules written"
-
-
-
-
-# # SDRplay RSPduo
-# SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", ENV{ID_MODEL_ID}=="3020", MODE="0660", GROUP="$SPECTRE_GROUP"
-
 
 # Reload udev rules and trigger them
 echo "🔄 Reloading udev rules"
