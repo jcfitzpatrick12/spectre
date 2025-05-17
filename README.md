@@ -48,17 +48,6 @@ Capture data from SDRs, simply.
    ```bash
    spectre start session --tag rsp1a-example --seconds 30
    ```
-
-3. **Download data**:  
-   List all the newly created spectrogram files, stored in the [FITS file format](https://fits.gsfc.nasa.gov/fits_primer.html):  
-   ```bash
-   spectre get batch-files --tag rsp1a-example
-   ```
-
-   And download the latest one to your present working directory:  
-   ```bash
-   curl $(spectre get batch-files --tag rsp1a-example --extensions fits | tail -1)
-   ```
    
 ## Supported Receivers
 
