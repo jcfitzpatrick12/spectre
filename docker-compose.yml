@@ -1,10 +1,7 @@
-networks:
-  spectre-network:
-    name: spectre-network
-    driver: bridge
-
 services:
   spectre-server:
+    container_name: spectre-server
+    image: spectre-server
     build:
       context: backend
       dockerfile: Dockerfile
@@ -13,22 +10,23 @@ services:
       - SPECTRE_GID=${SPECTRE_GID}
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
       - SPECTRE_BIND_PORT=${SPECTRE_BIND_PORT}
-    container_name: spectre-server
     group_add:
       - "${SPECTRE_GID}"
-    image: spectre-server
-    mem_limit: 8g 
-    shm_size: 8g
     networks:
       - spectre-network
     volumes:
       - spectre-data:/app/.spectre-data
     devices:
       - "/dev/bus/usb"
-    stop_signal: SIGKILL
     ports:
       - ${SPECTRE_PORT_MAP}
+    mem_limit: 8g
+    shm_size: 8g
+    stop_signal: SIGKILL
+
   spectre-cli:
+    container_name: spectre-cli
+    image: spectre-cli
     build:
       context: ./cli
       dockerfile: Dockerfile
@@ -36,15 +34,18 @@ services:
     environment:
       - SPECTRE_SERVER_HOST=${SPECTRE_SERVER_HOST}
       - SPECTRE_SERVER_PORT=${SPECTRE_SERVER_PORT}
-    container_name: spectre-cli
-    image: spectre-cli
     networks:
       - spectre-network
     depends_on:
       - spectre-server
-    # Keep the container running on start-up
-    tty: true 
+    tty: true
     stop_signal: SIGKILL
+
+networks:
+  spectre-network:
+    name: spectre-network
+    driver: bridge
 
 volumes:
   spectre-data:
+    name: spectre-data
