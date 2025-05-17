@@ -34,7 +34,7 @@ def safe_request(
 ) -> dict:
     """Send a request to the `spectre-server` and handle jsend-style responses.
 
-    :param route_url: Endpoint path to append to the `spectre-server` base URL. This base URL is defined by the environment variables `SPECTRE_SERVICE_HOST`, `SPECTRE_SERVICE_PORT` or `SPECTRE_SERVER`.
+    :param route_url: Endpoint path to append to the `spectre-server` base URL. This base URL is defined by the environment variables `SPECTRE_SERVER_HOST`, `SPECTRE_SERVER_PORT` or `SPECTRE_SERVER`.
     :param method: HTTP method to use for the request (e.g., 'GET', 'POST').
     :param json: Optional JSON payload for the request body.
     :param params: Optional query parameters for the request.

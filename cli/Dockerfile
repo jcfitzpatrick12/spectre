@@ -3,44 +3,68 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # --------------------------------- # 
-# Create the base stage
+# Base stage.
 # --------------------------------- # 
 FROM python:3.10-slim AS base
 
+# Set a default working directory for each stage.
 WORKDIR /app
 
-# Copy in the spectre-cli program, along with the build requirements.
+# Explictly set the user to root by default for each stage.
+USER root
+
+# --------------------------------- # 
+# Build stage.
+# --------------------------------- # 
+FROM base AS build
+
+# Copy in the build requirements, and the CLI application code.
 COPY src pyproject.toml ./
 
-# Install the dependencies system-wide.
+# Install the build dependencies and CLI application system-wide.
 RUN pip install .
 
 # --------------------------------- # 
-# Create the final runtime image
+# Runtime stage.
 # --------------------------------- # 
-FROM python:3.10-slim AS runtime
+FROM base AS runtime
+
+LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+      version="0.0.8" \
+      description="Docker image for running the `spectre-cli`." \
+      license="GPL-3.0-or-later"
+
 
 WORKDIR /app
 
-# Copy in system-wide python packages for the cli
-COPY --from=base /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=base /usr/local/bin/spectre /usr/local/bin/spectre
+# Copy in the system-wide packages, and the CLI application executable.
+COPY --from=build /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=build /usr/local/bin/spectre /usr/local/bin/spectre
+
+# Create an arbitrary group and non-root user to run the application.
+RUN groupadd --gid 1000 appgroup && \
+    useradd -u 1000 -g appgroup appuser
+
+# Change ownership of the application directory to the non-root user.
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user, to improve security.
+USER appuser
 
 # --------------------------------- # 
-# Create the development stage
+# Development stage.
 # --------------------------------- # 
-FROM python:3.10-slim AS development
+FROM base AS development
 
-RUN apt-get update && \
-    apt-get install -y \
-    # Install development tools.
-    git python3-pip vim 
+# Install development tools.
+RUN apt-get update && apt-get install -y \
+    git \
+    vim 
 
-WORKDIR /app
-
-# Clone then install the latest `spectre` code, ready for development.
-COPY --chmod=0755 scripts/bash/install_spectre_latest.sh ./install_spectre_latest.sh
-RUN ./install_spectre_latest.sh && rm ./install_spectre_latest.sh
-
-CMD ["/bin/bash"]
+# Clone the `spectre` repository and install the CLI in editable mode.
+RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
+    git sparse-checkout init --no-cone && \
+    git sparse-checkout set cli/ && \
+    git checkout && \
+    pip install -e cli/
 

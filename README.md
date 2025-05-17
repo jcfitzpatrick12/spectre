@@ -1,11 +1,17 @@
 <h1 align="center">
-  SPECTRE: Process, Explore and Capture Transient Radio Emissions
+  Spectre: Process, Explore and Capture Transient Radio Emissions
 </h1>
 
 <div align="center">
   <img src="docs/gallery/solar_radio.png" width="30%" hspace="10" alt="Solar Radio Observations">
-  <img src="docs/gallery/spectre.png" width="30%" hspace="10" alt="SPECTRE Logo">
+  <img src="docs/gallery/spectre.png" width="30%" hspace="10" alt="Spectre Logo">
   <img src="docs/gallery/fm_radio.png" width="30%" hspace="10" alt="FM Band">
+</div>
+
+<div align="center">
+
+  <img src="docs/gallery/solar_radio_narrowband.png" width="50%" hspace="10" alt="Solar Radio Observations">
+
 </div>
 
 
@@ -13,7 +19,7 @@
 
 📢 **This project is under active development, expect breaking changes. Contributors welcome!** 📢
 
-`spectre` is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
+_Spectre_ is a receiver-agnostic program for recording and visualising radio spectrograms. Powered by [GNU Radio](https://www.gnuradio.org/).
 
 
 ### **Features**
@@ -29,18 +35,29 @@
 ### **Demo**
 Capture data from SDRs, simply.
 
-1. **Create a capture config**  
-   Create a new configuration file to collect data from the SDRPlay RSP1A receiver at a fixed center frequency:  
+1. **Create a capture config**:  
+   Create a new configuration file to collect data from the SDRplay RSP1A receiver at a fixed center frequency:  
    ```bash
    spectre create capture-config --receiver rsp1a \
                                  --mode fixed_center_frequency \
                                  --tag rsp1a-example
    ```
    
-2. **Capture data**  
+2. **Capture data**:  
    Start streaming I/Q samples from the receiver, and automatically post process the data into radio spectrograms:  
    ```bash
    spectre start session --tag rsp1a-example --seconds 30
+   ```
+
+3. **Download data**:  
+   List all the newly created spectrogram files, stored in the [FITS file format](https://fits.gsfc.nasa.gov/fits_primer.html):  
+   ```bash
+   spectre get batch-files --tag rsp1a-example
+   ```
+
+   And download the latest one to your present working directory:  
+   ```bash
+   curl $(spectre get batch-files --tag rsp1a-example --extensions fits | tail -1)
    ```
    
 ## Supported Receivers
@@ -48,8 +65,8 @@ Capture data from SDRs, simply.
 Our abstract framework can support any receiver with a source block in GNU Radio. If you have a receiver that isn't supported, reach out, and we can look into adding support for it!
 
 ### **Currently Supported Receivers**
-- [RSP1A (from SDRPlay)](https://www.sdrplay.com/rsp1a/)  
-- [RSPduo (from SDRPlay)](https://www.sdrplay.com/rspduo/)  
+- [RSP1A (from SDRplay)](https://www.sdrplay.com/rsp1a/)  
+- [RSPduo (from SDRplay)](https://www.sdrplay.com/rspduo/)  
 - [USRP B200mini (from Ettus Research)](https://www.ettus.com/all-products/usrp-b200mini/)
 
 ### **Planned Future Support**
@@ -58,17 +75,20 @@ Our abstract framework can support any receiver with a source block in GNU Radio
 - RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))  
 
 **⚠️ Note:**  
-SDRPlay clones (i.e., unofficially produced copies of SDRPlay receivers) will likely not work with spectre as they are not compatible with the official SDRPlay API.  
+SDRplay clones (i.e., unofficially produced copies of SDRplay receivers) will likely not work with spectre as they are not compatible with the official SDRplay API.  
+
 ## Supported Platforms
+
 `spectre` is expected to be compatible with most Linux distributions.
 
-The following operating systems and architectures have been verified:   
-- **ThinkPad P1G5** running:
-  - Ubuntu 22.04.3  
-- **Raspberry Pi 4 Model B** running:
-  - Ubuntu Desktop  
-  - Raspberry Pi OS  
-  - Raspberry Pi OS Lite  
+The following platforms have been verified:
+
+- **x86_64**
+  - Ubuntu 22.04.3 LTS
+- **arm64**
+  - Ubuntu Desktop (22.04)
+  - Raspberry Pi OS (Desktop and Lite)
+
 
 macOS compatibility will be explored in the future.
 
@@ -76,10 +96,11 @@ macOS compatibility will be explored in the future.
 
 ### **Prerequisites**
 To get going, you'll need the following installed on your machine:  
-| Prerequisite      | How to Install | Do I Already Have It? |
-|------------------|---------------|-----------------------|
-| **Docker Engine** | [Install Docker Engine](https://docs.docker.com/engine/install/) | Run `docker --version` |
-| **Git**          | [Getting Started - Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run `git --version` |
+| Prerequisite | Do I Already Have It? |
+|--------------|-----------------------|
+| [**Docker Engine**](https://docs.docker.com/engine/install/) | Run `docker --version` |
+| [**Docker Compose**](https://docs.docker.com/compose/) | Run `docker compose --help` |
+| [**Git**](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | Run `git --version` |
 
 ### **Getting started**
 
@@ -89,18 +110,26 @@ To get going, you'll need the following installed on your machine:
    git clone https://github.com/jcfitzpatrick12/spectre.git && cd spectre
    ```
 
-2. **Start the containers**  
+2. **Configure your host**  
+   Set up targeted USB permissions for the `Spectre` application, and initialise environment variables, with sensible defaults:  
+   ```bash
+   chmod +x setup.sh && sudo ./setup.sh
+   ```
+   This is __required__ to run the `spectre-server` as a non-root user, which is the default behaviour.
+
+3. **Start the containers**  
    Ensure any receivers are connected, then create and run the containers:  
    ```bash
    docker compose up --build
    ```
 
-3. **Create an alias for the CLI**  
+4. **Create an alias for the CLI**  
    In a new terminal tab, set up the following alias:    
    ```bash
-   echo "alias spectre='docker exec spectre-cli spectre'" >> ~/.bashrc && . ~/.bashrc
+   alias spectre='docker exec spectre-cli spectre'
    ```
    This lets you run `spectre-cli` commands as if they were executed directly on the host.
+
 
 4. **Good to go!**  
    Verify everything is up and running with:    
@@ -115,7 +144,7 @@ If you have a physical receiver connected, it's a good idea to verify that the `
    ```bash
    docker exec spectre-server sdrplay_find_devices
    ```
-
+   
 - For USRP receivers, run:  
    ```bash
    docker exec spectre-server uhd_find_devices
@@ -139,7 +168,14 @@ You can also run the CLI locally, without the `spectre-cli` container.
    ```bash
    pip install ./cli
    ```
-3. **Good to go!**  
+
+3. **Remove the existing alias**:  
+   Remove any existing alias to prevent shadowing:  
+   ```bash
+   unalias spectre
+   ```
+
+4. **Good to go!**  
    Verify everything is up and running with:      
    ```bash
    spectre --help
@@ -154,7 +190,7 @@ For development, use the development Compose file:
 [spectre](https://github.com/jcfitzpatrick12/spectre) is the primary application repository, with server-side implementations available in a separate Python package called [spectre-core](https://github.com/jcfitzpatrick12/spectre-core). Once the containers are running, you can use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
 
 **⚠️ Note:**  
-If you're working with SDRPlay receivers, you will have to start the SDRPlay API manually.
+If you're working with SDRplay receivers, you will have to start the SDRplay API manually.
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
