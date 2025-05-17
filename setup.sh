@@ -12,10 +12,6 @@ SPECTRE_PORT_MAP="127.0.0.1:${SPECTRE_BIND_PORT}:${SPECTRE_BIND_PORT}"
 SPECTRE_SERVER_HOST="spectre-server"
 SPECTRE_SERVER_PORT="5000"
 
-SPECTRE_GROUP=spectre-group
-UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
-DOTENV_FILE="./.env"
-
 # Check if the script is run with root privileges.
 if [ "$EUID" -ne 0 ]; then
     echo "❌ Please run this script as root: sudo ./setup.sh"
@@ -23,6 +19,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Create the group if it doesn't exist.
+SPECTRE_GROUP=spectre-group
 if getent group "$SPECTRE_GROUP" > /dev/null; then
     echo "✅ Group '$SPECTRE_GROUP' already exists"
 else
@@ -30,13 +27,28 @@ else
     groupadd "$SPECTRE_GROUP"
     echo "✅ Group '$SPECTRE_GROUP' created"
 fi
+SPECTRE_GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
 
-# Add udev rule for USB access. The `SPECTRE_GROUP` group will have read/write access to USB devices.
-echo "📝 Writing udev rule to $UDEV_FILE"
+# Add udev rule for USB access. The `SPECTRE_GROUP` group will have read/write access
+# to supported vendors
+UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
+echo "📝 Writing udev rules to $UDEV_FILE"
 tee "$UDEV_FILE" > /dev/null <<EOF
-SUBSYSTEM=="usb", MODE="0660", GROUP="$SPECTRE_GROUP"
+# Ettus Research
+SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="2500", MODE="0660", GROUP="$SPECTRE_GROUP"
+
+# SDRplay
+# SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", MODE="0660", GROUP="$SPECTRE_GROUP"
+
 EOF
-echo "✅ Udev rule written"
+echo "✅ Udev rules written"
+
+
+
+
+# # SDRplay RSPduo
+# SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", ENV{ID_MODEL_ID}=="3020", MODE="0660", GROUP="$SPECTRE_GROUP"
+
 
 # Reload udev rules and trigger them
 echo "🔄 Reloading udev rules"
@@ -44,11 +56,11 @@ udevadm control --reload-rules
 udevadm trigger
 echo "✅ Udev rules reloaded"
 
-# Get the group ID and write .env file for Docker Compose
-GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
+# write .env file for Docker Compose
+DOTENV_FILE="./.env"
 echo "📦 Writing environment variables to .env"
 {
-    echo "SPECTRE_GID=$GID"
+    echo "SPECTRE_GID=$SPECTRE_GID"
     echo "SPECTRE_BIND_HOST=$SPECTRE_BIND_HOST"
     echo "SPECTRE_BIND_PORT=$SPECTRE_BIND_PORT"
     echo "SPECTRE_PORT_MAP=$SPECTRE_PORT_MAP"
