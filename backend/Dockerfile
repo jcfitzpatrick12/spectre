@@ -283,5 +283,5 @@ RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git && cd gr-spectre
     
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
-CMD [ ]
+CMD [ "/bin/bash" ]
 
