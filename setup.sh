@@ -6,7 +6,7 @@
 # Server-side environment variables.
 SPECTRE_BIND_HOST="0.0.0.0"
 SPECTRE_BIND_PORT="5000"
-SPECTRE_PORT_MAP="127.0.0.1:${SPECTRE_BIND_PORT}:${SPECTRE_BIND_PORT}"
+SPECTRE_PORT_MAP="127.0.0.1:5000:5000"
 
 # Client-side environment variables.
 SPECTRE_SERVER_HOST="spectre-server"
@@ -18,7 +18,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Create the group if it doesn't exist.
+# Create a group, which we will use to give access to USB devices from named vendors.
 SPECTRE_GROUP=spectre-group
 if getent group "$SPECTRE_GROUP" > /dev/null; then
     echo "✅ Group '$SPECTRE_GROUP' already exists"
@@ -29,8 +29,7 @@ else
 fi
 SPECTRE_GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
 
-# Add udev rule for USB access. The `SPECTRE_GROUP` group will have read/write access
-# to supported vendors
+# Allow users in the group to access USB devices from named vendors.
 UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
 echo "📝 Writing udev rules to $UDEV_FILE"
 tee "$UDEV_FILE" > /dev/null <<EOF
@@ -42,13 +41,13 @@ SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", MODE="0660", GROUP="$SPECTRE_GROUP"
 EOF
 echo "✅ Udev rules written"
 
-# Reload udev rules and trigger them
+# Apply the new udev rules.
 echo "🔄 Reloading udev rules"
 udevadm control --reload-rules
 udevadm trigger
 echo "✅ Udev rules reloaded"
 
-# write .env file for Docker Compose
+# Write the `.env` file, which will be used to interpolate our for Docker Compose configs.
 DOTENV_FILE="./.env"
 echo "📦 Writing environment variables to .env"
 {
