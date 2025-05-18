@@ -198,7 +198,10 @@ With the containers running, development is done using [Dev Containers](https://
 
 
 **⚠️ Note:**  
-If you're working with SDRplay receivers, you will have to start the SDRplay API manually.
+If you're working with SDRplay receivers, you will have to start the SDRplay API manually with:  
+```bash
+sdrplay_apiService & 
+```
 
 ## Contributing
 This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
