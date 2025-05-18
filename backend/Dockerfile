@@ -288,11 +288,10 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-
 RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git && cd gr-spectre && \
     git checkout main
 
-
 # Get the latest version of `gr-sdrplay3`
 RUN git clone https://github.com/fventuri/gr-sdrplay3.git && cd gr-spectre && \
-git checkout main
-    
+    git checkout main
+        
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
 CMD [ "/bin/bash" ]
