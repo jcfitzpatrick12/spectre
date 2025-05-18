@@ -171,12 +171,31 @@ You can also run the CLI locally, without the `spectre-cli` container.
    ```
 
 ## **Quick Start for Developers**
-For development, use the development Compose file:    
-   ```bash
-   docker compose --file docker-compose.dev.yml up --build
-   ```
 
-[spectre](https://github.com/jcfitzpatrick12/spectre) is the primary application repository, with server-side implementations available in a separate Python package called [spectre-core](https://github.com/jcfitzpatrick12/spectre-core). Once the containers are running, you can use [dev-containers](https://code.visualstudio.com/docs/devcontainers/containers) to work on the latest versions of `spectre-core` and `spectre`.
+_Spectre_ development spans a few repositories:  
+
+| Repository                                                                 | Description                                 |
+|----------------------------------------------------------------------------|---------------------------------------------|
+| [spectre](https://github.com/jcfitzpatrick12/spectre)                     | Main application repository                 |
+| [spectre-core](https://github.com/jcfitzpatrick12/spectre-core)           | Python package containing server-side implementations |
+| [gr-spectre](https://github.com/jcfitzpatrick12/gr-spectre)               | Custom GNU Radio blocks                     |
+
+To begin development, use the development Compose file:
+
+```bash
+docker compose --file docker-compose.dev.yml up --build
+```
+
+If you intend to use GUI applications (like `gnuradio-companion`), first enable X11 access and remember to revoke it afterwards:
+
+```bash
+xhost +local:docker
+docker compose --file docker-compose.dev.yml up --build
+xhost -local:docker
+```
+
+With the containers running, development is done using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) in Visual Studio Code or a compatible editor.
+
 
 **⚠️ Note:**  
 If you're working with SDRplay receivers, you will have to start the SDRplay API manually.
