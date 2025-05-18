@@ -256,13 +256,21 @@ FROM runtime AS development
 
 # Install development tools.
 RUN apt-get update && apt-get install -y \
-    git \
     python3-venv \
     python3-setuptools \
     python3-pip \
     python3-wheel \
     twine \
-    vim 
+    git \
+    vim \
+    cmake \
+    make \
+    libboost-all-dev \
+    gnuradio-dev \
+    libgtk-3-dev x11-apps \
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module \
+    dbus-x11 
 
 # Clone the `spectre` repository and install the server in editable mode
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
@@ -276,11 +284,14 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-
     git checkout main && \
     pip install -e .
 
-# Get the latest version of `gr-spectre` and install it in editable mode.
-# Developers can rebuild again, if required.
+# Get the latest version of `gr-spectre`
 RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git && cd gr-spectre && \
     git checkout main
-    
+
+# Get the latest version of `gr-sdrplay3`
+RUN git clone https://github.com/fventuri/gr-sdrplay3.git && cd gr-spectre && \
+    git checkout main
+        
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
 CMD [ "/bin/bash" ]
