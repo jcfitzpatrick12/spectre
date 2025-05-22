@@ -1,7 +1,7 @@
 services:
-  spectre-server:
-    container_name: spectre-server
-    image: spectre-server
+  spectre-dev-server:
+    container_name: spectre-dev-server
+    image: spectre-dev-server
     build:
       context: backend
       dockerfile: Dockerfile
@@ -12,9 +12,9 @@ services:
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
       - SPECTRE_BIND_PORT=${SPECTRE_BIND_PORT}
     networks:
-      - spectre-network
+      - spectre-dev-network
     volumes:
-      - spectre-data:/app/.spectre-data
+      - spectre-dev-data:/app/.spectre-data
       - /tmp/.X11-unix:/tmp/.X11-unix # Enables GUI applications to run.
     devices:
       - "/dev/bus/usb"
@@ -25,9 +25,9 @@ services:
     tty: true
     stop_signal: SIGKILL
 
-  spectre-cli:
-    container_name: spectre-cli
-    image: spectre-cli
+  spectre-dev-cli:
+    container_name: spectre-dev-cli
+    image: spectre-dev-cli
     build:
       context: ./cli
       dockerfile: Dockerfile
@@ -36,17 +36,17 @@ services:
       - SPECTRE_SERVER_HOST=${SPECTRE_SERVER_HOST}
       - SPECTRE_SERVER_PORT=${SPECTRE_SERVER_PORT}
     networks:
-      - spectre-network
+      - spectre-dev-network
     depends_on:
-      - spectre-server
+      - spectre-dev-server
     tty: true
     stop_signal: SIGKILL
 
 networks:
-  spectre-network:
-    name: spectre-network
+  spectre-dev-network:
+    name: spectre-dev-network
     driver: bridge
 
 volumes:
-  spectre-data:
-    name: spectre-data
+  spectre-dev-data:
+    name: spectre-dev-data
