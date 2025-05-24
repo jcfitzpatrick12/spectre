@@ -57,9 +57,10 @@ USER appuser
 FROM base AS development
 
 # Install development tools.
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    vim 
+    vim && \  
+    rm -rf /var/lib/apt/lists/*
 
 # Clone the `spectre` repository and install the CLI in editable mode.
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
