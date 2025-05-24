@@ -24,11 +24,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     libpython3.10 \
     libusb-1.0-0 \
-    libspdlog1 \
+    liblog4cpp5-dev \
+    libspdlog-dev \
     libboost-program-options1.74.0 \
     libboost-thread1.74.0 \
     libboost-chrono1.74.0 \
     libboost-filesystem1.74.0 \
+    libboost-system1.74.0 \
+    libboost-serialization1.74.0 \
+    libsoapysdr0.8 \
+    soapysdr0.8-module-uhd \
+    libuhd4.1.0 \
+    libomp5 \
+    libgomp1 \
     libfftw3-3 && \
     rm -rf /var/lib/apt/lists/*
 
