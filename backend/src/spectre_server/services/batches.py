@@ -100,7 +100,7 @@ def get_batch_files(
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     batch_files.append(batch_file.file_path)
-    return batch_files
+    return sorted(batch_files)
 
 
 @log_call

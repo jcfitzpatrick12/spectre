@@ -186,14 +186,6 @@ To begin development, use the development Compose file:
 docker compose --file docker-compose.dev.yml up --build
 ```
 
-If you intend to use GUI applications (like `gnuradio-companion`), first enable X11 access and remember to revoke it afterwards:
-
-```bash
-xhost +local:docker
-docker compose --file docker-compose.dev.yml up --build
-xhost -local:docker
-```
-
 With the containers running, development is done using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) in Visual Studio Code or a compatible editor.
 
 
