@@ -376,7 +376,7 @@ COPY --from=build /usr /usr
 RUN apt-get update && apt-get install -y --no-install-recommends \
     vim \
     python3-venv \
-    python3-twine && \
+    twine && \
     python3 -m pip install --upgrade twine && \  
     rm -rf /var/lib/apt/lists/*
 
