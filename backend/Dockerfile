@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     libpython3.10 \
     libusb-1.0-0 \
+    liblog4cpp5-dev \
     libspdlog1 \
     libboost-program-options1.74.0 \
     libboost-thread1.74.0 \
@@ -307,6 +308,9 @@ WORKDIR /app
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 ENV MPLCONFIGDIR="/app/.mplconfigdir"
 ENV UHD_IMAGES_DIR="/usr/share/uhd/images"
+ENV GR_LOG_LEVEL=DEBUG
+ENV GR_LOG_TO_STDERR=1
+ENV UHD_LOG_LEVEL=DEBUG
 
 # Copy in the SDRplay runtime dependencies.
 COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
