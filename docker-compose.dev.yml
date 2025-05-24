@@ -7,19 +7,16 @@ services:
       dockerfile: Dockerfile
       target: development
     environment:
-      - DISPLAY=${DISPLAY} # Enables GUI applications to run.
-      - SPECTRE_GID=${SPECTRE_GID}
-      - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
-      - SPECTRE_BIND_PORT=${SPECTRE_BIND_PORT}
+      - SPECTRE_BIND_HOST=0.0.0.0
+      - SPECTRE_BIND_PORT=5001
     networks:
       - spectre-dev-network
     volumes:
       - spectre-dev-data:/app/.spectre-data
-      - /tmp/.X11-unix:/tmp/.X11-unix # Enables GUI applications to run.
     devices:
       - "/dev/bus/usb"
     ports:
-      - ${SPECTRE_PORT_MAP}
+      - 127.0.0.1:5001:5001
     mem_limit: 8g
     shm_size: 8g
     tty: true
@@ -33,8 +30,8 @@ services:
       dockerfile: Dockerfile
       target: development
     environment:
-      - SPECTRE_SERVER_HOST=${SPECTRE_SERVER_HOST}
-      - SPECTRE_SERVER_PORT=${SPECTRE_SERVER_PORT}
+      - SPECTRE_SERVER_HOST=spectre-dev-server
+      - SPECTRE_SERVER_PORT=5001
     networks:
       - spectre-dev-network
     depends_on:
