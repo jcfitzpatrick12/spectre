@@ -12,10 +12,7 @@ build_from_repo() {
     local repo_name=$(basename "$repo_url" .git)
 
     # Clone the repository, and navigate to its root directory.
-    git clone --depth 1 "$repo_url" && cd "$repo_name"
-
-    # Checkout the requested branch or tag.
-    git checkout "$branch_or_tag"
+    git clone --branch "$branch_or_tag" --depth 1 "$repo_url" && cd "$repo_name"
 
     # Build the OOT module.
     mkdir build && cd build
