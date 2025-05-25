@@ -1,11 +1,7 @@
 services:
   spectre-server:
     container_name: spectre-server
-    image: spectre-server
-    build:
-      context: backend
-      dockerfile: Dockerfile
-      target: runtime
+    image: jcfitzpatrick12/spectre-server:0.0.9
     environment:
       - SPECTRE_GID=${SPECTRE_GID}
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
@@ -26,11 +22,7 @@ services:
 
   spectre-cli:
     container_name: spectre-cli
-    image: spectre-cli
-    build:
-      context: ./cli
-      dockerfile: Dockerfile
-      target: runtime
+    image: jcfitzpatrick12/spectre-cli:0.0.9
     environment:
       - SPECTRE_SERVER_HOST=${SPECTRE_SERVER_HOST}
       - SPECTRE_SERVER_PORT=${SPECTRE_SERVER_PORT}
