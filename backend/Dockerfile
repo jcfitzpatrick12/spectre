@@ -25,8 +25,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpython3.10 \
     libusb-1.0-0 \
     liblog4cpp5-dev \
-    libspdlog-dev \
     libspdlog1 \
+    libuhd4.1.0 \
     libboost-program-options1.74.0 \
     libboost-thread1.74.0 \
     libboost-chrono1.74.0 \
@@ -34,10 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libboost-system1.74.0 \
     libboost-serialization1.74.0 \
     libsoapysdr0.8 \
-    soapysdr0.8-module-uhd \
-    libuhd4.1.0 \
-    libomp5 \
-    libgomp1 \
+    soapysdr-tools \
     libfftw3-3 && \
     rm -rf /var/lib/apt/lists/*
 
@@ -52,6 +49,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gnuradio-dev \
     libusb-1.0-0-dev \
+    libsoapysdr-dev \
+    libspdlog-dev \
     libudev-dev \
     pybind11-dev \
     python3-packaging \
@@ -316,9 +315,6 @@ WORKDIR /app
 ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
 ENV MPLCONFIGDIR="/app/.mplconfigdir"
 ENV UHD_IMAGES_DIR="/usr/share/uhd/images"
-ENV GR_LOG_LEVEL=DEBUG
-ENV GR_LOG_TO_STDERR=1
-ENV UHD_LOG_LEVEL=DEBUG
 
 # Copy in the SDRplay runtime dependencies.
 COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
