@@ -109,7 +109,7 @@ To get going, you'll need the following installed on your machine:
 3. **Start the containers**  
    Ensure any receivers are connected, then create and run the containers:  
    ```bash
-   docker compose up --build
+   docker compose up
    ```
 
 4. **Create an alias for the CLI**  
@@ -141,7 +141,7 @@ If you have a physical receiver connected, it's a good idea to verify that the `
 
 If this is the first time you're running the containers since plugging in the device, it may not be detected. Ensure the receiver is still connected, then restart the `spectre-server` with:  
    ```bash
-   docker compose restart spectre-server
+   docker restart spectre-server
    ```
 
 ### **Run the CLI without Docker**
