@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libboost-chrono1.74.0 \
     libboost-filesystem1.74.0 \
     libboost-system1.74.0 \
+    libboost-serialization1.74.0 \
     libsoapysdr0.8 \
     soapysdr-tools \
     libfftw3-3 && \
