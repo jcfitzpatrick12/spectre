@@ -100,7 +100,7 @@ To get going, you'll need the following installed on your machine:
    ```
 
 2. **Configure your host**  
-   Set up targeted USB permissions for the `Spectre` application, and initialise environment variables, with sensible defaults:  
+   Set up targeted USB permissions for the `spectre` application, and initialise environment variables, with sensible defaults:  
    ```bash
    chmod +x setup.sh && sudo ./setup.sh
    ```

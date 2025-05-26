@@ -61,4 +61,4 @@ echo "📦 Writing environment variables to .env"
 echo "✅ $DOTENV_FILE written"
 
 echo "🎉 Setup complete!"
-echo "You can now run the application with: docker compose up --build"
+echo "You can now run the application with: docker compose up"
