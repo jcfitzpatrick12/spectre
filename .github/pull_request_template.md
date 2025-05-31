@@ -15,6 +15,7 @@
 - [ ] I have checked static type hinting with `mypy`
 - [ ] I have added/updated necessary documentation, if required
 - [ ] I have checked for and resolved any merge conflicts
+- [ ] I have performed a self-review of my code
 
 ## Additional notes
 <!-- Any additional information that reviewers should know -->
