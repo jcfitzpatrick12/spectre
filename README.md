@@ -63,8 +63,7 @@ Our abstract framework can support any receiver with a source block in GNU Radio
 - Any USRP SDR 
 - RTLSDR, AirspyHF, BladeRF, HackRF, LimeSDR, PLUTO (via [`Soapy`](https://wiki.gnuradio.org/index.php/Soapy))  
 
-**⚠️ Note:**  
-SDRplay clones (i.e., unofficially produced copies of SDRplay receivers) will likely not work with spectre as they are not compatible with the official SDRplay API.  
+> **Note:** SDRplay clones (i.e., unofficially produced copies of SDRplay receivers) will likely not work with spectre as they are not compatible with the official SDRplay API.  
 
 ## Supported Platforms
 
@@ -171,43 +170,38 @@ You can also run the CLI locally, without the `spectre-cli` container.
    ```
 
 ## Contributing
-A great place to start is creating an issue in our [issue tracker](https://github.com/jcfitzpatrick12/spectre/issues).
 
-### **Making Changes**
-We follow [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow):
+Have an idea or found a bug? Start by [creating an issue](https://github.com/jcfitzpatrick12/spectre/issues) to suggest features, report bugs, or ask questions.
 
-1. Fork this repository, and create a new branch
-2. Make your changes
-3. Write or update tests (all new changes must be covered by unit tests)
-4. Run tests locally to ensure they pass
-5. Commit your changes following [conventional commits](https://www.conventionalcommits.org/)
-6. Push to your fork
-7. Open a Pull Request
+### Project Structure
 
-**⚠️ Note:**  
-You'll probably notice testing is a little sparse. To the chagrin of Michael Feathers, author of _Working Effectively with Legacy Code_, no unit tests were produced during development. Moving forward any changes _must_ be covered by unit tests.
+_Spectre_ development spans a few repositories:
 
-### **Quick Start for Developers**
+| Repository | Description |
+|------------|-------------|
+| [spectre](https://github.com/jcfitzpatrick12/spectre) | Main application repository |
+| [spectre-core](https://github.com/jcfitzpatrick12/spectre-core) | Python package containing server-side implementations |
+| [gr-spectre](https://github.com/jcfitzpatrick12/gr-spectre) | Custom GNU Radio blocks |
 
-_Spectre_ development spans a few repositories:  
+### Development Workflow
 
-| Repository                                                                 | Description                                 |
-|----------------------------------------------------------------------------|---------------------------------------------|
-| [spectre](https://github.com/jcfitzpatrick12/spectre)                     | Main application repository                 |
-| [spectre-core](https://github.com/jcfitzpatrick12/spectre-core)           | Python package containing server-side implementations |
-| [gr-spectre](https://github.com/jcfitzpatrick12/gr-spectre)               | Custom GNU Radio blocks                     |
+We follow [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and use containerised development environments. Here's how to get started:
 
-After you've forked the repository, you can use the development Compose file:
+1. **Set up the development environment**  
+   Fork the repository, create your branch, and start the development containers:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/spectre.git && cd spectre
+   git checkout -b your-feature-branch
+   docker compose --file docker-compose.dev.yml up --build
+   ```
 
-```bash
-docker compose --file docker-compose.dev.yml up --build
-```
+2. **Make your changes**  
+   - Check out the PR template in advance, to see what we expect with contributions.
+   - Use VS Code's [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) extension for development
+   - When working on `spectre-core` or `gr-spectre`, you can use your own forks
 
-With the containers running, development is done using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) in Visual Studio Code or a compatible editor.
+3. **Submit your contribution**  
+   - Push changes to your fork
+   - Open a Pull Request in the appropriate repository
 
-
-**⚠️ Note:**  
-If you're working with SDRplay receivers, you will have to start the SDRplay API manually with:  
-```bash
-sdrplay_apiService & 
-```
+> **Note:** While historical code may lack tests, all new contributions must include unit tests.
