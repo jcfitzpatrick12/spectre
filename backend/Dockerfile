@@ -393,11 +393,11 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd
     git sparse-checkout init --no-cone && \
     git sparse-checkout set backend/ && \
     git checkout && \
-    pip install --editable backend/
+    pip install --editable backend/[test]
 
 # Get the latest version of `spectre-core` and install it in editable mode
 RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
-    pip install --editable .
+    pip install --editable .[test]
 
 # Get the latest version of `gr-spectre`.
 RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git

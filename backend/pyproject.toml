@@ -20,3 +20,7 @@ dependencies = [
     "gunicorn==21.2.0"
 ]
 license = { file = "LICENSE" }
+
+
+[project.optional-dependencies]
+test = ["pytest", "mypy", "black"]

@@ -5,51 +5,46 @@
 
 from typing import Optional
 
-from spectre_core.logs import ( 
-   Logs, Log, ProcessType, log_call, parse_log_base_file_name
-)
+from spectre_core.logs import Logs, Log, ProcessType, log_call, parse_log_base_file_name
 
 
 def _get_log(
     base_file_name: str,
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> Log:
     """Get the `Log` instance corresponding to the input file."""
     _, pid, process_type = parse_log_base_file_name(base_file_name)
-    logs = Logs(process_type=ProcessType(process_type),
-                year=year,
-                month=month,
-                day=day)
+    logs = Logs(process_type=ProcessType(process_type), year=year, month=month, day=day)
     return logs.get_from_pid(pid)
 
 
 @log_call
 def get_log(
     base_file_name: str,
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> str:
     """Get the file path of a log written by a specific process.
-    
+
     :param base_file_name: Look for a log file with this base file name.
     :param year: Look for a log file under this numeric year. Defaults to None.
     :param month: Look for a log file under this numeric month. Defaults to None.
     :param day: Look for a log file under this numeric day. Defaults to None.
-    :return: The file path of the log file if it exists in the file system, as an absolute path within the container's file system. 
+    :return: The file path of the log file if it exists in the file system, as an absolute path within the container's file system.
     """
-    log = _get_log(base_file_name, year, month, day) 
+    log = _get_log(base_file_name, year, month, day)
     return log.file_path
 
 
 @log_call
 def get_log_raw(
     base_file_name: str,
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> str:
     """Read the log written by a specific process.
 
@@ -80,26 +75,22 @@ def get_logs(
     """
     if not process_types:
         process_types = ["user", "worker"]
-   
-   
+
     log_file_paths = []
     for process_type in process_types:
-        proc_type = ProcessType(process_type) 
-        logs = Logs(proc_type,
-                    year,
-                    month,
-                    day)
+        proc_type = ProcessType(process_type)
+        logs = Logs(proc_type, year, month, day)
         log_file_paths += [log.file_path for log in logs.log_list]
-        
+
     return log_file_paths
 
 
 @log_call
 def delete_log(
     base_file_name: str,
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> str:
     """Delete a log in the file system.
 
@@ -117,44 +108,27 @@ def delete_log(
 @log_call
 def delete_logs(
     process_types: list[str],
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> list[str]:
     """Delete log files. Use with caution, the current implementation contains little safeguarding.
 
     :param process_types: Delete logs with these process types. If no process type is given, then no logs will be deleted.
-    :param year: Delete only log files from this numeric year. Defaults to None. If no year, month,  or day is specified, 
+    :param year: Delete only log files from this numeric year. Defaults to None. If no year, month,  or day is specified,
     files from any year will be deleted.
-    :param month: Delete only log files from this numeric month. Defaults to None. If a year is  specified but not a month, 
+    :param month: Delete only log files from this numeric month. Defaults to None. If a year is  specified but not a month,
     all files from that year will be deleted.
-    :param day: Delete only log files from this numeric day. Defaults to None. If both year and month  are specified but not 
+    :param day: Delete only log files from this numeric day. Defaults to None. If both year and month  are specified but not
     a day, all files from that year and month will be deleted.
     :return: The file paths of all logs which were deleted, as absolute paths within the container's file system.
-    """    
+    """
     deleted_file_paths = []
     for process_type in process_types:
         proc_type = ProcessType(process_type)
-        logs = Logs(proc_type,
-                    year,
-                    month,
-                    day)
+        logs = Logs(proc_type, year, month, day)
         for log in logs:
             log.delete()
             deleted_file_paths.append(log.file_path)
 
     return deleted_file_paths
-
-
-
-
-
-
-
-
-
-
-
-
-
-
