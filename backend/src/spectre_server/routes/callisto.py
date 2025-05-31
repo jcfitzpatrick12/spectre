@@ -15,23 +15,15 @@ callisto_blueprint = Blueprint("callisto", __name__, url_prefix="/callisto")
 
 @callisto_blueprint.route("/instrument-codes", methods=["GET"])
 @jsendify_response
-def get_instrument_codes(
-) -> list[str]:
+def get_instrument_codes() -> list[str]:
     return callisto.get_instrument_codes()
 
 
 @callisto_blueprint.route("/batches/<int:year>/<int:month>/<int:day>", methods=["POST"])
 @jsendify_response
-def download(
-    year: int,
-    month: int,
-    day: int
-) -> list[str]:
+def download(year: int, month: int, day: int) -> list[str]:
     json = request.get_json()
     instrument_codes = json.get("instrument_codes", [])
-    batch_files = callisto.download_callisto_data(instrument_codes,
-                                                  year,
-                                                  month,
-                                                  day)
-    
-    return get_batch_file_endpoints( batch_files )
+    batch_files = callisto.download_callisto_data(instrument_codes, year, month, day)
+
+    return get_batch_file_endpoints(batch_files)

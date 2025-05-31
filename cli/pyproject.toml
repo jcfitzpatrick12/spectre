@@ -21,6 +21,9 @@ dependencies = [
     "pyyaml==6.0.2"
 ]
 
+[project.optional-dependencies]
+test = ["pytest", "mypy", "black", "types-PyYAML", "types-requests"]
+
 
 [project.scripts]
 spectre = "spectre_cli.__main__:app"

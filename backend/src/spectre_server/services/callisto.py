@@ -8,9 +8,9 @@ from datetime import date
 from spectre_core.logs import log_call
 from spectre_core import wgetting
 
+
 @log_call
-def get_instrument_codes(
-) -> list[str]:
+def get_instrument_codes() -> list[str]:
     """Get all defined e-Callisto network station codes."""
     return [code.value for code in wgetting.CallistoInstrumentCode]
 
@@ -18,7 +18,7 @@ def get_instrument_codes(
 @log_call
 def download_callisto_data(
     instrument_codes: list[str],
-    year: int, 
+    year: int,
     month: int,
     day: int,
 ) -> list[str]:
@@ -31,10 +31,10 @@ def download_callisto_data(
     :return: A list of file paths of all newly created batch files, as absolute paths within the container's file system.
     """
     codes = [wgetting.CallistoInstrumentCode(code) for code in instrument_codes]
-    
+
     batch_file_paths = []
     for code in codes:
         # TODO: Remove redundant date object return from `download_callisto_data` return
-        new_batch_files, _ = wgetting.download_callisto_data(code, year, month, day) 
-        batch_file_paths +=  new_batch_files 
+        new_batch_files, _ = wgetting.download_callisto_data(code, year, month, day)
+        batch_file_paths += new_batch_files
     return batch_file_paths

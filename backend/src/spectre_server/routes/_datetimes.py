@@ -11,28 +11,24 @@ from spectre_core.logs import parse_log_base_file_name
 from spectre_core.config import TimeFormat
 
 
-def get_date_from_batch_file_path(
-    batch_file_path: str
-) -> date:
+def get_date_from_batch_file_path(batch_file_path: str) -> date:
     """Given a batch file path, get the date it belongs to."""
-    base_file_name  = basename(batch_file_path)
+    base_file_name = basename(batch_file_path)
     start_time, _, _ = parse_batch_base_file_name(base_file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
 
 
-def get_date_from_log_file_path(
-    log_file_path: str
-) -> date:
+def get_date_from_log_file_path(log_file_path: str) -> date:
     """Given a batch file path, get the date it belongs to."""
-    base_file_name  = basename(log_file_path)
+    base_file_name = basename(log_file_path)
     start_time, _, _ = parse_log_base_file_name(base_file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
 
 
 def validate_date(
-    year: Optional[int]=None,
-    month: Optional[int]=None,
-    day: Optional[int]=None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
 ) -> None:
     """
     Validate that the provided date components follow one of the allowed patterns and do not represent a future date.
@@ -49,7 +45,7 @@ def validate_date(
         raise ValueError("Day cannot be specified without month.")
     if month is not None and year is None:
         raise ValueError("Month cannot be specified without year.")
-    
+
     # Early exit: no date provided, and no validation is required.
     if year is None:
         return
