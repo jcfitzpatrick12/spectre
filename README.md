@@ -170,7 +170,24 @@ You can also run the CLI locally, without the `spectre-cli` container.
    spectre --help
    ```
 
-## **Quick Start for Developers**
+## Contributing
+A great place to start is creating an issue in our [issue tracker](https://github.com/jcfitzpatrick12/spectre/issues).
+
+### **Making Changes**
+We follow [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow):
+
+1. Fork this repository, and create a new branch
+2. Make your changes
+3. Write or update tests (all new changes must be covered by unit tests)
+4. Run tests locally to ensure they pass
+5. Commit your changes following [conventional commits](https://www.conventionalcommits.org/)
+6. Push to your fork
+7. Open a Pull Request
+
+**⚠️ Note:**  
+You'll probably notice testing is a little sparse. To the chagrin of Michael Feathers, author of _Working Effectively with Legacy Code_, no unit tests were produced during development. Moving forward any changes _must_ be covered by unit tests.
+
+### **Quick Start for Developers**
 
 _Spectre_ development spans a few repositories:  
 
@@ -180,7 +197,7 @@ _Spectre_ development spans a few repositories:
 | [spectre-core](https://github.com/jcfitzpatrick12/spectre-core)           | Python package containing server-side implementations |
 | [gr-spectre](https://github.com/jcfitzpatrick12/gr-spectre)               | Custom GNU Radio blocks                     |
 
-To begin development, use the development Compose file:
+After you've forked the repository, you can use the development Compose file:
 
 ```bash
 docker compose --file docker-compose.dev.yml up --build
@@ -194,6 +211,3 @@ If you're working with SDRplay receivers, you will have to start the SDRplay API
 ```bash
 sdrplay_apiService & 
 ```
-
-## Contributing
-This repository is in active development. If you are interested, feel free to contact  jcfitzpatrick12@gmail.com :)
