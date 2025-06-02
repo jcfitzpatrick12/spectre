@@ -106,10 +106,11 @@ To get going, you'll need the following installed on your machine:
    This is __required__ to run the `spectre-server` as a non-root user, which is the default behaviour.
 
 3. **Start the containers**  
-   Ensure any receivers are connected, then create and run the containers:  
+   Ensure any receivers are connected, then create and run the containers in the background:  
    ```bash
-   docker compose up
+   docker compose up --detach
    ```
+   > **Optional:** Omit the `--detach` flag, if you'd like to run them in the foreground. Everything works the same, but you'll have to open a new terminal tab for the next steps.
 
 4. **Create an alias for the CLI**  
    In a new terminal tab, set up the following alias:    
@@ -185,20 +186,22 @@ _Spectre_ development spans a few repositories:
 
 ### Development Workflow
 
-We follow [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and use containerised development environments. Here's how to get started:
+We follow [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and use containerised development environments. You can take a look at our PR templates in advance to understand what we expect with contributions. 
+
+Here's how to get started:
 
 1. **Set up the development environment**  
-   Fork the repository, create your branch, and start the development containers:
+   Fork the repository, and start the development containers:
    ```bash
    git clone https://github.com/YOUR_USERNAME/spectre.git && cd spectre
-   git checkout -b your-feature-branch
    docker compose --file docker-compose.dev.yml up --build
    ```
+   > **Optional:** Update the `development` stages in each `Dockerfile` to clone your own forks, before building the images.
 
 2. **Make your changes**  
-   - Check out the PR template in advance, to see what we expect with contributions.
    - Use VS Code's [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) extension for development
-   - When working on `spectre-core` or `gr-spectre`, you can use your own forks
+   - Develop inside the `spectre-dev-server` container for work on the `backend` directory, `spectre-core` or `gr-spectre`
+   - Develop inside the `spectre-dev-cli` container for work in the `cli` directory
 
 3. **Submit your contribution**  
    - Push changes to your fork
