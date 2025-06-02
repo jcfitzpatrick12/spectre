@@ -254,7 +254,7 @@ COPY --from=sdrplay_api /opt/sdrplay_api/lib/ /usr/lib/
 
 COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/fventuri/gr-sdrplay3.git message-passing && \
+    build_from_repo https://github.com/fventuri/gr-sdrplay3.git v3.11.0.9 && \
     rm -rf /tmp/*
 
 
