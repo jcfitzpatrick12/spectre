@@ -44,7 +44,7 @@ def capture(
     minutes: int = 0,
     hours: int = 0,
     force_restart: bool = False,
-    max_restarts: int = 5
+    max_restarts: int = 5,
 ) -> str:
     """Start capturing data from an SDR in real time.
 
@@ -53,7 +53,7 @@ def capture(
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
-    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers. 
+    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
     :return: A string indicating the job has completed.
     """
@@ -72,7 +72,7 @@ def session(
     minutes: int = 0,
     hours: int = 0,
     force_restart: bool = False,
-    max_restarts: int = 5
+    max_restarts: int = 5,
 ) -> str:
     """Start capturing data from an SDR, and post-process the data in real time into spectrograms.
 
@@ -81,7 +81,7 @@ def session(
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
-    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers. 
+    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
     :return: A string indicating the job has completed.
     """
