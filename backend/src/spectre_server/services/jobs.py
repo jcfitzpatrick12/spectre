@@ -44,6 +44,7 @@ def capture(
     minutes: int = 0,
     hours: int = 0,
     force_restart: bool = False,
+    max_restarts: int = 5,
 ) -> str:
     """Start capturing data from an SDR in real time.
 
@@ -51,15 +52,16 @@ def capture(
     :param seconds: The seconds component of the total runtime, defaults to 0
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
-    :param force_restart: If any worker encounters an error at runtime, force all
-    the workers to restart their processes. Defaults to False
+    :param force_restart: Whether to restart all workers if one dies unexpectedly.
+    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
+    Only applies when force_restart is True. Defaults to 5.
     :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     capture_worker = jobs.make_worker("capture_worker", _start_capture, (tag,))
     workers = [capture_worker]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
-    jobs.start_job(workers, total_runtime, force_restart)
+    jobs.start_job(workers, total_runtime, force_restart, max_restarts)
     return "Capture complete."
 
 
@@ -70,6 +72,7 @@ def session(
     minutes: int = 0,
     hours: int = 0,
     force_restart: bool = False,
+    max_restarts: int = 5,
 ) -> str:
     """Start capturing data from an SDR, and post-process the data in real time into spectrograms.
 
@@ -77,8 +80,10 @@ def session(
     :param seconds: The seconds component of the total runtime, defaults to 0
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
-    :param force_restart: If any worker encounters an error at runtime, force all
-    the workers to restart their processes. Defaults to False
+    :param force_restart: Whether to restart all workers if one dies unexpectedly.
+    :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
+    Only applies when force_restart is True. Defaults to 5.
+    :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     post_processing_worker = jobs.make_worker(
@@ -89,5 +94,5 @@ def session(
     # start the post processing worker first, so that it sees the first files opened by the capture worker.
     workers = [post_processing_worker, capture_worker]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
-    jobs.start_job(workers, total_runtime, force_restart)
+    jobs.start_job(workers, total_runtime, force_restart, max_restarts)
     return "Session complete."
