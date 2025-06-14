@@ -20,7 +20,8 @@ def capture() -> str:
     minutes = json.get("minutes")
     hours = json.get("hours")
     force_restart = json.get("force_restart")
-    return jobs.capture(tag, seconds, minutes, hours, force_restart)
+    max_restarts = json.get("max_restarts")
+    return jobs.capture(tag, seconds, minutes, hours, force_restart, max_restarts)
 
 
 @jobs_blueprint.route("/session", methods=["POST"])
@@ -32,4 +33,5 @@ def session() -> str:
     minutes = json.get("minutes")
     hours = json.get("hours")
     force_restart = json.get("force_restart")
-    return jobs.session(tag, seconds, minutes, hours, force_restart)
+    max_restarts = json.get("max_restarts")
+    return jobs.session(tag, seconds, minutes, hours, force_restart, max_restarts)
