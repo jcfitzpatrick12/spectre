@@ -17,11 +17,11 @@ def _calculate_total_runtime(
         raise ValueError(f"Total duration must be strictly positive.")
     return total_duration
 
+
 @log_call
-def _start_post_processing(
-    tag: str
-) -> None:
+def _start_post_processing(tag: str) -> None:
     start_post_processor(tag)
+
 
 @log_call
 def _start_capture(
