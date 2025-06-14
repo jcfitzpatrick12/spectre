@@ -52,7 +52,7 @@ def capture(
     :param seconds: The seconds component of the total runtime, defaults to 0
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
-    :param force_restart: Whether to restart all workers if one exits unexpectedly.
+    :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers. 
     Only applies when force_restart is True. Defaults to 5.
     :return: A string indicating the job has completed.
@@ -80,7 +80,7 @@ def session(
     :param seconds: The seconds component of the total runtime, defaults to 0
     :param minutes: The minutes component of the total runtime, defaults to 0
     :param hours: The hours component of the total runtime, defaults to 0
-    :param force_restart: Whether to restart all workers if one exits unexpectedly.
+    :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers. 
     Only applies when force_restart is True. Defaults to 5.
     :return: A string indicating the job has completed.
