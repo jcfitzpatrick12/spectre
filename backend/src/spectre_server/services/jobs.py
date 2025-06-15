@@ -24,7 +24,8 @@ def _start_post_processing(tag: str) -> None:
     start_post_processor(tag)
 
 
-# Decorate with `log_call`, so that log records are written to file if the function errors out when called by a worker.@log_call
+# Decorate with `log_call`, so that log records are written to file if the function errors out when called by a worker.
+@log_call
 def _start_capture(
     tag: str,
 ) -> None:
