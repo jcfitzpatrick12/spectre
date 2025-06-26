@@ -27,15 +27,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     liblog4cpp5-dev \
     libspdlog1 \
     libuhd4.1.0 \
+    libfftw3-3 \
+    libsoapysdr0.8 \
+    soapysdr-tools \
     libboost-program-options1.74.0 \
     libboost-thread1.74.0 \
     libboost-chrono1.74.0 \
     libboost-filesystem1.74.0 \
     libboost-system1.74.0 \
-    libboost-serialization1.74.0 \
-    libsoapysdr0.8 \
-    soapysdr-tools \
-    libfftw3-3 && \
+    libboost-serialization1.74.0 && \
     rm -rf /var/lib/apt/lists/*
 
 # -------------------------------------- # 
@@ -47,12 +47,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     cmake \
     build-essential \
-    gnuradio-dev \
-    libusb-1.0-0-dev \
-    libsoapysdr-dev \
-    libspdlog-dev \
-    libudev-dev \
-    pybind11-dev \
+    twine \
+    python3-dev \
     python3-packaging \
     python3-pip \
     python3-setuptools \
@@ -60,8 +56,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-mako \
     python3-numpy \
     python3-build \
-    python3-yaml && \
-    python3 -m pip install --upgrade pip setuptools build && \
+    python3-venv \
+    python3-yaml \
+    pybind11-dev \
+    libusb-1.0-0-dev \
+    libsoapysdr-dev \
+    libspdlog-dev \
+    libudev-dev \
+    libfftw3-dev \
+    libgmp-dev \
+    libgsm1-dev \
+    libthrift-dev \
+    libcppunit-dev \
+    libboost-program-options1.74-dev \
+    libboost-thread1.74-dev \
+    libboost-chrono1.74-dev \
+    libboost-filesystem1.74-dev \
+    libboost-system1.74-dev \
+    libboost-serialization1.74-dev \
+    libboost-date-time1.74-dev \
+    libboost-regex1.74-dev \
+    libboost-test1.74-dev && \
+    python3 -m pip install --upgrade pip setuptools build twine && \
     rm -rf /var/lib/apt/lists/*
 
 # --------------------------------------------- #
@@ -88,17 +104,19 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     -DENABLE_MAN_PAGES=OFF \
     -DENABLE_DOXYGEN=OFF \
     -DENABLE_MANUAL=OFF \
+    -DENABLE_SIM=OFF \
+    -DENABLE_MPMD=OFF \
+    -DENABLE_OCTOCLOCK=OFF \
+    -DENABLE_B100=OFF \
     -DENABLE_C_API=OFF \
     -DENABLE_USRP2=OFF \
     -DENABLE_X300=OFF \
     -DENABLE_X400=OFF \
     -DENABLE_N300=OFF \
+    -DENABLE_E320=OFF \
+    -DENABLE_E300=OFF \
     -DENABLE_N320=OFF \
-    -DENABLE_SIM=OFF \
-    -DENABLE_MPMD=OFF \
-    -DENABLE_B100=OFF \
     -DENABLE_USRP1=OFF \
-    -DENABLE_OCTOCLOCK=OFF \
     .. && \
     make -j"$(nproc)" && \
     make install && \
@@ -152,10 +170,9 @@ COPY --from=volk /opt/volk/include /usr/include
 COPY --from=volk /opt/volk/lib /usr/lib
 COPY --from=volk /opt/volk/bin /usr/bin
 
-# Minimal GNU Radio install, to reduce image size. In particular, our installation is headless.
-# NOTE: Currently using a custom fork with a one-line patch (see PR: https://github.com/gnuradio/gnuradio/pull/7751),
-# because the fix is in the latest maint-3.10 but the cloned OOT modules are not yet compatible with it.
-# TODO: Revert to the official GNU Radio maint-3.10 branch once OOT module compatibility is resolved.
+# Minimal GNU Radio install, to reduce image size. Notably, our installation is headless.
+# Currently using a custom fork with a one-line patch (see PR: https://github.com/gnuradio/gnuradio/pull/7751
+# TODO: Build GNU Radio from an official branch. See https://github.com/jcfitzpatrick12/spectre/issues/108
 RUN git clone --branch v3.10.1.1-streamtag-fix --depth 1 https://github.com/jcfitzpatrick12/gnuradio.git && \
     cd gnuradio && \
     mkdir build && \
@@ -209,7 +226,6 @@ ARG SDRPLAY_API_PATCH=2
 ARG SDRPLAY_VERSION=${SDRPLAY_API_MAJ_MIN}.${SDRPLAY_API_PATCH}
 ARG SDRPLAY_API_LIB=libsdrplay_api
 
-# Install the SDRplay API.
 RUN mkdir -p /opt/sdrplay_api/include \
              /opt/sdrplay_api/lib \
              /opt/sdrplay_api/bin \
@@ -224,7 +240,6 @@ RUN mkdir -p /opt/sdrplay_api/include \
     ln --symbolic ${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/${SDRPLAY_API_LIB}.so.3 && \
     ln --symbolic ${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/${SDRPLAY_API_LIB}.so && \
     rm -rf /tmp/*
-
 
 # --------------------------------------------- #
 # Create an executable to find SDRplay devices.
@@ -241,18 +256,39 @@ RUN mkdir -p /opt/sdrplay_find_devices/bin && \
     g++ sdrplay_find_devices.cpp -l sdrplay_api -o /opt/sdrplay_find_devices/bin/sdrplay_find_devices && \
     rm -rf /tmp/*
 
+# --------------------------------------------- #
+# Shared build dependencies for OOT modules.
+# --------------------------------------------- #
+FROM build AS oot_module
+
+WORKDIR /tmp
+
+# Copy in the GNU Radio dependencies.
+COPY --from=uhd /opt/uhd/include /usr/include
+COPY --from=uhd /opt/uhd/lib /usr/lib
+COPY --from=uhd /opt/uhd/bin /usr/bin
+COPY --from=uhd /opt/uhd/share /usr/share
+
+COPY --from=volk /opt/volk/include /usr/include
+COPY --from=volk /opt/volk/lib /usr/lib
+COPY --from=volk /opt/volk/bin /usr/bin
+
+COPY --from=gnuradio /opt/gnuradio/lib /usr/lib
+COPY --from=gnuradio /opt/gnuradio/bin /usr/bin
+COPY --from=gnuradio /opt/gnuradio/share /usr/share
+COPY --from=gnuradio /opt/gnuradio/include /usr/include
+
+# A bash script used to build OOT modules consistently.
+COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 
 # --------------------------------------------- #
 # Install the gr-sdrplay3 OOT module.
 # --------------------------------------------- #
-FROM build AS gr_sdrplay3
-
-WORKDIR /tmp
+FROM oot_module AS gr_sdrplay3
 
 COPY --from=sdrplay_api /opt/sdrplay_api/include/ /usr/include/
 COPY --from=sdrplay_api /opt/sdrplay_api/lib/ /usr/lib/
 
-COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/fventuri/gr-sdrplay3.git v3.11.0.9 && \
     rm -rf /tmp/*
@@ -261,11 +297,8 @@ RUN . ./build_oot_module.sh && \
 # --------------------------------------------- #
 # Install the gr-spectre OOT module.
 # --------------------------------------------- #
-FROM build AS gr_spectre
+FROM oot_module AS gr_spectre
 
-WORKDIR /tmp
-
-COPY --chmod=0755 ./scripts/bash/build_oot_module.sh build_oot_module.sh
 RUN . ./build_oot_module.sh && \
     build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v0.0.4 && \
     rm -rf /tmp/*
@@ -280,7 +313,6 @@ RUN . ./build_oot_module.sh && \
 # final runtime image later.
 FROM base AS spectre_server
 
-# Set up a working directory for the Python build
 WORKDIR /tmp/spectre_server
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -288,17 +320,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 -m pip install --upgrade pip && \
     rm -rf /var/lib/apt/lists/*
 
-
 # Copy in the source code and build requirements.
 COPY pyproject.toml ./
 COPY src src
 
-# Finally, install the Python dependencies into the virtual environment.
+# Finally, install the Python dependencies system wide.
 RUN pip install . && \
     rm -rf /tmp/*
 
 COPY gunicorn.conf.py /opt/spectre_server/
-
 
 # --------------------------------- # 
 # Create the final runtime image.
@@ -375,31 +405,42 @@ CMD ["/app/cmd.sh"]
 # --------------------------------- # 
 # Create the development stage.
 # --------------------------------- # 
-FROM runtime AS development
+FROM base AS development
 
-# Broadly copy in all the build dependencies.
+LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+      version="0.0.14" \
+      description="Docker image for  developing the `spectre-server`." \
+      license="GPL-3.0-or-later"
+
+WORKDIR /app
+
+ENV SPECTRE_DATA_DIR_PATH="/app/.spectre-data"
+ENV MPLCONFIGDIR="/app/.mplconfigdir"
+ENV UHD_IMAGES_DIR="/usr/share/uhd/images"
+
+# Broadly copy in the build dependencies.
 COPY --from=build /usr /usr
 
-# Install extra development tools.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    vim \
-    python3-venv \
-    twine && \
-    python3 -m pip install --upgrade twine && \  
-    rm -rf /var/lib/apt/lists/*
+# Broadly copy in the runtime dependencies.
+COPY --from=runtime /usr /usr
 
-# Clone the `spectre` repository and install the server in editable mode
+# GNU Radio header files.
+COPY --from=uhd /opt/uhd/include /usr/include
+COPY --from=volk /opt/volk/include /usr/include
+COPY --from=gnuradio /opt/gnuradio/include /usr/include
+
+# Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
 RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set backend/ && \
     git checkout && \
     pip install --editable backend/[test]
 
-# Get the latest version of `spectre-core` and install it in editable mode
+# Get the latest version of `spectre-core`, overriding that from the `runtime` stage.
 RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
     pip install --editable .[test]
 
-# Get the latest version of `gr-spectre`.
+# Get the latest version of `gr-spectre`, but don't build it by default.
 RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git
         
 # Disable the existing entrypoint and start up commands, and run as root.
