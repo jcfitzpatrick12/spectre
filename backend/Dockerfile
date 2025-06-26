@@ -408,7 +408,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="0.0.14" \
+      version="0.0.15" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
