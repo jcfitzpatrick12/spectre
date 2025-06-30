@@ -91,6 +91,7 @@ def delete_log(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
+    dry_run: bool = False,
 ) -> str:
     """Delete a log in the file system.
 
@@ -98,10 +99,12 @@ def delete_log(
     :param year: Delete a log under this numeric year. Defaults to None.
     :param month: Delete a log under this numeric month. Defaults to None.
     :param day: Delete a log under this numeric day. Defaults to None.
+    :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted log file, as an absolute path in the container's file system.
     """
     log = _get_log(file_name, year, month, day)
-    log.delete()
+    if not dry_run:
+        log.delete()
     return log.file_path
 
 
@@ -111,6 +114,7 @@ def delete_logs(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
+    dry_run: bool = False,
 ) -> list[str]:
     """Delete log files. Use with caution, the current implementation contains little safeguarding.
 
@@ -121,6 +125,7 @@ def delete_logs(
     all files from that year will be deleted.
     :param day: Delete only log files from this numeric day. Defaults to None. If both year and month  are specified but not
     a day, all files from that year and month will be deleted.
+    :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file paths of all logs which were deleted, as absolute paths within the container's file system.
     """
     deleted_file_paths = []
@@ -128,7 +133,8 @@ def delete_logs(
         proc_type = ProcessType(process_type)
         logs = Logs(proc_type, year, month, day)
         for log in logs:
-            log.delete()
+            if not dry_run:
+                log.delete()
             deleted_file_paths.append(log.file_path)
 
     return deleted_file_paths

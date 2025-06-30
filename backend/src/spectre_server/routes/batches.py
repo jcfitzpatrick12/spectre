@@ -7,7 +7,7 @@ from flask import Blueprint, request, url_for, Response
 from os.path import basename
 
 from ..services import batches
-from ._datetimes import validate_date, get_date_from_batch_file_path
+from ._utils import validate_date, get_date_from_batch_file_path, is_true
 from ._format_responses import jsendify_response, serve_from_directory
 
 
@@ -49,7 +49,10 @@ def get_batch_file(year: int, month: int, day: int, file_name: str) -> Response:
 @jsendify_response
 def delete_batch_file(year: int, month: int, day: int, file_name: str) -> str:
     validate_date(year, month, day)
-    batch_file_path = batches.delete_batch_file(file_name, year, month, day)
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
+    batch_file_path = batches.delete_batch_file(
+        file_name, year, month, day, dry_run=dry_run
+    )
     return get_batch_file_endpoint(batch_file_path)
 
 
@@ -104,8 +107,11 @@ def get_batch_files() -> list[str]:
 def delete_batch_files_year_month_day(year: int, month: int, day: int) -> list[str]:
     extensions = request.args.getlist("extension")
     tags = request.args.getlist("tag")
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month, day)
-    batch_files = batches.delete_batch_files(tags, extensions, year, month, day)
+    batch_files = batches.delete_batch_files(
+        tags, extensions, year, month, day, dry_run=dry_run
+    )
     return get_batch_file_endpoints(batch_files)
 
 
@@ -117,8 +123,11 @@ def delete_batch_files_year_month(
 ) -> list[str]:
     extensions = request.args.getlist("extension")
     tags = request.args.getlist("tag")
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month)
-    batch_files = batches.delete_batch_files(tags, extensions, year, month)
+    batch_files = batches.delete_batch_files(
+        tags, extensions, year, month, dry_run=dry_run
+    )
     return get_batch_file_endpoints(batch_files)
 
 
@@ -129,8 +138,9 @@ def delete_batch_files_year(
 ) -> list[str]:
     extensions = request.args.getlist("extension")
     tags = request.args.getlist("tag")
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year)
-    batch_files = batches.delete_batch_files(tags, extensions, year)
+    batch_files = batches.delete_batch_files(tags, extensions, year, dry_run=dry_run)
     return get_batch_file_endpoints(batch_files)
 
 
@@ -139,7 +149,9 @@ def delete_batch_files_year(
 def delete_batch_files() -> list[str]:
     extensions = request.args.getlist("extension")
     tags = request.args.getlist("tag")
-    batch_files = batches.delete_batch_files(tags, extensions)
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
+    print(dry_run)
+    batch_files = batches.delete_batch_files(tags, extensions, dry_run=dry_run)
     return get_batch_file_endpoints(batch_files)
 
 

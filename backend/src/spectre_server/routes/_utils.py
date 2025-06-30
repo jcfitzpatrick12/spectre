@@ -60,3 +60,8 @@ def validate_date(
 
     if constructed > today:
         raise ValueError("Date cannot be in the future.")
+
+
+def is_true(value: str):
+    """Truthy callable for boolean query parameter values."""
+    return value.lower() == "true"

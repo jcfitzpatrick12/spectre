@@ -5,7 +5,12 @@
 from typer import Typer, Option, Exit
 
 from ._utils import safe_request, build_date_path, get_capture_config_file_name
-from ._secho_resources import secho_stale_resource, secho_stale_resources
+from ._secho_resources import (
+    secho_stale_resource,
+    secho_stale_resources,
+    secho_existing_resource,
+    secho_existing_resources,
+)
 
 
 delete_typer = Typer(help="Delete resources.")
@@ -26,10 +31,17 @@ def logs(
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),
+    dry_run: bool = Option(
+        False,
+        "--dry-run",
+        help="Display which files would be deleted without actually deleting them.",
+    ),
 ) -> None:
-    params = {
-        "process_type": process_types,
-    }
+    if dry_run:
+        non_interactive = True
+
+    params = {"process_type": process_types, "dry_run": dry_run}
+
     jsend_dict = safe_request(
         f"spectre-data/logs/{build_date_path(year, month, day)}",
         "DELETE",
@@ -38,7 +50,10 @@ def logs(
         non_interactive=non_interactive,
     )
     endpoints = jsend_dict["data"]
-    secho_stale_resources(endpoints)
+    if not dry_run:
+        secho_stale_resources(endpoints)
+    else:
+        secho_existing_resources(endpoints)
     raise Exit()
 
 
@@ -62,8 +77,15 @@ def batch_files(
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),
+    dry_run: bool = Option(
+        False,
+        "--dry-run",
+        help="Display which files would be deleted without actually deleting them.",
+    ),
 ) -> None:
-    params = {"extension": extensions, "tag": tags}
+    if dry_run:
+        non_interactive = True
+    params = {"extension": extensions, "tag": tags, "dry_run": dry_run}
     jsend_dict = safe_request(
         f"spectre-data/batches/{build_date_path(year, month, day)}",
         "DELETE",
@@ -72,7 +94,10 @@ def batch_files(
         non_interactive=non_interactive,
     )
     endpoints = jsend_dict["data"]
-    secho_stale_resources(endpoints)
+    if not dry_run:
+        secho_stale_resources(endpoints)
+    else:
+        secho_existing_resources(endpoints)
     raise Exit()
 
 
@@ -85,16 +110,26 @@ def capture_config(
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),
+    dry_run: bool = Option(
+        False,
+        "--dry-run",
+        help="Display which files would be deleted without actually deleting them.",
+    ),
 ) -> None:
-
+    if dry_run:
+        non_interactive = True
     file_name = get_capture_config_file_name(file_name, tag)
-
+    params = {"dry_run": dry_run}
     jsend_dict = safe_request(
         f"spectre-data/configs/{tag}.json",
         "DELETE",
+        params=params,
         require_confirmation=True,
         non_interactive=non_interactive,
     )
     endpoint = jsend_dict["data"]
-    secho_stale_resource(endpoint)
+    if not dry_run:
+        secho_stale_resource(endpoint)
+    else:
+        secho_existing_resource(endpoint)
     raise Exit()
