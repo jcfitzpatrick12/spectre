@@ -58,50 +58,6 @@ def get_capture_configs() -> list[str]:
     return [entry.path for entry in scandir(config_dir)]
 
 
-@log_call
-def create_capture_config(
-    file_name: str,
-    receiver_name: str,
-    receiver_mode: str,
-    string_parameters: Optional[list[str]] = None
-) -> str:
-    """Create a capture config.
-
-    :param file_name: The file name of the capture config.
-    :param receiver_name: The name of the receiver used for capture.
-    :param receiver_mode: The operating mode for the receiver to be used for capture.
-    :param string_parameters: The parameters to store in the capture config. Specifically,
-    A list of strings of the form `a=b`, where each element is interpreted as a parameter
-    with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
-    :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
-    """
-    if string_parameters is None:
-        string_parameters = []
-
-    name = ReceiverName(receiver_name)
-    receiver = get_receiver(name, mode=receiver_mode)
-
-    parameters = make_parameters(parse_string_parameters(string_parameters))
-
-    tag, extension = splitext(file_name)
-
-    if extension != ".json":
-        raise ValueError(
-            "Capture config file names must be of the form <tag>.json"
-        )
-
-    receiver.save_parameters(tag, parameters, force=True)
-
-    # create an instance of the newly created capture config
-    capture_config = _get_capture_config(file_name)
-
-    _LOGGER.info(
-        f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}"
-    )
-
-    return capture_config.file_path
-
-
 def _has_batches(tag: str) -> bool:
     """Returns True if any files exist under the input tag."""
     batch_cls = get_batch_cls_from_tag(tag)
@@ -128,6 +84,54 @@ def _caution_update(tag: str, force: bool) -> None:
             )
             _LOGGER.error(error_message)
             raise FileExistsError(error_message)
+
+
+@log_call
+def create_capture_config(
+    file_name: str,
+    receiver_name: str,
+    receiver_mode: str,
+    string_parameters: Optional[list[str]] = None,
+    force: bool = False
+) -> str:
+    """Create a capture config.
+
+    :param file_name: The file name of the capture config.
+    :param receiver_name: The name of the receiver used for capture.
+    :param receiver_mode: The operating mode for the receiver to be used for capture.
+    :param string_parameters: The parameters to store in the capture config. Specifically,
+    A list of strings of the form `a=b`, where each element is interpreted as a parameter
+    with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
+    :param force: If True, force the creation even if batches exist with the input tag. Defaults to False
+    :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
+    """
+    if string_parameters is None:
+        string_parameters = []
+
+    name = ReceiverName(receiver_name)
+    receiver = get_receiver(name, mode=receiver_mode)
+
+    parameters = make_parameters(parse_string_parameters(string_parameters))
+
+    tag, extension = splitext(file_name)
+    
+    _caution_update(tag, force)
+
+    if extension != ".json":
+        raise ValueError(
+            "Capture config file names must be of the form <tag>.json"
+        )
+
+    receiver.save_parameters(tag, parameters, force=True)
+
+    # create an instance of the newly created capture config
+    capture_config = _get_capture_config(file_name)
+
+    _LOGGER.info(
+        f"The capture-config for tag '{tag}' has been created: {capture_config.file_name}"
+    )
+
+    return capture_config.file_path
 
 
 @log_call
