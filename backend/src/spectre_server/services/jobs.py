@@ -60,7 +60,12 @@ def capture(
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     capture_worker = jobs.make_worker(
-        "capture_worker", _start_capture, (tag, validate,)
+        "capture_worker",
+        _start_capture,
+        (
+            tag,
+            validate,
+        ),
     )
     workers = [capture_worker]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
@@ -94,7 +99,14 @@ def session(
     post_processing_worker = jobs.make_worker(
         "post_processing_worker", _start_post_processing, (tag,)
     )
-    capture_worker = jobs.make_worker("capture_worker", _start_capture, (tag, validate,))
+    capture_worker = jobs.make_worker(
+        "capture_worker",
+        _start_capture,
+        (
+            tag,
+            validate,
+        ),
+    )
 
     # start the post processing worker first, so that it sees the first files opened by the capture worker.
     workers = [post_processing_worker, capture_worker]
