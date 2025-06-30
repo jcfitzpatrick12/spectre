@@ -22,7 +22,7 @@ from spectre_core.capture_configs import (
 
 
 def _get_capture_config(file_name: str) -> CaptureConfig:
-    """Get a capture config instance from it's file name."""
+    """Get a capture config instance from its file name."""
     tag, _ = splitext(file_name)
     return CaptureConfig(tag)
 
