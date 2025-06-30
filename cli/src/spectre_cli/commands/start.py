@@ -46,7 +46,7 @@ def capture(
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not apply the capture template and do not validate capture config parameters.",
+        help="If specified, do not validate capture config parameters.",
     ),
 ) -> None:
     json = {
@@ -96,7 +96,7 @@ def session(
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not apply the capture template and do not validate capture config parameters.",
+        help="If specified, do not validate capture config parameters.",
     ),
 ) -> None:
     json = {
