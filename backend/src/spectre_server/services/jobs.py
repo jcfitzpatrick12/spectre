@@ -26,14 +26,14 @@ def _start_post_processing(tag: str) -> None:
 
 # Decorate with `log_call`, so that log records are written to file if the function errors out when called by a worker.
 @log_call
-def _start_capture(tag: str, skip_validation: bool = False) -> None:
+def _start_capture(tag: str, validate: bool = True) -> None:
     # load the receiver and mode from the capture config file
     capture_config = CaptureConfig(tag)
 
     # start capturing data from the receiver.
     name = ReceiverName(capture_config.receiver_name)
     receiver = get_receiver(name, capture_config.receiver_mode)
-    receiver.start_capture(tag, skip_validation)
+    receiver.start_capture(tag, validate)
 
 
 @log_call
@@ -44,7 +44,7 @@ def capture(
     hours: int = 0,
     force_restart: bool = False,
     max_restarts: int = 5,
-    skip_validation: bool = False,
+    validate: bool = True,
 ) -> str:
     """Start capturing data from an SDR in real time.
 
@@ -55,12 +55,12 @@ def capture(
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
-    :param skip_validation: If True, skip validating the capture config. Defaults to False.
+    :param validate: If True, validate the capture config. Defaults to False.
     :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     capture_worker = jobs.make_worker(
-        "capture_worker", _start_capture, (tag, skip_validation)
+        "capture_worker", _start_capture, (tag, validate,)
     )
     workers = [capture_worker]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
@@ -76,7 +76,7 @@ def session(
     hours: int = 0,
     force_restart: bool = False,
     max_restarts: int = 5,
-    skip_validation: bool = False,
+    validate: bool = True,
 ) -> str:
     """Start capturing data from an SDR, and post-process the data in real time into spectrograms.
 
@@ -87,14 +87,14 @@ def session(
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
-    :param skip_validation: If True, skip validating the capture config. Defaults to False.
+    :param validate: If True, validate the capture config. Defaults to False.
     :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     post_processing_worker = jobs.make_worker(
         "post_processing_worker", _start_post_processing, (tag,)
     )
-    capture_worker = jobs.make_worker("capture_worker", _start_capture, (tag, skip_validation,))
+    capture_worker = jobs.make_worker("capture_worker", _start_capture, (tag, validate,))
 
     # start the post processing worker first, so that it sees the first files opened by the capture worker.
     workers = [post_processing_worker, capture_worker]
