@@ -60,8 +60,8 @@ def analytical(
     day: int = Option(
         ..., "--day", "-d", help="Test a spectrogram file under this numeric day."
     ),
-    base_file_name: str = Option(
-        ..., "-f", help="Test a spectrogram file with this base file name."
+    file_name: str = Option(
+        ..., "-f", help="Test a spectrogram file with this file name."
     ),
     absolute_tolerance: float = Option(
         1e-3,
@@ -80,13 +80,13 @@ def analytical(
         "absolute_tolerance": absolute_tolerance,
     }
     jsend_dict = safe_request(
-        f"spectre-data/batches/{year}/{month}/{day}/{base_file_name}/analytical-test-results",
+        f"spectre-data/batches/{year}/{month}/{day}/{file_name}/analytical-test-results",
         "GET",
         params=params,
     )
     test_results = jsend_dict["data"]
     _pretty_print_test_results(
-        base_file_name,
+        file_name,
         test_results["times_validated"],
         test_results["frequencies_validated"],
         test_results["spectrum_validated"],
