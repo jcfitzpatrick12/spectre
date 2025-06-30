@@ -92,6 +92,7 @@ def create_capture_config(
     receiver_name: str,
     receiver_mode: str,
     string_parameters: Optional[list[str]] = None,
+    force: bool = False,
     validate: bool = True
 ) -> str:
     """Create a capture config.
@@ -102,6 +103,7 @@ def create_capture_config(
     :param string_parameters: The parameters to store in the capture config. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
+    :param force: If True, force the update even if batches exist with the input tag. Defaults to False
     :param validate: If True, apply the capture template and validate capture config parameters. Defaults to True.
     :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
     """
@@ -119,6 +121,11 @@ def create_capture_config(
         raise ValueError(
             "Capture config file names must be of the form <tag>.json"
         )
+    
+    capture_config = _get_capture_config(file_name)
+    # If the capture config already exists, check if batches exist under the tag.
+    if capture_config.exists:
+        _caution_update(tag, force)
 
     receiver.save_parameters(tag, parameters, validate=validate, force=True)
 
