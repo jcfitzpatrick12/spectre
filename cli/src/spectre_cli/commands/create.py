@@ -26,12 +26,6 @@ def capture_config(
     params: List[str] = Option(
         [], "--param", "-p", help="Parameters as key-value pairs.", metavar="KEY=VALUE"
     ),
-    force: bool = Option(
-        False,
-        "--force",
-        help="If a capture config already exists with the same tag, overwrite it.",
-        is_flag=True,
-    ),
 ) -> None:
 
     file_name = get_capture_config_file_name(file_name, tag)
@@ -39,8 +33,7 @@ def capture_config(
     json = {
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
-        "string_parameters": params,
-        "force": force,
+        "string_parameters": params
     }
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PUT", json=json)
     endpoint = jsend_dict["data"]
