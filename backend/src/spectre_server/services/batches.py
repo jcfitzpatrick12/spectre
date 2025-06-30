@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Optional, Tuple
+from typing import Optional
 from os.path import splitext
 from os import walk
 from datetime import date, time, datetime

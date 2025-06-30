@@ -2,9 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Tuple
-from datetime import date
-
 from spectre_core.logs import log_call
 from spectre_core import wgetting
 
