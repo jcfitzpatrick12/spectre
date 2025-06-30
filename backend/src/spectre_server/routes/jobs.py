@@ -21,9 +21,9 @@ def capture() -> str:
     hours = json.get("hours")
     force_restart = json.get("force_restart")
     max_restarts = json.get("max_restarts")
-    skip_validation = json.get("skip_validation")
+    validate = json.get("validate")
     return jobs.capture(
-        tag, seconds, minutes, hours, force_restart, max_restarts, skip_validation
+        tag, seconds, minutes, hours, force_restart, max_restarts, validate
     )
 
 
@@ -37,7 +37,7 @@ def session() -> str:
     hours = json.get("hours")
     force_restart = json.get("force_restart")
     max_restarts = json.get("max_restarts")
-    skip_validation = json.get("skip_validation")
+    validate = json.get("validate")
     return jobs.session(
-        tag, seconds, minutes, hours, force_restart, max_restarts, skip_validation
+        tag, seconds, minutes, hours, force_restart, max_restarts, validate
     )
