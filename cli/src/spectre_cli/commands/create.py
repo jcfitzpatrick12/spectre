@@ -43,6 +43,7 @@ def capture_config(
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
         "string_parameters": params,
+        "force": force,
         "validate": not skip_validation,
     }
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PUT", json=json)
