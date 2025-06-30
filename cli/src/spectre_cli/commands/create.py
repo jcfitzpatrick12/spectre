@@ -26,14 +26,24 @@ def capture_config(
     params: List[str] = Option(
         [], "--param", "-p", help="Parameters as key-value pairs.", metavar="KEY=VALUE"
     ),
+    force: bool = Option(
+        False,
+        "--force",
+        help="If specified, force the creation even if batch files exist with the capture config tag."
+    ),
+    skip_validation: bool = Option(
+        False,
+        "--skip-validation",
+        help="If specified, do not apply the capture template and do not validate capture config parameters."
+    )
 ) -> None:
-
     file_name = get_capture_config_file_name(file_name, tag)
 
     json = {
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
-        "string_parameters": params
+        "string_parameters": params,
+        "validate": not skip_validation,
     }
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PUT", json=json)
     endpoint = jsend_dict["data"]
