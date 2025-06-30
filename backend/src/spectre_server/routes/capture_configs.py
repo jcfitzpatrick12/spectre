@@ -64,9 +64,11 @@ def create_capture_config(file_name: str) -> str:
     receiver_name = json.get("receiver_name")
     receiver_mode = json.get("receiver_mode")
     string_parameters = json.get("string_parameters")
+    force = json.get("force")
+    validate = json.get("validate")
 
     capture_config_file_path = capture_configs.create_capture_config(
-        file_name, receiver_name, receiver_mode, string_parameters
+        file_name, receiver_name, receiver_mode, string_parameters, force=force, validate=validate
     )
 
     return _get_capture_config_endpoint(capture_config_file_path)
@@ -85,9 +87,10 @@ def update_capture_config(file_name: str) -> str:
     json = request.get_json()
     string_parameters = json.get("params")
     force = json.get("force")
+    validate = json.get("validate")
 
     capture_config_file_path = capture_configs.update_capture_config(
-        file_name, string_parameters, force
+        file_name, string_parameters, force=force, validate=validate
     )
 
     return _get_capture_config_endpoint(capture_config_file_path)
