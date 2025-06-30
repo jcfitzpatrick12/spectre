@@ -8,7 +8,7 @@ from os.path import basename
 
 from ..services import logs
 from ._format_responses import jsendify_response, serve_from_directory
-from ._datetimes import get_date_from_log_file_path, validate_date
+from ._utils import get_date_from_log_file_path, validate_date, is_true
 
 
 logs_blueprint = Blueprint("logs", __name__, url_prefix="/spectre-data/logs")
@@ -97,18 +97,20 @@ def get_logs() -> list[str]:
 )
 @jsendify_response
 def delete_log(year: int, month: int, day: int, file_name: str) -> str:
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month, day)
-    log_file = logs.delete_log(file_name, year, month, day)
+    log_file = logs.delete_log(file_name, year, month, day, dry_run=dry_run)
     return _get_log_file_endpoint(log_file)
 
 
 @logs_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["DELETE"])
 @jsendify_response
 def delete_logs_year_month_day(year: int, month: int, day: int) -> list[str]:
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month, day)
     process_types = request.args.getlist("process_type")
 
-    log_files = logs.delete_logs(process_types, year, month, day)
+    log_files = logs.delete_logs(process_types, year, month, day, dry_run=dry_run)
 
     return _get_log_file_endpoints(log_files)
 
@@ -120,8 +122,9 @@ def delete_logs_year_month(
     month: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month)
-    log_files = logs.delete_logs(process_types, year, month)
+    log_files = logs.delete_logs(process_types, year, month, dry_run=dry_run)
 
     return _get_log_file_endpoints(log_files)
 
@@ -132,8 +135,9 @@ def delete_logs_year(
     year: int,
 ) -> list[str]:
     process_types = request.args.getlist("process_type")
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
     validate_date(year)
-    log_files = logs.delete_logs(process_types, year)
+    log_files = logs.delete_logs(process_types, year, dry_run=dry_run)
 
     return _get_log_file_endpoints(log_files)
 
@@ -142,6 +146,6 @@ def delete_logs_year(
 @jsendify_response
 def delete_logs() -> list[str]:
     process_types = request.args.getlist("process_type")
-
-    log_files = logs.delete_logs(process_types)
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
+    log_files = logs.delete_logs(process_types, dry_run=dry_run)
     return _get_log_file_endpoints(log_files)

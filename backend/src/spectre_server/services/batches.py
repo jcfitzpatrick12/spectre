@@ -115,6 +115,7 @@ def delete_batch_file(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
+    dry_run: bool = False,
 ) -> str:
     """Delete a batch file in the file system.
 
@@ -122,10 +123,12 @@ def delete_batch_file(
     :param year: Delete a batch file under this numeric year. Defaults to None.
     :param month: Delete a batch file under this numeric month. Defaults to None.
     :param day: Delete a batch file under this numeric day. Defaults to None.
+    :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
     batch_file = _get_batch_file(file_name, year, month, day)
-    batch_file.delete()
+    if not dry_run:
+        batch_file.delete()
     return batch_file.file_path
 
 
@@ -136,6 +139,7 @@ def delete_batch_files(
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
+    dry_run: bool = False,
 ) -> list[str]:
     """Delete batch files. Use with caution, the current implementation contains little safeguarding.
 
@@ -144,6 +148,7 @@ def delete_batch_files(
     :param year: Delete batch files under only numeric year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
     :param month: Delete batch files under only this numeric month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
     :param day: Delete batch files under only this numeric day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
+    :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file paths of batch files which have been successfully deleted, as absolute paths within the container's file system.
     """
     deleted_batch_files = []
@@ -155,7 +160,8 @@ def delete_batch_files(
             for extension in extensions:
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
-                    batch_file.delete()
+                    if not dry_run:
+                        batch_file.delete()
                     deleted_batch_files.append(batch_file.file_path)
     return deleted_batch_files
 

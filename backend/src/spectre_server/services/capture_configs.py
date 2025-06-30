@@ -181,12 +181,11 @@ def update_capture_config(
 
 
 @log_call
-def delete_capture_config(
-    file_name: str,
-) -> str:
+def delete_capture_config(file_name: str, dry_run: bool = False) -> str:
     """Delete a capture config.
 
     :param file_name: The file_name of the capture config.
+    :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the successfully deleted capture config, as an absolute path within the container's file system.
     """
     tag, _ = splitext(file_name)
@@ -199,6 +198,7 @@ def delete_capture_config(
         raise FileExistsError(error_message)
 
     capture_config = _get_capture_config(file_name)
-    capture_config.delete()
+    if not dry_run:
+        capture_config.delete()
     _LOGGER.info(f"File deleted: {capture_config.file_name}")
     return capture_config.file_path

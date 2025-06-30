@@ -8,6 +8,7 @@ from typing import Any
 
 from ..services import capture_configs
 from ._format_responses import jsendify_response, serve_from_directory
+from ._utils import is_true
 
 
 capture_configs_blueprint = Blueprint(
@@ -82,7 +83,10 @@ def create_capture_config(file_name: str) -> str:
 @capture_configs_blueprint.route("/<string:file_name>", methods=["DELETE"])
 @jsendify_response
 def delete_capture_config(file_name: str) -> str:
-    capture_config_file_path = capture_configs.delete_capture_config(file_name)
+    dry_run = request.args.get("dry_run", type=is_true, default=False)
+    capture_config_file_path = capture_configs.delete_capture_config(
+        file_name, dry_run=dry_run
+    )
     return _get_capture_config_endpoint(capture_config_file_path)
 
 
