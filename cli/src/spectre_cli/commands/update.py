@@ -36,7 +36,7 @@ def capture_config(
     skip_validation: bool = Option(
         False,
         "--skip-validation",
-        help="If specified, do not apply the capture template and do not validate capture config parameters.",
+        help="If specified, do not validate capture config parameters.",
     ),
 ) -> None:
 

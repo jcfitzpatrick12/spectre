@@ -12,6 +12,7 @@ start_typer = typer.Typer(help="Start a job.")
 _DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
 _DEFAULT_FORCE_RESTART = False
+_DEFAULT_SKIP_VALIDATION = False
 
 
 @start_typer.command(help="Capture data from an SDR in real time.")
@@ -42,6 +43,11 @@ def capture(
         "--max-restarts",
         help="Maximum number of times workers can be restarted before giving up and killing all workers. ",
     ),
+    skip_validation: bool = typer.Option(
+        _DEFAULT_SKIP_VALIDATION,
+        "--skip-validation",
+        help="If specified, do not validate capture config parameters.",
+    ),
 ) -> None:
     json = {
         "tag": tag,
@@ -50,6 +56,7 @@ def capture(
         "hours": hours,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
+        "validate": not skip_validation,
     }
     _ = safe_request("jobs/capture", "POST", json=json)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
@@ -86,6 +93,11 @@ def session(
         "--max-restarts",
         help="Maximum number of times workers can be restarted before giving up and killing all workers.",
     ),
+    skip_validation: bool = typer.Option(
+        _DEFAULT_SKIP_VALIDATION,
+        "--skip-validation",
+        help="If specified, do not validate capture config parameters.",
+    ),
 ) -> None:
     json = {
         "tag": tag,
@@ -94,6 +106,7 @@ def session(
         "hours": hours,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
+        "validate": not skip_validation,
     }
     _ = safe_request("jobs/session", "POST", json=json)
     typer.secho(f"Session completed sucessfully for tag '{tag}'")

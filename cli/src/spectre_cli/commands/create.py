@@ -34,7 +34,7 @@ def capture_config(
     skip_validation: bool = Option(
         False,
         "--skip-validation",
-        help="If specified, do not apply the capture template and do not validate capture config parameters.",
+        help="If specified, do not validate capture config parameters.",
     ),
 ) -> None:
     file_name = get_capture_config_file_name(file_name, tag)
@@ -43,6 +43,7 @@ def capture_config(
         "receiver_name": receiver_name,
         "receiver_mode": receiver_mode,
         "string_parameters": params,
+        "force": force,
         "validate": not skip_validation,
     }
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PUT", json=json)
