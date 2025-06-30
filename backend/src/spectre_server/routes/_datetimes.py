@@ -6,22 +6,22 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from os.path import basename
 
-from spectre_core.batches import parse_batch_base_file_name
-from spectre_core.logs import parse_log_base_file_name
+from spectre_core.batches import parse_batch_file_name
+from spectre_core.logs import parse_log_file_name
 from spectre_core.config import TimeFormat
 
 
 def get_date_from_batch_file_path(batch_file_path: str) -> date:
     """Given a batch file path, get the date it belongs to."""
-    base_file_name = basename(batch_file_path)
-    start_time, _, _ = parse_batch_base_file_name(base_file_name)
+    file_name = basename(batch_file_path)
+    start_time, _, _ = parse_batch_file_name(file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
 
 
 def get_date_from_log_file_path(log_file_path: str) -> date:
     """Given a batch file path, get the date it belongs to."""
-    base_file_name = basename(log_file_path)
-    start_time, _, _ = parse_log_base_file_name(base_file_name)
+    file_name = basename(log_file_path)
+    start_time, _, _ = parse_log_file_name(file_name)
     return datetime.strptime(start_time, TimeFormat.DATETIME).date()
 
 

@@ -21,7 +21,7 @@ def get_batch_file_endpoint(
     batch_file_date = get_date_from_batch_file_path(batch_file_path)
     return url_for(
         "batches.get_batch_file",
-        base_file_name=basename(batch_file_path),
+        file_name=basename(batch_file_path),
         year=batch_file_date.year,
         month=batch_file_date.month,
         day=batch_file_date.day,
@@ -35,23 +35,21 @@ def get_batch_file_endpoints(batch_file_paths: list[str]) -> list[str]:
 
 
 @batches_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"]
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"]
 )
 @jsendify_response
-def get_batch_file(year: int, month: int, day: int, base_file_name: str) -> Response:
+def get_batch_file(year: int, month: int, day: int, file_name: str) -> Response:
     validate_date(year, month, day)
-    return serve_from_directory(
-        batches.get_batch_file(base_file_name, year, month, day)
-    )
+    return serve_from_directory(batches.get_batch_file(file_name, year, month, day))
 
 
 @batches_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["DELETE"]
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["DELETE"]
 )
 @jsendify_response
-def delete_batch_file(year: int, month: int, day: int, base_file_name: str) -> str:
+def delete_batch_file(year: int, month: int, day: int, file_name: str) -> str:
     validate_date(year, month, day)
-    batch_file_path = batches.delete_batch_file(base_file_name, year, month, day)
+    batch_file_path = batches.delete_batch_file(file_name, year, month, day)
     return get_batch_file_endpoint(batch_file_path)
 
 
@@ -146,7 +144,7 @@ def delete_batch_files() -> list[str]:
 
 
 @batches_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>/analytical-test-results",
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>/analytical-test-results",
     methods=["GET"],
 )
 @jsendify_response
@@ -154,13 +152,13 @@ def get_analytical_test_results(
     year: int,
     month: int,
     day: int,
-    base_file_name: str,
+    file_name: str,
 ) -> dict[str, bool | dict[float, bool]]:
     absolute_tolerance = request.args.get(
         "absolute_tolerance", type=float, default=1e-5
     )
     return batches.get_analytical_test_results(
-        year, month, day, base_file_name, absolute_tolerance
+        year, month, day, file_name, absolute_tolerance
     )
 
 
