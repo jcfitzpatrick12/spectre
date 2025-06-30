@@ -5,56 +5,56 @@
 
 from typing import Optional
 
-from spectre_core.logs import Logs, Log, ProcessType, log_call, parse_log_base_file_name
+from spectre_core.logs import Logs, Log, ProcessType, log_call, parse_log_file_name
 
 
 def _get_log(
-    base_file_name: str,
+    file_name: str,
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> Log:
     """Get the `Log` instance corresponding to the input file."""
-    _, pid, process_type = parse_log_base_file_name(base_file_name)
+    _, pid, process_type = parse_log_file_name(file_name)
     logs = Logs(process_type=ProcessType(process_type), year=year, month=month, day=day)
     return logs.get_from_pid(pid)
 
 
 @log_call
 def get_log(
-    base_file_name: str,
+    file_name: str,
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> str:
     """Get the file path of a log written by a specific process.
 
-    :param base_file_name: Look for a log file with this base file name.
+    :param file_name: Look for a log file with this file name.
     :param year: Look for a log file under this numeric year. Defaults to None.
     :param month: Look for a log file under this numeric month. Defaults to None.
     :param day: Look for a log file under this numeric day. Defaults to None.
     :return: The file path of the log file if it exists in the file system, as an absolute path within the container's file system.
     """
-    log = _get_log(base_file_name, year, month, day)
+    log = _get_log(file_name, year, month, day)
     return log.file_path
 
 
 @log_call
 def get_log_raw(
-    base_file_name: str,
+    file_name: str,
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> str:
     """Read the log written by a specific process.
 
-    :param base_file_name: Read the log file with this base file name.
+    :param file_name: Read the log file with this file name.
     :param year: Read a log file under this numeric year.
     :param month: Read a log file under this numeric month.
     :param day: Read a log file under this numeric day.
     :return: The contents of the log, if it exists in the file system.
     """
-    log = _get_log(base_file_name, year, month, day)
+    log = _get_log(file_name, year, month, day)
     return log.read()
 
 
@@ -87,20 +87,20 @@ def get_logs(
 
 @log_call
 def delete_log(
-    base_file_name: str,
+    file_name: str,
     year: Optional[int] = None,
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> str:
     """Delete a log in the file system.
 
-    :param base_file_name: Delete a batch file with this file name.
+    :param file_name: Delete a batch file with this file name.
     :param year: Delete a log under this numeric year. Defaults to None.
     :param month: Delete a log under this numeric month. Defaults to None.
     :param day: Delete a log under this numeric day. Defaults to None.
     :return: The file path of the deleted log file, as an absolute path in the container's file system.
     """
-    log = _get_log(base_file_name, year, month, day)
+    log = _get_log(file_name, year, month, day)
     log.delete()
     return log.file_path
 

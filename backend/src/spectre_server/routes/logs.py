@@ -21,7 +21,7 @@ def _get_log_file_endpoint(
     log_file_date = get_date_from_log_file_path(log_file_path)
     return url_for(
         "logs.get_log",
-        base_file_name=basename(log_file_path),
+        file_name=basename(log_file_path),
         year=log_file_date.year,
         month=log_file_date.month,
         day=log_file_date.day,
@@ -35,21 +35,21 @@ def _get_log_file_endpoints(log_file_paths: list[str]) -> list[str]:
 
 
 @logs_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["GET"]
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["GET"]
 )
 @jsendify_response
-def get_log(year: int, month: int, day: int, base_file_name: str) -> Response:
+def get_log(year: int, month: int, day: int, file_name: str) -> Response:
     validate_date(year, month, day)
-    return serve_from_directory(logs.get_log(base_file_name, year, month, day))
+    return serve_from_directory(logs.get_log(file_name, year, month, day))
 
 
 @logs_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>/raw", methods=["GET"]
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>/raw", methods=["GET"]
 )
 @jsendify_response
-def get_log_raw(year: int, month: int, day: int, base_file_name: str) -> str:
+def get_log_raw(year: int, month: int, day: int, file_name: str) -> str:
     validate_date(year, month, day)
-    return logs.get_log_raw(base_file_name, year, month, day)
+    return logs.get_log_raw(file_name, year, month, day)
 
 
 @logs_blueprint.route("/<int:year>/<int:month>/<int:day>", methods=["GET"])
@@ -93,12 +93,12 @@ def get_logs() -> list[str]:
 
 
 @logs_blueprint.route(
-    "/<int:year>/<int:month>/<int:day>/<string:base_file_name>", methods=["DELETE"]
+    "/<int:year>/<int:month>/<int:day>/<string:file_name>", methods=["DELETE"]
 )
 @jsendify_response
-def delete_log(year: int, month: int, day: int, base_file_name: str) -> str:
+def delete_log(year: int, month: int, day: int, file_name: str) -> str:
     validate_date(year, month, day)
-    log_file = logs.delete_log(base_file_name, year, month, day)
+    log_file = logs.delete_log(file_name, year, month, day)
     return _get_log_file_endpoint(log_file)
 
 
