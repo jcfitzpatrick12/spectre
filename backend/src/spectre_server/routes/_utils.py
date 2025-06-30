@@ -64,4 +64,4 @@ def validate_date(
 
 def is_true(value: str):
     """Truthy callable for boolean query parameter values."""
-    return value.lower() == 'true'
+    return value.lower() == "true"

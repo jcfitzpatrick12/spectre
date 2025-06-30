@@ -50,7 +50,9 @@ def get_batch_file(year: int, month: int, day: int, file_name: str) -> Response:
 def delete_batch_file(year: int, month: int, day: int, file_name: str) -> str:
     validate_date(year, month, day)
     dry_run = request.args.get("dry_run", type=is_true, default=False)
-    batch_file_path = batches.delete_batch_file(file_name, year, month, day, dry_run=dry_run)
+    batch_file_path = batches.delete_batch_file(
+        file_name, year, month, day, dry_run=dry_run
+    )
     return get_batch_file_endpoint(batch_file_path)
 
 
