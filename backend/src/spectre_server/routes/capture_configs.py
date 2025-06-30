@@ -64,10 +64,9 @@ def create_capture_config(file_name: str) -> str:
     receiver_name = json.get("receiver_name")
     receiver_mode = json.get("receiver_mode")
     string_parameters = json.get("string_parameters")
-    force = json.get("force")
 
     capture_config_file_path = capture_configs.create_capture_config(
-        file_name, receiver_name, receiver_mode, string_parameters, force
+        file_name, receiver_name, receiver_mode, string_parameters
     )
 
     return _get_capture_config_endpoint(capture_config_file_path)

@@ -63,8 +63,7 @@ def create_capture_config(
     file_name: str,
     receiver_name: str,
     receiver_mode: str,
-    string_parameters: Optional[list[str]] = None,
-    force: bool = False,
+    string_parameters: Optional[list[str]] = None
 ) -> str:
     """Create a capture config.
 
@@ -74,7 +73,6 @@ def create_capture_config(
     :param string_parameters: The parameters to store in the capture config. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
-    :param force: If True, overwrites the existing capture config if it already exists, defaults to False
     :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
     """
     if string_parameters is None:
@@ -92,7 +90,7 @@ def create_capture_config(
             "Capture config file names must be of the form <tag>.json"
         )
 
-    receiver.save_parameters(tag, parameters, force)
+    receiver.save_parameters(tag, parameters, force=True)
 
     # create an instance of the newly created capture config
     capture_config = _get_capture_config(file_name)
