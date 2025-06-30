@@ -150,7 +150,6 @@ def delete_batch_files() -> list[str]:
     extensions = request.args.getlist("extension")
     tags = request.args.getlist("tag")
     dry_run = request.args.get("dry_run", type=is_true, default=False)
-    print(dry_run)
     batch_files = batches.delete_batch_files(tags, extensions, dry_run=dry_run)
     return get_batch_file_endpoints(batch_files)
 
