@@ -56,7 +56,7 @@ def capture(
         "hours": hours,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
-        "skip_validation": skip_validation
+        "validate": not skip_validation,
     }
     _ = safe_request("jobs/capture", "POST", json=json)
     typer.secho(f"Capture completed sucessfully for tag '{tag}'")
@@ -106,7 +106,7 @@ def session(
         "hours": hours,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
-        "skip_validation": skip_validation
+        "validate": not skip_validation,
     }
     _ = safe_request("jobs/session", "POST", json=json)
     typer.secho(f"Session completed sucessfully for tag '{tag}'")
