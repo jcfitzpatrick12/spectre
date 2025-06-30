@@ -40,9 +40,7 @@ def get_batch_file_endpoints(batch_file_paths: list[str]) -> list[str]:
 @jsendify_response
 def get_batch_file(year: int, month: int, day: int, file_name: str) -> Response:
     validate_date(year, month, day)
-    return serve_from_directory(
-        batches.get_batch_file(file_name, year, month, day)
-    )
+    return serve_from_directory(batches.get_batch_file(file_name, year, month, day))
 
 
 @batches_blueprint.route(

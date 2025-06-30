@@ -93,7 +93,7 @@ def create_capture_config(
     receiver_mode: str,
     string_parameters: Optional[list[str]] = None,
     force: bool = False,
-    validate: bool = True
+    validate: bool = True,
 ) -> str:
     """Create a capture config.
 
@@ -118,10 +118,8 @@ def create_capture_config(
     tag, extension = splitext(file_name)
 
     if extension != ".json":
-        raise ValueError(
-            "Capture config file names must be of the form <tag>.json"
-        )
-    
+        raise ValueError("Capture config file names must be of the form <tag>.json")
+
     capture_config = _get_capture_config(file_name)
     # If the capture config already exists, check if batches exist under the tag.
     if capture_config.exists:
@@ -144,7 +142,7 @@ def update_capture_config(
     file_name: str,
     string_parameters: list[str],
     force: bool = False,
-    validate: bool = True
+    validate: bool = True,
 ) -> str:
     """Update a capture config.
 
