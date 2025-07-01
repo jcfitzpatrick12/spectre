@@ -30,7 +30,7 @@ RUN pip install .
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="0.0.17" \
+      version="0.0.18" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
@@ -57,7 +57,7 @@ USER appuser
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="0.0.17" \
+      version="0.0.18" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
