@@ -21,32 +21,32 @@ def capture(
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
         "--seconds",
-        help="The seconds component of the capture duration.",
+        help="The seconds component of the job duration.",
     ),
     minutes: int = typer.Option(
         _DEFAULT_DURATION,
         "--minutes",
-        help="The minutes component of the capture duration.",
+        help="The minutes component of the job duration.",
     ),
     hours: int = typer.Option(
         _DEFAULT_DURATION,
         "--hours",
-        help="The hours component of the capture duration.",
+        help="The hours component of the job duration.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="Whether to restart all workers if one dies unexpectedly." "and restart.",
+        help="Whether to restart all workers if one dies unexpectedly.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,
         "--max-restarts",
-        help="Maximum number of times workers can be restarted before giving up and killing all workers. ",
+        help="Maximum number of times workers can be restarted before giving up and killing all workers.",
     ),
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate capture config parameters.",
+        help="If specified, do not validate parameters.",
     ),
 ) -> None:
     json = {
@@ -59,7 +59,7 @@ def capture(
         "validate": not skip_validation,
     }
     _ = safe_request("jobs/capture", "POST", json=json)
-    typer.secho(f"Capture completed sucessfully for tag '{tag}'")
+    typer.secho(f"Capture completed successfully for tag '{tag}'")
     raise typer.Exit()
 
 
@@ -71,22 +71,22 @@ def session(
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
         "--seconds",
-        help="The seconds component of the session duration.",
+        help="The seconds component of the job duration.",
     ),
     minutes: int = typer.Option(
         _DEFAULT_DURATION,
         "--minutes",
-        help="The minutes component of the session duration.",
+        help="The minutes component of the job duration.",
     ),
     hours: int = typer.Option(
         _DEFAULT_DURATION,
         "--hours",
-        help="The hours component of the session duration.",
+        help="The hours component of the job duration.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="Whether to restart all workers if one dies unexpectedly." "and restart.",
+        help="Whether to restart all workers if one dies unexpectedly.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,
@@ -96,7 +96,7 @@ def session(
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate capture config parameters.",
+        help="If specified, do not validate parameters.",
     ),
 ) -> None:
     json = {
@@ -109,5 +109,5 @@ def session(
         "validate": not skip_validation,
     }
     _ = safe_request("jobs/session", "POST", json=json)
-    typer.secho(f"Session completed sucessfully for tag '{tag}'")
+    typer.secho(f"Session completed successfully for tag '{tag}'")
     raise typer.Exit()

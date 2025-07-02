@@ -11,7 +11,7 @@ from ._secho_resources import pprint_dict, secho_existing_resources
 get_typer = Typer(help="Display one or many resources.")
 
 
-@get_typer.command(help="List supported e-Callisto instrument codes.")
+@get_typer.command(help="List e-Callisto network instrument codes.")
 def callisto_instrument_codes() -> None:
     jsend_dict = safe_request("callisto/instrument-codes", "GET")
     callisto_instrument_codes = jsend_dict["data"]
@@ -22,20 +22,20 @@ def callisto_instrument_codes() -> None:
     raise Exit()
 
 
-@get_typer.command(help="List existing log files.")
+@get_typer.command(help="List log files.")
 def logs(
     process_types: list[str] = Option(
-        [], "--process-type", help="Specifies one of 'worker' or 'user'."
+        [],
+        "--process-type",
+        help="List all logs with this process type. Specifies one of 'worker' or 'user'. If not provided, list log files with any process type.",
     ),
     year: int = Option(
-        None, "--year", "-y", help="List log files under this numeric year."
+        None, "--year", "-y", help="Only list log files under this year."
     ),
     month: int = Option(
-        None, "--month", "-m", help="List log files under this numeric month."
+        None, "--month", "-m", help="Only list log files under this month."
     ),
-    day: int = Option(
-        None, "--day", "-d", help="List log files under this numeric day."
-    ),
+    day: int = Option(None, "--day", "-d", help="Only list log files under this day."),
 ) -> None:
     params = {
         "process_type": process_types,
@@ -51,16 +51,10 @@ def logs(
 
 @get_typer.command(help="Print the contents of a log file.")
 def log(
-    year: int = Option(
-        ..., "--year", "-y", help="Read a log file under this numeric year."
-    ),
-    month: int = Option(
-        ..., "--month", "-m", help="Read a log file under this numeric month."
-    ),
-    day: int = Option(
-        ..., "--day", "-d", help="Read a log file under this numeric day."
-    ),
-    file_name: str = Option(..., "-f", help="The file name of the log file."),
+    year: int = Option(..., "--year", "-y", help="Read a log file under this year."),
+    month: int = Option(..., "--month", "-m", help="Read a log file under this month."),
+    day: int = Option(..., "--day", "-d", help="Read a log file under this day."),
+    file_name: str = Option(..., "-f", help="The file name."),
 ) -> None:
     jsend_dict = safe_request(
         f"spectre-data/logs/{year}/{month}/{day}/{file_name}/raw", "GET"
@@ -70,22 +64,28 @@ def log(
     raise Exit()
 
 
-@get_typer.command(help="List existing batch files.")
+@get_typer.command(help="List batch files.")
 def batch_files(
     extensions: list[str] = Option(
-        [], "--extension", "-e", help="Filter for batch files with this file extension."
+        [],
+        "--extension",
+        "-e",
+        help="List all batch files with this file extension. If not provided, list batch files with any extension.",
     ),
     tags: list[str] = Option(
-        [], "--tag", "-t", help="Filter batch files with this tag."
+        [],
+        "--tag",
+        "-t",
+        help="List all batch files with this tag. If not provided, list batch files with any tag.",
     ),
     year: int = Option(
-        None, "--year", "-y", help="Filter for batch files under this numeric year."
+        None, "--year", "-y", help="Only list batch files under this numeric year."
     ),
     month: int = Option(
-        None, "--month", "-m", help="Filter for batch files under this numeric month."
+        None, "--month", "-m", help="Only list batch files under this month."
     ),
     day: int = Option(
-        None, "--day", "-d", help="Filter for batch files under this numeric day."
+        None, "--day", "-d", help="Only list batch files under this day."
     ),
 ) -> None:
     params = {"extension": extensions, "tag": tags}
@@ -145,7 +145,7 @@ def specs(
     raise Exit()
 
 
-@get_typer.command(help="List existing capture configs.")
+@get_typer.command(help="List capture configs.")
 def capture_configs() -> None:
 
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
@@ -156,10 +156,8 @@ def capture_configs() -> None:
 
 @get_typer.command(help="Print capture config file contents.")
 def capture_config(
-    file_name: str = Option(None, "-f", help="The file name of the capture config"),
-    tag: str = Option(
-        None, "--tag", "-t", help="The unique identifier for the capture config"
-    ),
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
 ) -> None:
 
     file_name = get_capture_config_file_name(file_name, tag)
@@ -176,19 +174,19 @@ def tags(
         None,
         "--year",
         "-y",
-        help="Find tags with existing batch files under this numeric year.",
+        help="Only list tags under this year.",
     ),
     month: int = Option(
         None,
         "--month",
         "-m",
-        help="Find tags with existing batch files under this numeric month.",
+        help="Only list tags under this month.",
     ),
     day: int = Option(
         None,
         "--day",
         "-d",
-        help="Find tags with existing batch files under this numeric day.",
+        help="Only list tags under this day.",
     ),
 ) -> None:
     url = (
@@ -214,7 +212,10 @@ def capture_template(
         ..., "--mode", "-m", help="The operating mode of the receiver."
     ),
     param_name: str = Option(
-        None, "--param", "-p", help="Filter for a particular parameter template."
+        None,
+        "--param",
+        "-p",
+        help="The name of the parameter to print a template for. If not provided, prints the full capture template.",
     ),
 ) -> None:
 
