@@ -60,9 +60,7 @@ def analytical(
     day: int = Option(
         ..., "--day", "-d", help="Test a spectrogram file under this day."
     ),
-    file_name: str = Option(
-        ..., "-f", help="The name of the spectrogram file."
-    ),
+    file_name: str = Option(..., "-f", help="The name of the spectrogram file."),
     absolute_tolerance: float = Option(
         1e-3,
         "--atol",
