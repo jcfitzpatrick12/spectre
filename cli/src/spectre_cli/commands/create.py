@@ -13,28 +13,30 @@ create_typer = Typer(help="Create resources.")
 
 @create_typer.command(help="Create a capture config.")
 def capture_config(
-    tag: str = Option(
-        None, "--tag", "-t", help="Unique tag identifier for the capture config."
-    ),
-    file_name: str = Option(None, "-f", help="The file name for the capture config."),
     receiver_name: str = Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     ),
     receiver_mode: str = Option(
         ..., "--mode", "-m", help="The operating mode for the receiver."
     ),
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
     params: List[str] = Option(
-        [], "--param", "-p", help="Parameters as key-value pairs.", metavar="KEY=VALUE"
+        [],
+        "--param",
+        "-p",
+        help="Parameters as key-value pairs.",
+        metavar="<key>=<value>",
     ),
     force: bool = Option(
         False,
         "--force",
-        help="If specified, force the creation even if batch files exist with the capture config tag.",
+        help="If specified, force the operation even if batch files exist with the same tag.",
     ),
     skip_validation: bool = Option(
         False,
         "--skip-validation",
-        help="If specified, do not validate capture config parameters.",
+        help="If specified, do not validate the parameters.",
     ),
 ) -> None:
     file_name = get_capture_config_file_name(file_name, tag)
@@ -58,8 +60,7 @@ def plot(
         ...,
         "--tag",
         "-t",
-        help="Specify one or more spectrograms to plot. The first tag specified will "
-        "determine which batch the plot will be saved under.",
+        help="The batch file tag. Specifying multiple tags yields a stacked plot over the same time frame.",
     ),
     obs_date: str = Option(
         ...,
@@ -91,22 +92,22 @@ def plot(
     log_norm: bool = Option(
         False,
         "--log-norm",
-        help="If specifed, normalises spectrograms to the 0-1 range on a logarithmic scale.",
+        help="If specified, normalise all values to the 0-1 range on a logarithmic scale.",
     ),
     dBb: bool = Option(
         False,
         "--dBb",
-        help="If specified, plots the spectrograms in decibels above the background.",
+        help="If specified, use units of decibels above the background.",
     ),
     vmin: float = Option(
         None,
         "--vmin",
-        help="The minimum value for the colormap. Only applies if `dBb` is True.",
+        help="The minimum value for the colormap. Only applies if `dBb` is specified.",
     ),
     vmax: float = Option(
         None,
         "--vmax",
-        help="The minimum value for the colormap. Only applies if `dBb` is True.",
+        help="The maximum value for the colormap. Only applies if `dBb` is specified.",
     ),
     figsize_x: int = Option(
         None, "--figsize-x", help="The horizontal size of the plot."

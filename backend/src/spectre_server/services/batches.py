@@ -59,12 +59,12 @@ def get_batch_file(
     month: Optional[int] = None,
     day: Optional[int] = None,
 ) -> str:
-    """Look for a batch file in the file system with a given file name.
+    """Get the file path of a batch file which exists in the file system.
 
-    :param file_name: Look for a batch file with this file name.
-    :param year: Look for a batch file under this numeric year. Defaults to None
-    :param month: Look for a batch file under this numeric month. Defaults to None.
-    :param day: Look for a batch file under this numeric day. Defaults to None.
+    :param file_name: Look for any batch file with this file name.
+    :param year: Only look for batch files under this year. Defaults to None
+    :param month: Only look for batch files under this month. Defaults to None.
+    :param day: Only look for batch files under this day. Defaults to None.
     :return: The file path of the batch file if it exists in the file system, as an absolute path within the container's file system.
     """
     batch_file = _get_batch_file(file_name, year, month, day)
@@ -82,11 +82,10 @@ def get_batch_files(
     """Get the file paths of batch files which exist in the file system.
 
     :param tags: Look for batch files with these tags. If no tags are specified, look for batch files with any tag.
-    :param extensions: Look for batch files with this extension. If no extensions are specified, look for batch files with any extension.
-    :param year: Look for batch files under this numeric year, defaults to None. If year, month and day are unspecified, look for batch files under any year.
-    :param month: Look for batch files under this numeric month, defaults to None. If year is specified, but not month and day, look for batch files under that year.
-    :param day: Look for batch files under this numeric day, defaults to None. If year and month are specified, but not day, look for batch files under that month and year.
-
+    :param extensions: Look for batch files with these extensions. If no extensions are specified, look for batch files with any extension.
+    :param year: Only look for batch files under this year, defaults to None. If year, month and day are unspecified, look for batch files under any year.
+    :param month: Only look for batch files under this month, defaults to None. If year is specified, but not month and day, look for batch files under that year.
+    :param day: Only look for batch files under this day, defaults to None. If year and month are specified, but not day, look for batch files under that month and year.
     :return: The file paths of all batch files under the input tag which exist in the file system, as absolute paths within the container's file system.
     """
     if not tags:
@@ -117,12 +116,12 @@ def delete_batch_file(
     day: Optional[int] = None,
     dry_run: bool = False,
 ) -> str:
-    """Delete a batch file in the file system.
+    """Remove a batch file from the file system.
 
-    :param file_name: Delete a batch file with this file name.
-    :param year: Delete a batch file under this numeric year. Defaults to None.
-    :param month: Delete a batch file under this numeric month. Defaults to None.
-    :param day: Delete a batch file under this numeric day. Defaults to None.
+    :param file_name: Delete the batch file with this file name.
+    :param year: Delete a batch file under this year. Defaults to None.
+    :param month: Delete a batch file under this month. Defaults to None.
+    :param day: Delete a batch file under this day. Defaults to None.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
@@ -141,13 +140,15 @@ def delete_batch_files(
     day: Optional[int] = None,
     dry_run: bool = False,
 ) -> list[str]:
-    """Delete batch files. Use with caution, the current implementation contains little safeguarding.
+    """Bulk remove batch files from the file system.
+
+    Use with caution, the current implementation contains little safeguarding.
 
     :param tags: Only batch files with these tags will be deleted. If no tags are provided, no batch files will be deleted.
     :param extensions: Only batch files with these extensions will be deleted. If no extensions are provided, no batch files will be deleted.
-    :param year: Delete batch files under only numeric year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
-    :param month: Delete batch files under only this numeric month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
-    :param day: Delete batch files under only this numeric day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
+    :param year: Only delete batch files under this year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
+    :param month: Only delete batch files under this month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
+    :param day: Only delete batch files under this day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file paths of batch files which have been successfully deleted, as absolute paths within the container's file system.
     """
@@ -176,15 +177,16 @@ def get_batch_keys() -> list[str]:
 def get_analytical_test_results(
     year: int, month: int, day: int, file_name: str, absolute_tolerance: float
 ) -> dict[str, bool | dict[float, bool]]:
-    """Compare all spectrograms with the input tag to analytically derived solutions.
+    """Validate spectrograms produced by the signal generator against analytically derived solutions.
 
-    The tag must be associated with a `Test` receiver capture config.
+    The batch file must be the spectrogram file for the batch.
 
-    :param year: The numeric year of the batch file.
-    :param month: The numeric month of the batch file.
-    :param day: The numeric day of the batch file.
+    :param year: The year of the batch file.
+    :param month: The month of the batch file.
+    :param day: The day of the batch file.
     :param file_name: The batch file name.
-    :param absolute_tolerance: Tolerance level for numerical comparisons.
+    :param absolute_tolerance: The absolute tolerance to which we consider agreement with the
+    analytical solution for each spectral component. See the 'atol' keyword argument for `np.isclose`.
     :return: The test results for the spectrogram file, as a serialisable dictionary.
     """
     batch = _get_batch(file_name, year, month, day)
@@ -211,9 +213,9 @@ def get_tags(
 ) -> list[str]:
     """Look for tags with existing batch files in the file system.
 
-    :param year: Filter batch files by the numeric year, defaults to None. If none of year, month and day are specified, find tags under any year.
-    :param month: Filter batch files by the numeric month, defaults to None. If year is specified, but not month or day, find tags under that year.
-    :param day: Filter batch files by the numeric day, defaults to None. If year and month are specified, but not day, find tags under that month.
+    :param year: Only look for batch files under this year. Defaults to None. If none of year, month and day are specified, find tags under any year.
+    :param month: Only look for batch files under this month. Defaults to None. If year is specified, but not month or day, find tags under that year.
+    :param day: Only look for batch files under this day. Defaults to None. If year and month are specified, but not day, find tags under that month.
     :return: A list of unique tags which have existing batch files in the file system.
     """
     batches_dir_path = get_batches_dir_path(year, month, day)
@@ -273,9 +275,11 @@ def create_plot(
     vmax: Optional[float] = None,
 ) -> str:
     """
-    Create a plot visualising spectrogram data over a specified time interval and optional frequency range.
+    Create a stacked plot of spectrogram data over a specified time interval, then save it to the
+    file system as a batch file.
 
-    :param tags: A list of spectrogram tags to plot. The first tag is used to save the resulting batch file.
+    :param tags: The batch file tag. Specifying multiple tags yields a stacked plot over the same time frame. The first
+    tag indicates which batch the plot will be saved under.
     :param figsize: The `matplotlib` figure size as a tuple of (width, height).
     :param obs_date: The observation start date, in the format `%Y-%m-%d`.
     :param start_time: The observation start time (UTC), in the format `%H:%M:%S`.
@@ -285,10 +289,10 @@ def create_plot(
     :param upper_freq: The upper bound of the frequency range in Hz. If not specified, the maximum available
     frequency is used for each spectrogram. Defaults to None.
     :param log_norm: If True, normalises the spectrograms to the 0-1 range on a logarithmic scale. Defaults to False.
-    :param dBb: If True, plots the spectrograms in decibels above the background. Defaults to False.
+    :param dBb: If True, use units of decibels above the background. Defaults to False.
     :param vmin: The minimum value for the colourmap. Applies only if `dBb` is True.
     :param vmax: The maximum value for the colourmap. Applies only if `dBb` is True.
-    :return: The file path of the newly created batch file containing the plot, as an absolute path in the container's file system. Additionally, the batch file's start time.
+    :return: The file path of the newly created batch file containing the plot, as an absolute path in the container's file system.
     """
     # Parse the datetimes
     obs_date_as_date = datetime.strptime(obs_date, TimeFormat.DATE).date()

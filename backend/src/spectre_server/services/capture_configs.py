@@ -31,7 +31,7 @@ def _get_capture_config(file_name: str) -> CaptureConfig:
 def get_capture_config(
     file_name: str,
 ) -> str:
-    """Look for a capture config in the file system with a given file name.
+    """Get the file path of a capture config which exists in the file system.
 
     :param file_name: Look for a capture config with this file name.
     :return: The file path of the capture config if it exists in the file system, as an absolute path within the container's file system.
@@ -45,7 +45,7 @@ def read_capture_config(file_name: str) -> dict[str, Any]:
     """Read the contents of a capture config.
 
     :param file_name: The file name of the capture config.
-    :return: The contents of the capture config.
+    :return: The contents of the capture config, as a serialisable dictionary.
     """
     capture_config = _get_capture_config(file_name)
     return capture_config.read()
@@ -53,22 +53,22 @@ def read_capture_config(file_name: str) -> dict[str, Any]:
 
 @log_call
 def get_capture_configs() -> list[str]:
-    """Get the file paths for all capture configs, as absolute paths within the container's file system."""
+    """Get the absolute file paths of all capture configs which exist in the file system."""
     config_dir = get_configs_dir_path()
     return [entry.path for entry in scandir(config_dir)]
 
 
 def _has_batches(tag: str) -> bool:
-    """Returns True if any files exist under the input tag."""
+    """Returns True if any batch files exist under the input tag."""
     batch_cls = get_batch_cls_from_tag(tag)
     batches = Batches(tag, batch_cls)
     return len(batches.batch_list) > 0
 
 
 def _caution_update(tag: str, force: bool) -> None:
-    """Caution users if batches exist with the input tag.
+    """Caution users if batch files exist with the input tag.
 
-    :param tag: The batch tag.
+    :param tag: The batch file tag.
     :param force: If True, warn the user, suppress the explicit error and continue with the update.
     :raises FileExistsError: Raised if `force` is False, and batches exist with the input tag.
     """
@@ -98,14 +98,14 @@ def create_capture_config(
     """Create a capture config.
 
     :param file_name: The file name of the capture config.
-    :param receiver_name: The name of the receiver used for capture.
-    :param receiver_mode: The operating mode for the receiver to be used for capture.
-    :param string_parameters: The parameters to store in the capture config. Specifically,
+    :param receiver_name: The name of the receiver.
+    :param receiver_mode: The operating mode of the receiver.
+    :param string_parameters: The parameters to store as key-value pairs. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter
     with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
-    :param validate: If True, apply the capture template and validate capture config parameters. Defaults to True.
-    :return: The file path of the successfully created capture config, as an absolute path in the container's file system.
+    :param validate: If True, validate capture config parameters. Defaults to True.
+    :return: The file path of the newly created capture config, as an absolute path in the container's file system.
     """
     if string_parameters is None:
         string_parameters = []
@@ -146,13 +146,12 @@ def update_capture_config(
 ) -> str:
     """Update a capture config.
 
-    Any parameters passed in via `string_parameters` will overwrite the corresponding parameters
-    already existing in the capture config.
+    Any parameters passed in via `string_parameters` will overwrite existing parameters.
 
-    :param file_name: The file name of the capture config to update.
-    :param string_parameters: The parameters to update in the capture config. Specifically,
+    :param file_name: The file name of the capture config.
+    :param string_parameters: The parameters to update as key-value pairs. Specifically,
     A list of strings of the form `a=b`, where each element is interpreted as a parameter
-    with name `a` and value `b`, defaults to None. A None value will be interpreted as an empty list.
+    with name `a` and value `b`.
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
     :param validate: If True, apply the capture template and validate capture config parameters. Defaults to True.
     :return: The file path of the successfully updated capture config, as an absolute path in the container's file system.
@@ -184,7 +183,7 @@ def update_capture_config(
 def delete_capture_config(file_name: str, dry_run: bool = False) -> str:
     """Delete a capture config.
 
-    :param file_name: The file_name of the capture config.
+    :param file_name: The file name of the capture config.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the successfully deleted capture config, as an absolute path within the container's file system.
     """

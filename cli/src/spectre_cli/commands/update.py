@@ -17,26 +17,24 @@ def _secho_updated_resource(endpoint: str) -> None:
 
 @update_typer.command(help="Update capture config parameters.")
 def capture_config(
-    tag: str = Option(
-        None, "--tag", "-t", help="Unique identifier for the capture config."
-    ),
-    file_name: str = Option(None, "-f", help="The file name of the capture config"),
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
     params: List[str] = Option(
-        ...,
+        [],
         "--param",
         "-p",
-        help="Pass arbitrary key-value pairs.",
-        metavar="KEY=VALUE",
+        help="Parameters as key-value pairs.",
+        metavar="<key>=<value>",
     ),
     force: bool = Option(
         False,
         "--force",
-        help="If specified, force the update even if batch files exist with the capture config tag.",
+        help="If specified, force the operation even if batch files exist with the same tag.",
     ),
     skip_validation: bool = Option(
         False,
         "--skip-validation",
-        help="If specified, do not validate capture config parameters.",
+        help="If specified, do not validate the parameters.",
     ),
 ) -> None:
 

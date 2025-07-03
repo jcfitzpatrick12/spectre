@@ -19,15 +19,15 @@ delete_typer = Typer(help="Delete resources.")
 @delete_typer.command(help="Delete log files.")
 def logs(
     process_types: list[str] = Option(
-        [], "--process-type", help="Specifies one of 'worker' or 'user'."
+        [],
+        "--process-type",
+        help="Delete all logs with this process type. Specifies one of 'worker' or 'user'. If not provided, nothing will be deleted.",
     ),
-    year: int = Option(
-        None, "--year", "-y", help="Delete logs under this numeric year."
-    ),
+    year: int = Option(None, "--year", "-y", help="Only delete logs under this year."),
     month: int = Option(
-        None, "--month", "-m", help="Delete logs under this numeric month."
+        None, "--month", "-m", help="Only delete logs under this month."
     ),
-    day: int = Option(None, "--day", "-d", help="Delete  logs under this numeric day."),
+    day: int = Option(None, "--day", "-d", help="Only delete logs under this day."),
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),
@@ -60,19 +60,25 @@ def logs(
 @delete_typer.command(help="Delete batch files.")
 def batch_files(
     tags: list[str] = Option(
-        [], "--tag", "-t", help="The tag used to capture the data."
+        [],
+        "--tag",
+        "-t",
+        help="Delete all batch files with this unique identifier. If not provided, nothing will be deleted.",
     ),
     extensions: list[str] = Option(
-        [], "--extension", "-e", help="Delete all batch files with this file extension."
+        [],
+        "--extension",
+        "-e",
+        help="Delete all batch files with this file extension. If not provided, nothing will be deleted.",
     ),
     year: int = Option(
-        None, "--year", "-y", help="Delete all batch files under this numeric year."
+        None, "--year", "-y", help="Only delete batch files under this year."
     ),
     month: int = Option(
-        None, "--month", "-m", help="Delete all batch files under this numeric month."
+        None, "--month", "-m", help="Only delete batch files under this month."
     ),
     day: int = Option(
-        None, "--day", "-d", help="Delete all batch files under this numeric day."
+        None, "--day", "-d", help="Only delete batch files under this day."
     ),
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
@@ -103,10 +109,8 @@ def batch_files(
 
 @delete_typer.command(help="Delete a capture config.")
 def capture_config(
-    tag: str = Option(
-        None, "--tag", "-t", help="Unique identifier for the capture config."
-    ),
-    file_name: str = Option(None, "-f", help="The file name of the capture config."),
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),
@@ -121,7 +125,7 @@ def capture_config(
     file_name = get_capture_config_file_name(file_name, tag)
     params = {"dry_run": dry_run}
     jsend_dict = safe_request(
-        f"spectre-data/configs/{tag}.json",
+        f"spectre-data/configs/{file_name}",
         "DELETE",
         params=params,
         require_confirmation=True,

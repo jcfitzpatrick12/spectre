@@ -19,15 +19,9 @@ def callisto(
         "-i",
         help="The case-sensitive e-Callisto station instrument code.",
     ),
-    year: int = Option(
-        ..., "--year", "-y", help="Download files under this numeric year."
-    ),
-    month: int = Option(
-        ..., "--month", "-m", help="Download files under this numeric month."
-    ),
-    day: int = Option(
-        ..., "--day", "-d", help="Download files under this numeric day."
-    ),
+    year: int = Option(..., "--year", "-y", help="Download files under this year."),
+    month: int = Option(..., "--month", "-m", help="Download files under this month."),
+    day: int = Option(..., "--day", "-d", help="Download files under this day."),
 ) -> None:
     json = {
         "instrument_codes": instrument_codes,

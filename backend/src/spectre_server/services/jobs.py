@@ -46,19 +46,18 @@ def capture(
     max_restarts: int = 5,
     validate: bool = True,
 ) -> str:
-    """Start capturing data from an SDR in real time.
+    """Capture data from an SDR in real time.
 
     :param tag: The capture config tag.
-    :param seconds: The seconds component of the total runtime, defaults to 0
-    :param minutes: The minutes component of the total runtime, defaults to 0
-    :param hours: The hours component of the total runtime, defaults to 0
+    :param seconds: The seconds component of the job duration., defaults to 0
+    :param minutes: The minutes component of the job duration, defaults to 0
+    :param hours: The hours component of the job duration, defaults to 0
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
-    :param validate: If True, validate the capture config. Defaults to False.
+    :param validate: If True, validate the capture config parameters. Defaults to True.
     :return: A string indicating the job has completed.
     """
-    # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
     capture_worker = jobs.make_worker(
         "capture_worker",
         _start_capture,
@@ -83,16 +82,16 @@ def session(
     max_restarts: int = 5,
     validate: bool = True,
 ) -> str:
-    """Start capturing data from an SDR, and post-process the data in real time into spectrograms.
+    """Capture data from an SDR and post-process it into spectrograms in real time.
 
     :param tag: The capture config tag.
-    :param seconds: The seconds component of the total runtime, defaults to 0
-    :param minutes: The minutes component of the total runtime, defaults to 0
-    :param hours: The hours component of the total runtime, defaults to 0
+    :param seconds: The seconds component of the job duration., defaults to 0
+    :param minutes: The minutes component of the job duration, defaults to 0
+    :param hours: The hours component of the job duration, defaults to 0
     :param force_restart: Whether to restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
-    :param validate: If True, validate the capture config. Defaults to False.
+    :param validate: If True, validate the capture config parameters. Defaults to True.
     :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
