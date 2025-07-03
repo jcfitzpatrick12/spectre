@@ -10,7 +10,7 @@ from spectre_core.receivers import get_receiver, get_registered_receivers, Recei
 
 @log_call
 def get_receiver_names() -> list[str]:
-    """List the names of all registered receiver supported by `spectre`."""
+    """List the names of all supported receivers."""
     return get_registered_receivers()
 
 
@@ -18,10 +18,10 @@ def get_receiver_names() -> list[str]:
 def get_modes(
     receiver_name: str,
 ) -> list[str]:
-    """Get the defined operating modes for the input receiver.
+    """Get the defined operating modes for a receiver.
 
     :param receiver_name: The name of the receiver.
-    :return: All the defined operating modes for the receiver.
+    :return: The operating modes for the receiver.
     """
     receiver = get_receiver(ReceiverName(receiver_name))
     return receiver.modes
@@ -31,7 +31,7 @@ def get_modes(
 def get_specs(
     receiver_name: str,
 ) -> dict[str, float | int | list[float | int]]:
-    """Get the hardware specifications for the input receiver.
+    """Get the hardware specifications for a receiver.
 
     :param receiver_name: The name of the receiver.
     :return: The hardware specifications for the receiver.
@@ -46,7 +46,7 @@ def get_capture_template(receiver_name: str, receiver_mode: str) -> dict[str, An
 
     :param receiver_name: The name of the receiver.
     :param receiver_mode: The operating mode for the receiver.
-    :return: The capture template converted to a serialisable dictionary.
+    :return: The capture template as a serialisable dictionary.
     """
     name = ReceiverName(receiver_name)
     receiver = get_receiver(name, mode=receiver_mode)
