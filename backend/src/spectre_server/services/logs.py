@@ -117,7 +117,7 @@ def delete_logs(
     dry_run: bool = False,
 ) -> list[str]:
     """Bulk remove logs from the file system.
-    
+
     Use with caution, the current implementation contains little safeguarding.
 
     :param process_types: Delete logs with these process types. If none are provided, no logs are deleted.

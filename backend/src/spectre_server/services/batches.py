@@ -141,7 +141,7 @@ def delete_batch_files(
     dry_run: bool = False,
 ) -> list[str]:
     """Bulk remove batch files from the file system.
-    
+
     Use with caution, the current implementation contains little safeguarding.
 
     :param tags: Only batch files with these tags will be deleted. If no tags are provided, no batch files will be deleted.
@@ -178,7 +178,7 @@ def get_analytical_test_results(
     year: int, month: int, day: int, file_name: str, absolute_tolerance: float
 ) -> dict[str, bool | dict[float, bool]]:
     """Validate spectrograms produced by the signal generator against analytically derived solutions.
-    
+
     The batch file must be the spectrogram file for the batch.
 
     :param year: The year of the batch file.
@@ -275,7 +275,7 @@ def create_plot(
     vmax: Optional[float] = None,
 ) -> str:
     """
-    Create a stacked plot of spectrogram data over a specified time interval, then save it to the 
+    Create a stacked plot of spectrogram data over a specified time interval, then save it to the
     file system as a batch file.
 
     :param tags: The batch file tag. Specifying multiple tags yields a stacked plot over the same time frame. The first
