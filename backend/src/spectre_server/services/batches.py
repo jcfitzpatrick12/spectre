@@ -96,6 +96,10 @@ def get_batch_files(
             exts = extensions or batch.extensions
 
             for extension in exts:
+                # Just ignore undefined extensions.
+                if extension not in batch.extensions:
+                    continue
+
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     batch_files.append(batch_file.file_path)
@@ -181,7 +185,9 @@ def get_analytical_test_results(
     spectrogram = batch_file.read()
 
     if not isinstance(spectrogram, Spectrogram):
-        raise ValueError(f"The file '{batch_file.file_name}' does not contain a spectrogram.")
+        raise ValueError(
+            f"The file '{batch_file.file_name}' does not contain a spectrogram."
+        )
 
     capture_config = CaptureConfig(tag)
     test_results = validate_analytically(
