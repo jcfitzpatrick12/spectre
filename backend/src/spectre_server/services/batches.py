@@ -151,6 +151,11 @@ def delete_batch_files(
 
         for batch in batches:
             for extension in extensions:
+                
+                # Just ignore undefined extensions.
+                if extension not in batch.extensions:
+                    continue
+                
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     if not dry_run:
