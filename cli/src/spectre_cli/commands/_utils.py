@@ -78,52 +78,6 @@ def safe_request(
         )
 
 
-def build_date_path(
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
-) -> str:
-    """
-    Construct a URL date path in one of the allowed formats:
-
-    - "YYYY"
-    - "YYYY/MM"
-    - "YYYY/MM/DD"
-
-    If no parts are provided, returns an empty string.
-    """
-    today = datetime.now(timezone.utc).date()
-
-    if day is not None and month is None:
-        raise ValueError("Day cannot be specified without month.")
-    if month is not None and year is None:
-        raise ValueError("Month cannot be specified without year.")
-
-    # If no date parts are provided, return empty path
-    if year is None:
-        return ""
-
-    # Use minimal defaults to validate
-    d = day if day is not None else 1
-    m = month if month is not None else 1
-
-    try:
-        constructed = date(year, m, d)
-    except ValueError as e:
-        raise ValueError(f"Invalid date: {e}")
-
-    if constructed > today:
-        raise ValueError("Date cannot be in the future.")
-
-    # Build path
-    if day is not None:
-        return f"{year}/{month:02d}/{day:02d}"
-    elif month is not None:
-        return f"{year}/{month:02d}"
-    else:
-        return f"{year}"
-
-
 def get_capture_config_file_name(file_name: Optional[str], tag: Optional[str]) -> str:
     """Given either a file name, or the tag, build the capture config file name.
 

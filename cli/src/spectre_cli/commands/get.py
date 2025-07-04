@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._utils import safe_request, build_date_path, get_capture_config_file_name
+from ._utils import safe_request, get_capture_config_file_name
 from ._secho_resources import pprint_dict, secho_existing_resources
 
 
@@ -37,12 +37,8 @@ def logs(
     ),
     day: int = Option(None, "--day", "-d", help="Only list log files under this day."),
 ) -> None:
-    params = {
-        "process_type": process_types,
-    }
-    jsend_dict = safe_request(
-        f"spectre-data/logs/{build_date_path(year, month, day)}", "GET", params=params
-    )
+    params = {"process_type": process_types, "year": year, "month": month, "day": day}
+    jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
     secho_existing_resources(endpoints)
@@ -51,14 +47,9 @@ def logs(
 
 @get_typer.command(help="Print the contents of a log file.")
 def log(
-    year: int = Option(..., "--year", "-y", help="Read a log file under this year."),
-    month: int = Option(..., "--month", "-m", help="Read a log file under this month."),
-    day: int = Option(..., "--day", "-d", help="Read a log file under this day."),
     file_name: str = Option(..., "-f", help="The file name."),
 ) -> None:
-    jsend_dict = safe_request(
-        f"spectre-data/logs/{year}/{month}/{day}/{file_name}/raw", "GET"
-    )
+    jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
     log_contents = jsend_dict["data"]
     print(log_contents)
     raise Exit()
@@ -88,9 +79,15 @@ def batch_files(
         None, "--day", "-d", help="Only list batch files under this day."
     ),
 ) -> None:
-    params = {"extension": extensions, "tag": tags}
+    params = {
+        "extension": extensions,
+        "tag": tags,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
     jsend_dict = safe_request(
-        f"spectre-data/batches/{build_date_path(year, month, day)}",
+        f"spectre-data/batches",
         "GET",
         params=params,
     )
@@ -189,12 +186,13 @@ def tags(
         help="Only list tags under this day.",
     ),
 ) -> None:
+    params = {"year": year, "month": month, "day": day}
     url = (
-        f"spectre-data/batches/{build_date_path(year, month, day)}/tags"
+        f"spectre-data/batches/tags"
         if year is not None
         else "spectre-data/batches/tags"
     )
-    jsend_dict = safe_request(url, "GET")
+    jsend_dict = safe_request(url, "GET", params=params)
     tags = jsend_dict["data"]
 
     for tag in tags:

@@ -7,6 +7,7 @@ from os.path import splitext
 from os import walk
 from datetime import date, time, datetime
 
+from spectre_core.config import TimeFormat
 from spectre_core.logs import log_call
 from spectre_core.batches import (
     Batches,
@@ -29,9 +30,9 @@ from spectre_core.plotting import PanelStack, SpectrogramPanel
 
 def _get_batch(
     file_name: str,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
+    year: int,
+    month: int,
+    day: int,
 ) -> BaseBatch:
     """Get the `BaseBatch` subclass instance corresponding to the input file."""
     start_time, tag, _ = parse_batch_file_name(file_name)
@@ -42,32 +43,25 @@ def _get_batch(
 
 def _get_batch_file(
     file_name: str,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
 ) -> BatchFile:
     """Get the `BatchFile` instance corresponding to the input file."""
-    _, _, extension = parse_batch_file_name(file_name)
-    batch = _get_batch(file_name, year, month, day)
+    start_time, _, extension = parse_batch_file_name(file_name)
+    dt = datetime.strptime(start_time, TimeFormat.DATETIME)
+    batch = _get_batch(file_name, dt.year, dt.month, dt.day)
     return batch.get_file(extension)
 
 
 @log_call
 def get_batch_file(
     file_name: str,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
 ) -> str:
     """Get the file path of a batch file which exists in the file system.
 
     :param file_name: Look for any batch file with this file name.
-    :param year: Only look for batch files under this year. Defaults to None
-    :param month: Only look for batch files under this month. Defaults to None.
-    :param day: Only look for batch files under this day. Defaults to None.
     :return: The file path of the batch file if it exists in the file system, as an absolute path within the container's file system.
     """
-    batch_file = _get_batch_file(file_name, year, month, day)
+
+    batch_file = _get_batch_file(file_name)
     return batch_file.file_path
 
 
@@ -111,21 +105,15 @@ def get_batch_files(
 @log_call
 def delete_batch_file(
     file_name: str,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
     dry_run: bool = False,
 ) -> str:
     """Remove a batch file from the file system.
 
     :param file_name: Delete the batch file with this file name.
-    :param year: Delete a batch file under this year. Defaults to None.
-    :param month: Delete a batch file under this month. Defaults to None.
-    :param day: Delete a batch file under this day. Defaults to None.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted batch file, as an absolute file path in the container's file system.
     """
-    batch_file = _get_batch_file(file_name, year, month, day)
+    batch_file = _get_batch_file(file_name)
     if not dry_run:
         batch_file.delete()
     return batch_file.file_path
@@ -175,29 +163,26 @@ def get_batch_keys() -> list[str]:
 
 @log_call
 def get_analytical_test_results(
-    year: int, month: int, day: int, file_name: str, absolute_tolerance: float
+    file_name: str, absolute_tolerance: float
 ) -> dict[str, bool | dict[float, bool]]:
     """Validate spectrograms produced by the signal generator against analytically derived solutions.
 
     The batch file must be the spectrogram file for the batch.
 
-    :param year: The year of the batch file.
-    :param month: The month of the batch file.
-    :param day: The day of the batch file.
     :param file_name: The batch file name.
     :param absolute_tolerance: The absolute tolerance to which we consider agreement with the
     analytical solution for each spectral component. See the 'atol' keyword argument for `np.isclose`.
     :return: The test results for the spectrogram file, as a serialisable dictionary.
     """
-    batch = _get_batch(file_name, year, month, day)
-    _, tag, extension = parse_batch_file_name(file_name)
+    batch_file = _get_batch_file(file_name)
 
-    if batch.spectrogram_file.file_path != batch.get_file(extension).file_path:
-        raise ValueError(
-            f"{file_name} is not the designated spectrogram file for this batch"
-        )
+    _, tag, _ = parse_batch_file_name(file_name)
 
-    spectrogram = batch.read_spectrogram()
+    spectrogram = batch_file.read()
+
+    if not isinstance(spectrogram, Spectrogram):
+        raise ValueError(f"{batch_file} does not contain a spectrogram.")
+
     capture_config = CaptureConfig(tag)
     test_results = validate_analytically(
         spectrogram, capture_config, absolute_tolerance
