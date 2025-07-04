@@ -181,7 +181,7 @@ def get_analytical_test_results(
     spectrogram = batch_file.read()
 
     if not isinstance(spectrogram, Spectrogram):
-        raise ValueError(f"{batch_file} does not contain a spectrogram.")
+        raise ValueError(f"The file '{batch_file.file_name}' does not contain a spectrogram.")
 
     capture_config = CaptureConfig(tag)
     test_results = validate_analytically(
