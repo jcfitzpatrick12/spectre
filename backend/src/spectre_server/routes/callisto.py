@@ -19,10 +19,13 @@ def get_instrument_codes() -> list[str]:
     return callisto.get_instrument_codes()
 
 
-@callisto_blueprint.route("/batches/<int:year>/<int:month>/<int:day>", methods=["POST"])
+@callisto_blueprint.route("/batches", methods=["POST"])
 @jsendify_response
-def download(year: int, month: int, day: int) -> list[str]:
+def download() -> list[str]:
     json = request.get_json()
+    year = json.get("year")
+    month = json.get("month")
+    day = json.get("day")
     instrument_codes = json.get("instrument_codes", [])
     batch_files = callisto.download_callisto_data(instrument_codes, year, month, day)
 

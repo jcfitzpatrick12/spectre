@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit
 
-from ._utils import safe_request, build_date_path, get_capture_config_file_name
+from ._utils import safe_request, get_capture_config_file_name
 from ._secho_resources import (
     secho_stale_resource,
     secho_stale_resources,
@@ -40,10 +40,16 @@ def logs(
     if dry_run:
         non_interactive = True
 
-    params = {"process_type": process_types, "dry_run": dry_run}
+    params = {
+        "process_type": process_types,
+        "dry_run": dry_run,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
 
     jsend_dict = safe_request(
-        f"spectre-data/logs/{build_date_path(year, month, day)}",
+        f"spectre-data/logs",
         "DELETE",
         params=params,
         require_confirmation=True,
@@ -91,9 +97,16 @@ def batch_files(
 ) -> None:
     if dry_run:
         non_interactive = True
-    params = {"extension": extensions, "tag": tags, "dry_run": dry_run}
+    params = {
+        "extension": extensions,
+        "tag": tags,
+        "dry_run": dry_run,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
     jsend_dict = safe_request(
-        f"spectre-data/batches/{build_date_path(year, month, day)}",
+        f"spectre-data/batches",
         "DELETE",
         params=params,
         require_confirmation=True,

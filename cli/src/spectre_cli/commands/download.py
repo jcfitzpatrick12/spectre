@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._utils import safe_request, build_date_path
+from ._utils import safe_request
 from ._secho_resources import secho_new_resources
 
 
@@ -25,11 +25,12 @@ def callisto(
 ) -> None:
     json = {
         "instrument_codes": instrument_codes,
+        "year": year,
+        "month": month,
+        "day": day,
     }
     secho(f"Download in progress...", fg="yellow")
-    jsend_dict = safe_request(
-        f"callisto/batches/{build_date_path(year, month, day)}", "POST", json=json
-    )
+    jsend_dict = safe_request(f"callisto/batches", "POST", json=json)
     endpoints = jsend_dict["data"]
     secho_new_resources(endpoints)
     raise Exit()
