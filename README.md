@@ -21,6 +21,7 @@ Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki
 - [Tutorials](https://github.com/jcfitzpatrick12/spectre/wiki/Tutorials)
 - [Contributing](https://github.com/jcfitzpatrick12/spectre/wiki/Contributing)
 
+Track our progress and upcoming features on our [GitHub Project Board](https://github.com/users/jcfitzpatrick12/projects/3).
 
 ## About Us
 
