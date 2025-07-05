@@ -9,8 +9,8 @@
 </div>
 
 <div align="center">
-  <img src="gallery/finland_comparison.png" width="35%" hspace="7" alt="Solar Radio Observations">
-  <img src="gallery/solar_radio_narrowband.png" width="35%" hspace="7" alt="Solar Radio Observations">
+  <img src="gallery/finland_comparison.png" width="45%" hspace="7" alt="Solar Radio Observations">
+  <img src="gallery/solar_radio_narrowband.png" width="45%" hspace="7" alt="Solar Radio Observations">
 </div>
 
 ## About Us
