@@ -13,8 +13,16 @@
   <img src="gallery/solar_radio_narrowband.png" width="45%" hspace="7" alt="Solar Radio Observations">
 </div>
 
-## About Us
+## Getting started
 
+Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki). Quick links are provided below:  
+
+- [Installation](https://github.com/jcfitzpatrick12/spectre/wiki/Installation)
+- [Tutorials](https://github.com/jcfitzpatrick12/spectre/wiki/Tutorials)
+- [Contributing](https://github.com/jcfitzpatrick12/spectre/wiki/Contributing)
+
+
+## About Us
 
 _Spectre_ is a free and open source receiver-agnostic program for recording and visualising radio spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
 
@@ -36,12 +44,3 @@ Offering robust performance on modest hardware, applications include:
 - ⚙️ Flexible, configurable data capture
 - ✏️ Backend web server with a discoverable RESTful API
 - 🔧 Developer-friendly and extensible
-
-
-## Getting started
-
-Check out our [GitHub Wiki](https://github.com/jcfitzpatrick12/spectre/wiki), linked below:  
-
-- [Installation](https://github.com/jcfitzpatrick12/spectre/wiki/Installation)
-- [Tutorials](https://github.com/jcfitzpatrick12/spectre/wiki/Tutorials)
-- [Contributing](https://github.com/jcfitzpatrick12/spectre/wiki/Contributing)
