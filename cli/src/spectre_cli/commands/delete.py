@@ -16,12 +16,12 @@ from ._secho_resources import (
 delete_typer = Typer(help="Delete resources.")
 
 
-@delete_typer.command(help="Delete log files.")
+@delete_typer.command(help="Delete logs.")
 def logs(
     process_types: list[str] = Option(
         [],
         "--process-type",
-        help="Delete all logs with this process type. Specifies one of 'worker' or 'user'. If not provided, nothing will be deleted.",
+        help="Delete all logs with this process type, specifying one of 'worker' or 'user'. If not provided, nothing will be deleted.",
     ),
     year: int = Option(None, "--year", "-y", help="Only delete logs under this year."),
     month: int = Option(
