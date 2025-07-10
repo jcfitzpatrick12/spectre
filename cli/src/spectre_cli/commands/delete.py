@@ -69,7 +69,7 @@ def batch_files(
         [],
         "--tag",
         "-t",
-        help="Delete all batch files with this unique identifier. If not provided, nothing will be deleted.",
+        help="Delete all batch files with this tag. If not provided, nothing will be deleted.",
     ),
     extensions: list[str] = Option(
         [],
