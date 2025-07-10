@@ -29,12 +29,8 @@ def logs(
         "--process-type",
         help="List all logs with this process type, specifying one of 'worker' or 'user'. If not provided, list logs with any process type.",
     ),
-    year: int = Option(
-        None, "--year", "-y", help="Only list logs under this year."
-    ),
-    month: int = Option(
-        None, "--month", "-m", help="Only list logs under this month."
-    ),
+    year: int = Option(None, "--year", "-y", help="Only list logs under this year."),
+    month: int = Option(None, "--month", "-m", help="Only list logs under this month."),
     day: int = Option(None, "--day", "-d", help="Only list logs under this day."),
 ) -> None:
     params = {"process_type": process_types, "year": year, "month": month, "day": day}
