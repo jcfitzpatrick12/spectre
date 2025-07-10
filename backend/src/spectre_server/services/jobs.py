@@ -52,7 +52,7 @@ def capture(
     :param seconds: The seconds component of the job duration., defaults to 0
     :param minutes: The minutes component of the job duration, defaults to 0
     :param hours: The hours component of the job duration, defaults to 0
-    :param force_restart: Whether to restart all workers if one dies unexpectedly.
+    :param force_restart: If specified, restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
     :param validate: If True, validate the capture config parameters. Defaults to True.
@@ -88,7 +88,7 @@ def session(
     :param seconds: The seconds component of the job duration., defaults to 0
     :param minutes: The minutes component of the job duration, defaults to 0
     :param hours: The hours component of the job duration, defaults to 0
-    :param force_restart: Whether to restart all workers if one dies unexpectedly.
+    :param force_restart: If specified, restart all workers if one dies unexpectedly.
     :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
     Only applies when force_restart is True. Defaults to 5.
     :param validate: If True, validate the capture config parameters. Defaults to True.
