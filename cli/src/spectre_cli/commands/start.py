@@ -36,7 +36,7 @@ def capture(
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="Whether to restart all workers if one dies unexpectedly.",
+        help="If specified, restart all workers if one dies unexpectedly.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,
@@ -86,7 +86,7 @@ def session(
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="Whether to restart all workers if one dies unexpectedly.",
+        help="If specified, restart all workers if one dies unexpectedly.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,

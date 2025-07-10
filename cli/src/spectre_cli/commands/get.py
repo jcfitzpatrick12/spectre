@@ -22,20 +22,16 @@ def callisto_instrument_codes() -> None:
     raise Exit()
 
 
-@get_typer.command(help="List log files.")
+@get_typer.command(help="List logs.")
 def logs(
     process_types: list[str] = Option(
         [],
         "--process-type",
-        help="List all logs with this process type. Specifies one of 'worker' or 'user'. If not provided, list log files with any process type.",
+        help="List all logs with this process type, specifying one of 'worker' or 'user'. If not provided, list logs with any process type.",
     ),
-    year: int = Option(
-        None, "--year", "-y", help="Only list log files under this year."
-    ),
-    month: int = Option(
-        None, "--month", "-m", help="Only list log files under this month."
-    ),
-    day: int = Option(None, "--day", "-d", help="Only list log files under this day."),
+    year: int = Option(None, "--year", "-y", help="Only list logs under this year."),
+    month: int = Option(None, "--month", "-m", help="Only list logs under this month."),
+    day: int = Option(None, "--day", "-d", help="Only list logs under this day."),
 ) -> None:
     params = {"process_type": process_types, "year": year, "month": month, "day": day}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
@@ -45,7 +41,7 @@ def logs(
     raise Exit()
 
 
-@get_typer.command(help="Print the contents of a log file.")
+@get_typer.command(help="Print the contents of a log.")
 def log(
     file_name: str = Option(..., "-f", help="The file name."),
 ) -> None:
@@ -70,7 +66,7 @@ def batch_files(
         help="List all batch files with this tag. If not provided, list batch files with any tag.",
     ),
     year: int = Option(
-        None, "--year", "-y", help="Only list batch files under this numeric year."
+        None, "--year", "-y", help="Only list batch files under this year."
     ),
     month: int = Option(
         None, "--month", "-m", help="Only list batch files under this month."
