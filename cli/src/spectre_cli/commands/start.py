@@ -14,7 +14,8 @@ _DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
 _DEFAULT_FORCE_RESTART = False
 _DEFAULT_SKIP_VALIDATION = False
-_IN_PROGRESS="In progress... "
+_IN_PROGRESS = "In progress... "
+
 
 @start_typer.command(help="Capture data from an SDR in real time.")
 def capture(
