@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
+from yaspin import yaspin
 
 from ._utils import safe_request
 
@@ -13,6 +14,7 @@ _DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
 _DEFAULT_FORCE_RESTART = False
 _DEFAULT_SKIP_VALIDATION = False
+_IN_PROGRESS = "In progress... "
 
 
 @start_typer.command(help="Capture data from an SDR in real time.")
@@ -58,8 +60,8 @@ def capture(
         "max_restarts": max_restarts,
         "validate": not skip_validation,
     }
-    _ = safe_request("jobs/capture", "POST", json=json)
-    typer.secho(f"Capture completed successfully for tag '{tag}'")
+    with yaspin(text=_IN_PROGRESS):
+        _ = safe_request("jobs/capture", "POST", json=json)
     raise typer.Exit()
 
 
@@ -108,6 +110,6 @@ def session(
         "max_restarts": max_restarts,
         "validate": not skip_validation,
     }
-    _ = safe_request("jobs/session", "POST", json=json)
-    typer.secho(f"Session completed successfully for tag '{tag}'")
+    with yaspin(text=_IN_PROGRESS):
+        _ = safe_request("jobs/session", "POST", json=json)
     raise typer.Exit()

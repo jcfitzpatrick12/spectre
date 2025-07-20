@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-cli"
-version = "0.0.24-alpha"
+version = "0.1.0-alpha"
 maintainers = [
   { name="Jimmy Fitzpatrick", email="jcfitzpatrick12@gmail.com" },
 ]
@@ -18,7 +18,8 @@ dependencies = [
     "click<8.2.0",
     "typer-slim==0.13.1",
     "requests==2.31.0",
-    "pyyaml==6.0.2"
+    "pyyaml==6.0.2",
+    "yaspin==3.1.0"
 ]
 
 [project.optional-dependencies]
