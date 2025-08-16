@@ -27,21 +27,21 @@ Track our progress and upcoming features on our [GitHub Project Board](https://g
 
 _Spectre_ is a free and open source receiver-agnostic program for recording and visualising radio spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
 
-Offering robust performance on modest hardware, applications include:  
+Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.org/), it provides high performance on modest hardware. Applications include:  
 
-- 🌞 Solar and Jovian radio observations
-- ✏️ Educational outreach and citizen science
-- 🎛️ Amateur radio experimentation
-- 🔍 Weak signal detection
-- ⚡ Lightning and atmospheric event detection
-- 📡 RFI monitoring
+- Solar and Jovian radio observations
+- Educational outreach and citizen science
+- Amateur radio experimentation
+- Lightning and atmospheric event detection
+- RFI monitoring
 
 ## **Features**
 
-- 💻 Intuitive CLI tool
-- 🐳 Simple installation with Docker
-- 🛰️ Wide receiver support  
-- 💾 Live recording of radio spectrograms and I/Q data  
-- ⚙️ Flexible, configurable data capture
-- ✏️ Backend web server with a discoverable RESTful API
-- 🔧 Developer-friendly and extensible
+- Simple installation with Docker
+- Wide receiver support  
+- Run natively on Linux, including Raspberry Pi
+- Intuitive CLI tool
+- Live record spectrograms and I/Q data  
+- Offers fixed and sweeping center frequency modes
+- Backend web server with a discoverable RESTful API
+- Developer-friendly and extensible
