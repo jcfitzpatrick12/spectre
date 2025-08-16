@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-cli"
-version = "0.1.0-alpha"
+version = "1.0.0-alpha"
 maintainers = [
   { name="Jimmy Fitzpatrick", email="jcfitzpatrick12@gmail.com" },
 ]
