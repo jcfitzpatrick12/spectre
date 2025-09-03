@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-server"
-version = "1.0.0-alpha"
+version = "1.0.1-alpha"
 authors = [
   { name = "Jimmy Fitzpatrick", email = "jcfitzpatrick12@gmail.com" }
 ]
@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 dependencies = [
-    "spectre-core==1.0.0",
+    "spectre-core==1.1.0",
     "flask==2.3.2",
     "gunicorn==21.2.0"
 ]
