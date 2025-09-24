@@ -187,10 +187,10 @@ RUN git clone --branch v3.10.1.1-streamtag-fix --depth 1 https://github.com/jcfi
     -DENABLE_GR_FILTER=ON \
     -DENABLE_GR_ANALOG=ON \
     -DENABLE_GR_FFT=ON \
+    -DENABLE_GR_SOAPY=ON \
     -DENABLE_GR_UTILS=OFF \
     -DENABLE_GR_MODTOOL=OFF \
     -DENABLE_GR_BLOCKTOOL=OFF \
-    -DENABLE_GR_SOAPY=OFF \
     -DENABLE_GR_PDU=OFF \
     -DENABLE_GR_AUDIO=OFF \
     -DENABLE_GR_CHANNELS=OFF \
@@ -255,6 +255,48 @@ COPY ./scripts/cpp/sdrplay_find_devices.cpp sdrplay_find_devices.cpp
 RUN mkdir -p /opt/sdrplay_find_devices/bin && \
     g++ sdrplay_find_devices.cpp -l sdrplay_api -o /opt/sdrplay_find_devices/bin/sdrplay_find_devices && \
     rm -rf /tmp/*
+
+# --------------------------------------------- #
+# Install hackRF host software.
+# --------------------------------------------- #
+FROM build AS hackrf
+
+WORKDIR /tmp
+
+RUN git clone --depth 1 -b v2022.09.1 https://github.com/greatscottgadgets/hackrf.git && \
+    cd hackrf/host && \
+    mkdir build && \
+    cd build && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/hackrf \
+          -DINSTALL_UDEV_RULES=OFF \
+          .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    rm -rf /tmp/*
+
+# --------------------------------------------- #
+# Install the hackRF Soapy plugin.
+# --------------------------------------------- #
+FROM build AS soapy_hackrf
+
+WORKDIR /tmp
+
+COPY --from=hackrf /opt/hackrf/include /usr/include
+COPY --from=hackrf /opt/hackrf/bin /usr/bin
+COPY --from=hackrf /opt/hackrf/lib /usr/lib
+
+RUN git clone --depth 1 -b soapy-hackrf-0.3.4 https://github.com/pothosware/SoapyHackRF.git && \
+    cd SoapyHackRF && \
+    mkdir build && \
+    cd build && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/soapy_hackrf \
+          .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    rm -rf /tmp/*
+
 
 # --------------------------------------------- #
 # Shared build dependencies for OOT modules.
@@ -336,7 +378,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.0.3-alpha" \
+      version="1.1.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -350,6 +392,11 @@ ENV UHD_IMAGES_DIR="/usr/share/uhd/images"
 COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
 COPY --from=sdrplay_api /opt/sdrplay_api/lib /usr/lib
 COPY --from=sdrplay_find_devices /opt/sdrplay_find_devices/bin /usr/bin
+
+# Copy in the hackRF runtime dependencies
+COPY --from=hackrf /opt/hackrf/bin /usr/bin
+COPY --from=hackrf /opt/hackrf/lib /usr/lib
+COPY --from=soapy_hackrf /opt/soapy_hackrf/lib /usr/local/lib
 
 # Copy in the UHD runtime dependencies.
 COPY --from=uhd /opt/uhd/lib /usr/lib
@@ -408,7 +455,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.0.3-alpha" \
+      version="1.1.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
