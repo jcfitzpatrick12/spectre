@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-server"
-version = "1.0.3-alpha"
+version = "1.1.0-alpha"
 authors = [
   { name = "Jimmy Fitzpatrick", email = "jcfitzpatrick12@gmail.com" }
 ]
