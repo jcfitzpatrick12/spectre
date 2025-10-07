@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit
 
-from ._utils import safe_request, get_capture_config_file_name
+from ._utils import safe_request, get_config_file_name
 from ._secho_resources import (
     secho_stale_resource,
     secho_stale_resources,
@@ -120,7 +120,7 @@ def batch_files(
     raise Exit()
 
 
-@delete_typer.command(help="Delete a capture config.")
+@delete_typer.command(help="Delete a capture config.", deprecated=True)
 def capture_config(
     tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
     file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
@@ -135,7 +135,39 @@ def capture_config(
 ) -> None:
     if dry_run:
         non_interactive = True
-    file_name = get_capture_config_file_name(file_name, tag)
+    file_name = get_config_file_name(file_name, tag)
+    params = {"dry_run": dry_run}
+    jsend_dict = safe_request(
+        f"spectre-data/configs/{file_name}",
+        "DELETE",
+        params=params,
+        require_confirmation=True,
+        non_interactive=non_interactive,
+    )
+    endpoint = jsend_dict["data"]
+    if not dry_run:
+        secho_stale_resource(endpoint)
+    else:
+        secho_existing_resource(endpoint)
+    raise Exit()
+
+
+@delete_typer.command(help="Delete a config.")
+def config(
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
+    non_interactive: bool = Option(
+        False, "--non-interactive", help="Suppress any interactive prompts."
+    ),
+    dry_run: bool = Option(
+        False,
+        "--dry-run",
+        help="Display which files would be deleted without actually deleting them.",
+    ),
+) -> None:
+    if dry_run:
+        non_interactive = True
+    file_name = get_config_file_name(file_name, tag)
     params = {"dry_run": dry_run}
     jsend_dict = safe_request(
         f"spectre-data/configs/{file_name}",

@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._utils import safe_request, get_capture_config_file_name
+from ._utils import safe_request, get_config_file_name
 from ._secho_resources import pprint_dict, secho_existing_resources
 
 
@@ -138,7 +138,7 @@ def specs(
     raise Exit()
 
 
-@get_typer.command(help="List capture configs.")
+@get_typer.command(help="List capture configs.", deprecated=True)
 def capture_configs() -> None:
 
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
@@ -147,17 +147,40 @@ def capture_configs() -> None:
     raise Exit()
 
 
-@get_typer.command(help="Print capture config file contents.")
+@get_typer.command(help="List configs.")
+def configs() -> None:
+
+    jsend_dict = safe_request(f"spectre-data/configs", "GET")
+    endpoints = jsend_dict["data"]
+    secho_existing_resources(endpoints)
+    raise Exit()
+
+
+@get_typer.command(help="Print capture config file contents.", deprecated=True)
 def capture_config(
     tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
     file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
 ) -> None:
 
-    file_name = get_capture_config_file_name(file_name, tag)
+    file_name = get_config_file_name(file_name, tag)
 
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
     capture_config = jsend_dict["data"]
     pprint_dict(capture_config)
+    raise Exit()
+
+
+@get_typer.command(help="Print config file contents.")
+def config(
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
+) -> None:
+
+    file_name = get_config_file_name(file_name, tag)
+
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
+    config = jsend_dict["data"]
+    pprint_dict(config)
     raise Exit()
 
 
