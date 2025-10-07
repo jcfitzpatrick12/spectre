@@ -11,6 +11,7 @@ from spectre_cli.commands.start import start_typer
 from spectre_cli.commands.update import update_typer
 from spectre_cli.commands.download import download_typer
 from spectre_cli.commands.test import test_typer
+from spectre_cli.commands.record import record_typer
 
 app = Typer(help="Spectre: Process, Explore and Capture Transient Radio Emissions")
 
@@ -21,3 +22,4 @@ app.add_typer(start_typer, name="start")
 app.add_typer(update_typer, name="update")
 app.add_typer(download_typer, name="download")
 app.add_typer(test_typer, name="test")
+app.add_typer(record_typer, name="record")

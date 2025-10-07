@@ -8,7 +8,7 @@ from yaspin import yaspin
 from ._utils import safe_request
 
 
-start_typer = typer.Typer(help="Start a job.")
+record_typer = typer.Typer(help="Start a job.")
 
 _DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
@@ -17,8 +17,8 @@ _DEFAULT_SKIP_VALIDATION = False
 _IN_PROGRESS = "In progress... "
 
 
-@start_typer.command(help="Capture data from an SDR in real time.", deprecated=True)
-def capture(
+@record_typer.command(help="Capture data from an SDR in real time.")
+def signal(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
@@ -61,15 +61,14 @@ def capture(
         "validate": not skip_validation,
     }
     with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/capture", "POST", json=json)
+        _ = safe_request("jobs/signal", "POST", json=json)
     raise typer.Exit()
 
 
-@start_typer.command(
-    help="Capture data from an SDR and post-process it into spectrograms in real time.",
-    deprecated=True,
+@record_typer.command(
+    help="Capture data from an SDR and post-process it into spectrograms in real time."
 )
-def session(
+def spectrograms(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
@@ -112,5 +111,5 @@ def session(
         "validate": not skip_validation,
     }
     with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/session", "POST", json=json)
+        _ = safe_request("jobs/spectrograms", "POST", json=json)
     raise typer.Exit()
