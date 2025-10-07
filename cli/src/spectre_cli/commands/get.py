@@ -4,7 +4,7 @@
 
 from typer import Typer, Option, Exit, secho
 
-from ._utils import safe_request, get_capture_config_file_name
+from ._utils import safe_request, get_config_file_name
 from ._secho_resources import pprint_dict, secho_existing_resources
 
 
@@ -51,7 +51,7 @@ def log(
     raise Exit()
 
 
-@get_typer.command(help="List batch files.")
+@get_typer.command(help="List batch files.", deprecated=True)
 def batch_files(
     extensions: list[str] = Option(
         [],
@@ -74,6 +74,44 @@ def batch_files(
     day: int = Option(
         None, "--day", "-d", help="Only list batch files under this day."
     ),
+) -> None:
+    params = {
+        "extension": extensions,
+        "tag": tags,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
+    jsend_dict = safe_request(
+        f"spectre-data/batches",
+        "GET",
+        params=params,
+    )
+    endpoints = jsend_dict["data"]
+
+    secho_existing_resources(endpoints)
+    raise Exit()
+
+
+@get_typer.command(help="List files.")
+def files(
+    extensions: list[str] = Option(
+        [],
+        "--extension",
+        "-e",
+        help="List all files with this file extension. If not provided, list files with any extension.",
+    ),
+    tags: list[str] = Option(
+        [],
+        "--tag",
+        "-t",
+        help="List all files with this tag. If not provided, list files with any tag.",
+    ),
+    year: int = Option(None, "--year", "-y", help="Only list files under this year."),
+    month: int = Option(
+        None, "--month", "-m", help="Only list files under this month."
+    ),
+    day: int = Option(None, "--day", "-d", help="Only list files under this day."),
 ) -> None:
     params = {
         "extension": extensions,
@@ -138,7 +176,7 @@ def specs(
     raise Exit()
 
 
-@get_typer.command(help="List capture configs.")
+@get_typer.command(help="List capture configs.", deprecated=True)
 def capture_configs() -> None:
 
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
@@ -147,13 +185,22 @@ def capture_configs() -> None:
     raise Exit()
 
 
-@get_typer.command(help="Print capture config file contents.")
+@get_typer.command(help="List configs.")
+def configs() -> None:
+
+    jsend_dict = safe_request(f"spectre-data/configs", "GET")
+    endpoints = jsend_dict["data"]
+    secho_existing_resources(endpoints)
+    raise Exit()
+
+
+@get_typer.command(help="Print capture config file contents.", deprecated=True)
 def capture_config(
     tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
     file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
 ) -> None:
 
-    file_name = get_capture_config_file_name(file_name, tag)
+    file_name = get_config_file_name(file_name, tag)
 
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
     capture_config = jsend_dict["data"]
@@ -161,7 +208,21 @@ def capture_config(
     raise Exit()
 
 
-@get_typer.command(help="List tags with existing batch files.")
+@get_typer.command(help="Print config file contents.")
+def config(
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
+) -> None:
+
+    file_name = get_config_file_name(file_name, tag)
+
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
+    config = jsend_dict["data"]
+    pprint_dict(config)
+    raise Exit()
+
+
+@get_typer.command(help="List tags with existing files.")
 def tags(
     year: int = Option(
         None,

@@ -8,6 +8,8 @@ from spectre_core.receivers import get_receiver, ReceiverName
 from spectre_core.post_processing import start_post_processor
 from spectre_core import jobs
 
+DONE = "Done"
+
 
 def _calculate_total_runtime(
     seconds: int = 0, minutes: int = 0, hours: int = 0
@@ -20,24 +22,21 @@ def _calculate_total_runtime(
 
 # Decorate with `log_call`, so that log records are written to file if the function errors out when called by a worker.
 @log_call
-def _start_post_processing(tag: str) -> None:
+def _post_process(tag: str) -> None:
     start_post_processor(tag)
 
 
 # Decorate with `log_call`, so that log records are written to file if the function errors out when called by a worker.
 @log_call
-def _start_capture(tag: str, validate: bool = True) -> None:
-    # load the receiver and mode from the capture config file
+def _record_signal(tag: str, validate: bool = True) -> None:
     capture_config = CaptureConfig(tag)
-
-    # start capturing data from the receiver.
     name = ReceiverName(capture_config.receiver_name)
     receiver = get_receiver(name, capture_config.receiver_mode)
     receiver.start_capture(tag, validate)
 
 
 @log_call
-def capture(
+def signal(
     tag: str,
     seconds: int = 0,
     minutes: int = 0,
@@ -58,22 +57,22 @@ def capture(
     :param validate: If True, validate the capture config parameters. Defaults to True.
     :return: A string indicating the job has completed.
     """
-    capture_worker = jobs.make_worker(
-        "capture_worker",
-        _start_capture,
+    signal_recorder = jobs.make_worker(
+        "signal_recorder",
+        _record_signal,
         (
             tag,
             validate,
         ),
     )
-    workers = [capture_worker]
+    workers = [signal_recorder]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
     jobs.start_job(workers, total_runtime, force_restart, max_restarts)
-    return "Capture complete."
+    return DONE
 
 
 @log_call
-def session(
+def spectrograms(
     tag: str,
     seconds: int = 0,
     minutes: int = 0,
@@ -85,7 +84,7 @@ def session(
     """Capture data from an SDR and post-process it into spectrograms in real time.
 
     :param tag: The capture config tag.
-    :param seconds: The seconds component of the job duration., defaults to 0
+    :param seconds: The seconds component of the job duration, defaults to 0
     :param minutes: The minutes component of the job duration, defaults to 0
     :param hours: The hours component of the job duration, defaults to 0
     :param force_restart: If specified, restart all workers if one dies unexpectedly.
@@ -95,20 +94,18 @@ def session(
     :return: A string indicating the job has completed.
     """
     # Trailing commas are required so that the bracket terms are interpreted as tuples, not a grouping.
-    post_processing_worker = jobs.make_worker(
-        "post_processing_worker", _start_post_processing, (tag,)
-    )
-    capture_worker = jobs.make_worker(
-        "capture_worker",
-        _start_capture,
+    post_processer = jobs.make_worker("post_processer", _post_process, (tag,))
+    signal_recorder = jobs.make_worker(
+        "signal_recorder",
+        _record_signal,
         (
             tag,
             validate,
         ),
     )
 
-    # start the post processing worker first, so that it sees the first files opened by the capture worker.
-    workers = [post_processing_worker, capture_worker]
+    # Start the spectrogram recorder
+    workers = [post_processer, signal_recorder]
     total_runtime = _calculate_total_runtime(seconds, minutes, hours)
     jobs.start_job(workers, total_runtime, force_restart, max_restarts)
-    return "Session complete."
+    return DONE
