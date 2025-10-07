@@ -51,7 +51,7 @@ def log(
     raise Exit()
 
 
-@get_typer.command(help="List batch files.")
+@get_typer.command(help="List batch files.", deprecated=True)
 def batch_files(
     extensions: list[str] = Option(
         [],
@@ -74,6 +74,44 @@ def batch_files(
     day: int = Option(
         None, "--day", "-d", help="Only list batch files under this day."
     ),
+) -> None:
+    params = {
+        "extension": extensions,
+        "tag": tags,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
+    jsend_dict = safe_request(
+        f"spectre-data/batches",
+        "GET",
+        params=params,
+    )
+    endpoints = jsend_dict["data"]
+
+    secho_existing_resources(endpoints)
+    raise Exit()
+
+
+@get_typer.command(help="List files.")
+def files(
+    extensions: list[str] = Option(
+        [],
+        "--extension",
+        "-e",
+        help="List all files with this file extension. If not provided, list files with any extension.",
+    ),
+    tags: list[str] = Option(
+        [],
+        "--tag",
+        "-t",
+        help="List all files with this tag. If not provided, list files with any tag.",
+    ),
+    year: int = Option(None, "--year", "-y", help="Only list files under this year."),
+    month: int = Option(
+        None, "--month", "-m", help="Only list files under this month."
+    ),
+    day: int = Option(None, "--day", "-d", help="Only list files under this day."),
 ) -> None:
     params = {
         "extension": extensions,
@@ -184,7 +222,7 @@ def config(
     raise Exit()
 
 
-@get_typer.command(help="List tags with existing batch files.")
+@get_typer.command(help="List tags with existing files.")
 def tags(
     year: int = Option(
         None,

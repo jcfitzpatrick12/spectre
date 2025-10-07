@@ -63,7 +63,7 @@ def logs(
     raise Exit()
 
 
-@delete_typer.command(help="Delete batch files.")
+@delete_typer.command(help="Delete batch files.", deprecated=True)
 def batch_files(
     tags: list[str] = Option(
         [],
@@ -86,6 +86,59 @@ def batch_files(
     day: int = Option(
         None, "--day", "-d", help="Only delete batch files under this day."
     ),
+    non_interactive: bool = Option(
+        False, "--non-interactive", help="Suppress any interactive prompts."
+    ),
+    dry_run: bool = Option(
+        False,
+        "--dry-run",
+        help="Display which files would be deleted without actually deleting them.",
+    ),
+) -> None:
+    if dry_run:
+        non_interactive = True
+    params = {
+        "extension": extensions,
+        "tag": tags,
+        "dry_run": dry_run,
+        "year": year,
+        "month": month,
+        "day": day,
+    }
+    jsend_dict = safe_request(
+        f"spectre-data/batches",
+        "DELETE",
+        params=params,
+        require_confirmation=True,
+        non_interactive=non_interactive,
+    )
+    endpoints = jsend_dict["data"]
+    if not dry_run:
+        secho_stale_resources(endpoints)
+    else:
+        secho_existing_resources(endpoints)
+    raise Exit()
+
+
+@delete_typer.command(help="Delete files.")
+def files(
+    tags: list[str] = Option(
+        [],
+        "--tag",
+        "-t",
+        help="Delete all files with this tag. If not provided, nothing will be deleted.",
+    ),
+    extensions: list[str] = Option(
+        [],
+        "--extension",
+        "-e",
+        help="Delete all files with this file extension. If not provided, nothing will be deleted.",
+    ),
+    year: int = Option(None, "--year", "-y", help="Only delete files under this year."),
+    month: int = Option(
+        None, "--month", "-m", help="Only delete files under this month."
+    ),
+    day: int = Option(None, "--day", "-d", help="Only delete files under this day."),
     non_interactive: bool = Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
     ),

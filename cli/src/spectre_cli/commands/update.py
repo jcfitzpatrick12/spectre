@@ -29,7 +29,7 @@ def capture_config(
     force: bool = Option(
         False,
         "--force",
-        help="If specified, force the operation even if batch files exist with the same tag.",
+        help="If specified, force the operation even if files exist with the same tag.",
     ),
     skip_validation: bool = Option(
         False,
@@ -61,7 +61,7 @@ def config(
     force: bool = Option(
         False,
         "--force",
-        help="If specified, force the operation even if batch files exist with the same tag.",
+        help="If specified, force the operation even if files exist with the same tag.",
     ),
     skip_validation: bool = Option(
         False,
