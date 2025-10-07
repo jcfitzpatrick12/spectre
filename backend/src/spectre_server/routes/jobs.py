@@ -22,7 +22,7 @@ def capture() -> str:
     force_restart = json.get("force_restart")
     max_restarts = json.get("max_restarts")
     validate = json.get("validate")
-    return jobs.capture(
+    return jobs.signal(
         tag, seconds, minutes, hours, force_restart, max_restarts, validate
     )
 
@@ -38,6 +38,38 @@ def session() -> str:
     force_restart = json.get("force_restart")
     max_restarts = json.get("max_restarts")
     validate = json.get("validate")
-    return jobs.session(
+    return jobs.spectrograms(
+        tag, seconds, minutes, hours, force_restart, max_restarts, validate
+    )
+
+
+@jobs_blueprint.route("/signal", methods=["POST"])
+@jsendify_response
+def signal() -> str:
+    json = request.get_json()
+    tag = json.get("tag")
+    seconds = json.get("seconds")
+    minutes = json.get("minutes")
+    hours = json.get("hours")
+    force_restart = json.get("force_restart")
+    max_restarts = json.get("max_restarts")
+    validate = json.get("validate")
+    return jobs.signal(
+        tag, seconds, minutes, hours, force_restart, max_restarts, validate
+    )
+
+
+@jobs_blueprint.route("/spectrograms", methods=["POST"])
+@jsendify_response
+def spectrograms() -> str:
+    json = request.get_json()
+    tag = json.get("tag")
+    seconds = json.get("seconds")
+    minutes = json.get("minutes")
+    hours = json.get("hours")
+    force_restart = json.get("force_restart")
+    max_restarts = json.get("max_restarts")
+    validate = json.get("validate")
+    return jobs.spectrograms(
         tag, seconds, minutes, hours, force_restart, max_restarts, validate
     )
