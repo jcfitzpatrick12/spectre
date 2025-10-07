@@ -17,7 +17,7 @@ _DEFAULT_SKIP_VALIDATION = False
 _IN_PROGRESS = "In progress... "
 
 
-@start_typer.command(help="Capture data from an SDR in real time.")
+@start_typer.command(help="Capture data from an SDR in real time.", deprecated=True)
 def capture(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
     seconds: int = typer.Option(
@@ -66,7 +66,8 @@ def capture(
 
 
 @start_typer.command(
-    help="Capture data from an SDR and post-process it into spectrograms in real time."
+    help="Capture data from an SDR and post-process it into spectrograms in real time.",
+    deprecated=True,
 )
 def session(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
