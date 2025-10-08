@@ -8,7 +8,7 @@ from yaspin import yaspin
 from ._utils import safe_request
 
 
-start_typer = typer.Typer(help="Start a job.")
+record_typer = typer.Typer(help="Start recording data.")
 
 _DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
@@ -17,38 +17,38 @@ _DEFAULT_SKIP_VALIDATION = False
 _IN_PROGRESS = "In progress... "
 
 
-@start_typer.command(help="Capture data from an SDR in real time.", deprecated=True)
-def capture(
+@record_typer.command(help="Capture data from an SDR in real time.")
+def signal(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
         "--seconds",
-        help="The seconds component of the job duration.",
+        help="The seconds component of the duration.",
     ),
     minutes: int = typer.Option(
         _DEFAULT_DURATION,
         "--minutes",
-        help="The minutes component of the job duration.",
+        help="The minutes component of the duration.",
     ),
     hours: int = typer.Option(
         _DEFAULT_DURATION,
         "--hours",
-        help="The hours component of the job duration.",
+        help="The hours component of the duration.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="If specified, restart all workers if one dies unexpectedly.",
+        help="If specified, restart if an error occurs at runtime.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,
         "--max-restarts",
-        help="Maximum number of times workers can be restarted before giving up and killing all workers.",
+        help="Maximum number of times to restart before giving up.",
     ),
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate parameters.",
+        help="If specified, do not validate config parameters.",
     ),
 ) -> None:
     json = {
@@ -61,45 +61,44 @@ def capture(
         "validate": not skip_validation,
     }
     with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/capture", "POST", json=json)
+        _ = safe_request("jobs/signal", "POST", json=json)
     raise typer.Exit()
 
 
-@start_typer.command(
-    help="Capture data from an SDR and post-process it into spectrograms in real time.",
-    deprecated=True,
+@record_typer.command(
+    help="Capture data from an SDR and post-process it into spectrograms in real time."
 )
-def session(
+def spectrograms(
     tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
     seconds: int = typer.Option(
         _DEFAULT_DURATION,
         "--seconds",
-        help="The seconds component of the job duration.",
+        help="The seconds component of the duration.",
     ),
     minutes: int = typer.Option(
         _DEFAULT_DURATION,
         "--minutes",
-        help="The minutes component of the job duration.",
+        help="The minutes component of the duration.",
     ),
     hours: int = typer.Option(
         _DEFAULT_DURATION,
         "--hours",
-        help="The hours component of the job duration.",
+        help="The hours component of the duration.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
         "--force-restart",
-        help="If specified, restart all workers if one dies unexpectedly.",
+        help="If specified, restart if an error occurs at runtime.",
     ),
     max_restarts: int = typer.Option(
         _DEFAULT_MAX_RESTARTS,
         "--max-restarts",
-        help="Maximum number of times workers can be restarted before giving up and killing all workers.",
+        help="Maximum number of times to restart before giving up.",
     ),
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate parameters.",
+        help="If specified, do not validate config parameters.",
     ),
 ) -> None:
     json = {
@@ -112,5 +111,5 @@ def session(
         "validate": not skip_validation,
     }
     with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/session", "POST", json=json)
+        _ = safe_request("jobs/spectrograms", "POST", json=json)
     raise typer.Exit()

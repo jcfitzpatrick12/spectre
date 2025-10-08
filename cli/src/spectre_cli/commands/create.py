@@ -6,12 +6,12 @@ from typer import Typer, Option, Exit
 from typing import List
 
 from ._secho_resources import secho_new_resource
-from ._utils import safe_request, get_capture_config_file_name
+from ._utils import safe_request, get_config_file_name
 
 create_typer = Typer(help="Create resources.")
 
 
-@create_typer.command(help="Create a capture config.")
+@create_typer.command(help="Create a capture config.", deprecated=True)
 def capture_config(
     receiver_name: str = Option(
         ..., "--receiver", "-r", help="The name of the receiver."
@@ -39,7 +39,50 @@ def capture_config(
         help="If specified, do not validate the parameters.",
     ),
 ) -> None:
-    file_name = get_capture_config_file_name(file_name, tag)
+    file_name = get_config_file_name(file_name, tag)
+
+    json = {
+        "receiver_name": receiver_name,
+        "receiver_mode": receiver_mode,
+        "string_parameters": params,
+        "force": force,
+        "validate": not skip_validation,
+    }
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PUT", json=json)
+    endpoint = jsend_dict["data"]
+    secho_new_resource(endpoint)
+    raise Exit()
+
+
+@create_typer.command(help="Create a config.")
+def config(
+    receiver_name: str = Option(
+        ..., "--receiver", "-r", help="The name of the receiver."
+    ),
+    receiver_mode: str = Option(
+        ..., "--mode", "-m", help="The operating mode for the receiver."
+    ),
+    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
+    params: List[str] = Option(
+        [],
+        "--param",
+        "-p",
+        help="Parameters as key-value pairs.",
+        metavar="<key>=<value>",
+    ),
+    force: bool = Option(
+        False,
+        "--force",
+        help="If specified, force the operation even if files exist with the same tag.",
+    ),
+    skip_validation: bool = Option(
+        False,
+        "--skip-validation",
+        help="If specified, do not validate the parameters.",
+    ),
+) -> None:
+    file_name = get_config_file_name(file_name, tag)
 
     json = {
         "receiver_name": receiver_name,
@@ -60,7 +103,7 @@ def plot(
         ...,
         "--tag",
         "-t",
-        help="The batch file tag. Specifying multiple tags yields a stacked plot over the same time frame.",
+        help="The file tag. Specifying multiple tags yields a stacked plot over the same time frame.",
     ),
     obs_date: str = Option(
         ...,
