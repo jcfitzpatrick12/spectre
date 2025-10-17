@@ -14,48 +14,42 @@ SPECTRE_SERVER_PORT="5000"
 
 # Check if the script is run with root privileges.
 if [ "$EUID" -ne 0 ]; then
-    echo "❌ Please run this script as root: sudo ./setup.sh"
+    echo "Please run this script as root: sudo ./setup.sh"
     exit 1
 fi
 
-# Create a group, which we will use to give access to USB devices from named vendors.
+# Create the group used to give Spectre access to USB devices from named vendors.
 SPECTRE_GROUP=spectre-group
 if getent group "$SPECTRE_GROUP" > /dev/null; then
-    echo "✅ Group '$SPECTRE_GROUP' already exists"
+    echo "Group '$SPECTRE_GROUP' already exists"
 else
-    echo "➕ Creating group '$SPECTRE_GROUP'"
+    echo "Creating group '$SPECTRE_GROUP'"
     groupadd "$SPECTRE_GROUP"
-    echo "✅ Group '$SPECTRE_GROUP' created"
 fi
 SPECTRE_GID=$(getent group "$SPECTRE_GROUP" | cut -d: -f3)
 
 # Allow users in the group to access USB devices from named vendors.
 UDEV_FILE="/etc/udev/rules.d/99-spectre.rules"
-echo "📝 Writing udev rules to $UDEV_FILE"
-tee "$UDEV_FILE" > /dev/null <<EOF
-# Ettus Research
-SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="2500", MODE="0660", GROUP="$SPECTRE_GROUP"
-
-# SDRplay
-SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1df7", MODE="0660", GROUP="$SPECTRE_GROUP"
-
-# HackRF
-SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="1d50", MODE="0660", GROUP="$SPECTRE_GROUP"
-
-# RTL-SDR
-SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="0bda", MODE="0660", GROUP="$SPECTRE_GROUP"
-EOF
-echo "✅ Udev rules written"
+echo "Writing udev rules to $UDEV_FILE"
+{
+    echo '# Ettus Research'
+    echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"2500\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
+    echo "# SDRplay"
+    echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"1df7\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
+    echo '# HackRF'
+    echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"1d50\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
+    echo '# RTL-SDR'
+    echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"0bda\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
+} > "$UDEV_FILE"
 
 # Apply the new udev rules.
-echo "🔄 Reloading udev rules"
+echo "Reloading udev rules"
 udevadm control --reload-rules
 udevadm trigger
-echo "✅ Udev rules reloaded"
 
-# Write the `.env` file, which will be used to interpolate our for Docker Compose configs.
+# Write environment variables to the `.env` file, which will be used to interpolate the docker compose configs.
 DOTENV_FILE="./.env"
-echo "📦 Writing environment variables to .env"
+echo "Writing environment variables to $DOTENV_FILE"
 {
     echo "SPECTRE_GID=$SPECTRE_GID"
     echo "SPECTRE_BIND_HOST=$SPECTRE_BIND_HOST"
@@ -64,7 +58,6 @@ echo "📦 Writing environment variables to .env"
     echo "SPECTRE_SERVER_HOST=$SPECTRE_SERVER_HOST"
     echo "SPECTRE_SERVER_PORT=$SPECTRE_SERVER_PORT"
 } > "$DOTENV_FILE"
-echo "✅ $DOTENV_FILE written"
 
-echo "🎉 Setup complete!"
-echo "You can now run the application with: docker compose up"
+echo "Setup complete!"
+echo "You can now run Spectre with: docker compose up"
