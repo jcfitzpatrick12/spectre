@@ -297,6 +297,46 @@ RUN git clone --depth 1 -b soapy-hackrf-0.3.4 https://github.com/pothosware/Soap
     make install && \
     rm -rf /tmp/*
 
+# --------------------------------------------- #
+# Install RTL-SDR library
+# --------------------------------------------- #
+FROM build AS rtlsdr
+
+WORKDIR /tmp
+
+RUN git clone --depth 1 -b v2.0.1 https://github.com/osmocom/rtl-sdr.git rtlsdr && \
+    cd rtlsdr && \
+    mkdir build && \
+    cd build && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/rtlsdr \
+          -DDETACH_KERNEL_DRIVER=ON \
+          ..  && \
+    make -j"$(nproc)" && \
+    make install && \
+    rm -rf /tmp/*
+
+# --------------------------------------------- #
+# Install the RTL-SDR Soapy plugin.
+# --------------------------------------------- #
+FROM build AS soapy_rtlsdr
+
+WORKDIR /tmp
+
+COPY --from=rtlsdr /opt/rtlsdr/include /usr/include
+COPY --from=rtlsdr /opt/rtlsdr/bin /usr/bin
+COPY --from=rtlsdr /opt/rtlsdr/lib /usr/lib
+
+RUN git clone --depth 1 -b soapy-rtl-sdr-0.3.3 https://github.com/pothosware/SoapyRTLSDR.git && \
+    cd SoapyRTLSDR && \
+    mkdir build && \
+    cd build && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/soapy_rtlsdr \
+          .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    rm -rf /tmp/*
 
 # --------------------------------------------- #
 # Shared build dependencies for OOT modules.
@@ -378,7 +418,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.1.2-alpha" \
+      version="1.2.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -393,10 +433,15 @@ COPY --from=sdrplay_api /opt/sdrplay_api/bin /usr/bin
 COPY --from=sdrplay_api /opt/sdrplay_api/lib /usr/lib
 COPY --from=sdrplay_find_devices /opt/sdrplay_find_devices/bin /usr/bin
 
-# Copy in the hackRF runtime dependencies
+# Copy in the hackRF runtime dependencies.
 COPY --from=hackrf /opt/hackrf/bin /usr/bin
 COPY --from=hackrf /opt/hackrf/lib /usr/lib
 COPY --from=soapy_hackrf /opt/soapy_hackrf/lib /usr/local/lib
+
+# Copy in the rtlsdr runtime dependencies.
+COPY --from=rtlsdr /opt/rtlsdr/bin /usr/bin
+COPY --from=rtlsdr /opt/rtlsdr/lib /usr/lib
+COPY --from=soapy_rtlsdr /opt/soapy_rtlsdr/lib /usr/local/lib
 
 # Copy in the UHD runtime dependencies.
 COPY --from=uhd /opt/uhd/lib /usr/lib
@@ -455,7 +500,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.1.2-alpha" \
+      version="1.2.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
