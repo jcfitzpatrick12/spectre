@@ -38,10 +38,12 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 ## **Features**
 
 - Simple installation with Docker
-- Wide receiver support  
+- Wide receiver support (SDRplay, HackRF, RTL-SDR, USRP)
 - Run natively on Linux, including Raspberry Pi
 - Intuitive CLI tool
 - Live record spectrograms and I/Q data  
 - Offers fixed and sweeping center frequency modes
 - Backend web server with a discoverable RESTful API
 - Developer-friendly and extensible
+
+ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/jcfitzpatrick12/spectre-lite), a stripped-back derivative of _Spectre_, written in pure C (no Docker required).
