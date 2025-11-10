@@ -2,19 +2,19 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
+import typing
 
-from spectre_core.logs import log_call
-from spectre_core.receivers import get_receiver, get_registered_receivers, ReceiverName
+import spectre_core.logs
+import spectre_core.receivers
 
 
-@log_call
+@spectre_core.logs.log_call
 def get_receiver_names() -> list[str]:
     """List the names of all supported receivers."""
-    return get_registered_receivers()
+    return spectre_core.receivers.get_registered_receivers()
 
 
-@log_call
+@spectre_core.logs.log_call
 def get_modes(
     receiver_name: str,
 ) -> list[str]:
@@ -23,32 +23,17 @@ def get_modes(
     :param receiver_name: The name of the receiver.
     :return: The operating modes for the receiver.
     """
-    receiver = get_receiver(ReceiverName(receiver_name))
+    receiver = spectre_core.receivers.get_receiver(receiver_name)
     return receiver.modes
 
 
-@log_call
-def get_specs(
-    receiver_name: str,
-) -> dict[str, float | int | list[float | int]]:
-    """Get the hardware specifications for a receiver.
-
-    :param receiver_name: The name of the receiver.
-    :return: The hardware specifications for the receiver.
-    """
-    receiver = get_receiver(ReceiverName(receiver_name))
-    return {k.value: v for k, v in receiver.specs.items()}
-
-
-@log_call
-def get_capture_template(receiver_name: str, receiver_mode: str) -> dict[str, Any]:
-    """Get the capture template for a receiver in a particular operating mode.
+@spectre_core.logs.log_call
+def get_model(receiver_name: str, receiver_mode: str) -> dict[str, typing.Any]:
+    """Get the model for a receiver in a particular operating mode.
 
     :param receiver_name: The name of the receiver.
     :param receiver_mode: The operating mode for the receiver.
-    :return: The capture template as a serialisable dictionary.
+    :return: The serialisable model.
     """
-    name = ReceiverName(receiver_name)
-    receiver = get_receiver(name, mode=receiver_mode)
-
-    return receiver.capture_template.to_dict()
+    receiver = spectre_core.receivers.get_receiver(receiver_name, receiver_mode)
+    return receiver.model_schema
