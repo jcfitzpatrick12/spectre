@@ -76,7 +76,9 @@ def _make_jsend_response(
 P = typing.ParamSpec("P")
 # Loosen type hinting to support any JSON-compatible data structures.
 # Additionally, permit `Response` objects, under the assumption they are produced by `send_from_directory`.
-T = typing.TypeVar("T", bound=None | int | str | list[typing.Any] | dict[str, typing.Any])
+T = typing.TypeVar(
+    "T", bound=None | int | str | list[typing.Any] | dict[str, typing.Any]
+)
 
 
 def jsendify_response(
