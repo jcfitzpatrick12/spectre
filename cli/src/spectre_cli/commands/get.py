@@ -207,40 +207,22 @@ def tags(
     raise typer.Exit()
 
 
-@get_typer.command(help="Print a capture template.")
-def capture_template(
+@get_typer.command(help="Print a model.")
+def model(
     receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     ),
     receiver_mode: str = typer.Option(
         ..., "--mode", "-m", help="The operating mode of the receiver."
-    ),
-    param_name: str = typer.Option(
-        None,
-        "--param",
-        "-p",
-        help="The name of the parameter to print a template for. If not provided, prints the full capture template.",
-    ),
+    )
 ) -> None:
 
     params = {
         "receiver_mode": receiver_mode,
     }
     jsend_dict = safe_request(
-        f"receivers/{receiver_name}/capture-template", "GET", params=params
+        f"receivers/{receiver_name}/model", "GET", params=params
     )
-    capture_template = jsend_dict["data"]
-
-    if param_name is None:
-        pprint_dict(capture_template)
-    else:
-        if param_name not in capture_template:
-            raise KeyError(
-                f"A parameter with name '{param_name}' does not exist "
-                f"in the capture template for the receiver '{receiver_name}' "
-                f"operating in mode '{receiver_mode}'. Expected one of: "
-                f"{list(capture_template.keys())}"
-            )
-        pprint_dict(capture_template[param_name])
-
+    model = jsend_dict["data"]
+    pprint_dict(model)
     typer.Exit()
