@@ -3,37 +3,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
-from yaspin import yaspin
 
-from ._utils import safe_request
+from ._utils import safe_request, spinner
 
 
 record_typer = typer.Typer(help="Start recording data.")
 
-_DEFAULT_DURATION = 0
 _DEFAULT_MAX_RESTARTS = 5
 _DEFAULT_FORCE_RESTART = False
 _DEFAULT_SKIP_VALIDATION = False
-_IN_PROGRESS = "In progress... "
 
 
 @record_typer.command(help="Capture data from an SDR in real time.")
 def signal(
-    tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
-    seconds: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--seconds",
-        help="The seconds component of the duration.",
-    ),
-    minutes: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--minutes",
-        help="The minutes component of the duration.",
-    ),
-    hours: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--hours",
-        help="The hours component of the duration.",
+    tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
+    duration: float = typer.Option(
+        ...,
+        "--duration",
+        help="How long to record the signal for, in seconds.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
@@ -52,16 +39,14 @@ def signal(
     ),
 ) -> None:
     json = {
-        "tag": tag,
-        "seconds": seconds,
-        "minutes": minutes,
-        "hours": hours,
+        "tags": tags,
+        "duration": duration,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
         "validate": not skip_validation,
     }
-    with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/signal", "POST", json=json)
+    with spinner():
+        _ = safe_request("recordings/signal", "POST", json=json)
     raise typer.Exit()
 
 
@@ -69,21 +54,11 @@ def signal(
     help="Capture data from an SDR and post-process it into spectrograms in real time."
 )
 def spectrograms(
-    tag: str = typer.Option(..., "--tag", "-t", help="The capture config tag."),
-    seconds: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--seconds",
-        help="The seconds component of the duration.",
-    ),
-    minutes: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--minutes",
-        help="The minutes component of the duration.",
-    ),
-    hours: int = typer.Option(
-        _DEFAULT_DURATION,
-        "--hours",
-        help="The hours component of the duration.",
+    tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
+    duration: float = typer.Option(
+        ...,
+        "--duration",
+        help="How long to record the signal for, in seconds.",
     ),
     force_restart: bool = typer.Option(
         _DEFAULT_FORCE_RESTART,
@@ -102,14 +77,12 @@ def spectrograms(
     ),
 ) -> None:
     json = {
-        "tag": tag,
-        "seconds": seconds,
-        "minutes": minutes,
-        "hours": hours,
+        "tags": tags,
+        "duration": duration,
         "force_restart": force_restart,
         "max_restarts": max_restarts,
         "validate": not skip_validation,
     }
-    with yaspin(text=_IN_PROGRESS):
-        _ = safe_request("jobs/spectrograms", "POST", json=json)
+    with spinner():
+        _ = safe_request("recordings/spectrogram", "POST", json=json)
     raise typer.Exit()
