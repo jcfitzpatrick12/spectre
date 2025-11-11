@@ -30,7 +30,7 @@ class _JsendStatus(enum.Enum):
 
 def _make_jsend_response(
     status: _JsendStatus,
-    data: None | str | list[typing.Any] | dict[str, typing.Any] = None,
+    data: None | int | str | list[typing.Any] | dict[str, typing.Any] = None,
     message: typing.Optional[str] = None,
     code: typing.Optional[int] = None,
 ) -> flask.Response:
@@ -76,7 +76,7 @@ def _make_jsend_response(
 P = typing.ParamSpec("P")
 # Loosen type hinting to support any JSON-compatible data structures.
 # Additionally, permit `Response` objects, under the assumption they are produced by `send_from_directory`.
-T = typing.TypeVar("T", bound=None | str | list[typing.Any] | dict[str, typing.Any])
+T = typing.TypeVar("T", bound=None | int | str | list[typing.Any] | dict[str, typing.Any])
 
 
 def jsendify_response(

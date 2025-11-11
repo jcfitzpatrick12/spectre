@@ -13,7 +13,7 @@ recordings_blueprint = flask.Blueprint("recordings", __name__, url_prefix="/reco
 
 @recordings_blueprint.route("/signal", methods=["POST"])
 @jsendify_response
-def signal() -> str:
+def signal() -> int:
     json = flask.request.get_json()
     tags = json.get("tags")
     duration = json.get("duration")
@@ -25,7 +25,7 @@ def signal() -> str:
 
 @recordings_blueprint.route("/spectrogram", methods=["POST"])
 @jsendify_response
-def spectrograms() -> str:
+def spectrograms() -> int:
     json = flask.request.get_json()
     tags = json.get("tags")
     duration = json.get("duration")
