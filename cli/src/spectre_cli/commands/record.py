@@ -19,7 +19,7 @@ def signal(
     tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
     duration: float = typer.Option(
         ...,
-        "--duration",
+        "--duration", "-d",
         help="How long to record the signal for, in seconds.",
     ),
     force_restart: bool = typer.Option(
@@ -57,7 +57,7 @@ def spectrograms(
     tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
     duration: float = typer.Option(
         ...,
-        "--duration",
+        "--duration", "-d",
         help="How long to record the signal for, in seconds.",
     ),
     force_restart: bool = typer.Option(
