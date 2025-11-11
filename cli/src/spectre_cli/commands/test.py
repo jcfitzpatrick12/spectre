@@ -2,11 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typer import Typer, Option, Exit, secho
+import typer
 
 from ._utils import safe_request
 
-test_typer = Typer(help="Run tests.")
+test_typer = typer.Typer(help="Run tests.")
 
 
 def _pretty_print_test_results(
@@ -19,13 +19,15 @@ def _pretty_print_test_results(
     """Print test results with appropriate formatting and colours."""
 
     def print_colored(label: str, value: bool) -> None:
-        secho(f"{label}: {'PASS' if value else 'FAIL'}", fg="green" if value else "red")
+        typer.secho(
+            f"{label}: {'PASS' if value else 'FAIL'}", fg="green" if value else "red"
+        )
 
     def print_spectrum_results():
-        secho("\nPer spectrum results:" if per_spectrum else "\nSummary:")
+        typer.secho("\nPer spectrum results:" if per_spectrum else "\nSummary:")
         if per_spectrum:
             for time, is_valid in spectrum_validated.items():
-                secho(
+                typer.secho(
                     f"  Time {float(time):.3f} [s]: {'PASS' if is_valid else 'FAIL'}",
                     fg="green" if is_valid else "red",
                 )
@@ -33,12 +35,12 @@ def _pretty_print_test_results(
             num_validated_spectrums = sum(
                 is_validated for is_validated in spectrum_validated.values()
             )
-            secho(f"  Validated spectrums: {num_validated_spectrums}", fg="green")
+            typer.secho(f"  Validated spectrums: {num_validated_spectrums}", fg="green")
 
             num_invalid_spectrums = len(spectrum_validated) - num_validated_spectrums
-            secho(f"  Invalid spectrums: {num_invalid_spectrums}", fg="red")
+            typer.secho(f"  Invalid spectrums: {num_invalid_spectrums}", fg="red")
 
-    secho(f"\nTest results for {file_name}:", bold=True)
+    typer.secho(f"\nTest results for {file_name}:", bold=True)
     print_colored("Times validated", times_validated)
     print_colored("Frequencies validated", frequencies_validated)
     print_spectrum_results()
@@ -51,8 +53,8 @@ def _pretty_print_test_results(
     )
 )
 def analytical(
-    file_name: str = Option(..., "-f", help="The name of the spectrogram file."),
-    absolute_tolerance: float = Option(
+    file_name: str = typer.Option(..., "-f", help="The name of the spectrogram file."),
+    absolute_tolerance: float = typer.Option(
         1e-3,
         "--atol",
         "--absolute-tolerance",
@@ -60,7 +62,7 @@ def analytical(
         "analytical solution for each spectral component. See the 'atol' "
         "keyword argument for `np.isclose`.",
     ),
-    per_spectrum: bool = Option(
+    per_spectrum: bool = typer.Option(
         False, "--per-spectrum", help="Show validated status per spectrum."
     ),
 ) -> None:
@@ -82,4 +84,4 @@ def analytical(
         per_spectrum,
     )
 
-    raise Exit()
+    raise typer.Exit()
