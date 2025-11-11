@@ -21,8 +21,8 @@ def _get_batch(
 ) -> spectre_core.batches.Base:
     start_time, tag, _ = spectre_core.batches.parse_batch_file_name(file_name)
     batches = spectre_core.batches.Batches(
-        spectre_core.receivers.get_batch_cls(tag),
         tag,
+        spectre_core.receivers.get_batch_cls(tag),
         spectre_core.config.paths.get_batches_dir_path(year, month, day),
     )
     return batches[start_time]
@@ -74,8 +74,8 @@ def get_batch_files(
     batch_files = []
     for tag in tags:
         batches = spectre_core.batches.Batches(
-            spectre_core.receivers.get_batch_cls(tag),
             tag,
+            spectre_core.receivers.get_batch_cls(tag),
             spectre_core.config.paths.get_batches_dir_path(year, month, day),
         )
 
@@ -135,10 +135,9 @@ def delete_batch_files(
     """
     deleted_batch_files = []
     for tag in tags:
-        batch_cls = spectre_core.receivers.get_batch_cls(tag)
         batches = spectre_core.batches.Batches(
-            batch_cls,
             tag,
+            spectre_core.receivers.get_batch_cls(tag),
             spectre_core.config.paths.get_batches_dir_path(year, month, day),
         )
 
@@ -155,15 +154,6 @@ def delete_batch_files(
                         batch_file.delete()
                     deleted_batch_files.append(batch_file.file_path)
     return deleted_batch_files
-
-
-def _get_signal_generator(mode: str) -> spectre_core.receivers.SignalGenerator:
-    return typing.cast(
-        spectre_core.receivers.SignalGenerator,
-        spectre_core.receivers.get_receiver(
-            spectre_core.receivers.ReceiverName.SIGNAL_GENERATOR, mode
-        ),
-    )
 
 
 @spectre_core.logs.log_call
@@ -195,7 +185,9 @@ def get_analytical_test_results(
         raise ValueError(
             f"Expected receiver name '{spectre_core.receivers.ReceiverName.SIGNAL_GENERATOR}', but got '{config.receiver_name}."
         )
-    signal_generator = _get_signal_generator(config.receiver_mode)
+    signal_generator = spectre_core.receivers.get_receiver(
+        "signal_generator", config.receiver_mode
+    )
     return signal_generator.validate_analytically(
         spectrogram,
         signal_generator.model_validate(config.parameters),
@@ -234,8 +226,8 @@ def _make_batches(
     obs_date: datetime.date,
 ):
     return spectre_core.batches.Batches(
-        spectre_core.receivers.get_batch_cls(tag),
         tag,
+        spectre_core.receivers.get_batch_cls(tag),
         spectre_core.config.paths.get_batches_dir_path(
             obs_date.year, obs_date.month, obs_date.day
         ),
@@ -341,4 +333,4 @@ def create_plot(
                 spectrogram, log_norm=log_norm, dBb=dBb, vmin=vmin, vmax=vmax
             )
         )
-    return panel_stack.save(tag)
+    return panel_stack.save(tags[0])

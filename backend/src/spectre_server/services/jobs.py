@@ -37,7 +37,7 @@ def spectrograms(
     force_restart: bool = False,
     max_restarts: int = 5,
     validate: bool = True,
-) -> str:
+) -> int:
     """Capture data from an SDR and post-process it into spectrograms in real time.
 
     :param tags: A bundle of config tags.

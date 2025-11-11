@@ -49,7 +49,7 @@ def get_configs() -> list[str]:
 
 def _has_batches(tag: str) -> bool:
     batches = spectre_core.batches.Batches(
-        spectre_core.receivers.get_batch_cls(tag), tag
+        tag, spectre_core.receivers.get_batch_cls(tag)
     )
     return len(batches) > 0
 
@@ -125,6 +125,7 @@ def create_config(
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
     :param validate: If True, validate config parameters. Defaults to True.
     :return: The file path of the newly created config, as an absolute path in the container's file system.
+    :raises FileExistsError: If the config already exists, files exist under the config tag and force is False.
     """
     if string_parameters is None:
         string_parameters = []
@@ -163,10 +164,11 @@ def update_config(
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
     :param validate: If True, apply the capture template and validate config parameters. Defaults to True.
     :return: The file path of the successfully updated config, as an absolute path in the container's file system.
+    :raises FileNotFoundError: If the config does not exist.
     """
     tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
     if not os.path.exists(spectre_core.receivers.get_config_file_path(tag)):
-        raise ValueError(f"A config with tag '{tag}' does not exist")
+        raise FileNotFoundError(f"{file_name} does not exist.")
 
     _caution_update(tag, force)
     config = spectre_core.receivers.read_config(tag)
@@ -202,5 +204,7 @@ def delete_config(file_name: str, dry_run: bool = False) -> str:
 
     config_file_path = spectre_core.receivers.get_config_file_path(tag)
     if not dry_run:
+        if not os.path.exists(config_file_path):
+            raise FileNotFoundError(f"{file_name} does not exist.")
         os.remove(config_file_path)
     return config_file_path
