@@ -9,7 +9,7 @@ import spectre_core.receivers
 
 
 @spectre_core.logs.log_call
-def get_receiver_names() -> list[str]:
+def get_receivers() -> list[str]:
     """List the names of all supported receivers."""
     return spectre_core.receivers.get_registered_receivers()
 

@@ -69,7 +69,7 @@ def get_logs(
     log_file_paths = []
     for process_type in process_types:
         logs = spectre_core.logs.Logs(
-            spectre_core.logs.ProcessType(process_type),
+            spectre_core.logs.ProcessType(process_type).value,
             spectre_core.config.paths.get_logs_dir_path(year, month, day),
         )
         log_file_paths += [log.file_path for log in logs]
@@ -115,7 +115,7 @@ def delete_logs(
     """
     deleted_file_paths = []
     for process_type in process_types:
-        proc_type = spectre_core.logs.ProcessType(process_type)
+        proc_type = spectre_core.logs.ProcessType(process_type).value
         logs = spectre_core.logs.Logs(
             proc_type, spectre_core.config.paths.get_logs_dir_path(year, month, day)
         )

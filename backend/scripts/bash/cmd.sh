@@ -7,4 +7,4 @@
 sdrplay_apiService &
 
 # Start the spectre server.
-python3 -m gunicorn -c gunicorn.conf.py spectre_server.__main__:app
+python3 -m gunicorn -c gunicorn.conf.py spectre_server.__main__:make_app
