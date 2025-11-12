@@ -63,11 +63,11 @@ def _caution_update(tag: str, force: bool) -> None:
     """
     if _has_batches(tag):
         if force:
-            _LOGGER.warning(f"Batches exist under the tag {tag}, forcing update")
+            _LOGGER.warning(f"Batches exist under the tag '{tag}', forcing update")
             return
         else:
             error_message = (
-                f"Files exist under the tag {tag}. Any updates to the corresponding config may lead to undefined behaviour. "
+                f"Files exist under the tag '{tag}'. Any updates to the corresponding config may lead to undefined behaviour. "
                 f"For any changes, it is recommended to create a new config, or to first delete existing batch files "
                 f"if they are no longer required. This warning can be overridden."
             )
@@ -168,7 +168,7 @@ def update_config(
     """
     tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
     if not os.path.exists(spectre_core.receivers.get_config_file_path(tag)):
-        raise FileNotFoundError(f"{file_name} does not exist.")
+        raise FileNotFoundError(f"The config '{file_name}' does not exist.")
 
     _caution_update(tag, force)
     config = spectre_core.receivers.read_config(tag)
@@ -194,17 +194,20 @@ def delete_config(file_name: str, dry_run: bool = False) -> str:
     :return: The file path of the deleted config, as an absolute path within the container's file system.
     """
     tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
-    if _has_batches(tag):
-        error_message = (
-            f"Files exist under the tag {tag}, and deleting the corresponding config "
-            f"would lead to undefined behaviour."
-        )
-        _LOGGER.error(error_message)
-        raise FileExistsError(error_message)
-
     config_file_path = spectre_core.receivers.get_config_file_path(tag)
+    config_exists = os.path.exists(config_file_path)
+
+    if config_exists:
+        if _has_batches(tag):
+            error_message = (
+                f"Files exist under the tag '{tag}', and deleting the corresponding config "
+                f"would lead to undefined behaviour."
+            )
+            _LOGGER.error(error_message)
+            raise FileExistsError(error_message)
+
     if not dry_run:
-        if not os.path.exists(config_file_path):
-            raise FileNotFoundError(f"{file_name} does not exist.")
+        if not config_exists:
+            raise FileNotFoundError(f"The config '{file_name}' does not exist.")
         os.remove(config_file_path)
     return config_file_path
