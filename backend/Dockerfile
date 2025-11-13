@@ -95,6 +95,15 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     cmake -Wno-dev \
     -DCMAKE_INSTALL_PREFIX=/opt/uhd \
     -DENABLE_B200=ON \
+    -DENABLE_B100=ON \
+    -DENABLE_USRP2=ON \
+    -DENABLE_X300=ON \
+    -DENABLE_X400=ON \
+    -DENABLE_N300=ON \
+    -DENABLE_E320=ON \
+    -DENABLE_E300=ON \
+    -DENABLE_N320=ON \
+    -DENABLE_USRP1=ON \
     -DENABLE_LIBUHD=ON \
     -DENABLE_USB=ON \
     -DENABLE_PYTHON_API=ON \
@@ -107,16 +116,7 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     -DENABLE_SIM=OFF \
     -DENABLE_MPMD=OFF \
     -DENABLE_OCTOCLOCK=OFF \
-    -DENABLE_B100=OFF \
     -DENABLE_C_API=OFF \
-    -DENABLE_USRP2=OFF \
-    -DENABLE_X300=OFF \
-    -DENABLE_X400=OFF \
-    -DENABLE_N300=OFF \
-    -DENABLE_E320=OFF \
-    -DENABLE_E300=OFF \
-    -DENABLE_N320=OFF \
-    -DENABLE_USRP1=OFF \
     .. && \
     make -j"$(nproc)" && \
     make install && \
@@ -529,7 +529,7 @@ RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd
     pip install --editable backend/[test]
 
 # Get the latest version of `spectre-core`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
+RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git -b issue-185 && cd spectre-core && \
     pip install --editable .[test]
 
 # Get the latest version of `gr-spectre`, but don't build it by default.
