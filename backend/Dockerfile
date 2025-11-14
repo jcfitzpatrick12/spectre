@@ -94,20 +94,20 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     cd build && \
     cmake -Wno-dev \
     -DCMAKE_INSTALL_PREFIX=/opt/uhd \
-    -DENABLE_B200=ON \
     -DENABLE_B100=ON \
-    -DENABLE_USRP2=ON \
-    -DENABLE_X300=ON \
-    -DENABLE_X400=ON \
-    -DENABLE_N300=ON \
-    -DENABLE_E320=ON \
-    -DENABLE_E300=ON \
-    -DENABLE_N320=ON \
+    -DENABLE_B200=ON \
     -DENABLE_USRP1=ON \
+    -DENABLE_USRP2=ON \
     -DENABLE_LIBUHD=ON \
     -DENABLE_USB=ON \
     -DENABLE_PYTHON_API=ON \
     -DENABLE_UTILS=ON \
+    -DENABLE_X300=OFF \
+    -DENABLE_X400=OFF \
+    -DENABLE_E320=OFF \
+    -DENABLE_E300=OFF \
+    -DENABLE_N320=OFF \
+    -DENABLE_N300=OFF \
     -DENABLE_EXAMPLES=OFF \
     -DENABLE_TESTS=OFF \
     -DENABLE_MAN_PAGES=OFF \
