@@ -94,11 +94,20 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     cd build && \
     cmake -Wno-dev \
     -DCMAKE_INSTALL_PREFIX=/opt/uhd \
+    -DENABLE_B100=ON \
     -DENABLE_B200=ON \
+    -DENABLE_USRP1=ON \
+    -DENABLE_USRP2=ON \
     -DENABLE_LIBUHD=ON \
     -DENABLE_USB=ON \
     -DENABLE_PYTHON_API=ON \
     -DENABLE_UTILS=ON \
+    -DENABLE_X300=OFF \
+    -DENABLE_X400=OFF \
+    -DENABLE_E320=OFF \
+    -DENABLE_E300=OFF \
+    -DENABLE_N320=OFF \
+    -DENABLE_N300=OFF \
     -DENABLE_EXAMPLES=OFF \
     -DENABLE_TESTS=OFF \
     -DENABLE_MAN_PAGES=OFF \
@@ -107,16 +116,7 @@ RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.
     -DENABLE_SIM=OFF \
     -DENABLE_MPMD=OFF \
     -DENABLE_OCTOCLOCK=OFF \
-    -DENABLE_B100=OFF \
     -DENABLE_C_API=OFF \
-    -DENABLE_USRP2=OFF \
-    -DENABLE_X300=OFF \
-    -DENABLE_X400=OFF \
-    -DENABLE_N300=OFF \
-    -DENABLE_E320=OFF \
-    -DENABLE_E300=OFF \
-    -DENABLE_N320=OFF \
-    -DENABLE_USRP1=OFF \
     .. && \
     make -j"$(nproc)" && \
     make install && \
@@ -418,7 +418,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.2.0-alpha" \
+      version="2.0.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -500,7 +500,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="1.2.0-alpha" \
+      version="2.0.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 

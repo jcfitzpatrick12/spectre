@@ -2,13 +2,17 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typer import Typer, Option, Exit, secho
+import typer
 
 from ._utils import safe_request, get_config_file_name
-from ._secho_resources import pprint_dict, secho_existing_resources
+from ._secho_resources import (
+    pprint_dict,
+    secho_existing_resource,
+    secho_existing_resources,
+)
 
 
-get_typer = Typer(help="Display one or many resources.")
+get_typer = typer.Typer(help="Display one or many resources.")
 
 
 @get_typer.command(help="List e-Callisto network instrument codes.")
@@ -17,101 +21,67 @@ def callisto_instrument_codes() -> None:
     callisto_instrument_codes = jsend_dict["data"]
 
     for instrument_code in callisto_instrument_codes:
-        secho(instrument_code)
+        secho_existing_resource(instrument_code)
 
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="List logs.")
 def logs(
-    process_types: list[str] = Option(
+    process_types: list[str] = typer.Option(
         [],
         "--process-type",
         help="List all logs with this process type, specifying one of 'worker' or 'user'. If not provided, list logs with any process type.",
     ),
-    year: int = Option(None, "--year", "-y", help="Only list logs under this year."),
-    month: int = Option(None, "--month", "-m", help="Only list logs under this month."),
-    day: int = Option(None, "--day", "-d", help="Only list logs under this day."),
+    year: int = typer.Option(
+        None, "--year", "-y", help="Only list logs under this year."
+    ),
+    month: int = typer.Option(
+        None, "--month", "-m", help="Only list logs under this month."
+    ),
+    day: int = typer.Option(None, "--day", "-d", help="Only list logs under this day."),
 ) -> None:
     params = {"process_type": process_types, "year": year, "month": month, "day": day}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
     secho_existing_resources(endpoints)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="Print the contents of a log.")
 def log(
-    file_name: str = Option(..., "-f", help="The file name."),
+    file_name: str = typer.Option(..., "-f", help="The file name."),
 ) -> None:
     jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
     log_contents = jsend_dict["data"]
     print(log_contents)
-    raise Exit()
-
-
-@get_typer.command(help="List batch files.", deprecated=True)
-def batch_files(
-    extensions: list[str] = Option(
-        [],
-        "--extension",
-        "-e",
-        help="List all batch files with this file extension. If not provided, list batch files with any extension.",
-    ),
-    tags: list[str] = Option(
-        [],
-        "--tag",
-        "-t",
-        help="List all batch files with this tag. If not provided, list batch files with any tag.",
-    ),
-    year: int = Option(
-        None, "--year", "-y", help="Only list batch files under this year."
-    ),
-    month: int = Option(
-        None, "--month", "-m", help="Only list batch files under this month."
-    ),
-    day: int = Option(
-        None, "--day", "-d", help="Only list batch files under this day."
-    ),
-) -> None:
-    params = {
-        "extension": extensions,
-        "tag": tags,
-        "year": year,
-        "month": month,
-        "day": day,
-    }
-    jsend_dict = safe_request(
-        f"spectre-data/batches",
-        "GET",
-        params=params,
-    )
-    endpoints = jsend_dict["data"]
-
-    secho_existing_resources(endpoints)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="List files.")
 def files(
-    extensions: list[str] = Option(
+    extensions: list[str] = typer.Option(
         [],
         "--extension",
         "-e",
         help="List all files with this file extension. If not provided, list files with any extension.",
     ),
-    tags: list[str] = Option(
+    tags: list[str] = typer.Option(
         [],
         "--tag",
         "-t",
         help="List all files with this tag. If not provided, list files with any tag.",
     ),
-    year: int = Option(None, "--year", "-y", help="Only list files under this year."),
-    month: int = Option(
+    year: int = typer.Option(
+        None, "--year", "-y", help="Only list files under this year."
+    ),
+    month: int = typer.Option(
         None, "--month", "-m", help="Only list files under this month."
     ),
-    day: int = Option(None, "--day", "-d", help="Only list files under this day."),
+    day: int = typer.Option(
+        None, "--day", "-d", help="Only list files under this day."
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -128,7 +98,7 @@ def files(
     endpoints = jsend_dict["data"]
 
     secho_existing_resources(endpoints)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="List supported receivers.")
@@ -138,14 +108,14 @@ def receivers() -> None:
     receiver_names = jsend_dict["data"]
 
     for receiver_name in receiver_names:
-        secho(receiver_name)
+        secho_existing_resource(receiver_name)
 
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help=("List the supported operating modes for a receiver."))
 def modes(
-    receiver_name: str = Option(
+    receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     )
 ) -> None:
@@ -154,14 +124,14 @@ def modes(
     receiver_modes = jsend_dict["data"]
 
     for receiver_mode in receiver_modes:
-        secho(receiver_mode)
+        secho_existing_resource(receiver_mode)
 
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="Print receiver hardware specifications.")
 def specs(
-    receiver_name: str = Option(
+    receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     )
 ) -> None:
@@ -171,18 +141,9 @@ def specs(
     specs = jsend_dict["data"]
 
     for k, v in specs.items():
-        secho(f"{k}: {v}")
+        secho_existing_resource(f"{k}: {v}")
 
-    raise Exit()
-
-
-@get_typer.command(help="List capture configs.", deprecated=True)
-def capture_configs() -> None:
-
-    jsend_dict = safe_request(f"spectre-data/configs", "GET")
-    endpoints = jsend_dict["data"]
-    secho_existing_resources(endpoints)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="List configs.")
@@ -191,27 +152,15 @@ def configs() -> None:
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
     endpoints = jsend_dict["data"]
     secho_existing_resources(endpoints)
-    raise Exit()
-
-
-@get_typer.command(help="Print capture config file contents.", deprecated=True)
-def capture_config(
-    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
-    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
-) -> None:
-
-    file_name = get_config_file_name(file_name, tag)
-
-    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
-    capture_config = jsend_dict["data"]
-    pprint_dict(capture_config)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="Print config file contents.")
 def config(
-    tag: str = Option(None, "--tag", "-t", help="The unique identifier."),
-    file_name: str = Option(None, "-f", help="The file name.", metavar="<tag>.json"),
+    tag: str = typer.Option(None, "--tag", "-t", help="The unique identifier."),
+    file_name: str = typer.Option(
+        None, "-f", help="The file name.", metavar="<tag>.json"
+    ),
 ) -> None:
 
     file_name = get_config_file_name(file_name, tag)
@@ -219,24 +168,24 @@ def config(
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
     config = jsend_dict["data"]
     pprint_dict(config)
-    raise Exit()
+    raise typer.Exit()
 
 
 @get_typer.command(help="List tags with existing files.")
 def tags(
-    year: int = Option(
+    year: int = typer.Option(
         None,
         "--year",
         "-y",
         help="Only list tags under this year.",
     ),
-    month: int = Option(
+    month: int = typer.Option(
         None,
         "--month",
         "-m",
         help="Only list tags under this month.",
     ),
-    day: int = Option(
+    day: int = typer.Option(
         None,
         "--day",
         "-d",
@@ -253,45 +202,27 @@ def tags(
     tags = jsend_dict["data"]
 
     for tag in tags:
-        secho(tag)
+        secho_existing_resource(tag)
 
-    raise Exit()
+    raise typer.Exit()
 
 
-@get_typer.command(help="Print a capture template.")
-def capture_template(
-    receiver_name: str = Option(
+@get_typer.command(help="Print a model.")
+def model(
+    receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     ),
-    receiver_mode: str = Option(
+    receiver_mode: str = typer.Option(
         ..., "--mode", "-m", help="The operating mode of the receiver."
-    ),
-    param_name: str = Option(
-        None,
-        "--param",
-        "-p",
-        help="The name of the parameter to print a template for. If not provided, prints the full capture template.",
-    ),
+    )
 ) -> None:
 
     params = {
         "receiver_mode": receiver_mode,
     }
     jsend_dict = safe_request(
-        f"receivers/{receiver_name}/capture-template", "GET", params=params
+        f"receivers/{receiver_name}/model", "GET", params=params
     )
-    capture_template = jsend_dict["data"]
-
-    if param_name is None:
-        pprint_dict(capture_template)
-    else:
-        if param_name not in capture_template:
-            raise KeyError(
-                f"A parameter with name '{param_name}' does not exist "
-                f"in the capture template for the receiver '{receiver_name}' "
-                f"operating in mode '{receiver_mode}'. Expected one of: "
-                f"{list(capture_template.keys())}"
-            )
-        pprint_dict(capture_template[param_name])
-
-    Exit()
+    model = jsend_dict["data"]
+    pprint_dict(model)
+    typer.Exit()

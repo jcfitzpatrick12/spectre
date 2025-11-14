@@ -6,13 +6,21 @@
 
 # TODO: Refactor later, when it makes sense to do so.
 
+import typing
 import requests
 import os
+import contextlib
+
 import typer
-from typing import Optional
-from datetime import date, datetime, timezone
+import yaspin
 
 from ..config import SPECTRE_SERVER
+
+
+@contextlib.contextmanager
+def spinner():
+    with yaspin.yaspin(text="In progress... "):
+        yield
 
 
 def confirm_with_user() -> None:
@@ -25,8 +33,8 @@ def confirm_with_user() -> None:
 def safe_request(
     route_url: str,
     method: str,
-    json: Optional[dict] = None,
-    params: Optional[dict] = None,
+    json: typing.Optional[dict] = None,
+    params: typing.Optional[dict] = None,
     require_confirmation: bool = False,
     non_interactive: bool = False,
 ) -> dict:
@@ -34,8 +42,8 @@ def safe_request(
 
     :param route_url: Endpoint path to append to the `spectre-server` base URL. This base URL is defined by the environment variables `SPECTRE_SERVER_HOST`, `SPECTRE_SERVER_PORT` or `SPECTRE_SERVER`.
     :param method: HTTP method to use for the request (e.g., 'GET', 'POST').
-    :param json: Optional JSON payload for the request body.
-    :param params: Optional query parameters for the request.
+    :param json: typer.Optional JSON payload for the request body.
+    :param params: typer.Optional query parameters for the request.
     :param require_confirmation: If True, prompt the user if they'd like to continue.
     :param suppress_confirmation: If True, ignore the `require_confirmation` flag, and continue with the request.
     :return: Parsed JSON response as a dictionary.
@@ -78,7 +86,9 @@ def safe_request(
         )
 
 
-def get_config_file_name(file_name: Optional[str], tag: Optional[str]) -> str:
+def get_config_file_name(
+    file_name: typing.Optional[str], tag: typing.Optional[str]
+) -> str:
     """Given either a file name, or the tag, build the config file name.
 
     Primarily used for input validation, where the user can specify either or via the CLI.

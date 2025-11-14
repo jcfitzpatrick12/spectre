@@ -3,24 +3,26 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from flask import Blueprint, request, url_for, Response
-from os.path import basename
+import flask
+import os
 
-from ..services import batches
+from ..services import batches as services
 from ._utils import validate_date, is_true
 from ._format_responses import jsendify_response, serve_from_directory
 
 
-batches_blueprint = Blueprint("batches", __name__, url_prefix="/spectre-data/batches")
+batches_blueprint = flask.Blueprint(
+    "batches", __name__, url_prefix="/spectre-data/batches"
+)
 
 
 def get_batch_file_endpoint(
     batch_file_path: str,
 ) -> str:
     """Return the URL endpoint corresponding to the input batch file path,"""
-    return url_for(
+    return flask.url_for(
         "batches.get_batch_file",
-        file_name=basename(batch_file_path),
+        file_name=os.path.basename(batch_file_path),
         _external=True,
     )
 
@@ -31,29 +33,28 @@ def get_batch_file_endpoints(batch_file_paths: list[str]) -> list[str]:
 
 
 @batches_blueprint.route("/<string:file_name>", methods=["GET"])
-@jsendify_response
-def get_batch_file(file_name: str) -> Response:
-    return serve_from_directory(batches.get_batch_file(file_name))
+def get_batch_file(file_name: str) -> flask.Response:
+    return serve_from_directory(services.get_batch_file(file_name))
 
 
 @batches_blueprint.route("/<string:file_name>", methods=["DELETE"])
 @jsendify_response
 def delete_batch_file(file_name: str) -> str:
-    dry_run = request.args.get("dry_run", type=is_true, default=False)
-    batch_file_path = batches.delete_batch_file(file_name, dry_run=dry_run)
+    dry_run = flask.request.args.get("dry_run", type=is_true, default=False)
+    batch_file_path = services.delete_batch_file(file_name, dry_run=dry_run)
     return get_batch_file_endpoint(batch_file_path)
 
 
 @batches_blueprint.route("/", methods=["GET"])
 @jsendify_response
 def get_batch_files() -> list[str]:
-    year = request.args.get("year", type=int)
-    month = request.args.get("month", type=int)
-    day = request.args.get("day", type=int)
-    tags = request.args.getlist("tag")
-    extensions = request.args.getlist("extension")
+    year = flask.request.args.get("year", type=int)
+    month = flask.request.args.get("month", type=int)
+    day = flask.request.args.get("day", type=int)
+    tags = flask.request.args.getlist("tag")
+    extensions = flask.request.args.getlist("extension")
     validate_date(year, month, day)
-    batch_files = batches.get_batch_files(
+    batch_files = services.get_batch_files(
         tags, extensions, year=year, month=month, day=day
     )
     return get_batch_file_endpoints(batch_files)
@@ -62,14 +63,14 @@ def get_batch_files() -> list[str]:
 @batches_blueprint.route("/", methods=["DELETE"])
 @jsendify_response
 def delete_batch_files() -> list[str]:
-    year = request.args.get("year", type=int)
-    month = request.args.get("month", type=int)
-    day = request.args.get("day", type=int)
-    extensions = request.args.getlist("extension")
-    tags = request.args.getlist("tag")
-    dry_run = request.args.get("dry_run", type=is_true, default=False)
+    year = flask.request.args.get("year", type=int)
+    month = flask.request.args.get("month", type=int)
+    day = flask.request.args.get("day", type=int)
+    extensions = flask.request.args.getlist("extension")
+    tags = flask.request.args.getlist("tag")
+    dry_run = flask.request.args.get("dry_run", type=is_true, default=False)
     validate_date(year, month, day)
-    batch_files = batches.delete_batch_files(
+    batch_files = services.delete_batch_files(
         tags, extensions, year=year, month=month, day=day, dry_run=dry_run
     )
     return get_batch_file_endpoints(batch_files)
@@ -83,26 +84,26 @@ def delete_batch_files() -> list[str]:
 def get_analytical_test_results(
     file_name: str,
 ) -> dict[str, bool | dict[float, bool]]:
-    absolute_tolerance = request.args.get(
+    absolute_tolerance = flask.request.args.get(
         "absolute_tolerance", type=float, default=1e-5
     )
-    return batches.get_analytical_test_results(file_name, absolute_tolerance)
+    return services.get_analytical_test_results(file_name, absolute_tolerance)
 
 
 @batches_blueprint.route("/tags", methods=["GET"])
 @jsendify_response
 def get_tags() -> list[str]:
-    year = request.args.get("year", type=int)
-    month = request.args.get("month", type=int)
-    day = request.args.get("day", type=int)
+    year = flask.request.args.get("year", type=int)
+    month = flask.request.args.get("month", type=int)
+    day = flask.request.args.get("day", type=int)
     validate_date(year, month, day)
-    return batches.get_tags(year, month, day)
+    return services.get_tags(year, month, day)
 
 
 @batches_blueprint.route("/plots", methods=["PUT"])
 @jsendify_response
 def create_plot() -> str:
-    json = request.get_json()
+    json = flask.request.get_json()
     # Data from multiple batch files can be compared, by passing extra `tags` through the request body.
     tags = json.get("tags")
     figsize_x = json.get("figsize_x")
@@ -131,7 +132,7 @@ def create_plot() -> str:
         figsize = (15, 8)
 
     # Create the plot and return the name of the batch file containing the plot.
-    batch_file = batches.create_plot(
+    batch_file = services.create_plot(
         tags,
         figsize,
         obs_date,
