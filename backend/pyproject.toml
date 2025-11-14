@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 dependencies = [
-    "spectre-core==1.3.0",
+    "spectre-core==2.0.0",
     "flask==2.3.2",
     "gunicorn==21.2.0"
 ]
