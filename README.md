@@ -44,6 +44,61 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - Live record spectrograms and I/Q data  
 - Offers fixed and sweeping center frequency modes
 - Backend web server with a discoverable RESTful API
+- **Web UI for local spectrogram recording and visualization**
 - Developer-friendly and extensible
 
 ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/jcfitzpatrick12/spectre-lite), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
+
+## Web UI
+
+Spectre ships with a lightweight browser UI for starting spectrogram recordings, monitoring progress, and reviewing PNG outputs, all without leaving your local machine.
+
+### Local Web UI via `docker-compose.yml`
+
+1. **Build once** (uses the existing backend + new frontend service in the same stack):
+   ```bash
+   docker compose build spectre-server spectre-frontend
+   ```
+2. **Start the services** (backend + nginx-hosted frontend + CLI helper):
+   ```bash
+   docker compose up spectre-server spectre-frontend spectre-cli
+   ```
+3. **Open your browser:** [http://localhost:8080](http://localhost:8080) serves the React UI. All API calls are proxied inside the Compose network to `spectre-server`, so no extra port wrangling is required.
+4. **Stop everything:** press `Ctrl+C` in the compose terminal. Restart with the same `docker compose up` command whenever you need it.
+
+This flow keeps the UI “in the family” with the backend container—no manual Docker commands beyond the two above.
+
+### Development stack & VS Code Dev Containers
+
+Prefer hot reload or editing inside the container?
+
+1. Install the VS Code **Dev Containers** extension.
+2. Run `Ctrl+Shift+P` → “Dev Containers: Reopen in Container”. VS Code will spin up the services from `docker-compose.dev.yml` (`spectre-dev-server`, `spectre-dev-cli`, `spectre-frontend` dev server).
+3. Once the containers are online, visit [http://localhost:3000](http://localhost:3000) for the Vite dev server (it proxies API calls to `http://spectre-dev-server:5001` automatically).
+4. To use the dev stack from the terminal only, run:
+   ```bash
+   docker compose -f docker-compose.dev.yml up --build
+   ```
+
+### Using the Web UI
+
+- **Recording Form:** Select a receiver config tag (this encodes center frequency and hardware settings) and enter a duration in seconds. Optional advanced toggles mirror the CLI flags (`force_restart`, `max_restarts`, `validate`).
+- **Status + Result:** The UI calls `POST /recordings/spectrogram` and, on success, immediately triggers `PUT /spectre-data/batches/plots` for the same tag/time window. When the PNG URL returns, it renders inline.
+- **View Previous:** The “Previous Recordings” list pulls directly from `GET /spectre-data/batches?extension=png`, so every PNG served from `/spectre-data/batches/<file>.png` is one click away.
+- **Client-side validation:** Duration must be numeric and positive (≤3600 s), restart limits stay within 1‑20, and you’ll get inline guidance before any network calls fire.
+
+### Configuration
+
+Create or inspect receiver configs via the CLI (inside whichever CLI container you’re already running):
+
+```bash
+# Create a configuration for your SDR device
+docker exec -it spectre-cli spectre create config --receiver rtlsdr --mode fixed --tag my_rtlsdr
+
+# List available configurations
+docker exec -it spectre-cli spectre get configs
+```
+
+> Replace `spectre-cli` with `spectre-dev-cli` when you are running the dev stack from `docker-compose.dev.yml`.
+
+The UI reads `/spectre-data/configs/` and automatically offers every tag it finds. Use tags whose parameters already contain the center frequency / bandwidth you care about—no extra UI fields are needed today because the runtime API accepts tags + duration only.

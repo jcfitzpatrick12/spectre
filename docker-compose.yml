@@ -2,6 +2,8 @@ services:
   spectre-server:
     container_name: spectre-server
     image: jcfitzpatrick12/spectre-server:2.0.0-alpha
+    entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
+    command: ["/app/cmd.sh"]
     environment:
       - SPECTRE_GID=${SPECTRE_GID}
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
@@ -32,6 +34,20 @@ services:
       - spectre-server
     tty: true
     stop_signal: SIGKILL
+
+  spectre-frontend:
+    container_name: spectre-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    image: spectre-frontend:latest
+    networks:
+      - spectre-network
+    depends_on:
+      - spectre-server
+    ports:
+      - 127.0.0.1:8080:3000
 
 networks:
   spectre-network:

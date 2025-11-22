@@ -23,7 +23,6 @@ def get_batch_file_endpoint(
     return flask.url_for(
         "batches.get_batch_file",
         file_name=os.path.basename(batch_file_path),
-        _external=True,
     )
 
 

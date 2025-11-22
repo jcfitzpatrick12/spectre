@@ -39,6 +39,25 @@ services:
     tty: true
     stop_signal: SIGKILL
 
+  spectre-frontend:
+    container_name: spectre-frontend
+    image: spectre-frontend-dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    networks:
+      - spectre-dev-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - 127.0.0.1:3000:3000
+    depends_on:
+      - spectre-dev-server
+    environment:
+      - NODE_ENV=development
+
 networks:
   spectre-dev-network:
     name: spectre-dev-network

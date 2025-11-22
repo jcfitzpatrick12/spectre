@@ -24,7 +24,6 @@ def _get_config_endpoint(
     return flask.url_for(
         "configs.get_config",
         file_name=os.path.basename(config_file_path),
-        _external=True,
     )
 
 

@@ -21,7 +21,6 @@ def _get_log_file_endpoint(
     return flask.url_for(
         "logs.get_log",
         file_name=os.path.basename(log_file_path),
-        _external=True,
     )
 
 
