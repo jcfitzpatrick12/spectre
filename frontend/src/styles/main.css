@@ -144,7 +144,8 @@ body {
 
 /* Section styling */
 .recording-section,
-.gallery-section {
+.gallery-section,
+.config-section {
   background-color: var(--bg-secondary);
   border-radius: 10px;
   padding: 2rem;
@@ -154,7 +155,8 @@ body {
 }
 
 .recording-section h2,
-.gallery-section h2 {
+.gallery-section h2,
+.config-section h2 {
   margin-bottom: 1.5rem;
   color: var(--text-primary);
   font-size: 1.5rem;
@@ -552,6 +554,231 @@ body {
   background-color: #218838;
 }
 
+/* Config Manager Section */
+.config-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.config-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+}
+
+.config-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-hover);
+}
+
+.config-info {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.config-tag {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.config-details {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.config-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.config-action-button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.config-action-button:hover {
+  transform: translateY(-1px);
+}
+
+.config-action-button:active {
+  transform: translateY(0);
+}
+
+.config-action-button.view {
+  background-color: #667eea;
+  color: white;
+}
+
+.config-action-button.view:hover {
+  background-color: #5568d3;
+}
+
+.config-action-button.edit {
+  background-color: #28a745;
+  color: white;
+}
+
+.config-action-button.edit:hover {
+  background-color: #218838;
+}
+
+.config-action-button.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.config-action-button.delete:hover {
+  background-color: #c82333;
+}
+
+/* Config Modal */
+.config-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.config-modal-content {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 30px var(--shadow-hover);
+  transition: background-color 0.3s ease;
+}
+
+.config-modal-content.small {
+  max-width: 500px;
+}
+
+.config-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.config-modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.config-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.config-modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
+.json-editor {
+  width: 100%;
+  min-height: 300px;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  resize: vertical;
+  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
+}
+
+.json-editor:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.json-editor:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.warning-text {
+  color: #dc3545;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.delete-confirm-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-confirm-button:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.delete-confirm-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .app {
@@ -568,7 +795,8 @@ body {
   }
 
   .recording-section,
-  .gallery-section {
+  .gallery-section,
+  .config-section {
     padding: 1.5rem;
     margin-bottom: 1rem;
   }
@@ -607,6 +835,28 @@ body {
   }
 
   .lightbox-download {
+    width: 100%;
+  }
+
+  .config-list {
+    grid-template-columns: 1fr;
+  }
+
+  .config-modal-content {
+    max-width: 95vw;
+  }
+
+  .config-modal-header,
+  .config-modal-body,
+  .config-modal-footer {
+    padding: 1rem;
+  }
+
+  .config-modal-footer {
+    flex-direction: column;
+  }
+
+  .config-modal-footer button {
     width: 100%;
   }
 }

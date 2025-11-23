@@ -88,6 +88,41 @@ class ApiClient {
     return this.request(`/spectre-data/configs/${fileName}/raw`)
   }
 
+  async createConfig(fileName, payload) {
+    return this.request(`/spectre-data/configs/${fileName}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async updateConfig(fileName, payload) {
+    return this.request(`/spectre-data/configs/${fileName}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async deleteConfig(fileName, dryRun = false) {
+    const params = dryRun ? '?dry_run=true' : ''
+    return this.request(`/spectre-data/configs/${fileName}${params}`, {
+      method: 'DELETE'
+    })
+  }
+
+  // Receiver endpoints
+  async getReceivers() {
+    return this.request('/receivers')
+  }
+
+  async getReceiverModes(receiverName) {
+    return this.request(`/receivers/${receiverName}/modes`)
+  }
+
+  async getReceiverModel(receiverName, receiverMode) {
+    const params = new URLSearchParams({ receiver_mode: receiverMode })
+    return this.request(`/receivers/${receiverName}/model?${params}`)
+  }
+
   // Recording endpoints
   // Extended timeout for long recordings (15 minutes = 900,000ms)
   async recordSignal(payload) {

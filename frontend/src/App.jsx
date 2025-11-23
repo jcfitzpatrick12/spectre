@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import RecordingForm from './components/RecordingForm'
+import ConfigManager from './components/ConfigManager'
 import SavedSpectrograms from './components/SavedSpectrograms'
 import { apiClient } from './services/apiClient'
 
@@ -108,6 +109,8 @@ function App() {
             onRecordingComplete={handleRecordingComplete}
           />
         </section>
+
+        <ConfigManager />
 
         <SavedSpectrograms key={refreshKey} />
       </main>
