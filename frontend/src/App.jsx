@@ -50,6 +50,16 @@ function App() {
     setRefreshKey(prev => prev + 1)
   }
 
+  const handleConfigsChange = async () => {
+    // Reload configs when they change in ConfigManager
+    try {
+      const configsResponse = await apiClient.getConfigs()
+      setConfigs(configsResponse.data || [])
+    } catch (err) {
+      console.error('Failed to reload configs:', err)
+    }
+  }
+
   const toggleDarkMode = () => {
     setDarkMode(prev => !prev)
   }
@@ -102,15 +112,21 @@ function App() {
       </header>
 
       <main className="main">
-        <section className="recording-section">
-          <h2>Start New Recording</h2>
-          <RecordingForm
-            configs={configs}
-            onRecordingComplete={handleRecordingComplete}
-          />
+        <section className="recording-config-section">
+          <h2>Recording & Configuration</h2>
+          <div className="recording-config-grid">
+            <div className="recording-panel">
+              <h3>Start New Recording</h3>
+              <RecordingForm
+                configs={configs}
+                onRecordingComplete={handleRecordingComplete}
+              />
+            </div>
+            <div className="config-panel">
+              <ConfigManager onConfigsChange={handleConfigsChange} />
+            </div>
+          </div>
         </section>
-
-        <ConfigManager />
 
         <SavedSpectrograms key={refreshKey} />
       </main>

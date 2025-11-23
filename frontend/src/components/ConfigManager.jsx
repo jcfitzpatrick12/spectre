@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../services/apiClient'
 
-function ConfigManager() {
+function ConfigManager({ onConfigsChange }) {
   const [configs, setConfigs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -124,6 +124,11 @@ function ConfigManager() {
       await loadConfigs()
       setEditingConfig(null)
       setEditedJson('')
+
+      // Notify parent component
+      if (onConfigsChange) {
+        onConfigsChange()
+      }
     } catch (err) {
       setJsonError(`Save failed: ${err.message}`)
     } finally {
@@ -145,6 +150,11 @@ function ConfigManager() {
       // Reload configs and close dialog
       await loadConfigs()
       setDeletingConfig(null)
+
+      // Notify parent component
+      if (onConfigsChange) {
+        onConfigsChange()
+      }
     } catch (err) {
       setError(`Delete failed: ${err.message}`)
       setDeletingConfig(null)
@@ -245,6 +255,11 @@ function ConfigManager() {
       // Reload configs and close create form
       await loadConfigs()
       setCreatingConfig(false)
+
+      // Notify parent component
+      if (onConfigsChange) {
+        onConfigsChange()
+      }
     } catch (err) {
       setJsonError(`Create failed: ${err.message}`)
     } finally {
@@ -254,89 +269,87 @@ function ConfigManager() {
 
   if (loading) {
     return (
-      <section className="config-section">
-        <h2>Configuration Manager</h2>
+      <>
+        <h3>Configurations</h3>
         <div className="loading">Loading configurations...</div>
-      </section>
+      </>
     )
   }
 
   return (
     <>
-      <section className="config-section">
-        <div className="gallery-header">
-          <h2>Configuration Manager</h2>
-          <div className="gallery-controls">
-            <button
-              className="start-button"
-              onClick={handleCreateNew}
-              title="Create new configuration"
-            >
-              + Create New
-            </button>
-            <button
-              className="refresh-button"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              title="Refresh configurations list"
-            >
-              {refreshing ? '↻ Refreshing...' : '↻ Refresh'}
-            </button>
-          </div>
+      <div className="gallery-header">
+        <h3>Configurations</h3>
+        <div className="gallery-controls">
+          <button
+            className="start-button"
+            onClick={handleCreateNew}
+            title="Create new configuration"
+          >
+            + Create New
+          </button>
+          <button
+            className="refresh-button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            title="Refresh configurations list"
+          >
+            {refreshing ? '↻ Refreshing...' : '↻ Refresh'}
+          </button>
         </div>
+      </div>
 
-        {error && (
-          <div className="error">
-            <p>{error}</p>
-            <button onClick={() => setError(null)}>Dismiss</button>
-          </div>
-        )}
+      {error && (
+        <div className="error">
+          <p>{error}</p>
+          <button onClick={() => setError(null)}>Dismiss</button>
+        </div>
+      )}
 
-        {configs.length === 0 ? (
-          <p className="no-recordings">No configurations yet. Create your first one!</p>
-        ) : (
-          <div className="config-list">
-            {configs.map((config) => (
-              <div key={config.fileName} className="config-card">
-                <div className="config-info">
-                  <p className="config-tag">
-                    <strong>{config.tag}</strong>
-                  </p>
-                  <p className="config-details">
-                    {config.receiver_name} - {config.receiver_mode}
-                  </p>
-                  {config.error && (
-                    <p className="error-message">{config.error}</p>
-                  )}
-                </div>
-                <div className="config-actions">
-                  <button
-                    className="config-action-button view"
-                    onClick={() => handleView(config)}
-                    title="View configuration"
-                  >
-                    View
-                  </button>
-                  <button
-                    className="config-action-button edit"
-                    onClick={() => handleEdit(config)}
-                    title="Edit configuration"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="config-action-button delete"
-                    onClick={() => handleDelete(config)}
-                    title="Delete configuration"
-                  >
-                    Delete
-                  </button>
-                </div>
+      {configs.length === 0 ? (
+        <p className="no-recordings">No configurations yet. Create your first one!</p>
+      ) : (
+        <div className="config-list">
+          {configs.map((config) => (
+            <div key={config.fileName} className="config-card">
+              <div className="config-info">
+                <p className="config-tag">
+                  <strong>{config.tag}</strong>
+                </p>
+                <p className="config-details">
+                  {config.receiver_name} - {config.receiver_mode}
+                </p>
+                {config.error && (
+                  <p className="error-message">{config.error}</p>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+              <div className="config-actions">
+                <button
+                  className="config-action-button view"
+                  onClick={() => handleView(config)}
+                  title="View configuration"
+                >
+                  View
+                </button>
+                <button
+                  className="config-action-button edit"
+                  onClick={() => handleEdit(config)}
+                  title="Edit configuration"
+                >
+                  Edit
+                </button>
+                <button
+                  className="config-action-button delete"
+                  onClick={() => handleDelete(config)}
+                  title="Delete configuration"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* View Modal */}
       {viewingConfig && (
