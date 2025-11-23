@@ -8,10 +8,26 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [darkMode, setDarkMode] = useState(() => {
+    // Initialize from localStorage or default to false
+    const saved = localStorage.getItem('darkMode')
+    return saved ? JSON.parse(saved) : false
+  })
 
   useEffect(() => {
     loadInitialData()
   }, [])
+
+  // Apply dark mode class to body
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', JSON.stringify(darkMode))
+  }, [darkMode])
 
   const loadInitialData = async () => {
     try {
@@ -33,11 +49,18 @@ function App() {
     setRefreshKey(prev => prev + 1)
   }
 
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev)
+  }
+
   if (loading) {
     return (
       <div className="app">
         <header className="header">
           <h1>Spectre - Radio Spectrogram Recording</h1>
+          <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
         </header>
         <main className="main">
           <div className="loading">Loading...</div>
@@ -51,6 +74,9 @@ function App() {
       <div className="app">
         <header className="header">
           <h1>Spectre - Radio Spectrogram Recording</h1>
+          <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
         </header>
         <main className="main">
           <div className="error">
@@ -69,6 +95,9 @@ function App() {
       <header className="header">
         <h1>Spectre - Radio Spectrogram Recording</h1>
         <p>Process, Explore and Capture Transient Radio Emissions</p>
+        <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+          {darkMode ? '☀️ Light' : '🌙 Dark'}
+        </button>
       </header>
 
       <main className="main">
