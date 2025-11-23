@@ -33,6 +33,12 @@ if [ -d "$PROFILES_DIR" ]; then
     for profile in "$PROFILES_DIR"/*.json; do
         if [ -f "$profile" ]; then
             filename=$(basename "$profile")
+
+            # Skip metadata files (not actual receiver configs)
+            if [ "$filename" = "profiles_manifest.json" ]; then
+                continue
+            fi
+
             dest="$CONFIGS_DIR/$filename"
 
             # Only copy if file doesn't exist (preserve user modifications)
