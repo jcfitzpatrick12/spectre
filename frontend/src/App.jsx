@@ -136,6 +136,16 @@ function App() {
 
         <LogViewer />
       </main>
+
+      <footer className="footer">
+        <p>
+          Built by <a href="https://github.com/b3p3k0/spectre" target="_blank" rel="noreferrer">Spectre WebUI</a>
+          {' '}with gratitude to the
+          {' '}<a href="https://github.com/jcfitzpatrick12/spectre" target="_blank" rel="noreferrer">original Spectre project</a>
+          {' '}and the
+          {' '}<a href="https://www.reddit.com/r/vibecoding/" target="_blank" rel="noreferrer">r/vibecoding</a> community.
+        </p>
+      </footer>
     </div>
   )
 }

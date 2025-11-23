@@ -182,6 +182,22 @@ body {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.footer a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
 .recording-config-section h2 {
   margin-bottom: 1rem;
   color: var(--text-primary);
