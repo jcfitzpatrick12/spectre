@@ -24,16 +24,19 @@ The goal is a predictable, copy-paste-friendly path even if Docker is brand new.
 ### Prerequisites
 
 - Docker Desktop (Windows/macOS) or Docker Engine + Docker Compose plugin (Linux)
-- A terminal with `git` and `docker` available (PowerShell, macOS Terminal, WSL, etc.)
+- Command-line basics: `curl`, `jq`, `tar`, and `docker` available (PowerShell, macOS Terminal, WSL, etc.)
 - Optional but fun: an SDR such as RTL-SDR, HackRF, SDRplay, or USRP. The `demo-sine` profile works without hardware.
 
 ### Five-minute install
 
-1. Clone and enter the repo:
+1. Grab the latest GitHub release (known-good snapshot) and enter it:
    ```bash
-   git clone https://github.com/b3p3k0/spectre.git
-   cd spectre
+   # Requires curl, jq, tar
+   LATEST_TAG=$(curl -s https://api.github.com/repos/b3p3k0/spectre/releases/latest | jq -r .tag_name)
+   curl -L "https://github.com/b3p3k0/spectre/archive/refs/tags/${LATEST_TAG}.tar.gz" | tar xz
+   cd "spectre-${LATEST_TAG#v}"
    ```
+   Prefer a browser? Download the latest release here: https://github.com/b3p3k0/spectre/releases/latest
 2. Sanity-check Docker:
    ```bash
    docker --version
@@ -102,6 +105,7 @@ Spectre’s React UI talks to the backend via the internal Docker network, so no
 - **Vibecoding roots.** This Web UI launched after that [vibecoding call-to-arms](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/)—drop in with sketches, feedback, or wild requests.
 - **Hardware rabbit holes.** Browse SDRplay’s [hardware catalog](https://www.sdrplay.com/), Great Scott Gadgets’ [HackRF gear](https://greatscottgadgets.com/hackrf/), Ettus Research [USRPs](https://www.ettus.com/), or Airspy’s [compact receivers](https://airspy.com/) when you’re ready to expand your kit.
 - **Hangouts.** r/RTLSDR, the SignalsEverywhere [community hub](https://www.signalseverywhere.com/) (Discord + tutorials), and tools like [ReceiverBook’s station map](https://www.receiverbook.de/) are great places to compare notes and see what others are hearing.
+- **Pinned ideas.** Ongoing feature and UX ideas live in `docs/notes/PINLIST.md` for quick browsing.
 
 ## Configuration
 
