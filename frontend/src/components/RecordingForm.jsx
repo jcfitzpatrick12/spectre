@@ -47,8 +47,6 @@ function RecordingForm({ configs, onRecordingComplete }) {
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState(STATUS.IDLE)
   const [statusMessage, setStatusMessage] = useState('')
-  const [resultImage, setResultImage] = useState(null)
-  const [resultMeta, setResultMeta] = useState(null)
 
   const availableTags = useMemo(() => {
     if (!Array.isArray(configs) || configs.length === 0) return []
@@ -127,8 +125,6 @@ function RecordingForm({ configs, onRecordingComplete }) {
     setErrors({})
     setStatus(STATUS.IDLE)
     setStatusMessage('')
-    setResultImage(null)
-    setResultMeta(null)
   }
 
   const handleSubmit = async (event) => {
@@ -137,8 +133,6 @@ function RecordingForm({ configs, onRecordingComplete }) {
 
     setStatus(STATUS.RECORDING)
     setStatusMessage('Starting spectrogram recording...')
-    setResultImage(null)
-    setResultMeta(null)
 
     const payload = {
       tags: [formData.tag],
@@ -162,14 +156,7 @@ function RecordingForm({ configs, onRecordingComplete }) {
         end_time: window.end_time
       }
 
-      const response = await apiClient.createPlot(plotPayload)
-      setResultImage(response.data)
-      setResultMeta({
-        tag: formData.tag,
-        duration: formData.duration,
-        start: window.start_iso,
-        end: window.end_iso
-      })
+      await apiClient.createPlot(plotPayload)
 
       setStatus(STATUS.COMPLETE)
       setStatusMessage('Spectrogram ready.')
@@ -295,20 +282,6 @@ function RecordingForm({ configs, onRecordingComplete }) {
       {statusMessage && (
         <div className={`status-message ${status}`}>
           {statusMessage}
-        </div>
-      )}
-
-      {resultImage && (
-        <div className="result-section">
-          <h3>Latest PNG</h3>
-          <img src={resultImage} alt="Spectrogram result" loading="lazy" />
-          {resultMeta && (
-            <p className="result-info">
-              Tag {resultMeta.tag} · {resultMeta.duration}s ·{' '}
-              {new Date(resultMeta.start).toUTCString()} ➜{' '}
-              {new Date(resultMeta.end).toUTCString()}
-            </p>
-          )}
         </div>
       )}
     </div>
