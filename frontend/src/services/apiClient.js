@@ -5,16 +5,32 @@ class ApiClient {
 
   async request(path, options = {}) {
     const url = `${this.baseUrl}${path}`
+
+    // Handle timeout with AbortController if specified
+    let timeoutId
+    const controller = new AbortController()
+
+    if (options.timeout) {
+      timeoutId = setTimeout(() => controller.abort(), options.timeout)
+    }
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers
       },
+      signal: controller.signal,
       ...options
     }
 
+    // Remove timeout from config (it's not a fetch option)
+    delete config.timeout
+
     try {
       const response = await fetch(url, config)
+
+      // Clear timeout if request completes
+      if (timeoutId) clearTimeout(timeoutId)
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -50,6 +66,12 @@ class ApiClient {
       // Non-JSON responses (e.g., proxied binary files)
       return response.url
     } catch (error) {
+      // Clear timeout on error
+      if (timeoutId) clearTimeout(timeoutId)
+
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - operation took too long')
+      }
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
         throw new Error('Network error - check if the server is running')
       }
@@ -67,17 +89,20 @@ class ApiClient {
   }
 
   // Recording endpoints
+  // Extended timeout for long recordings (15 minutes = 900,000ms)
   async recordSignal(payload) {
     return this.request('/recordings/signal', {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      timeout: 900000  // 15 minutes
     })
   }
 
   async recordSpectrogram(payload) {
     return this.request('/recordings/spectrogram', {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      timeout: 900000  // 15 minutes
     })
   }
 

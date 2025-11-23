@@ -7,6 +7,7 @@ function SavedSpectrograms() {
   const [error, setError] = useState(null)
   const [lightboxUrl, setLightboxUrl] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [sortOrder, setSortOrder] = useState('newest')
 
   useEffect(() => {
     loadRecordings()
@@ -38,6 +39,21 @@ function SavedSpectrograms() {
     } finally {
       setRefreshing(false)
     }
+  }
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')
+  }
+
+  const getSortedRecordings = () => {
+    const sorted = [...recordings].sort((a, b) => {
+      // URLs contain filenames with format: YYYYMMDD_HHMMSS_tag.png
+      // These are already sortable strings
+      return sortOrder === 'newest'
+        ? b.localeCompare(a)  // Descending (newest first)
+        : a.localeCompare(b)  // Ascending (oldest first)
+    })
+    return sorted
   }
 
   const parseMetadata = (url) => {
@@ -132,21 +148,30 @@ function SavedSpectrograms() {
       <section className="gallery-section">
         <div className="gallery-header">
           <h2>Previous Recordings</h2>
-          <button
-            className="refresh-button"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            title="Refresh recordings list"
-          >
-            {refreshing ? '↻ Refreshing...' : '↻ Refresh'}
-          </button>
+          <div className="gallery-controls">
+            <button
+              className="sort-button"
+              onClick={toggleSortOrder}
+              title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
+            >
+              {sortOrder === 'newest' ? '↓ Newest First' : '↑ Oldest First'}
+            </button>
+            <button
+              className="refresh-button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              title="Refresh recordings list"
+            >
+              {refreshing ? '↻ Refreshing...' : '↻ Refresh'}
+            </button>
+          </div>
         </div>
 
         {recordings.length === 0 ? (
           <p className="no-recordings">No recordings yet. Start your first recording above!</p>
         ) : (
           <div className="recordings-grid">
-            {recordings.map((recording, index) => {
+            {getSortedRecordings().map((recording, index) => {
               const metadata = parseMetadata(recording)
 
               return (

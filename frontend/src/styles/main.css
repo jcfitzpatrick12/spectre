@@ -278,6 +278,32 @@ body {
   margin-bottom: 0;
 }
 
+.gallery-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sort-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.sort-button:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.sort-button:active {
+  transform: translateY(0);
+}
+
 .refresh-button {
   background-color: #667eea;
   color: white;
@@ -499,6 +525,12 @@ body {
     margin-bottom: 0;
   }
 
+  .gallery-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .sort-button,
   .refresh-button {
     width: 100%;
   }
