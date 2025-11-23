@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { apiClient } from '../services/apiClient'
 
 const STATUS = {
@@ -8,6 +8,8 @@ const STATUS = {
   COMPLETE: 'complete',
   ERROR: 'error'
 }
+
+const STORAGE_KEY_TAG = 'spectre.selectedTag'
 
 const INITIAL_FORM = {
   tag: '',
@@ -35,7 +37,13 @@ const getObservationWindow = (durationSeconds) => {
 }
 
 function RecordingForm({ configs, onRecordingComplete }) {
-  const [formData, setFormData] = useState(() => ({ ...INITIAL_FORM }))
+  const [formData, setFormData] = useState(() => {
+    const savedTag = localStorage.getItem(STORAGE_KEY_TAG)
+    return {
+      ...INITIAL_FORM,
+      tag: savedTag || INITIAL_FORM.tag
+    }
+  })
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState(STATUS.IDLE)
   const [statusMessage, setStatusMessage] = useState('')
@@ -50,6 +58,15 @@ function RecordingForm({ configs, onRecordingComplete }) {
       .map((fileName) => fileName.replace(/\.json$/i, ''))
       .sort()
   }, [configs])
+
+  // Validate persisted tag exists in current configs
+  useEffect(() => {
+    if (formData.tag && availableTags.length > 0 && !availableTags.includes(formData.tag)) {
+      // Stored tag no longer exists, clear it
+      localStorage.removeItem(STORAGE_KEY_TAG)
+      setFormData((prev) => ({ ...prev, tag: '' }))
+    }
+  }, [availableTags, formData.tag])
 
   const handleChange = (event) => {
     const { name, type, value, checked } = event.target
@@ -69,6 +86,11 @@ function RecordingForm({ configs, onRecordingComplete }) {
 
       return { ...prev, [name]: value }
     })
+
+    // Persist tag selection to localStorage
+    if (name === 'tag') {
+      localStorage.setItem(STORAGE_KEY_TAG, value)
+    }
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
