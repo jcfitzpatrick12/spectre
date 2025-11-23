@@ -11,17 +11,48 @@ function SavedSpectrograms() {
   // Delete confirmation dialog state: {url, filename} or null
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  // Filter state
+  const [filters, setFilters] = useState({
+    year: '',
+    month: '',
+    day: '',
+    tags: []
+  })
+  const [availableTags, setAvailableTags] = useState([])
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     loadRecordings()
+    loadAvailableTags()
   }, [])
 
-  const loadRecordings = async () => {
+  // Load available tags for filter dropdown
+  const loadAvailableTags = async () => {
+    try {
+      const response = await apiClient.getTags()
+      setAvailableTags(response.data || [])
+    } catch (err) {
+      // Non-critical - filter will still work with manual tag entry
+      console.warn('Failed to load tags:', err.message)
+    }
+  }
+
+  const loadRecordings = async (filterParams = null) => {
     try {
       setLoading(true)
       setError(null)
 
-      const batchFiles = await apiClient.getBatchFiles(['png'])
+      // Use provided filters or current state filters
+      const activeFilters = filterParams !== null ? filterParams : filters
+
+      // Build API parameters
+      const extensions = ['png']
+      const tags = activeFilters.tags || []
+      const year = activeFilters.year || null
+      const month = activeFilters.month || null
+      const day = activeFilters.day || null
+
+      const batchFiles = await apiClient.getBatchFiles(extensions, tags, year, month, day)
       setRecordings(batchFiles.data || [])
     } catch (err) {
       setError(`Failed to load recordings: ${err.message}`)
@@ -33,15 +64,40 @@ function SavedSpectrograms() {
   const handleRefresh = async () => {
     try {
       setRefreshing(true)
-      setError(null)
-
-      const batchFiles = await apiClient.getBatchFiles(['png'])
-      setRecordings(batchFiles.data || [])
+      await loadRecordings()
     } catch (err) {
       setError(`Failed to refresh recordings: ${err.message}`)
     } finally {
       setRefreshing(false)
     }
+  }
+
+  // Apply filters and reload recordings
+  const handleApplyFilters = () => {
+    loadRecordings(filters)
+  }
+
+  // Clear all filters and reload
+  const handleClearFilters = () => {
+    const emptyFilters = {
+      year: '',
+      month: '',
+      day: '',
+      tags: []
+    }
+    setFilters(emptyFilters)
+    loadRecordings(emptyFilters)
+  }
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    return filters.year || filters.month || filters.day || filters.tags.length > 0
+  }
+
+  // Handle tag selection change
+  const handleTagChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
+    setFilters(prev => ({ ...prev, tags: selectedOptions }))
   }
 
   const toggleSortOrder = () => {
@@ -193,6 +249,14 @@ function SavedSpectrograms() {
           <h2>Previous Recordings</h2>
           <div className="gallery-controls">
             <button
+              className="filter-toggle-button"
+              onClick={() => setShowFilters(!showFilters)}
+              title="Toggle filters"
+            >
+              {showFilters ? '🔽 Hide Filters' : '🔼 Show Filters'}
+              {hasActiveFilters() && <span className="filter-badge">●</span>}
+            </button>
+            <button
               className="sort-button"
               onClick={toggleSortOrder}
               title={`Sort by ${sortOrder === 'newest' ? 'oldest' : 'newest'} first`}
@@ -209,6 +273,99 @@ function SavedSpectrograms() {
             </button>
           </div>
         </div>
+
+        {showFilters && (
+          <div className="filters-section">
+            <div className="filters-grid">
+              <div className="filter-group">
+                <label htmlFor="filter-year">Year</label>
+                <input
+                  id="filter-year"
+                  type="number"
+                  placeholder="YYYY (e.g., 2025)"
+                  value={filters.year}
+                  onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value }))}
+                  min="2020"
+                  max="2099"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label htmlFor="filter-month">Month</label>
+                <input
+                  id="filter-month"
+                  type="number"
+                  placeholder="MM (1-12)"
+                  value={filters.month}
+                  onChange={(e) => setFilters(prev => ({ ...prev, month: e.target.value }))}
+                  min="1"
+                  max="12"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label htmlFor="filter-day">Day</label>
+                <input
+                  id="filter-day"
+                  type="number"
+                  placeholder="DD (1-31)"
+                  value={filters.day}
+                  onChange={(e) => setFilters(prev => ({ ...prev, day: e.target.value }))}
+                  min="1"
+                  max="31"
+                />
+              </div>
+
+              <div className="filter-group filter-group-tags">
+                <label htmlFor="filter-tags">Tags</label>
+                <select
+                  id="filter-tags"
+                  multiple
+                  value={filters.tags}
+                  onChange={handleTagChange}
+                  size="3"
+                >
+                  {availableTags.length === 0 ? (
+                    <option disabled>No tags available</option>
+                  ) : (
+                    availableTags.map(tag => (
+                      <option key={tag} value={tag}>{tag}</option>
+                    ))
+                  )}
+                </select>
+                <small className="filter-hint">Hold Ctrl/Cmd to select multiple</small>
+              </div>
+            </div>
+
+            <div className="filters-actions">
+              <button
+                className="apply-filters-button"
+                onClick={handleApplyFilters}
+              >
+                Apply Filters
+              </button>
+              <button
+                className="clear-filters-button"
+                onClick={handleClearFilters}
+                disabled={!hasActiveFilters()}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+            {hasActiveFilters() && (
+              <div className="active-filters">
+                <strong>Active Filters:</strong>
+                {filters.year && <span className="filter-pill">Year: {filters.year}</span>}
+                {filters.month && <span className="filter-pill">Month: {filters.month}</span>}
+                {filters.day && <span className="filter-pill">Day: {filters.day}</span>}
+                {filters.tags.map(tag => (
+                  <span key={tag} className="filter-pill">Tag: {tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {recordings.length === 0 ? (
           <p className="no-recordings">No recordings yet. Start your first recording above!</p>

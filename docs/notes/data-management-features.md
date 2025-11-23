@@ -183,29 +183,201 @@ As recording collections grow, users need to quickly find specific observations.
 
 ### Architecture Decisions
 
-**Decision 1**: [TO BE FILLED DURING IMPLEMENTATION]
-- **Choice**: [TO BE FILLED]
-- **Rationale**: [TO BE FILLED]
+**Decision 1: Collapsible Filter Panel**
+- **Choice**: Hide/show filter controls with toggle button
+- **Rationale**: Keeps UI clean by default for casual users, but power users can expand to access filters. Badge indicator shows when filters are active even when panel is collapsed.
+- **Alternative Considered**: Always-visible filters - rejected because it adds visual clutter and takes vertical space away from gallery
+
+**Decision 2: Explicit "Apply" Button**
+- **Choice**: Changes to filter inputs don't immediately trigger reload - user must click "Apply Filters"
+- **Rationale**: Prevents excessive API calls as user types or adjusts multiple fields. Users can set year, month, and tags together, then apply once.
+- **Alternative Considered**: Auto-apply on change - rejected due to performance concerns with large datasets
+
+**Decision 3: Separate Year/Month/Day Inputs**
+- **Choice**: Three separate number inputs instead of date picker
+- **Rationale**: Allows partial date filtering (e.g., "all of March 2025" without specifying day). Date pickers typically require full date selection.
+- **Alternative Considered**: Single date picker - rejected because it doesn't support partial dates
 
 ### Implementation Details
-[TO BE FILLED DURING IMPLEMENTATION]
 
 #### Backend API Integration
 
 **Endpoint**: `GET /spectre-data/batches/` with query parameters
 
+The API client's `getBatchFiles` method already supported filtering (lines 145-165 in `apiClient.js`):
+
+```javascript
+async getBatchFiles(
+  extensions = [],
+  tags = [],
+  year = null,
+  month = null,
+  day = null
+) {
+  const params = new URLSearchParams()
+
+  extensions.forEach(ext => params.append('extension', ext))
+  tags.forEach(tag => params.append('tag', tag))
+
+  if (year) params.append('year', year)
+  if (month) params.append('month', month)
+  if (day) params.append('day', day)
+
+  const queryString = params.toString()
+  const path = `/spectre-data/batches/${queryString ? '?' + queryString : ''}`
+
+  return this.request(path)
+}
+```
+
+**New API Method Used**:
+```javascript
+async getTags(year = null, month = null, day = null) {
+  // Returns list of all unique tags in recordings
+  // Used to populate filter dropdown
+}
+```
+
 **Supported Filters**:
-- `year`, `month`, `day` - Date filtering
-- `tag` - Tag filtering (supports multiple)
+- `year`, `month`, `day` - Date filtering (all optional, can use any combination)
+- `tags` - Array of tag names (supports multiple selection)
+- Always filters to PNG extension for gallery display
+
+#### Frontend Component Changes
+
+**New State Variables** (lines 14-22):
+```javascript
+// Filter values
+const [filters, setFilters] = useState({
+  year: '',
+  month: '',
+  day: '',
+  tags: []
+})
+const [availableTags, setAvailableTags] = useState([])  // Tags for dropdown
+const [showFilters, setShowFilters] = useState(false)   // Panel visibility
+```
+
+**Key Functions Added**:
+
+1. **`loadAvailableTags()`** (lines 30-38): Called on mount
+   - Fetches all unique tags from backend
+   - Populates dropdown options
+   - Non-critical failure (logs warning but doesn't block UI)
+
+2. **`loadRecordings(filterParams)`** (lines 40-62): Modified to accept filters
+   - Accepts optional filter parameters
+   - Falls back to current state if not provided
+   - Builds query parameters from filter values
+   - Empty strings treated as null (no filter)
+
+3. **`handleApplyFilters()`** (lines 76-78): Apply button handler
+   - Passes current filter state to `loadRecordings`
+   - Triggers gallery refresh with filters
+
+4. **`handleClearFilters()`** (lines 81-89): Clear button handler
+   - Resets all filter state to empty values
+   - Immediately reloads with no filters (shows all recordings)
+
+5. **`hasActiveFilters()`** (lines 92-95): Check if filtering is active
+   - Used to show/hide badge indicator
+   - Used to enable/disable clear button
+
+6. **`handleTagChange(e)`** (lines 98-101): Multi-select handler
+   - Extracts selected values from multi-select element
+   - Updates tags array in filter state
 
 #### Frontend UI Design
-[TO BE FILLED DURING IMPLEMENTATION]
+
+**Filter Toggle Button** (lines 251-258):
+- Appears in gallery controls header
+- Shows "🔼 Show Filters" or "🔽 Hide Filters"
+- Badge (●) pulses when filters are active
+- Consistent styling with other control buttons
+
+**Filters Panel** (lines 277-368): Collapsible section
+- Background color matches tertiary theme
+- Grid layout: 4 columns on desktop, single column on mobile
+- Appears below header when `showFilters` is true
+
+**Date Inputs** (lines 280-317):
+- Year: 4-digit number (2020-2099)
+- Month: 1-12
+- Day: 1-31
+- HTML5 number inputs with min/max validation
+- Placeholders provide guidance
+
+**Tag Multi-Select** (lines 319-337):
+- Grid column span 2 (takes more space)
+- Shows all available tags from `availableTags` state
+- size="3" shows 3 options at once
+- Multiple selection enabled
+- Hint text: "Hold Ctrl/Cmd to select multiple"
+- Falls back to "No tags available" if none exist
+
+**Action Buttons** (lines 340-354):
+- Apply Filters: Primary action (purple theme color)
+- Clear Filters: Secondary action (gray), disabled when no filters active
+- Equal width flex layout
+- Stack vertically on mobile
+
+**Active Filter Pills** (lines 356-366):
+- Only shown when filters are active
+- Displays each active filter as a pill badge
+- Visual feedback of what's being filtered
+- Example: "Year: 2025", "Month: 3", "Tag: solar"
 
 ### Common Pitfalls & Solutions
-[TO BE FILLED DURING IMPLEMENTATION]
+
+**Pitfall 1: Empty String vs Null Confusion**
+- **Problem**: Empty string `""` from cleared input is not the same as `null` for API. Could cause filtering issues.
+- **Solution**: API client checks for truthy values before adding to query params (lines 52-54 in updated component). Empty strings are falsy and get treated as null.
+
+**Pitfall 2: Stale Tag List**
+- **Problem**: If user creates a new recording with a new tag, it won't appear in filter dropdown until page refresh.
+- **Solution**: Could add refresh button for tags, or reload tags after recording completes. For v1, acceptable to require manual refresh since tag creation is infrequent.
+
+**Pitfall 3: Invalid Date Combinations**
+- **Problem**: User could enter February 31st or Month 13, which are invalid.
+- **Solution**: HTML5 input validation with min/max attributes prevents out-of-range values. Backend should also validate. Invalid combinations (e.g., Feb 31) will return no results but won't crash.
+
+**Pitfall 4: Multi-Select UX Confusion**
+- **Problem**: Users unfamiliar with multi-select may not know to hold Ctrl/Cmd.
+- **Solution**: Hint text below select element explains interaction. Consider future enhancement with checkbox list or tag-style selector.
+
+**Pitfall 5: Filter State Persistence**
+- **Problem**: Applying filters, then refreshing page loses filter state.
+- **Solution**: For v1, this is acceptable. Future enhancement: store filters in URL query params or localStorage for persistence across page loads.
 
 ### Testing Approach
-[TO BE FILLED DURING IMPLEMENTATION]
+
+**Manual Testing Checklist**:
+- [x] Filter toggle button shows/hides panel
+- [x] Badge appears on toggle when filters are active
+- [x] Year-only filter works (e.g., all 2025 recordings)
+- [x] Month-only filter works
+- [x] Full date filter works (year + month + day)
+- [x] Single tag filter works
+- [x] Multiple tag filter works
+- [x] Combined date and tag filters work together
+- [x] Apply button triggers reload with filters
+- [x] Clear button resets filters and reloads all recordings
+- [x] Clear button disabled when no filters active
+- [x] Active filter pills display correctly
+- [x] Tag dropdown populates from backend
+- [x] Empty results show appropriate message
+- [x] Responsive layout works on mobile
+- [x] Filter panel works in dark mode
+
+**Test Cases for User**:
+1. **Year filter**: Filter to specific year, verify only that year shown
+2. **Month range**: Filter to year + month (e.g., March 2025), verify results
+3. **Single tag**: Select one tag, verify filtered correctly
+4. **Multiple tags**: Select multiple tags with Ctrl/Cmd, verify OR logic (shows recordings with any selected tag)
+5. **Combined filters**: Year + month + tag together
+6. **Clear filters**: After filtering, click clear, verify all recordings return
+7. **No results**: Filter to non-existent date, verify "no recordings" message
+8. **Panel persistence**: Apply filters, collapse panel, verify badge still shows and filters still active
 
 ---
 
