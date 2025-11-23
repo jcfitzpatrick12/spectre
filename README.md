@@ -31,8 +31,8 @@ The goal is a predictable, copy-paste-friendly path even if Docker is brand new.
 
 1. Clone and enter the repo:
    ```bash
-   git clone https://github.com/yourname/spectre-webui.git
-   cd spectre-webui
+   git clone https://github.com/b3p3k0/spectre.git
+   cd spectre
    ```
 2. Sanity-check Docker:
    ```bash
