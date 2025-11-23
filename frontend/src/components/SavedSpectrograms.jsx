@@ -8,6 +8,9 @@ function SavedSpectrograms() {
   const [lightboxUrl, setLightboxUrl] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
   const [sortOrder, setSortOrder] = useState('newest')
+  // Delete confirmation dialog state: {url, filename} or null
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadRecordings()
@@ -122,6 +125,46 @@ function SavedSpectrograms() {
     }
   }
 
+  // Handle delete button click - show confirmation dialog
+  const handleDeleteClick = (url) => {
+    const filename = url.split('/').pop()
+    setDeleteConfirm({ url, filename })
+  }
+
+  // Perform the actual deletion after confirmation
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm) return
+
+    try {
+      setDeleting(true)
+      setError(null)
+
+      // Call API to delete the file (pessimistic update - wait for success)
+      await apiClient.deleteBatchFile(deleteConfirm.filename)
+
+      // Remove from local state after successful deletion
+      setRecordings(prev => prev.filter(rec => rec !== deleteConfirm.url))
+
+      // Close lightbox if deleted file was open
+      if (lightboxUrl === deleteConfirm.url) {
+        setLightboxUrl(null)
+      }
+
+      // Close confirmation dialog
+      setDeleteConfirm(null)
+    } catch (err) {
+      setError(`Failed to delete recording: ${err.message}`)
+      // Keep dialog open so user can retry or cancel
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  // Cancel deletion
+  const handleDeleteCancel = () => {
+    setDeleteConfirm(null)
+  }
+
   if (loading) {
     return (
       <section className="gallery-section">
@@ -198,16 +241,28 @@ function SavedSpectrograms() {
                     </p>
                     <p className="recording-filename">{metadata.filename}</p>
 
-                    <button
-                      className="download-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(recording);
-                      }}
-                      title="Download PNG file"
-                    >
-                      ⬇ Download
-                    </button>
+                    <div className="recording-actions">
+                      <button
+                        className="download-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(recording);
+                        }}
+                        title="Download PNG file"
+                      >
+                        ⬇ Download
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(recording);
+                        }}
+                        title="Delete recording"
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               )
@@ -241,6 +296,39 @@ function SavedSpectrograms() {
                 }}
               >
                 ⬇ Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-label="Delete confirmation"
+          onClick={handleDeleteCancel}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Recording?</h3>
+            <p>Are you sure you want to delete this recording?</p>
+            <p className="modal-filename"><strong>{deleteConfirm.filename}</strong></p>
+            <p className="modal-warning">This action cannot be undone.</p>
+
+            <div className="modal-actions">
+              <button
+                className="modal-button modal-button-cancel"
+                onClick={handleDeleteCancel}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-button modal-button-delete"
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

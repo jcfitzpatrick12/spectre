@@ -494,7 +494,15 @@ body {
   word-break: break-all;
 }
 
+/* Recording card action buttons */
+.recording-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .download-button {
+  flex: 1;
   background-color: #28a745;
   color: white;
   border: none;
@@ -503,12 +511,30 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 0.25rem;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .download-button:hover {
   background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.delete-button {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
 }
 
 .lightbox {
@@ -577,6 +603,101 @@ body {
 
 .lightbox-download:hover {
   background-color: #218838;
+}
+
+/* Delete Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: 0 8px 30px var(--shadow-hover);
+  transition: background-color 0.3s ease;
+}
+
+.modal-content h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.modal-content p {
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.modal-filename {
+  background-color: var(--bg-tertiary);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
+  margin: 1rem 0;
+}
+
+.modal-warning {
+  color: var(--error-text);
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.modal-button {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.modal-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.modal-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-button-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-button-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.modal-button-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-button-delete:hover:not(:disabled) {
+  background-color: #c82333;
 }
 
 /* Config Manager Section */
@@ -863,6 +984,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .recording-preview img {
+    height: 150px;
+  }
+
   .gallery-header {
     flex-direction: column;
     align-items: flex-start;
@@ -923,6 +1048,28 @@ body {
   }
 
   .config-modal-footer button {
+    width: 100%;
+  }
+
+  .modal-content {
+    max-width: 95vw;
+    padding: 1.25rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-button {
+    width: 100%;
+  }
+
+  .recording-actions {
+    flex-direction: column;
+  }
+
+  .download-button,
+  .delete-button {
     width: 100%;
   }
 }

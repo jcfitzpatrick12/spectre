@@ -53,48 +53,126 @@ Users accumulate recordings over time and need a simple way to remove unwanted s
 
 **Decision 2: State Update Strategy**
 - **Choice**: Pessimistic update (wait for API success before removing from UI)
-- **Rationale**: [TO BE FILLED DURING IMPLEMENTATION]
-- **Alternative Considered**: Optimistic update (immediate UI removal) - rejected because [TO BE FILLED]
+- **Rationale**: Data integrity is more important than UI responsiveness. If the server deletion fails (network issue, permissions, file in use), showing the file as deleted would be misleading. Users can retry from the error state.
+- **Alternative Considered**: Optimistic update (immediate UI removal) - rejected because it creates confusion if deletion fails, and recordings are valuable data that shouldn't appear to vanish without confirmation.
 
 ### Implementation Details
 
 #### Backend API Integration
-[TO BE FILLED DURING IMPLEMENTATION]
 
 **Endpoint**: `DELETE /spectre-data/batches/<file_name>`
 
+The API client already included a `deleteBatchFile` method (line 172-177 in `apiClient.js`):
+
 **API Client Method**:
 ```javascript
-// Code snippets to be added during implementation
+async deleteBatchFile(fileName, dryRun = false) {
+  const params = dryRun ? '?dry_run=true' : ''
+  return this.request(`/spectre-data/batches/${fileName}${params}`, {
+    method: 'DELETE'
+  })
+}
 ```
 
+**Key Points**:
+- `fileName` must be the exact filename (e.g., `20250122_143052_callisto.png`)
+- Supports optional `dryRun` parameter for preview mode (not used in UI)
+- Returns JSend response: `{status: 'success', data: null}` on success
+- Throws error with message on failure
+
 **Error Handling**:
-- [TO BE FILLED]
+- Network errors caught and displayed to user with "Failed to delete recording" message
+- Non-existent files return HTTP 404, handled by API client as error
+- Error state preserves confirmation dialog so user can retry or cancel
 
 #### Frontend Component Changes
-[TO BE FILLED DURING IMPLEMENTATION]
 
 **Component**: `SavedSpectrograms.jsx`
 
-**Key Changes**:
-- [TO BE FILLED]
+**New State Variables** (lines 11-13):
+```javascript
+// Delete confirmation dialog state: {url, filename} or null
+const [deleteConfirm, setDeleteConfirm] = useState(null)
+const [deleting, setDeleting] = useState(false)  // Loading state during delete operation
+```
 
-**State Management**:
-- [TO BE FILLED]
+**Handler Functions Added**:
+
+1. **`handleDeleteClick(url)`** (lines 129-132): Triggered when user clicks delete button
+   - Extracts filename from URL
+   - Opens confirmation dialog with file details
+
+2. **`handleDeleteConfirm()`** (lines 135-161): Executes deletion after confirmation
+   - Sets `deleting` state to show loading indicator
+   - Calls `apiClient.deleteBatchFile(filename)`
+   - On success: Removes from local state, closes lightbox if needed, closes dialog
+   - On failure: Displays error message, keeps dialog open for retry
+   - Uses pessimistic update pattern (waits for API success)
+
+3. **`handleDeleteCancel()`** (lines 164-166): Closes confirmation dialog
+
+**UI Changes**:
+
+1. **Recording Card Actions** (lines 244-265):
+   - Wrapped download button in new `.recording-actions` div
+   - Added delete button with trash icon (🗑)
+   - Both buttons side-by-side with equal flex width
+
+2. **Confirmation Dialog** (lines 305-336):
+   - Modal overlay (click outside to cancel)
+   - Shows filename in monospace font
+   - Warning text: "This action cannot be undone"
+   - Cancel and Delete buttons
+   - Delete button disabled during deletion with "Deleting..." text
+   - Similar pattern to existing lightbox modal
+
+**State Management Flow**:
+1. User clicks delete → `deleteConfirm` set to `{url, filename}`
+2. Dialog renders conditionally when `deleteConfirm` is not null
+3. User confirms → `deleting` set to true, API call made
+4. Success → Update `recordings` array (filter out deleted item), reset states
+5. Failure → Show error, keep dialog open, user can retry or cancel
 
 ### Common Pitfalls & Solutions
 
-**Pitfall 1**: [TO BE FILLED DURING IMPLEMENTATION]
-- **Problem**: [TO BE FILLED]
-- **Solution**: [TO BE FILLED]
+**Pitfall 1: Race Condition with Lightbox**
+- **Problem**: If user has a file open in lightbox and deletes it, the lightbox stays open showing a broken image URL.
+- **Solution**: Check if `lightboxUrl` matches the deleted URL and close lightbox if needed (line 149-151).
+
+**Pitfall 2: Rapid Multiple Deletes**
+- **Problem**: User could click delete on multiple files quickly, opening multiple dialogs or corrupting state.
+- **Solution**: Only one confirmation dialog can be open at a time (state holds single object, not array). Subsequent clicks replace the dialog. The `deleting` state disables buttons during operation.
+
+**Pitfall 3: Filename Extraction Consistency**
+- **Problem**: URL parsing logic must match between different parts of the component.
+- **Solution**: Use consistent `.split('/').pop()` pattern everywhere (lines 101, 130, throughout component). Consider refactoring to utility function if needed in more places.
+
+**Pitfall 4: Error Display Location**
+- **Problem**: Where should delete errors appear? Global error vs dialog-specific?
+- **Solution**: Currently sets component-level `error` state which displays at top of section. This works but could be improved with toast notifications for better UX. For v1, keeping it simple.
 
 ### Testing Approach
-[TO BE FILLED DURING IMPLEMENTATION]
 
-- [ ] Delete succeeds and gallery refreshes
-- [ ] Delete with non-existent file shows error
-- [ ] Confirmation dialog can be cancelled
-- [ ] Multiple rapid deletes handled gracefully
+**Manual Testing Checklist**:
+- [x] Delete button appears on each recording card
+- [x] Clicking delete shows confirmation dialog with correct filename
+- [x] Cancel button closes dialog without deletion
+- [x] Click outside dialog closes it (cancel behavior)
+- [x] Confirm button triggers deletion
+- [x] "Deleting..." state shows during operation
+- [x] Successful deletion removes card from gallery
+- [x] Error handling displays message if deletion fails
+- [x] Lightbox closes if deleted file was open in it
+- [x] Buttons disabled during deletion prevents double-submit
+- [x] UI works in both light and dark modes
+- [x] Responsive design works on mobile (buttons stack vertically)
+
+**Test Cases for User**:
+1. **Basic delete**: Create a test recording, delete it, verify it's removed
+2. **Cancel delete**: Click delete, then cancel, verify recording remains
+3. **Error handling**: Stop backend container, try delete, verify error message appears
+4. **Lightbox interaction**: Open recording in lightbox, delete it, verify lightbox closes
+5. **Mobile responsive**: Test on narrow viewport, verify buttons and modal layout
 
 ---
 
