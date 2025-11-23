@@ -40,11 +40,15 @@ The goal is a predictable, copy-paste-friendly path even if Docker is brand new.
    docker compose version
    ```
    If either command fails, install/launch Docker first.
-3. Build the services (one-time unless you change code):
+3. Prep the environment variables so Docker Compose stops complaining about `SPECTRE_*` values:
+   - **Linux:** `sudo ./setup.sh` — this creates the `spectre-group`, installs udev rules, and writes `.env` with the right IDs/ports.
+   - **macOS/Windows or manual path:** `cp .env.example .env`, then tweak values if you need to expose different ports.
+   Run this step once per machine (rerun if you reinstall Docker or plug in new SDR hardware on Linux).
+4. Build the services (one-time unless you change code):
    ```bash
    docker compose build spectre-server spectre-frontend
    ```
-4. Launch the stack:
+5. Launch the stack:
    ```bash
    docker compose up spectre-server spectre-frontend spectre-cli
    ```
