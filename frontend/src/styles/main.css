@@ -580,57 +580,82 @@ body {
 }
 
 /* Config Manager Section */
-.config-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+.config-table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   margin-top: 1rem;
 }
 
-.config-card {
-  display: flex;
-  flex-direction: column;
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--bg-secondary);
+}
+
+.config-table thead {
+  position: sticky;
+  top: 0;
   background-color: var(--bg-tertiary);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px var(--shadow);
-  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+  z-index: 10;
 }
 
-.config-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px var(--shadow-hover);
-}
-
-.config-info {
-  flex: 1;
-  margin-bottom: 0.75rem;
-}
-
-.config-tag {
-  font-size: 1.1rem;
+.config-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 0.5rem 0;
-}
-
-.config-details {
+  border-bottom: 2px solid var(--border-color);
   font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.config-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: auto;
+.config-table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s ease;
+}
+
+.config-table tbody tr:nth-child(even) {
+  background-color: var(--bg-tertiary);
+}
+
+.config-table tbody tr:hover {
+  background-color: rgba(102, 126, 234, 0.08);
+}
+
+.config-table tbody tr.config-row-error {
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+.config-table td {
+  padding: 0.625rem 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.config-tag-cell strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.config-tag-cell .error-message {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.config-actions-cell {
+  white-space: nowrap;
 }
 
 .config-action-button {
-  flex: 1;
-  padding: 0.5rem;
+  padding: 0.35rem 0.65rem;
+  margin: 0 0.25rem;
   border: none;
   border-radius: 4px;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
@@ -867,8 +892,20 @@ body {
     width: 100%;
   }
 
-  .config-list {
-    grid-template-columns: 1fr;
+  .config-table-container {
+    max-height: 300px;
+  }
+
+  .config-table th,
+  .config-table td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .config-action-button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+    margin: 0 0.15rem;
   }
 
   .config-modal-content {

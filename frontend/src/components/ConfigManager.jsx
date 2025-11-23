@@ -309,45 +309,54 @@ function ConfigManager({ onConfigsChange }) {
       {configs.length === 0 ? (
         <p className="no-recordings">No configurations yet. Create your first one!</p>
       ) : (
-        <div className="config-list">
-          {configs.map((config) => (
-            <div key={config.fileName} className="config-card">
-              <div className="config-info">
-                <p className="config-tag">
-                  <strong>{config.tag}</strong>
-                </p>
-                <p className="config-details">
-                  {config.receiver_name} - {config.receiver_mode}
-                </p>
-                {config.error && (
-                  <p className="error-message">{config.error}</p>
-                )}
-              </div>
-              <div className="config-actions">
-                <button
-                  className="config-action-button view"
-                  onClick={() => handleView(config)}
-                  title="View configuration"
-                >
-                  View
-                </button>
-                <button
-                  className="config-action-button edit"
-                  onClick={() => handleEdit(config)}
-                  title="Edit configuration"
-                >
-                  Edit
-                </button>
-                <button
-                  className="config-action-button delete"
-                  onClick={() => handleDelete(config)}
-                  title="Delete configuration"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="config-table-container">
+          <table className="config-table">
+            <thead>
+              <tr>
+                <th>Tag</th>
+                <th>Receiver</th>
+                <th>Mode</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {configs.map((config) => (
+                <tr key={config.fileName} className={config.error ? 'config-row-error' : ''}>
+                  <td className="config-tag-cell">
+                    <strong>{config.tag}</strong>
+                    {config.error && (
+                      <div className="error-message">{config.error}</div>
+                    )}
+                  </td>
+                  <td>{config.receiver_name}</td>
+                  <td>{config.receiver_mode}</td>
+                  <td className="config-actions-cell">
+                    <button
+                      className="config-action-button view"
+                      onClick={() => handleView(config)}
+                      title="View configuration"
+                    >
+                      View
+                    </button>
+                    <button
+                      className="config-action-button edit"
+                      onClick={() => handleEdit(config)}
+                      title="Edit configuration"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="config-action-button delete"
+                      onClick={() => handleDelete(config)}
+                      title="Delete configuration"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
