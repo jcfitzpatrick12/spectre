@@ -3,6 +3,7 @@ import RecordingForm from './components/RecordingForm'
 import ConfigManager from './components/ConfigManager'
 import SavedSpectrograms from './components/SavedSpectrograms'
 import LogViewer from './components/LogViewer'
+import FriendlyError from './components/FriendlyError'
 import { apiClient } from './services/apiClient'
 
 function App() {
@@ -40,7 +41,7 @@ function App() {
       setConfigs(configsResponse.data || [])
 
     } catch (err) {
-      setError(`Failed to load initial data: ${err.message}`)
+      setError(err.message || 'Request failed')
     } finally {
       setLoading(false)
     }
@@ -91,12 +92,14 @@ function App() {
           </button>
         </header>
         <main className="main">
-          <div className="error">
-            <p>{error}</p>
-            <button onClick={() => {setError(null); loadInitialData()}}>
-              Retry
-            </button>
-          </div>
+          <FriendlyError
+            title="Spectre couldn't load its starting configs."
+            detail={error}
+            onRetry={() => {
+              setError(null)
+              loadInitialData()
+            }}
+          />
         </main>
       </div>
     )

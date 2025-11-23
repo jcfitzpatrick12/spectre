@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../services/apiClient'
+import FriendlyError from './FriendlyError'
 
 function LogViewer() {
   const [logFiles, setLogFiles] = useState([])
@@ -40,7 +41,7 @@ function LogViewer() {
       // Set paginated logs for current page
       updatePaginatedLogs(logs, 1) // Start at page 1
     } catch (err) {
-      setError(`Failed to load logs: ${err.message}`)
+      setError(err.message || 'Failed to load logs')
     } finally {
       setLoading(false)
     }
@@ -74,7 +75,7 @@ function LogViewer() {
       const response = await apiClient.getLogContent(fileName)
       setLogContent(response.data || '')
     } catch (err) {
-      setError(`Failed to load log content: ${err.message}`)
+      setError(err.message || 'Failed to load log content')
       setLogContent(null)
     } finally {
       setLoadingContent(false)
@@ -214,10 +215,15 @@ function LogViewer() {
       )}
 
       {error && (
-        <div className="error">
-          <p>{error}</p>
-          <button onClick={loadLogs}>Retry</button>
-        </div>
+        <FriendlyError
+          title="Logs didn't load this time."
+          detail={error}
+          onRetry={() => {
+            setError(null)
+            loadLogs()
+          }}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       {logFiles.length === 0 ? (

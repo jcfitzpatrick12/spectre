@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../services/apiClient'
+import FriendlyError from './FriendlyError'
 
 function ConfigManager({ onConfigsChange }) {
   const [configs, setConfigs] = useState([])
@@ -67,7 +68,7 @@ function ConfigManager({ onConfigsChange }) {
 
       setConfigs(configDetails)
     } catch (err) {
-      setError(`Failed to load configs: ${err.message}`)
+      setError(err.message || 'Failed to load configurations')
     } finally {
       setLoading(false)
     }
@@ -79,7 +80,7 @@ function ConfigManager({ onConfigsChange }) {
       setError(null)
       await loadConfigs()
     } catch (err) {
-      setError(`Failed to refresh configs: ${err.message}`)
+      setError(err.message || 'Refresh failed')
     } finally {
       setRefreshing(false)
     }
@@ -156,7 +157,7 @@ function ConfigManager({ onConfigsChange }) {
         onConfigsChange()
       }
     } catch (err) {
-      setError(`Delete failed: ${err.message}`)
+      setError(err.message || 'Delete failed')
       setDeletingConfig(null)
     } finally {
       setSaving(false)
@@ -178,7 +179,7 @@ function ConfigManager({ onConfigsChange }) {
       setTemplateParams('')
       setJsonError(null)
     } catch (err) {
-      setError(`Failed to load receivers: ${err.message}`)
+      setError(err.message || 'Failed to load receivers')
       setCreatingConfig(false)
     }
   }
@@ -300,10 +301,12 @@ function ConfigManager({ onConfigsChange }) {
       </div>
 
       {error && (
-        <div className="error">
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>Dismiss</button>
-        </div>
+        <FriendlyError
+          title="Configs are taking a breather."
+          detail={error}
+          onRetry={handleRefresh}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       {configs.length === 0 ? (

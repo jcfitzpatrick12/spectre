@@ -4,6 +4,28 @@ This document tracks feature ideas and enhancements that are planned for future 
 
 ---
 
+## Friendly Onboarding Ideas
+
+### Starter hardware links
+- **SDRplay** – approachable RSP receivers that cover LF-to-microwave in one USB stick-sized box. (https://www.sdrplay.com/)
+- **Great Scott Gadgets HackRF** – open hardware transceiver (1 MHz–6 GHz) that doubles as both RX/TX for experiments. (https://greatscottgadgets.com/hackrf/)
+- **Ettus Research USRP** – modular, professionally supported SDR platforms used in labs and universities worldwide. (https://www.ettus.com/)
+- **Airspy** – compact, high-dynamic-range SDRs (HF+ Discovery, Mini) for portable listening. (https://airspy.com/)
+
+### Community hangouts & maps
+- **r/RTLSDR** – massive Reddit community sharing daily captures, troubleshooting tips, and antenna hacks.
+- **SignalsEverywhere** – tutorials, Discord, and blog posts focused on practical SDR projects newcomers can copy. (https://www.signalseverywhere.com/)
+- **ReceiverBook map** – crowdsourced list of online receivers and SDR stations to compare against. (https://www.receiverbook.de/)
+- **r/vibecoding Spectre thread** – origin story + ongoing brainstorming hub. (https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/)
+
+### Roadmap reminders
+- **Curiosity prompts** – Added to README (“Try these experiments” section) so users always have a next step.
+- **Short explainer clips** – Produce 30‑second screen recordings (Quick Setup, first capture) and link them from README/docs.
+- **“What just happened?” post-setup recap** – After `setup.sh` runs, display a concise log of created groups, files, and next actions.
+- **Glossary of SDR & UI terms** – TODO: create a lightweight glossary covering spectrogram, I/Q, tag, batch, etc., and link it near Quick Setup.
+
+---
+
 ## High Priority - Future Iterations
 
 ### e-Callisto Network Integration

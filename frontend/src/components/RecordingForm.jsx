@@ -176,7 +176,13 @@ function RecordingForm({ configs, onRecordingComplete }) {
     <div className="recording-form">
       <form onSubmit={handleSubmit} noValidate>
         <div className="form-group">
-          <label htmlFor="tag">Configuration Tag</label>
+          <label htmlFor="tag">
+            Configuration Tag
+            <span
+              className="helper-tooltip"
+              title="Tags bundle receiver hardware, center frequency, and gain settings. Pick one you saved in the CLI."
+            >?</span>
+          </label>
           <select
             id="tag"
             name="tag"
@@ -196,7 +202,13 @@ function RecordingForm({ configs, onRecordingComplete }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="duration">Duration (seconds)</label>
+          <label htmlFor="duration">
+            Duration (seconds)
+            <span
+              className="helper-tooltip"
+              title="How long Spectre listens before drawing your PNG snapshot."
+            >?</span>
+          </label>
           <input
             type="number"
             id="duration"
@@ -227,11 +239,21 @@ function RecordingForm({ configs, onRecordingComplete }) {
                 disabled={isBusy}
               />
               Force restart on worker failure
+              <span
+                className="helper-tooltip"
+                title="If a worker hangs, this tells Spectre to stop and launch a fresh one instead of waiting."
+              >?</span>
             </label>
           </div>
 
           <div className="form-group">
-            <label htmlFor="maxRestarts">Max restarts</label>
+            <label htmlFor="maxRestarts">
+              Max restarts
+              <span
+                className="helper-tooltip"
+                title="Safety valve for how many times Spectre retries a flaky receiver before giving up."
+              >?</span>
+            </label>
             <input
               type="number"
               id="maxRestarts"
@@ -260,6 +282,10 @@ function RecordingForm({ configs, onRecordingComplete }) {
                 disabled={isBusy}
               />
               Validate configuration before recording
+              <span
+                className="helper-tooltip"
+                title="Spectre double-checks the config against your hardware before starting."
+              >?</span>
             </label>
           </div>
         </details>

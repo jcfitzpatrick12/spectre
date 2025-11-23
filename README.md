@@ -85,6 +85,18 @@ Spectre’s React UI talks to the backend via the internal Docker network, so no
 - **See what happened.** Successful prune jobs surface a dismissable banner (“Deleted 12 logs older than 14 days”) so collaborators know cleanup just ran.
 - **Script it if you like.** The backend exposes `POST /spectre-data/logs/prune` with body `{ "days": 30 }` for scheduled tasks or power users.
 
+## Try these experiments
+
+- **Run the demo, then the real deal.** Kick off `demo-sine` to watch a guaranteed-good spectrogram appear, then rerun the same duration with your RTL-SDR profile and compare the PNGs side-by-side.
+- **Time-box your curiosity.** Set `duration=60` seconds, flip on advanced options like `force_restart`, and peek at the live status panel to see how Spectre behaves when a job recovers from a hiccup.
+- **Share your science fair moment.** Post your favorite PNG (with tag + timestamp) to the friendly [r/RTLSDR](https://www.reddit.com/r/RTLSDR/) or the [vibecoding thread](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/) that inspired this UI.
+
+## Community & learning
+
+- **Vibecoding roots.** This Web UI launched after that [vibecoding call-to-arms](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/)—drop in with sketches, feedback, or wild requests.
+- **Hardware rabbit holes.** Browse SDRplay’s [hardware catalog](https://www.sdrplay.com/), Great Scott Gadgets’ [HackRF gear](https://greatscottgadgets.com/hackrf/), Ettus Research [USRPs](https://www.ettus.com/), or Airspy’s [compact receivers](https://airspy.com/) when you’re ready to expand your kit.
+- **Hangouts.** r/RTLSDR, the SignalsEverywhere [community hub](https://www.signalseverywhere.com/) (Discord + tutorials), and tools like [ReceiverBook’s station map](https://www.receiverbook.de/) are great places to compare notes and see what others are hearing.
+
 ## Configuration
 
 ### Default profiles

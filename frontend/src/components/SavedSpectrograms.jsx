@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../services/apiClient'
+import FriendlyError from './FriendlyError'
 
 function SavedSpectrograms() {
   const [recordings, setRecordings] = useState([])
@@ -68,7 +69,7 @@ function SavedSpectrograms() {
         setPagination(null)
       }
     } catch (err) {
-      setError(`Failed to load recordings: ${err.message}`)
+      setError(err.message || 'Failed to load recordings')
     } finally {
       setLoading(false)
     }
@@ -79,7 +80,7 @@ function SavedSpectrograms() {
       setRefreshing(true)
       await loadRecordings(null, currentPage)
     } catch (err) {
-      setError(`Failed to refresh recordings: ${err.message}`)
+      setError(err.message || 'Failed to refresh recordings')
     } finally {
       setRefreshing(false)
     }
@@ -242,7 +243,7 @@ function SavedSpectrograms() {
       // Reload current page to reflect the deletion
       await loadRecordings(null, currentPage)
     } catch (err) {
-      setError(`Failed to delete recording: ${err.message}`)
+      setError(err.message || 'Failed to delete recording')
       // Keep dialog open so user can retry or cancel
     } finally {
       setDeleting(false)
@@ -267,10 +268,15 @@ function SavedSpectrograms() {
     return (
       <section className="gallery-section">
         <h2>Previous Recordings</h2>
-        <div className="error">
-          <p>{error}</p>
-          <button onClick={loadRecordings}>Retry</button>
-        </div>
+        <FriendlyError
+          title="The gallery needs a second."
+          detail={error}
+          onRetry={() => {
+            setError(null)
+            loadRecordings(filters, currentPage)
+          }}
+          onDismiss={() => setError(null)}
+        />
       </section>
     )
   }
