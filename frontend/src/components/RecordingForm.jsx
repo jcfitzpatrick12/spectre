@@ -143,17 +143,29 @@ function RecordingForm({ configs, onRecordingComplete }) {
     }
 
     try {
+      // Capture the exact moment recording starts
+      const recordingStartTime = new Date()
+
+      // Start the recording (this blocks until recording completes)
       await apiClient.recordSpectrogram(payload)
 
       setStatus(STATUS.PLOTTING)
       setStatusMessage('Recording complete. Generating PNG snapshot...')
 
-      const window = getObservationWindow(formData.duration)
+      // Calculate forward from recording start time
+      const recordingEndTime = new Date(
+        recordingStartTime.getTime() + formData.duration * 1000
+      )
+
+      // Format times for the plot API
+      const [startDate, startTimeRaw] = recordingStartTime.toISOString().split('T')
+      const [, endTimeRaw] = recordingEndTime.toISOString().split('T')
+
       const plotPayload = {
         tags: [formData.tag],
-        obs_date: window.obs_date,
-        start_time: window.start_time,
-        end_time: window.end_time
+        obs_date: startDate,
+        start_time: startTimeRaw.split('.')[0],
+        end_time: endTimeRaw.split('.')[0]
       }
 
       await apiClient.createPlot(plotPayload)
