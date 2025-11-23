@@ -149,7 +149,7 @@ class ApiClient {
     month = null,
     day = null,
     page = 1,
-    perPage = 12
+    perPage = 9
   ) {
     const params = new URLSearchParams()
 

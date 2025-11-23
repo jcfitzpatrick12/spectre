@@ -56,7 +56,7 @@ function SavedSpectrograms() {
       const month = activeFilters.month || null
       const day = activeFilters.day || null
 
-      const response = await apiClient.getBatchFiles(extensions, tags, year, month, day, page, 12)
+      const response = await apiClient.getBatchFiles(extensions, tags, year, month, day, page, 9)
 
       // Handle paginated response structure
       if (response.data && response.data.items && response.data.pagination) {

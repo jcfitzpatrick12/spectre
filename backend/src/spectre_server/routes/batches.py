@@ -53,7 +53,7 @@ def get_batch_files() -> dict[str, list[str] | dict]:
     tags = flask.request.args.getlist("tag")
     extensions = flask.request.args.getlist("extension")
     page = flask.request.args.get("page", type=int, default=1)
-    per_page = flask.request.args.get("per_page", type=int, default=12)
+    per_page = flask.request.args.get("per_page", type=int, default=9)
 
     validate_date(year, month, day)
 
