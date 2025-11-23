@@ -424,6 +424,18 @@ async getLogContent(fileName) {
   - Query param: `process_type` (worker/user)
   - Query params: `year`, `month`, `day` (date filtering, not yet used in UI)
 - `GET /spectre-data/logs/<file_name>/raw` - Get log content as plain text
+- `POST /spectre-data/logs/prune` - Delete logs older than N days (payload: `{ "days": number, "dry_run": bool }`)
+
+**Client helper** (`apiClient.js`):
+
+```javascript
+async pruneLogs(days, dryRun = false) {
+  return this.request('/spectre-data/logs/prune', {
+    method: 'POST',
+    body: JSON.stringify({ days, dry_run: dryRun })
+  })
+}
+```
 
 #### Component Structure
 
@@ -460,7 +472,8 @@ const [loadingContent, setLoadingContent] = useState(false)  // Individual log l
 **Main Section** (lines 77-132):
 - Header with "System Logs" title
 - Process type filter dropdown (All/Worker/User)
-- Refresh button
+- Refresh button + destructive "🧹 Prune Logs" action
+- Success banner confirming prune actions (dismissable)
 - List of log files with filename + View button
 
 **Log List Items** (lines 114-126):
@@ -529,6 +542,33 @@ const logsPerPage = 5
 - Page info: "Page X of Y (Z total)"
 - Buttons disabled when at first/last page
 - Only shown when totalPages > 1
+- Shares the pagination control styling used by SavedSpectrograms (consistency)
+
+#### Prune Logs Workflow
+
+**Problem**: Log folders grow without bound on long-running installs. Users need a quick way to delete aged log files without shell access.
+
+**Solution**: Add a destructive "Prune Logs" CTA inside LogViewer that calls the new backend endpoint.
+
+**Flow**:
+1. User clicks 🧹 button → opens modal asking "Days to keep" (default 30, accepts `0` to nuke everything)
+2. Frontend validates integer ≥ 0 and blocks confirm while invalid or request in-flight
+3. API returns `{ deleted: n }`; UI shows dismissable success banner and reloads log listing
+4. Errors stay inside the modal via `modal-warning`, giving user a chance to adjust input and retry
+
+**State hooks**:
+```javascript
+const [showPruneModal, setShowPruneModal] = useState(false)
+const [pruneDays, setPruneDays] = useState(30)
+const [pruning, setPruning] = useState(false)
+const [pruneError, setPruneError] = useState(null)
+const [statusMessage, setStatusMessage] = useState(null)
+```
+
+**Backend behavior**:
+- Service walks every log path returned by `get_logs([], None, None, None)` and deletes files older than `(now - days)` based on mtime
+- Supports optional `dry_run` for future CLI reuse
+- Returns the absolute paths deleted; route summarizes as `{ deleted, days, dry_run }`
 
 **Filter Integration** (lines 17-20):
 - When process type filter changes, reset to page 1

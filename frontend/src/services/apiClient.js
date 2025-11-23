@@ -221,6 +221,13 @@ class ApiClient {
   async getLogContent(fileName) {
     return this.request(`/spectre-data/logs/${fileName}/raw`)
   }
+
+  async pruneLogs(days, dryRun = false) {
+    return this.request('/spectre-data/logs/prune', {
+      method: 'POST',
+      body: JSON.stringify({ days, dry_run: dryRun })
+    })
+  }
 }
 
 // Create and export a singleton instance

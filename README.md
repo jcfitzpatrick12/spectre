@@ -78,6 +78,13 @@ Spectre’s React UI talks to the backend via the internal Docker network, so no
 3. **Review results.** “Previous Recordings” lists `GET /spectre-data/batches?extension=png`. Click any row to view the PNG loaded from `/spectre-data/batches/<file>.png`.
 4. **Grab the files.** Because Docker bind-mounts `backend/.spectre-data`, every PNG or I/Q capture already lives on your host. Copy them into your analysis tools or share them however you like.
 
+## Log viewer & pruning
+
+- **Filter + inspect.** The **System Logs** panel filters worker/user logs and paginates in slices of five, so even month-long capture sessions stay readable. View entries inline or download the raw text.
+- **Prune old files.** Hit **🧹 Prune Logs** to delete files older than _N_ days (defaults to 30). The confirmation modal explains that the action is irreversible; passing `0` deletes every log.
+- **See what happened.** Successful prune jobs surface a dismissable banner (“Deleted 12 logs older than 14 days”) so collaborators know cleanup just ran.
+- **Script it if you like.** The backend exposes `POST /spectre-data/logs/prune` with body `{ "days": 30 }` for scheduled tasks or power users.
+
 ## Configuration
 
 ### Default profiles

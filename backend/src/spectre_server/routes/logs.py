@@ -75,3 +75,30 @@ def delete_logs() -> list[str]:
     )
 
     return _get_log_file_endpoints(log_files)
+
+
+@logs_blueprint.route("/prune", methods=["POST"])
+@jsendify_response
+def prune_logs() -> dict:
+    payload = flask.request.get_json(silent=True) or {}
+    days_value = payload.get("days")
+    dry_run = payload.get("dry_run", False)
+
+    if days_value is None:
+        flask.abort(400, description="'days' is required")
+
+    try:
+        days = int(days_value)
+    except (TypeError, ValueError):
+        flask.abort(400, description="'days' must be an integer")
+
+    if days < 0:
+        flask.abort(400, description="'days' must be greater than or equal to 0")
+
+    deleted_files = services.prune_logs_older_than(days, dry_run=bool(dry_run))
+
+    return {
+        "deleted": len(deleted_files),
+        "days": days,
+        "dry_run": bool(dry_run),
+    }

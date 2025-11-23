@@ -13,6 +13,11 @@ function LogViewer() {
   const [currentPage, setCurrentPage] = useState(1)
   const [allLogs, setAllLogs] = useState([]) // Store all logs for client-side pagination
   const logsPerPage = 5
+  const [showPruneModal, setShowPruneModal] = useState(false)
+  const [pruneDays, setPruneDays] = useState(30)
+  const [pruning, setPruning] = useState(false)
+  const [pruneError, setPruneError] = useState(null)
+  const [statusMessage, setStatusMessage] = useState(null)
 
   useEffect(() => {
     setCurrentPage(1) // Reset to page 1 when filter changes
@@ -112,6 +117,48 @@ function LogViewer() {
     }
   }
 
+  const openPruneModal = () => {
+    setPruneDays(30)
+    setPruneError(null)
+    setShowPruneModal(true)
+  }
+
+  const closePruneModal = () => {
+    if (pruning) return
+    setShowPruneModal(false)
+    setPruneError(null)
+  }
+
+  const handlePruneLogs = async () => {
+    const parsedDays = Number(pruneDays)
+    if (!Number.isFinite(parsedDays) || parsedDays < 0) {
+      setPruneError('Enter a whole number that is 0 or greater.')
+      return
+    }
+
+    const daysToKeep = Math.floor(parsedDays)
+
+    setPruning(true)
+    setPruneError(null)
+
+    try {
+      const response = await apiClient.pruneLogs(daysToKeep)
+      const deleted = response.data?.deleted ?? 0
+      setStatusMessage({
+        type: 'success',
+        text: `Deleted ${deleted} log${deleted === 1 ? '' : 's'} older than ${daysToKeep} day${daysToKeep === 1 ? '' : 's'}.`
+      })
+      setShowPruneModal(false)
+      await loadLogs()
+    } catch (err) {
+      setPruneError(err.message)
+    } finally {
+      setPruning(false)
+    }
+  }
+
+  const dismissStatusMessage = () => setStatusMessage(null)
+
   if (loading) {
     return (
       <section className="logs-section">
@@ -143,8 +190,28 @@ function LogViewer() {
           >
             ↻ Refresh
           </button>
+          <button
+            onClick={openPruneModal}
+            className="prune-button"
+            title="Delete logs older than a specific age"
+          >
+            🧹 Prune Logs
+          </button>
         </div>
       </div>
+
+      {statusMessage && (
+        <div className={`status-message ${statusMessage.type === 'error' ? 'error' : 'completed'} status-dismissable`}>
+          <span>{statusMessage.text}</span>
+          <button
+            className="status-dismiss"
+            onClick={dismissStatusMessage}
+            aria-label="Dismiss status message"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="error">
@@ -235,6 +302,46 @@ function LogViewer() {
                 onClick={handleCloseLog}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPruneModal && (
+        <div className="modal-overlay" onClick={closePruneModal}>
+          <div className="modal-content small" onClick={(e) => e.stopPropagation()}>
+            <h3>Prune Old Logs</h3>
+            <p>Delete log files older than the number of days you specify. This cannot be undone.</p>
+
+            <label className="modal-label" htmlFor="prune-days-input">Days to keep</label>
+            <input
+              id="prune-days-input"
+              type="number"
+              min="0"
+              step="1"
+              value={pruneDays}
+              onChange={(e) => setPruneDays(e.target.value)}
+              className="modal-input"
+            />
+            <p className="modal-helper">Logs older than this many days will be removed. Use 0 to delete everything.</p>
+
+            {pruneError && <p className="modal-warning">{pruneError}</p>}
+
+            <div className="modal-actions">
+              <button
+                className="modal-button modal-button-cancel"
+                onClick={closePruneModal}
+                disabled={pruning}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-button modal-button-delete"
+                onClick={handlePruneLogs}
+                disabled={pruning}
+              >
+                {pruning ? 'Pruning…' : 'Prune Logs'}
               </button>
             </div>
           </div>
