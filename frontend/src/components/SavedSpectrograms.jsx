@@ -56,7 +56,7 @@ function SavedSpectrograms() {
       const month = activeFilters.month || null
       const day = activeFilters.day || null
 
-      const response = await apiClient.getBatchFiles(extensions, tags, year, month, day, page, 9)
+      const response = await apiClient.getBatchFiles(extensions, tags, year, month, day, page, 9, sortOrder === 'newest' ? 'desc' : 'asc')
 
       // Handle paginated response structure
       if (response.data && response.data.items && response.data.pagination) {
@@ -120,22 +120,23 @@ function SavedSpectrograms() {
   const handleNextPage = () => {
     if (pagination?.has_next) {
       const nextPage = currentPage + 1
-      setCurrentPage(nextPage)
-      loadRecordings(null, nextPage)
+    setCurrentPage(nextPage)
+    loadRecordings(filters, nextPage)
     }
   }
 
   const handlePrevPage = () => {
     if (pagination?.has_prev) {
       const prevPage = currentPage - 1
-      setCurrentPage(prevPage)
-      loadRecordings(null, prevPage)
+    setCurrentPage(prevPage)
+    loadRecordings(filters, prevPage)
     }
   }
 
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')
-    // Note: Sorting is client-side so no need to reload or change page
+    setCurrentPage(1)
+    loadRecordings(filters, 1)
   }
 
   const getSortedRecordings = () => {

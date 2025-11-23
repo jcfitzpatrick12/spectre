@@ -54,12 +54,13 @@ def get_batch_files() -> dict[str, list[str] | dict]:
     extensions = flask.request.args.getlist("extension")
     page = flask.request.args.get("page", type=int, default=1)
     per_page = flask.request.args.get("per_page", type=int, default=9)
+    sort_order = flask.request.args.get("sort", type=str, default="desc").lower()
 
     validate_date(year, month, day)
 
     # Get all matching batch files
     all_batch_files = services.get_batch_files(
-        tags, extensions, year=year, month=month, day=day
+        tags, extensions, year=year, month=month, day=day, sort_order=sort_order
     )
 
     # Calculate pagination
@@ -85,6 +86,7 @@ def get_batch_files() -> dict[str, list[str] | dict]:
             "total_pages": total_pages,
             "has_next": page < total_pages,
             "has_prev": page > 1,
+            "sort": sort_order,
         },
     }
 
