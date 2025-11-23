@@ -20,6 +20,9 @@ function SavedSpectrograms() {
   })
   const [availableTags, setAvailableTags] = useState([])
   const [showFilters, setShowFilters] = useState(false)
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState(null)
 
   useEffect(() => {
     loadRecordings()
@@ -37,7 +40,7 @@ function SavedSpectrograms() {
     }
   }
 
-  const loadRecordings = async (filterParams = null) => {
+  const loadRecordings = async (filterParams = null, page = 1) => {
     try {
       setLoading(true)
       setError(null)
@@ -52,8 +55,18 @@ function SavedSpectrograms() {
       const month = activeFilters.month || null
       const day = activeFilters.day || null
 
-      const batchFiles = await apiClient.getBatchFiles(extensions, tags, year, month, day)
-      setRecordings(batchFiles.data || [])
+      const response = await apiClient.getBatchFiles(extensions, tags, year, month, day, page, 12)
+
+      // Handle paginated response structure
+      if (response.data && response.data.items && response.data.pagination) {
+        setRecordings(response.data.items)
+        setPagination(response.data.pagination)
+        setCurrentPage(response.data.pagination.current_page)
+      } else {
+        // Fallback for non-paginated response (backward compatibility)
+        setRecordings(response.data || [])
+        setPagination(null)
+      }
     } catch (err) {
       setError(`Failed to load recordings: ${err.message}`)
     } finally {
@@ -64,7 +77,7 @@ function SavedSpectrograms() {
   const handleRefresh = async () => {
     try {
       setRefreshing(true)
-      await loadRecordings()
+      await loadRecordings(null, currentPage)
     } catch (err) {
       setError(`Failed to refresh recordings: ${err.message}`)
     } finally {
@@ -72,12 +85,13 @@ function SavedSpectrograms() {
     }
   }
 
-  // Apply filters and reload recordings
+  // Apply filters and reload recordings (reset to page 1)
   const handleApplyFilters = () => {
-    loadRecordings(filters)
+    setCurrentPage(1)
+    loadRecordings(filters, 1)
   }
 
-  // Clear all filters and reload
+  // Clear all filters and reload (reset to page 1)
   const handleClearFilters = () => {
     const emptyFilters = {
       year: '',
@@ -86,7 +100,8 @@ function SavedSpectrograms() {
       tags: []
     }
     setFilters(emptyFilters)
-    loadRecordings(emptyFilters)
+    setCurrentPage(1)
+    loadRecordings(emptyFilters, 1)
   }
 
   // Check if any filters are active
@@ -100,8 +115,26 @@ function SavedSpectrograms() {
     setFilters(prev => ({ ...prev, tags: selectedOptions }))
   }
 
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (pagination?.has_next) {
+      const nextPage = currentPage + 1
+      setCurrentPage(nextPage)
+      loadRecordings(null, nextPage)
+    }
+  }
+
+  const handlePrevPage = () => {
+    if (pagination?.has_prev) {
+      const prevPage = currentPage - 1
+      setCurrentPage(prevPage)
+      loadRecordings(null, prevPage)
+    }
+  }
+
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')
+    // Note: Sorting is client-side so no need to reload or change page
   }
 
   const getSortedRecordings = () => {
@@ -198,9 +231,6 @@ function SavedSpectrograms() {
       // Call API to delete the file (pessimistic update - wait for success)
       await apiClient.deleteBatchFile(deleteConfirm.filename)
 
-      // Remove from local state after successful deletion
-      setRecordings(prev => prev.filter(rec => rec !== deleteConfirm.url))
-
       // Close lightbox if deleted file was open
       if (lightboxUrl === deleteConfirm.url) {
         setLightboxUrl(null)
@@ -208,6 +238,9 @@ function SavedSpectrograms() {
 
       // Close confirmation dialog
       setDeleteConfirm(null)
+
+      // Reload current page to reflect the deletion
+      await loadRecordings(null, currentPage)
     } catch (err) {
       setError(`Failed to delete recording: ${err.message}`)
       // Keep dialog open so user can retry or cancel
@@ -370,61 +403,90 @@ function SavedSpectrograms() {
         {recordings.length === 0 ? (
           <p className="no-recordings">No recordings yet. Start your first recording above!</p>
         ) : (
-          <div className="recordings-grid">
-            {getSortedRecordings().map((recording, index) => {
-              const metadata = parseMetadata(recording)
+          <>
+            <div className="recordings-grid">
+              {getSortedRecordings().map((recording, index) => {
+                const metadata = parseMetadata(recording)
 
-              return (
-                <div key={index} className="recording-card">
-                  <button
-                    type="button"
-                    className="recording-preview"
-                    onClick={() => setLightboxUrl(recording)}
-                    title="Click to view full size"
-                  >
-                    <img
-                      src={recording}
-                      alt={`Recording ${metadata.tag} - ${metadata.timestamp}`}
-                      loading="lazy"
-                    />
-                  </button>
+                return (
+                  <div key={index} className="recording-card">
+                    <button
+                      type="button"
+                      className="recording-preview"
+                      onClick={() => setLightboxUrl(recording)}
+                      title="Click to view full size"
+                    >
+                      <img
+                        src={recording}
+                        alt={`Recording ${metadata.tag} - ${metadata.timestamp}`}
+                        loading="lazy"
+                      />
+                    </button>
 
-                  <div className="recording-info">
-                    <p className="recording-tag">
-                      <strong>{metadata.tag}</strong>
-                    </p>
-                    <p className="recording-timestamp">
-                      {metadata.timestamp}
-                    </p>
-                    <p className="recording-filename">{metadata.filename}</p>
+                    <div className="recording-info">
+                      <p className="recording-tag">
+                        <strong>{metadata.tag}</strong>
+                      </p>
+                      <p className="recording-timestamp">
+                        {metadata.timestamp}
+                      </p>
+                      <p className="recording-filename">{metadata.filename}</p>
 
-                    <div className="recording-actions">
-                      <button
-                        className="download-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownload(recording);
-                        }}
-                        title="Download PNG file"
-                      >
-                        ⬇ Download
-                      </button>
-                      <button
-                        className="delete-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(recording);
-                        }}
-                        title="Delete recording"
-                      >
-                        🗑 Delete
-                      </button>
+                      <div className="recording-actions">
+                        <button
+                          className="download-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(recording);
+                          }}
+                          title="Download PNG file"
+                        >
+                          ⬇ Download
+                        </button>
+                        <button
+                          className="delete-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(recording);
+                          }}
+                          title="Delete recording"
+                        >
+                          🗑 Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+
+            {pagination && pagination.total_pages > 1 && (
+              <div className="pagination-controls">
+                <button
+                  className="pagination-button"
+                  onClick={handlePrevPage}
+                  disabled={!pagination.has_prev}
+                  title="Previous page"
+                >
+                  ← Previous
+                </button>
+
+                <span className="pagination-info">
+                  Page {pagination.current_page} of {pagination.total_pages}
+                  <span className="pagination-total"> ({pagination.total_items} total)</span>
+                </span>
+
+                <button
+                  className="pagination-button"
+                  onClick={handleNextPage}
+                  disabled={!pagination.has_next}
+                  title="Next page"
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
 

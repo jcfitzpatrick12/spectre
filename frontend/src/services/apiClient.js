@@ -147,7 +147,9 @@ class ApiClient {
     tags = [],
     year = null,
     month = null,
-    day = null
+    day = null,
+    page = 1,
+    perPage = 12
   ) {
     const params = new URLSearchParams()
 
@@ -157,6 +159,9 @@ class ApiClient {
     if (year) params.append('year', year)
     if (month) params.append('month', month)
     if (day) params.append('day', day)
+
+    params.append('page', page)
+    params.append('per_page', perPage)
 
     const queryString = params.toString()
     const path = `/spectre-data/batches/${queryString ? '?' + queryString : ''}`

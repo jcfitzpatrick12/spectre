@@ -491,6 +491,49 @@ Spectre generates two types of logs:
 - Useful for: Debugging Web UI issues, API errors, invalid configurations
 - Example issues: Config syntax errors, missing parameters, permission issues
 
+#### Pagination Implementation
+
+**Problem**: With many log files accumulating over time, the log list can grow very long, leading to excessive scrolling and poor UX.
+
+**Solution**: Client-side pagination limiting display to 5 logs per page, consistent with the gallery pagination pattern.
+
+**State Variables** (lines 12-15):
+```javascript
+const [currentPage, setCurrentPage] = useState(1)
+const [allLogs, setAllLogs] = useState([])  // Complete log list for pagination
+const logsPerPage = 5
+```
+
+**Implementation Strategy**:
+- **Client-Side Pagination**: Backend doesn't support paginated log endpoints, so all logs are fetched once and sliced client-side
+- **Page Size**: 5 logs per page (prevents long scrolling while showing enough content)
+- **Consistency**: Matches pagination pattern from SavedSpectrograms gallery
+
+**Key Functions**:
+
+1. **`updatePaginatedLogs(logs, page)`** (lines 44-51): Slice logs for current page
+   - Calculates start/end indices based on page number
+   - Updates `logFiles` with paginated subset
+   - Updates `currentPage` state
+
+2. **`getPaginationMetadata()`** (lines 53-61): Calculate pagination info
+   - Returns: `totalLogs`, `totalPages`, `hasPrev`, `hasNext`
+   - Used by UI to enable/disable navigation buttons
+
+3. **`handleNextPage()`** and **`handlePrevPage()`** (lines 98-113): Navigation
+   - Check if next/prev page exists before navigating
+   - Call `updatePaginatedLogs` with new page number
+
+**UI Controls** (lines 175-200):
+- Previous/Next buttons with arrow symbols
+- Page info: "Page X of Y (Z total)"
+- Buttons disabled when at first/last page
+- Only shown when totalPages > 1
+
+**Filter Integration** (lines 17-20):
+- When process type filter changes, reset to page 1
+- Ensures user sees results from the beginning after filtering
+
 ### Common Pitfalls & Solutions
 
 **Pitfall 1: Large Log Files Blocking UI**

@@ -9,8 +9,13 @@ function LogViewer() {
   const [logContent, setLogContent] = useState(null)
   const [loadingContent, setLoadingContent] = useState(false)
   const [processTypeFilter, setProcessTypeFilter] = useState('')
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [allLogs, setAllLogs] = useState([]) // Store all logs for client-side pagination
+  const logsPerPage = 5
 
   useEffect(() => {
+    setCurrentPage(1) // Reset to page 1 when filter changes
     loadLogs()
   }, [processTypeFilter])
 
@@ -22,12 +27,37 @@ function LogViewer() {
 
       const processType = processTypeFilter || null
       const response = await apiClient.getLogs(processType)
-      setLogFiles(response.data || [])
+      const logs = response.data || []
+
+      // Store all logs for pagination
+      setAllLogs(logs)
+
+      // Set paginated logs for current page
+      updatePaginatedLogs(logs, 1) // Start at page 1
     } catch (err) {
       setError(`Failed to load logs: ${err.message}`)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Update displayed logs based on current page
+  const updatePaginatedLogs = (logs, page) => {
+    const startIndex = (page - 1) * logsPerPage
+    const endIndex = startIndex + logsPerPage
+    const paginatedLogs = logs.slice(startIndex, endIndex)
+    setLogFiles(paginatedLogs)
+    setCurrentPage(page)
+  }
+
+  // Calculate pagination metadata
+  const getPaginationMetadata = () => {
+    const totalLogs = allLogs.length
+    const totalPages = Math.ceil(totalLogs / logsPerPage)
+    const hasPrev = currentPage > 1
+    const hasNext = currentPage < totalPages
+
+    return { totalLogs, totalPages, hasPrev, hasNext }
   }
 
   // Load content of a specific log file
@@ -63,6 +93,23 @@ function LogViewer() {
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+  }
+
+  // Pagination handlers
+  const handleNextPage = () => {
+    const { hasNext } = getPaginationMetadata()
+    if (hasNext) {
+      const nextPage = currentPage + 1
+      updatePaginatedLogs(allLogs, nextPage)
+    }
+  }
+
+  const handlePrevPage = () => {
+    const { hasPrev } = getPaginationMetadata()
+    if (hasPrev) {
+      const prevPage = currentPage - 1
+      updatePaginatedLogs(allLogs, prevPage)
+    }
   }
 
   if (loading) {
@@ -109,20 +156,49 @@ function LogViewer() {
       {logFiles.length === 0 ? (
         <p className="no-logs">No log files found.</p>
       ) : (
-        <div className="logs-list">
-          {logFiles.map((logFile) => (
-            <div key={logFile} className="log-item">
-              <span className="log-name">{logFile}</span>
+        <>
+          <div className="logs-list">
+            {logFiles.map((logFile) => (
+              <div key={logFile} className="log-item">
+                <span className="log-name">{logFile}</span>
+                <button
+                  className="view-log-button"
+                  onClick={() => handleLogClick(logFile)}
+                  title="View log content"
+                >
+                  👁 View
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {getPaginationMetadata().totalPages > 1 && (
+            <div className="pagination-controls">
               <button
-                className="view-log-button"
-                onClick={() => handleLogClick(logFile)}
-                title="View log content"
+                className="pagination-button"
+                onClick={handlePrevPage}
+                disabled={!getPaginationMetadata().hasPrev}
+                title="Previous page"
               >
-                👁 View
+                ← Previous
+              </button>
+
+              <span className="pagination-info">
+                Page {currentPage} of {getPaginationMetadata().totalPages}
+                <span className="pagination-total"> ({getPaginationMetadata().totalLogs} total)</span>
+              </span>
+
+              <button
+                className="pagination-button"
+                onClick={handleNextPage}
+                disabled={!getPaginationMetadata().hasNext}
+                title="Next page"
+              >
+                Next →
               </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {selectedLog && (

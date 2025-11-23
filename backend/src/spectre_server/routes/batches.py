@@ -46,17 +46,47 @@ def delete_batch_file(file_name: str) -> str:
 
 @batches_blueprint.route("/", methods=["GET"])
 @jsendify_response
-def get_batch_files() -> list[str]:
+def get_batch_files() -> dict[str, list[str] | dict]:
     year = flask.request.args.get("year", type=int)
     month = flask.request.args.get("month", type=int)
     day = flask.request.args.get("day", type=int)
     tags = flask.request.args.getlist("tag")
     extensions = flask.request.args.getlist("extension")
+    page = flask.request.args.get("page", type=int, default=1)
+    per_page = flask.request.args.get("per_page", type=int, default=12)
+
     validate_date(year, month, day)
-    batch_files = services.get_batch_files(
+
+    # Get all matching batch files
+    all_batch_files = services.get_batch_files(
         tags, extensions, year=year, month=month, day=day
     )
-    return get_batch_file_endpoints(batch_files)
+
+    # Calculate pagination
+    total_items = len(all_batch_files)
+    total_pages = max(1, (total_items + per_page - 1) // per_page)
+
+    # Ensure page is within valid range
+    page = max(1, min(page, total_pages))
+
+    # Calculate slice indices
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+
+    # Get paginated batch files
+    paginated_files = all_batch_files[start_idx:end_idx]
+
+    return {
+        "items": get_batch_file_endpoints(paginated_files),
+        "pagination": {
+            "current_page": page,
+            "per_page": per_page,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
+        },
+    }
 
 
 @batches_blueprint.route("/", methods=["DELETE"])
