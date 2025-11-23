@@ -48,6 +48,7 @@ The goal is a predictable, copy-paste-friendly path even if Docker is brand new.
    ```bash
    docker compose build spectre-server spectre-frontend
    ```
+   First build on a fresh machine can take several minutes because Docker has to download base images and `npm ci` compiles dependencies; subsequent builds are much quicker thanks to cached layers.
 5. Launch the stack:
    ```bash
    docker compose up spectre-server spectre-frontend spectre-cli
@@ -88,6 +89,7 @@ Spectre’s React UI talks to the backend via the internal Docker network, so no
 - **Prune old files.** Hit **🧹 Prune Logs** to delete files older than _N_ days (defaults to 30). The confirmation modal explains that the action is irreversible; passing `0` deletes every log.
 - **See what happened.** Successful prune jobs surface a dismissable banner (“Deleted 12 logs older than 14 days”) so collaborators know cleanup just ran.
 - **Script it if you like.** The backend exposes `POST /spectre-data/logs/prune` with body `{ "days": 30 }` for scheduled tasks or power users.
+- **Peek at the format.** A tiny sample log lives at `docs/samples/sample-system-log.txt` so newcomers can see what entries look like.
 
 ## Try these experiments
 

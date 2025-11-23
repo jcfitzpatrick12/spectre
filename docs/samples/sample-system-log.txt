@@ -1,0 +1,5 @@
+2025-11-23 12:05:14,102 [INFO] worker-1 Starting recording tag=demo-sine duration=15s
+2025-11-23 12:05:14,745 [INFO] worker-1 SDR backend initialized (signal_generator, fs=32000 Hz)
+2025-11-23 12:05:29,881 [INFO] worker-1 Saved spectrogram to batches/2025-11-23T12_05_29_demo-sine.png
+2025-11-23 12:05:29,882 [INFO] worker-1 Saved I/Q capture to recordings/2025-11-23T12_05_14_demo-sine.c8
+2025-11-23 12:05:29,884 [INFO] worker-1 Job finished status=success elapsed=15.8s
