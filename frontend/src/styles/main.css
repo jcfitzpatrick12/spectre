@@ -144,7 +144,8 @@ body {
 
 /* Section styling */
 .recording-config-section,
-.gallery-section {
+.gallery-section,
+.logs-section {
   background-color: var(--bg-secondary);
   border-radius: 10px;
   padding: 1.25rem;
@@ -864,6 +865,171 @@ body {
   background-color: #c82333;
 }
 
+/* Log Viewer Section */
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logs-header h2 {
+  margin-bottom: 0;
+}
+
+.logs-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.log-filter-select {
+  padding: 0.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.3s ease;
+}
+
+.log-filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.no-logs {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2rem;
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--bg-tertiary);
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.log-item:hover {
+  background-color: rgba(102, 126, 234, 0.08);
+}
+
+.log-name {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.view-log-button {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.view-log-button:hover {
+  background-color: #5568d3;
+  transform: translateY(-1px);
+}
+
+/* Log Modal */
+.log-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.log-modal-content {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  max-width: 90vw;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 30px var(--shadow-hover);
+  transition: background-color 0.3s ease;
+}
+
+.log-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.log-modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  word-break: break-all;
+}
+
+.log-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.log-content {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.log-modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
+.modal-button-download {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-button-download:hover:not(:disabled) {
+  background-color: #218838;
+}
+
 /* Config Manager Section */
 .config-table-container {
   max-height: 400px;
@@ -1252,6 +1418,38 @@ body {
 
   .download-button,
   .delete-button {
+    width: 100%;
+  }
+
+  .logs-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .logs-header h2 {
+    margin-bottom: 0;
+  }
+
+  .logs-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .log-filter-select,
+  .logs-controls .refresh-button {
+    width: 100%;
+  }
+
+  .log-modal-content {
+    max-width: 95vw;
+  }
+
+  .log-modal-footer {
+    flex-direction: column;
+  }
+
+  .log-modal-footer button {
     width: 100%;
   }
 }

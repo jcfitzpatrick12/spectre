@@ -197,6 +197,25 @@ class ApiClient {
 
     return this.request(path)
   }
+
+  // Log endpoints
+  async getLogs(processType = null, year = null, month = null, day = null) {
+    const params = new URLSearchParams()
+
+    if (processType) params.append('process_type', processType)
+    if (year) params.append('year', year)
+    if (month) params.append('month', month)
+    if (day) params.append('day', day)
+
+    const queryString = params.toString()
+    const path = `/spectre-data/logs/${queryString ? '?' + queryString : ''}`
+
+    return this.request(path)
+  }
+
+  async getLogContent(fileName) {
+    return this.request(`/spectre-data/logs/${fileName}/raw`)
+  }
 }
 
 // Create and export a singleton instance

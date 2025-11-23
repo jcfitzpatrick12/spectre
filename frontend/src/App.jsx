@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import RecordingForm from './components/RecordingForm'
 import ConfigManager from './components/ConfigManager'
 import SavedSpectrograms from './components/SavedSpectrograms'
+import LogViewer from './components/LogViewer'
 import { apiClient } from './services/apiClient'
 
 function App() {
@@ -129,6 +130,8 @@ function App() {
         </section>
 
         <SavedSpectrograms key={refreshKey} />
+
+        <LogViewer />
       </main>
     </div>
   )

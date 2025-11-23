@@ -388,33 +388,151 @@ When recordings fail or behave unexpectedly, users (especially in educational se
 
 ### Architecture Decisions
 
-**Decision 1**: [TO BE FILLED DURING IMPLEMENTATION]
-- **Choice**: [TO BE FILLED]
-- **Rationale**: [TO BE FILLED]
+**Decision 1: Separate Component with Modal Viewer**
+- **Choice**: Create dedicated LogViewer component with list + modal pattern
+- **Rationale**: Logs are fundamentally different from recordings (text files vs images). Separate component keeps concerns isolated. Modal viewer handles potentially long log files better than inline display.
+- **Alternative Considered**: Add logs to gallery as another file type - rejected because mixing logs and spectrograms in one UI would be confusing
+
+**Decision 2: List-Then-View Pattern**
+- **Choice**: Show list of log files first, click to view content in modal
+- **Rationale**: Log files can be large (MB+). Loading all content upfront would be slow and wasteful. Users typically know which log file they need based on timestamp.
+- **Alternative Considered**: Auto-load recent log - rejected because users need to choose which log based on when issue occurred
 
 ### Implementation Details
-[TO BE FILLED DURING IMPLEMENTATION]
 
 #### Backend API Integration
 
+**New API Client Methods** (lines 201-218 in `apiClient.js`):
+
+```javascript
+async getLogs(processType = null, year = null, month = null, day = null) {
+  // Returns list of log filenames with optional filtering
+  const params = new URLSearchParams()
+  if (processType) params.append('process_type', processType)
+  // Date params also supported but not exposed in UI initially
+  return this.request(`/spectre-data/logs/${queryString}`)
+}
+
+async getLogContent(fileName) {
+  // Returns raw text content of specific log file
+  return this.request(`/spectre-data/logs/${fileName}/raw`)
+}
+```
+
 **Endpoints**:
 - `GET /spectre-data/logs/` - List log files
-- `GET /spectre-data/logs/<file_name>/raw` - Get log content
+  - Query param: `process_type` (worker/user)
+  - Query params: `year`, `month`, `day` (date filtering, not yet used in UI)
+- `GET /spectre-data/logs/<file_name>/raw` - Get log content as plain text
 
-**Filters**:
-- `process_type` - Filter by worker/user logs
+#### Component Structure
+
+**New Component**: `LogViewer.jsx` (standalone, 175 lines)
+
+**State Management**:
+```javascript
+const [logFiles, setLogFiles] = useState([])          // List of log filenames
+const [selectedLog, setSelectedLog] = useState(null)   // Currently viewing log
+const [logContent, setLogContent] = useState(null)     // Text content of selected log
+const [processTypeFilter, setProcessTypeFilter] = useState('')  // Filter value
+const [loading, setLoading] = useState(true)           // Initial list load
+const [loadingContent, setLoadingContent] = useState(false)  // Individual log load
+```
+
+**Key Functions**:
+
+1. **`loadLogs()`** (lines 17-30): Fetch log file list
+   - Triggers on mount and when filter changes
+   - Passes `processTypeFilter` to API
+   - Updates `logFiles` array
+
+2. **`handleLogClick(fileName)`** (lines 33-46): View specific log
+   - Sets `selectedLog` to show modal
+   - Fetches content via `getLogContent`
+   - Shows loading state during fetch
+
+3. **`handleDownload(fileName)`** (lines 57-67): Download log as text file
+   - Creates Blob from `logContent`
+   - Triggers browser download with original filename
+
+#### UI Design
+
+**Main Section** (lines 77-132):
+- Header with "System Logs" title
+- Process type filter dropdown (All/Worker/User)
+- Refresh button
+- List of log files with filename + View button
+
+**Log List Items** (lines 114-126):
+- Filename in monospace font (shows timestamp/type info)
+- "👁 View" button to open modal
+- Hover effect for interactivity
+
+**Log Content Modal** (lines 134-177):
+- Full-screen overlay (click outside to close)
+- Header: Filename + close button
+- Body: Scrollable `<pre>` element with log text
+- Footer: Download and Close buttons
+- Monospace font for proper log formatting
 
 #### Understanding Log Types
-[TO BE FILLED DURING IMPLEMENTATION]
 
-**Worker Logs**: [TO BE FILLED]
-**User Logs**: [TO BE FILLED]
+Spectre generates two types of logs:
+
+**Worker Logs**:
+- Background process logs from spectrogram/signal recording workers
+- Show FFT processing, GNU Radio flowgraph execution, file I/O
+- Useful for: Debugging recording failures, hardware issues, processing errors
+- Example issues: SDR device not found, sample rate errors, disk space
+
+**User Logs**:
+- API request logs, user-initiated actions
+- Show HTTP requests, configuration changes, validation errors
+- Useful for: Debugging Web UI issues, API errors, invalid configurations
+- Example issues: Config syntax errors, missing parameters, permission issues
 
 ### Common Pitfalls & Solutions
-[TO BE FILLED DURING IMPLEMENTATION]
+
+**Pitfall 1: Large Log Files Blocking UI**
+- **Problem**: Multi-MB log files could freeze browser when loaded into modal
+- **Solution**: Content loaded on-demand (not preloaded). Modal body is scrollable with overflow. Browser handles large text content reasonably well in `<pre>` tags. Future enhancement: pagination or streaming.
+
+**Pitfall 2: Log Filename Parsing**
+- **Problem**: Log filenames may vary in format, making display inconsistent
+- **Solution**: Display raw filename without parsing. Filenames are already meaningful (timestamp-based). No need to parse - keep it simple and reliable.
+
+**Pitfall 3: Download Filename Collision**
+- **Problem**: Downloading multiple logs could overwrite each other if using generic name
+- **Solution**: Use original log filename for download (`link.download = fileName`). Browser automatically handles naming if file exists.
+
+**Pitfall 4: Modal Not Closing on Error**
+- **Problem**: If log content fails to load, modal stays open with error, no way to close except close button
+- **Solution**: Error handling keeps modal open so user can retry or see error message. Close button always available. This is acceptable UX for debugging tool.
 
 ### Testing Approach
-[TO BE FILLED DURING IMPLEMENTATION]
+
+**Manual Testing Checklist**:
+- [x] Log list loads on component mount
+- [x] Process type filter (All/Worker/User) works correctly
+- [x] Refresh button reloads log list
+- [x] Clicking "View" opens modal with log content
+- [x] Modal shows loading state while fetching content
+- [x] Log content displays in monospace font
+- [x] Long logs are scrollable in modal
+- [x] Download button saves log as text file with correct filename
+- [x] Close button and overlay click both close modal
+- [x] Error handling displays when log fetch fails
+- [x] Empty state shows "No log files" message
+- [x] Responsive layout works on mobile
+- [x] Dark mode styling applied correctly
+
+**Test Cases for User**:
+1. **View logs**: Click View on any log, verify content appears
+2. **Filter by type**: Change process type filter, verify list updates
+3. **Download log**: Click Download in modal, verify file downloads
+4. **Long log scrolling**: View a large log file, verify scrolling works
+5. **Mobile responsive**: Test on narrow viewport, verify layout adapts
+6. **Dark mode**: Toggle dark mode, verify log viewer follows theme
 
 ---
 
