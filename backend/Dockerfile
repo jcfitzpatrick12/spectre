@@ -473,6 +473,9 @@ COPY --from=spectre_server /opt/spectre_server/gunicorn.conf.py /app/gunicorn.co
 COPY --chmod=0755 scripts/bash/entrypoint.sh entrypoint.sh
 COPY --chmod=0755 scripts/bash/cmd.sh cmd.sh
 
+# Copy in the default configuration profiles.
+COPY default_profiles /app/default_profiles
+
 # Add a non-root user to run the application.
 RUN useradd -u 1000 -M -d /app appuser
 

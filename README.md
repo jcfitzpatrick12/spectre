@@ -89,7 +89,25 @@ Prefer hot reload or editing inside the container?
 
 ### Configuration
 
-Create or inspect receiver configs via the CLI (inside whichever CLI container you’re already running):
+#### Default Profiles
+
+On first startup, Spectre automatically seeds three default configuration profiles so the UI dropdown is never empty:
+
+| Profile | Receiver | Hardware Required | Use Case | Description |
+|---------|----------|-------------------|----------|-------------|
+| **demo-sine** | signal_generator | ❌ No | Testing, UI demo | Virtual sine wave at 32 kHz - works anywhere without SDR hardware |
+| **rtlsdr-fm-wide** | rtlsdr | ✅ RTL-SDR | FM broadcast monitoring | Wide-band FM at 98.5 MHz with 2.048 MSPS, optimized for RTL-SDR Blog v3 |
+| **rtlsdr-solar-20MHz** | rtlsdr | ✅ RTL-SDR + upconverter | Solar/Jupiter monitoring | Long-duration capture at 20.1 MHz for natural radio sources |
+
+These profiles are copied from `/app/default_profiles/` into `/app/.spectre-data/configs/` on container startup **only if they don't already exist**. This means:
+
+- **Fresh install**: All three profiles appear automatically
+- **Existing install**: Your modified configs are never overwritten
+- **Selective deletion**: If you delete a default profile, it will be restored on next container restart
+
+#### Custom Configurations
+
+Create or inspect receiver configs via the CLI (inside whichever CLI container you're already running):
 
 ```bash
 # Create a configuration for your SDR device

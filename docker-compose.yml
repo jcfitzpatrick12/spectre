@@ -1,7 +1,11 @@
 services:
   spectre-server:
     container_name: spectre-server
-    image: jcfitzpatrick12/spectre-server:2.0.0-alpha
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime
+    image: spectre-server:latest
     entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
     command: ["/app/cmd.sh"]
     environment:
