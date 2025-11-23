@@ -141,6 +141,33 @@ class ApiClient {
     })
   }
 
+  // Async recording endpoints (for long recordings)
+  async recordSpectrogramAsync(payload) {
+    // No timeout - returns immediately with job_id
+    return this.request('/recordings/spectrogram/async', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async getJobStatus(jobId) {
+    // Short timeout for status checks
+    return this.request(`/recordings/jobs/${jobId}`, {
+      timeout: 10000  // 10 seconds
+    })
+  }
+
+  async listJobs(limit = null) {
+    const params = limit ? `?limit=${limit}` : ''
+    return this.request(`/recordings/jobs${params}`)
+  }
+
+  async cancelJob(jobId) {
+    return this.request(`/recordings/jobs/${jobId}`, {
+      method: 'DELETE'
+    })
+  }
+
   // Batch file endpoints
   async getBatchFiles(
     extensions = [],
