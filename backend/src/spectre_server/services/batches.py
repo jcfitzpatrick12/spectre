@@ -58,6 +58,7 @@ def get_batch_files(
     year: typing.Optional[int] = None,
     month: typing.Optional[int] = None,
     day: typing.Optional[int] = None,
+    sort_order: str = "desc",
 ) -> list[str]:
     """Get the file paths of batch files which exist in the file system.
 
@@ -92,7 +93,8 @@ def get_batch_files(
                 if batch.has_file(extension):
                     batch_file = batch.get_file(extension)
                     batch_files.append(batch_file.file_path)
-    return sorted(batch_files)
+    reverse = sort_order.lower() != "asc"
+    return sorted(batch_files, reverse=reverse)
 
 
 @spectre_core.logs.log_call

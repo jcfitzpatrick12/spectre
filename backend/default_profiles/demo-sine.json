@@ -1,0 +1,26 @@
+{
+    "receiver_name": "signal_generator",
+    "receiver_mode": "cosine_wave",
+    "parameters": {
+        "time_range": 0.0,
+        "origin": "Spectre Demo",
+        "telescope": "Virtual Signal Generator",
+        "instrument": "Simulated Receiver",
+        "object": "Sine Wave Test Signal",
+        "obs_alt": 0.0,
+        "obs_lat": 0.0,
+        "obs_lon": 0.0,
+        "window_size": 1024,
+        "window_hop": 1024,
+        "window_type": "boxcar",
+        "center_frequency": 95800000.0,
+        "sample_rate": 128000,
+        "frequency_resolution": 0.0,
+        "time_resolution": 0.0,
+        "batch_size": 3.0,
+        "keep_signal": false,
+        "max_noutput_items": 100000,
+        "frequency": 32000.0,
+        "amplitude": 1
+    }
+}

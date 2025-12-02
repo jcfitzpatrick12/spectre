@@ -44,7 +44,12 @@ def get_config_raw(file_name: str) -> dict[str, typing.Any]:
 def get_configs() -> list[str]:
     """Get the absolute file paths of all configs which exist in the file system."""
     config_dir = spectre_core.config.paths.get_configs_dir_path()
-    return [entry.path for entry in os.scandir(config_dir) if entry.is_file()]
+    # Exclude metadata files that aren't receiver configs
+    excluded_files = {'profiles_manifest.json'}
+    return [
+        entry.path for entry in os.scandir(config_dir)
+        if entry.is_file() and entry.name not in excluded_files
+    ]
 
 
 def _has_batches(tag: str) -> bool:

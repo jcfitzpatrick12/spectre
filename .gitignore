@@ -1,5 +1,10 @@
 .spectre-data
 scrap.py
+# Runtime logs (generated at runtime; keep git clean)
+logs/
+backend/logs/
+frontend/logs/
+*.log.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

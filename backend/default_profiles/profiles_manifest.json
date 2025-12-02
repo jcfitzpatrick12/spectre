@@ -1,0 +1,41 @@
+{
+  "profiles": [
+    {
+      "id": "demo-sine",
+      "filename": "demo-sine.json",
+      "name": "Demo Sine Wave",
+      "description": "Virtual signal generator producing a clean sine wave at 32 kHz. Requires no hardware - perfect for testing the UI and plotting pipeline.",
+      "receiver": "signal_generator",
+      "mode": "cosine_wave",
+      "hardware_required": false,
+      "use_case": "Testing, UI demonstration, pipeline verification",
+      "tags": ["demo", "no-hardware", "beginner-friendly"]
+    },
+    {
+      "id": "rtlsdr-fm-wide",
+      "filename": "rtlsdr-fm-wide.json",
+      "name": "RTL-SDR FM Broadcast",
+      "description": "Wide-band FM broadcast monitoring centered at 98.5 MHz. Optimized for RTL-SDR Blog v3 or similar dongles with 2.048 MSPS sample rate and blackman windowing.",
+      "receiver": "rtlsdr",
+      "mode": "fixed_center_frequency",
+      "hardware_required": true,
+      "hardware_type": "RTL-SDR (RTL2832U based)",
+      "use_case": "FM radio monitoring, spectrum analysis, SDR introduction",
+      "tags": ["rtlsdr", "fm-broadcast", "beginner-friendly"]
+    },
+    {
+      "id": "rtlsdr-solar-20MHz",
+      "filename": "rtlsdr-solar-20MHz.json",
+      "name": "RTL-SDR Solar Monitoring (20.1 MHz)",
+      "description": "Long-duration solar and Jovian radio emission monitoring at 20.1 MHz. Configured for 10-minute batches with Hann windowing for spectral analysis of natural radio sources.",
+      "receiver": "rtlsdr",
+      "mode": "fixed_center_frequency",
+      "hardware_required": true,
+      "hardware_type": "RTL-SDR with upconverter or direct sampling mod",
+      "use_case": "Solar monitoring, Jupiter radio observation, radio astronomy",
+      "tags": ["rtlsdr", "radio-astronomy", "solar", "jupiter", "advanced"]
+    }
+  ],
+  "version": "1.0.0",
+  "last_updated": "2025-01-22"
+}

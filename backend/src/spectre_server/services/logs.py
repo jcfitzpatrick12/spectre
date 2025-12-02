@@ -4,7 +4,8 @@
 
 
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 
 import spectre_core.logs
 import spectre_core.config
@@ -123,5 +124,33 @@ def delete_logs(
             if not dry_run:
                 log.delete()
             deleted_file_paths.append(log.file_path)
+
+    return deleted_file_paths
+
+
+@spectre_core.logs.log_call
+def prune_logs_older_than(days: int, dry_run: bool = False) -> list[str]:
+    """Delete logs older than the requested age."""
+
+    if days < 0:
+        raise ValueError("days must be greater than or equal to zero")
+
+    cutoff_timestamp = (datetime.utcnow() - timedelta(days=days)).timestamp()
+    deleted_file_paths: list[str] = []
+
+    for file_path in get_logs([], None, None, None):
+        path_obj = Path(file_path)
+        try:
+            file_mtime = path_obj.stat().st_mtime
+        except FileNotFoundError:
+            continue
+
+        if file_mtime <= cutoff_timestamp:
+            if not dry_run:
+                try:
+                    path_obj.unlink()
+                except FileNotFoundError:
+                    continue
+            deleted_file_paths.append(file_path)
 
     return deleted_file_paths

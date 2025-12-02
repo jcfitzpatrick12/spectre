@@ -1,5 +1,5 @@
 <h1 align="center">
-  Spectre: Process, Explore and Capture Transient Radio Emissions
+  Spectre WebUI: An approachable frontend to Spectre
 </h1>
 
 <div align="center">
@@ -13,37 +13,136 @@
   <img src="gallery/solar_radio_narrowband.png" width="45%" hspace="7" alt="Solar Radio Observations">
 </div>
 
-## Getting started
+Spectre WebUI is a local-first interface for the Spectre SDR capture pipeline, prototyped 100% by Codex (GPT-5) and Claude after vibing on the [“Interested in vibecoding a frontend?” thread](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/). We stand on the shoulders of [jcfitzpatrick12/spectre](https://github.com/jcfitzpatrick12/spectre); check the [upstream README](https://github.com/jcfitzpatrick12/spectre/blob/main/README.md) whenever you need deeper backend details, device specifics, or CLI flag references.
 
-Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki). Quick links are provided below:  
+> ⚠️ **Local-only by design.** This UI has no auth, TLS, or rate limiting. Keep port 8080 inside your LAN, VPN, or SSH tunnel. If you expose it to the public internet, you are responsible for hardening every surface (reverse proxies, auth gateways, etc.).
 
-- [Installation](https://github.com/jcfitzpatrick12/spectre/wiki/Installation)
-- [Tutorials](https://github.com/jcfitzpatrick12/spectre/wiki/Tutorials)
-- [Contributing](https://github.com/jcfitzpatrick12/spectre/wiki/Contributing)
+## Quick setup
 
-Track our progress and upcoming features on our [GitHub Project Board](https://github.com/users/jcfitzpatrick12/projects/3).
+The goal is a predictable, copy-paste-friendly path even if Docker is brand new. Everything runs on your workstation; SDR traffic never leaves your network unless you share files manually.
 
-## About Us
+### Prerequisites
 
-_Spectre_ is a free and open source receiver-agnostic program for recording and visualising radio spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
+- Docker Desktop (Windows/macOS) or Docker Engine + Docker Compose plugin (Linux)
+- Command-line basics: `curl`, `jq`, `tar`, and `docker` available (PowerShell, macOS Terminal, WSL, etc.)
+- Optional but fun: an SDR such as RTL-SDR, HackRF, SDRplay, or USRP. The `demo-sine` profile works without hardware.
 
-Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.org/), it provides high performance on modest hardware. Applications include:  
+### Five-minute install
 
-- Solar and Jovian radio observations
-- Educational outreach and citizen science
-- Amateur radio experimentation
-- Lightning and atmospheric event detection
-- RFI monitoring
+1. Grab the latest GitHub release (known-good snapshot) and enter it:
+   ```bash
+   # Requires curl, jq, tar
+   LATEST_TAG=$(curl -s https://api.github.com/repos/b3p3k0/spectre/releases/latest | jq -r .tag_name)
+   curl -L "https://github.com/b3p3k0/spectre/archive/refs/tags/${LATEST_TAG}.tar.gz" | tar xz
+   cd "spectre-${LATEST_TAG#v}"
+   ```
+   Prefer a browser? Download the latest release here: https://github.com/b3p3k0/spectre/releases/latest
+2. Sanity-check Docker:
+   ```bash
+   docker --version
+   docker compose version
+   ```
+   If either command fails, install/launch Docker first.
+3. Prep the environment variables so Docker Compose stops complaining about `SPECTRE_*` values:
+   - **Linux:** `sudo ./setup.sh` — this creates the `spectre-group`, installs udev rules, and writes `.env` with the right IDs/ports.
+   - **macOS/Windows or manual path:** `cp .env.example .env`, then tweak values if you need to expose different ports.
+   Run this step once per machine (rerun if you reinstall Docker or plug in new SDR hardware on Linux).
+4. Build the services (one-time unless you change code):
+   ```bash
+   docker compose build spectre-server spectre-frontend
+   ```
+   First build on a fresh machine can take several minutes because Docker has to download base images and `npm ci` compiles dependencies; subsequent builds are much quicker thanks to cached layers.
+5. Launch the stack:
+   ```bash
+   docker compose up spectre-server spectre-frontend spectre-cli
+   ```
+   Leave this terminal open. Logs from the backend, frontend, and CLI appear here so you can see what the SDR is doing.
+5. Open [http://localhost:8080](http://localhost:8080). Pick a profile, choose a duration (seconds), press **Start Recording**.
+6. Stop everything with `Ctrl+C`. Restart later with the same `docker compose up ...` invocation. Outputs persist in `backend/.spectre-data/` on your host.
 
-## **Features**
+**Dev workflow.** When hacking on the frontend/CLI, use `docker-compose.dev.yml` instead: `docker compose -f docker-compose.dev.yml up spectre-server spectre-frontend spectre-dev-cli`.
 
-- Simple installation with Docker
-- Wide receiver support (SDRplay, HackRF, RTL-SDR, USRP)
-- Run natively on Linux, including Raspberry Pi
-- Intuitive CLI tool
-- Live record spectrograms and I/Q data  
-- Offers fixed and sweeping center frequency modes
-- Backend web server with a discoverable RESTful API
-- Developer-friendly and extensible
+**Troubleshooting.**
+- Port in use? Edit the `8080:8080` mapping in `docker-compose.yml` or stop the conflicting app.
+- USB access errors on Linux? Install the standard RTL-SDR/HackRF udev rules if you run the containers without `sudo`.
+- Empty dropdown? Ensure `.spectre-data/configs/` exists; delete it to re-seed the defaults.
+- Want to run natively? Use `setup.sh` as a reference, but Docker is the supported path for now.
 
-ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/jcfitzpatrick12/spectre-lite), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
+## Features at a glance
+
+- Local-only Web UI for triggering and inspecting spectrogram jobs
+- Shares Spectre’s receiver support (RTL-SDR, HackRF, SDRplay, USRP) through the backend API
+- Built-in demo profile so you can explore without hardware
+- Dockerized backend/frontend/CLI for reproducible installs across Linux, macOS, and Windows
+- Live logs in your terminal plus inline UI status updates and history view
+- REST endpoints remain available for automation while you use the UI
+
+## Web UI workflow
+
+Spectre’s React UI talks to the backend via the internal Docker network, so no manual port wrangling or CORS tweaks are required.
+
+1. **Start a recording.** Choose a profile tag, set a duration, and toggle advanced knobs (`force_restart`, `max_restarts`, `validate`) if needed. The UI issues `POST /recordings/spectrogram`.
+2. **Follow progress.** A lightweight poller keeps you informed until the job lands, then calls `PUT /spectre-data/batches/plots` to render PNGs.
+3. **Review results.** “Previous Recordings” lists `GET /spectre-data/batches?extension=png`. Click any row to view the PNG loaded from `/spectre-data/batches/<file>.png`.
+4. **Grab the files.** Because Docker bind-mounts `backend/.spectre-data`, every PNG or I/Q capture already lives on your host. Copy them into your analysis tools or share them however you like.
+
+## Log viewer & pruning
+
+- **Filter + inspect.** The **System Logs** panel filters worker/user logs and paginates in slices of five, so even month-long capture sessions stay readable. View entries inline or download the raw text.
+- **Prune old files.** Hit **🧹 Prune Logs** to delete files older than _N_ days (defaults to 30). The confirmation modal explains that the action is irreversible; passing `0` deletes every log.
+- **See what happened.** Successful prune jobs surface a dismissable banner (“Deleted 12 logs older than 14 days”) so collaborators know cleanup just ran.
+- **Script it if you like.** The backend exposes `POST /spectre-data/logs/prune` with body `{ "days": 30 }` for scheduled tasks or power users.
+- **Peek at the format.** A tiny sample log lives at `docs/samples/sample-system-log.txt` so newcomers can see what entries look like.
+
+## Try these experiments
+
+- **Run the demo, then the real deal.** Kick off `demo-sine` to watch a guaranteed-good spectrogram appear, then rerun the same duration with your RTL-SDR profile and compare the PNGs side-by-side.
+- **Time-box your curiosity.** Set `duration=60` seconds, flip on advanced options like `force_restart`, and peek at the live status panel to see how Spectre behaves when a job recovers from a hiccup.
+- **Share your science fair moment.** Post your favorite PNG (with tag + timestamp) to the friendly [r/RTLSDR](https://www.reddit.com/r/RTLSDR/) or the [vibecoding thread](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/) that inspired this UI.
+
+## Community & learning
+
+- **Vibecoding roots.** This Web UI launched after that [vibecoding call-to-arms](https://www.reddit.com/r/vibecoding/comments/1p33nbo/interested_in_vibecoding_a_frontend/)—drop in with sketches, feedback, or wild requests.
+- **Hardware rabbit holes.** Browse SDRplay’s [hardware catalog](https://www.sdrplay.com/), Great Scott Gadgets’ [HackRF gear](https://greatscottgadgets.com/hackrf/), Ettus Research [USRPs](https://www.ettus.com/), or Airspy’s [compact receivers](https://airspy.com/) when you’re ready to expand your kit.
+- **Hangouts.** r/RTLSDR, the SignalsEverywhere [community hub](https://www.signalseverywhere.com/) (Discord + tutorials), and tools like [ReceiverBook’s station map](https://www.receiverbook.de/) are great places to compare notes and see what others are hearing.
+- **Pinned ideas.** Ongoing feature and UX ideas live in `docs/notes/PINLIST.md` for quick browsing.
+
+## Configuration
+
+### Default profiles
+
+On first launch the backend seeds three starter configs so the dropdown is never empty:
+
+| Profile | Receiver | Hardware Required | Use Case | Description |
+|---------|----------|-------------------|----------|-------------|
+| **demo-sine** | signal_generator | ❌ No | UI test/demo | Virtual 32 kHz sine wave. Great for sanity checks anywhere. |
+| **rtlsdr-fm-wide** | rtlsdr | ✅ RTL-SDR | Broadcast FM | 98.5 MHz wideband capture tuned for RTL-SDR Blog v3 sticks (2.048 MSPS). |
+| **rtlsdr-solar-20MHz** | rtlsdr | ✅ RTL-SDR + upconverter | Solar/Jovian | Long-duration 20.1 MHz capture for natural radio sources. |
+
+These files live in `backend/.spectre-data/configs/`. They are only copied when missing, so your edits persist. Delete one and it will regenerate on the next container start—handy when you want to compare with the defaults.
+
+### Custom configs via CLI
+
+Use the bundled CLI container whenever you need a new profile or want to inspect existing ones:
+
+```bash
+# Create a configuration for your SDR
+docker exec -it spectre-cli spectre create config --receiver rtlsdr --mode fixed --tag my_rtlsdr
+
+# List available configurations
+docker exec -it spectre-cli spectre get configs
+```
+
+Swap `spectre-cli` for `spectre-dev-cli` when you run the dev stack. Every YAML file under `.spectre-data/configs/` instantly appears in the UI.
+
+## Data locations
+
+- `backend/.spectre-data/configs/` – Saved receiver profiles (YAML)
+- `backend/.spectre-data/batches/` – PNG spectrograms rendered by the backend
+- `backend/.spectre-data/recordings/` – Raw I/Q data and metadata
+
+Treat these folders like any other project directory: back them up, version them, or prune them when disk space matters. Docker bind-mounts them from your host, so nothing is trapped inside a container.
+
+## About us
+
+Spectre WebUI is a casual Sunday collaboration between Codex (GPT-5) and Claude to make SDR spectrogram capture friendlier for curious builders. We prioritize transparency, local-first defaults, and human-readable docs. Open an issue or PR if you have ideas—let’s keep vibin.

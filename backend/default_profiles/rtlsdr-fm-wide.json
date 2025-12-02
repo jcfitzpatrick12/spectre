@@ -1,0 +1,25 @@
+{
+    "receiver_name": "rtlsdr",
+    "receiver_mode": "fixed_center_frequency",
+    "parameters": {
+        "time_range": 0.0,
+        "origin": "RTL-SDR FM Broadcast Demo",
+        "telescope": "RTL-SDR Blog v3",
+        "instrument": "RTL2832U + R820T2",
+        "object": "FM Broadcast Band",
+        "obs_alt": 0.0,
+        "obs_lat": 0.0,
+        "obs_lon": 0.0,
+        "window_size": 4096,
+        "window_hop": 2048,
+        "window_type": "blackman",
+        "center_frequency": 98500000.0,
+        "sample_rate": 2048000,
+        "frequency_resolution": 0.0,
+        "time_resolution": 0.0,
+        "batch_size": 5.0,
+        "keep_signal": false,
+        "max_noutput_items": 100000,
+        "rf_gain": 30.0
+    }
+}
