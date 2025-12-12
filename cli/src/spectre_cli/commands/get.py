@@ -129,23 +129,6 @@ def modes(
     raise typer.Exit()
 
 
-@get_typer.command(help="Print receiver hardware specifications.")
-def specs(
-    receiver_name: str = typer.Option(
-        ..., "--receiver", "-r", help="The name of the receiver."
-    )
-) -> None:
-
-    params = {"receiver_name": receiver_name}
-    jsend_dict = safe_request(f"receivers/{receiver_name}/specs", "GET", params=params)
-    specs = jsend_dict["data"]
-
-    for k, v in specs.items():
-        secho_existing_resource(f"{k}: {v}")
-
-    raise typer.Exit()
-
-
 @get_typer.command(help="List configs.")
 def configs() -> None:
 
