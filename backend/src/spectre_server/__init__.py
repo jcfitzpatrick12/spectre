@@ -2,4 +2,4 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-__version__ = "2.0.0-alpha"
+__version__ = "2.0.1-alpha"
