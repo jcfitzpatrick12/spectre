@@ -197,15 +197,13 @@ def model(
     ),
     receiver_mode: str = typer.Option(
         ..., "--mode", "-m", help="The operating mode of the receiver."
-    )
+    ),
 ) -> None:
 
     params = {
         "receiver_mode": receiver_mode,
     }
-    jsend_dict = safe_request(
-        f"receivers/{receiver_name}/model", "GET", params=params
-    )
+    jsend_dict = safe_request(f"receivers/{receiver_name}/model", "GET", params=params)
     model = jsend_dict["data"]
     pprint_dict(model)
     typer.Exit()
