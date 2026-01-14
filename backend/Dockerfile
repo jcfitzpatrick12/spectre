@@ -46,6 +46,7 @@ FROM base AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     cmake \
+    clang-format \
     build-essential \
     twine \
     python3-dev \
@@ -58,6 +59,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-build \
     python3-venv \
     python3-yaml \
+    python3-pygccxml \
+    python3-click \
+    python3-click-plugins \
     pybind11-dev \
     libusb-1.0-0-dev \
     libsoapysdr-dev \
@@ -88,7 +92,7 @@ FROM build AS uhd
 WORKDIR /tmp
 
 # Minimal UHD install, to reduce image size.
-RUN git clone --branch v4.1.0.0  --depth 1 https://github.com/EttusResearch/uhd.git && \
+RUN git clone --branch v4.9.0.0  --depth 1 https://github.com/EttusResearch/uhd.git && \
     cd uhd/host && \
     mkdir build && \
     cd build && \
@@ -382,7 +386,7 @@ RUN . ./build_oot_module.sh && \
 FROM oot_module AS gr_spectre
 
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v0.0.4 && \
+    build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v2.0.0 && \
     rm -rf /tmp/*
 
 
@@ -418,7 +422,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="2.0.1-alpha" \
+      version="3.0.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -500,7 +504,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="2.0.1-alpha" \
+      version="3.0.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
