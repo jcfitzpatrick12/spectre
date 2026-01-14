@@ -14,7 +14,6 @@ from .routes.recordings import recordings_blueprint
 from .routes.batches import batches_blueprint
 from .routes.receivers import receivers_blueprint
 from .routes.logs import logs_blueprint
-from .routes.callisto import callisto_blueprint
 
 
 def make_app() -> flask.Flask:
@@ -22,7 +21,6 @@ def make_app() -> flask.Flask:
     app.register_blueprint(configs_blueprint)
     app.register_blueprint(recordings_blueprint)
     app.register_blueprint(batches_blueprint)
-    app.register_blueprint(callisto_blueprint)
     app.register_blueprint(logs_blueprint)
     app.register_blueprint(receivers_blueprint)
 
