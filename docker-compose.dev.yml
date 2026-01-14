@@ -12,7 +12,7 @@ services:
     networks:
       - spectre-dev-network
     volumes:
-      - spectre-dev-data:/app/.spectre-data
+      - spectre-dev-data-v3:/app/.spectre-data
     devices:
       - "/dev/bus/usb"
     ports:
@@ -45,5 +45,5 @@ networks:
     driver: bridge
 
 volumes:
-  spectre-dev-data:
-    name: spectre-dev-data
+  spectre-dev-data-v3:
+    name: spectre-dev-data-v3
