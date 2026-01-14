@@ -16,8 +16,6 @@ services:
       - "/dev/bus/usb"
     ports:
       - ${SPECTRE_PORT_MAP}
-    mem_limit: 8g
-    shm_size: 8g
     stop_signal: SIGKILL
 
   spectre-cli:
