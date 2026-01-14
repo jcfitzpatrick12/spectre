@@ -15,17 +15,6 @@ from ._secho_resources import (
 get_typer = typer.Typer(help="Display one or many resources.")
 
 
-@get_typer.command(help="List e-Callisto network instrument codes.")
-def callisto_instrument_codes() -> None:
-    jsend_dict = safe_request("callisto/instrument-codes", "GET")
-    callisto_instrument_codes = jsend_dict["data"]
-
-    for instrument_code in callisto_instrument_codes:
-        secho_existing_resource(instrument_code)
-
-    raise typer.Exit()
-
-
 @get_typer.command(help="List logs.")
 def logs(
     process_types: list[str] = typer.Option(
