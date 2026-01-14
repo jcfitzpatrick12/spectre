@@ -25,7 +25,7 @@ Track our progress and upcoming features on our [GitHub Project Board](https://g
 
 ## About Us
 
-_Spectre_ is a free and open source receiver-agnostic program for recording and visualising radio spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
+_Spectre_ is a free and open source SDR-agnostic program for recording radio signals and spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
 
 Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.org/), it provides high performance on modest hardware. Applications include:  
 
@@ -41,9 +41,8 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - Wide receiver support (SDRplay, HackRF, RTL-SDR, USRP)
 - Run natively on Linux, including Raspberry Pi
 - Intuitive CLI tool
-- Live record spectrograms and I/Q data  
-- Offers fixed and sweeping center frequency modes
-- Backend web server with a discoverable RESTful API
-- Developer-friendly and extensible
+- Record spectrograms and I/Q data
+- Long-form recordings
+- Compatible with [inspectrum](https://github.com/miek/inspectrum)
 
 ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/jcfitzpatrick12/spectre-lite), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
