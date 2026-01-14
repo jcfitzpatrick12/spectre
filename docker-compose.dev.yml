@@ -12,13 +12,11 @@ services:
     networks:
       - spectre-dev-network
     volumes:
-      - spectre-dev-data:/app/.spectre-data
+      - spectre-dev-data-v3:/app/.spectre-data
     devices:
       - "/dev/bus/usb"
     ports:
       - 127.0.0.1:5001:5001
-    mem_limit: 8g
-    shm_size: 8g
     tty: true
     stop_signal: SIGKILL
 
@@ -45,5 +43,5 @@ networks:
     driver: bridge
 
 volumes:
-  spectre-dev-data:
-    name: spectre-dev-data
+  spectre-dev-data-v3:
+    name: spectre-dev-data-v3
