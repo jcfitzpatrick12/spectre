@@ -10,6 +10,7 @@ import typing
 import requests
 import os
 import contextlib
+from urllib.parse import urlparse
 
 import typer
 import yaspin
@@ -104,8 +105,6 @@ def download_file(url: str, output_dir: str) -> None:
     :param url: The URL of the file to download.
     :param output_dir: The directory to save the file to.
     """
-    from urllib.parse import urlparse
-
     # Create the output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 

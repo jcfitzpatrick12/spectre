@@ -55,6 +55,11 @@ def log(
         None, "-o", help="Directory to save the downloaded file."
     ),
 ) -> None:
+    # Validate file_name to prevent path traversal attempts
+    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
+        typer.secho("Error: Invalid file name.", fg="yellow")
+        raise typer.Exit(1)
+
     if output_dir:
         # Download mode: use the direct endpoint to download the file
         # The backend's get_log endpoint returns the file directly
@@ -180,6 +185,11 @@ def config(
 ) -> None:
 
     file_name = get_config_file_name(file_name, tag)
+
+    # Validate file_name to prevent path traversal attempts
+    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
+        typer.secho("Error: Invalid file name.", fg="yellow")
+        raise typer.Exit(1)
 
     if output_dir:
         # Download mode: use the direct endpoint to download the file
