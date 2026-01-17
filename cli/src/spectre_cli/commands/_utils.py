@@ -55,7 +55,9 @@ def safe_request(
     if route_url.startswith("/"):
         route_url = route_url.lstrip("/")
 
-    full_url = f"{SPECTRE_SERVER}/{route_url}"
+    # Ensure SPECTRE_SERVER doesn't end with trailing slash
+    base_url = SPECTRE_SERVER.rstrip("/")
+    full_url = f"{base_url}/{route_url}"
 
     try:
         response = requests.request(method, full_url, json=json, params=params)
@@ -97,6 +99,17 @@ def get_config_file_name(
     if not (file_name is None) ^ (tag is None):
         raise ValueError("Specify exactly one of the tag or file name.")
     return file_name or f"{tag}.json"
+
+
+def validate_filename(file_name: str) -> None:
+    """Validate a filename to prevent path traversal attempts.
+
+    :param file_name: The filename to validate.
+    :raises typer.Exit: If the filename contains path separators or special names.
+    """
+    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
+        typer.secho("Error: Invalid file name.", fg="yellow")
+        raise typer.Exit(1)
 
 
 def download_file(url: str, output_dir: str) -> None:

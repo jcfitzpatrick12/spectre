@@ -5,7 +5,13 @@
 import typer
 
 from ..config import SPECTRE_SERVER
-from ._utils import safe_request, get_config_file_name, download_file, download_files
+from ._utils import (
+    safe_request,
+    get_config_file_name,
+    download_file,
+    download_files,
+    validate_filename,
+)
 from ._secho_resources import (
     pprint_dict,
     secho_existing_resource,
@@ -56,14 +62,12 @@ def log(
     ),
 ) -> None:
     # Validate file_name to prevent path traversal attempts
-    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
-        typer.secho("Error: Invalid file name.", fg="yellow")
-        raise typer.Exit(1)
+    validate_filename(file_name)
 
     if output_dir:
         # Download mode: use the direct endpoint to download the file
         # The backend's get_log endpoint returns the file directly
-        log_url = f"{SPECTRE_SERVER}/spectre-data/logs/{file_name}"
+        log_url = f"{SPECTRE_SERVER.rstrip('/')}/spectre-data/logs/{file_name}"
         download_file(log_url, output_dir)
     else:
         # Display mode: print the log contents
@@ -187,14 +191,12 @@ def config(
     file_name = get_config_file_name(file_name, tag)
 
     # Validate file_name to prevent path traversal attempts
-    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
-        typer.secho("Error: Invalid file name.", fg="yellow")
-        raise typer.Exit(1)
+    validate_filename(file_name)
 
     if output_dir:
         # Download mode: use the direct endpoint to download the file
         # The backend's get_config endpoint returns the file directly
-        config_url = f"{SPECTRE_SERVER}/spectre-data/configs/{file_name}"
+        config_url = f"{SPECTRE_SERVER.rstrip('/')}/spectre-data/configs/{file_name}"
         download_file(config_url, output_dir)
     else:
         # Display mode: print the config contents
