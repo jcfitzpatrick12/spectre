@@ -10,6 +10,7 @@ import typing
 import requests
 import os
 import contextlib
+from urllib.parse import urlparse
 
 import typer
 import yaspin
@@ -54,7 +55,9 @@ def safe_request(
     if route_url.startswith("/"):
         route_url = route_url.lstrip("/")
 
-    full_url = os.path.join(SPECTRE_SERVER, route_url)
+    # Ensure SPECTRE_SERVER doesn't end with trailing slash
+    base_url = SPECTRE_SERVER.rstrip("/")
+    full_url = f"{base_url}/{route_url}"
 
     try:
         response = requests.request(method, full_url, json=json, params=params)
@@ -96,3 +99,78 @@ def get_config_file_name(
     if not (file_name is None) ^ (tag is None):
         raise ValueError("Specify exactly one of the tag or file name.")
     return file_name or f"{tag}.json"
+
+
+def validate_filename(file_name: str) -> None:
+    """Validate a filename to prevent path traversal attempts.
+
+    :param file_name: The filename to validate.
+    :raises typer.Exit: If the filename contains path separators or special names.
+    """
+    if "/" in file_name or "\\" in file_name or file_name in (".", ".."):
+        typer.secho("Error: Invalid file name.", fg="yellow")
+        raise typer.Exit(1)
+
+
+def download_file(url: str, output_dir: str) -> None:
+    """Download a file from a URL to the specified directory.
+
+    :param url: The URL of the file to download.
+    :param output_dir: The directory to save the file to.
+    """
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Extract the file name from the URL using urlparse
+    parsed_url = urlparse(url)
+    file_name = os.path.basename(parsed_url.path)
+
+    # Sanitize the filename to prevent directory traversal
+    if (
+        not file_name
+        or file_name in (".", "..")
+        or "/" in file_name
+        or "\\" in file_name
+    ):
+        raise ValueError(f"Invalid filename in URL: {url}")
+
+    # Build the full output path and validate it's within output_dir
+    output_path = os.path.join(output_dir, file_name)
+    output_path = os.path.normpath(output_path)
+    if not output_path.startswith(os.path.normpath(output_dir)):
+        raise ValueError(f"Invalid path: {output_path}")
+
+    try:
+        response = requests.get(url, stream=True, timeout=30)
+        response.raise_for_status()
+
+        with open(output_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+        typer.secho(f"Downloaded: {output_path}", fg="green")
+    except requests.exceptions.ConnectionError:
+        typer.secho(
+            "Error: Unable to connect to the spectre-server. Is the container running?",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    except requests.exceptions.Timeout:
+        typer.secho(f"Error: Timeout while downloading {url}", fg="yellow")
+        raise typer.Exit(1)
+    except requests.exceptions.HTTPError as e:
+        typer.secho(f"Error: HTTP error while downloading {url}: {e}", fg="yellow")
+        raise typer.Exit(1)
+    except requests.exceptions.RequestException as e:
+        typer.secho(f"Error downloading {url}: {e}", fg="yellow")
+        raise typer.Exit(1)
+
+
+def download_files(urls: list[str], output_dir: str) -> None:
+    """Download multiple files from URLs to the specified directory.
+
+    :param urls: List of URLs of files to download.
+    :param output_dir: The directory to save the files to.
+    """
+    for url in urls:
+        download_file(url, output_dir)

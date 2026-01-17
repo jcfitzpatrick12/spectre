@@ -4,7 +4,14 @@
 
 import typer
 
-from ._utils import safe_request, get_config_file_name
+from ..config import SPECTRE_SERVER
+from ._utils import (
+    safe_request,
+    get_config_file_name,
+    download_file,
+    download_files,
+    validate_filename,
+)
 from ._secho_resources import (
     pprint_dict,
     secho_existing_resource,
@@ -29,22 +36,45 @@ def logs(
         None, "--month", "-m", help="Only list logs under this month."
     ),
     day: int = typer.Option(None, "--day", "-d", help="Only list logs under this day."),
+    output_dir: str = typer.Option(
+        None, "-o", help="Directory to save the downloaded files."
+    ),
 ) -> None:
     params = {"process_type": process_types, "year": year, "month": month, "day": day}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
-    secho_existing_resources(endpoints)
+    if output_dir:
+        # Download mode: download all log files
+        download_files(endpoints, output_dir)
+    else:
+        # Display mode: list the endpoints
+        secho_existing_resources(endpoints)
+
     raise typer.Exit()
 
 
 @get_typer.command(help="Print the contents of a log.")
 def log(
     file_name: str = typer.Option(..., "-f", help="The file name."),
+    output_dir: str = typer.Option(
+        None, "-o", help="Directory to save the downloaded file."
+    ),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
-    log_contents = jsend_dict["data"]
-    print(log_contents)
+    # Validate file_name to prevent path traversal attempts
+    validate_filename(file_name)
+
+    if output_dir:
+        # Download mode: use the direct endpoint to download the file
+        # The backend's get_log endpoint returns the file directly
+        log_url = f"{SPECTRE_SERVER.rstrip('/')}/spectre-data/logs/{file_name}"
+        download_file(log_url, output_dir)
+    else:
+        # Display mode: print the log contents
+        jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
+        log_contents = jsend_dict["data"]
+        print(log_contents)
+
     raise typer.Exit()
 
 
@@ -71,6 +101,9 @@ def files(
     day: int = typer.Option(
         None, "--day", "-d", help="Only list files under this day."
     ),
+    output_dir: str = typer.Option(
+        None, "-o", help="Directory to save the downloaded files."
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -86,7 +119,13 @@ def files(
     )
     endpoints = jsend_dict["data"]
 
-    secho_existing_resources(endpoints)
+    if output_dir:
+        # Download mode: download all batch files
+        download_files(endpoints, output_dir)
+    else:
+        # Display mode: list the endpoints
+        secho_existing_resources(endpoints)
+
     raise typer.Exit()
 
 
@@ -119,11 +158,22 @@ def modes(
 
 
 @get_typer.command(help="List configs.")
-def configs() -> None:
+def configs(
+    output_dir: str = typer.Option(
+        None, "-o", help="Directory to save the downloaded files."
+    ),
+) -> None:
 
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
     endpoints = jsend_dict["data"]
-    secho_existing_resources(endpoints)
+
+    if output_dir:
+        # Download mode: download all config files
+        download_files(endpoints, output_dir)
+    else:
+        # Display mode: list the endpoints
+        secho_existing_resources(endpoints)
+
     raise typer.Exit()
 
 
@@ -133,13 +183,27 @@ def config(
     file_name: str = typer.Option(
         None, "-f", help="The file name.", metavar="<tag>.json"
     ),
+    output_dir: str = typer.Option(
+        None, "-o", help="Directory to save the downloaded file."
+    ),
 ) -> None:
 
     file_name = get_config_file_name(file_name, tag)
 
-    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
-    config = jsend_dict["data"]
-    pprint_dict(config)
+    # Validate file_name to prevent path traversal attempts
+    validate_filename(file_name)
+
+    if output_dir:
+        # Download mode: use the direct endpoint to download the file
+        # The backend's get_config endpoint returns the file directly
+        config_url = f"{SPECTRE_SERVER.rstrip('/')}/spectre-data/configs/{file_name}"
+        download_file(config_url, output_dir)
+    else:
+        # Display mode: print the config contents
+        jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
+        config = jsend_dict["data"]
+        pprint_dict(config)
+
     raise typer.Exit()
 
 
