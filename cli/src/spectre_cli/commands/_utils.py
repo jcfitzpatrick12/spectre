@@ -96,3 +96,48 @@ def get_config_file_name(
     if not (file_name is None) ^ (tag is None):
         raise ValueError("Specify exactly one of the tag or file name.")
     return file_name or f"{tag}.json"
+
+
+def download_file(url: str, output_dir: str) -> None:
+    """Download a file from a URL to the specified directory.
+
+    :param url: The URL of the file to download.
+    :param output_dir: The directory to save the file to.
+    """
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Extract the file name from the URL
+    file_name = os.path.basename(url.rstrip("/"))
+
+    # Build the full output path
+    output_path = os.path.join(output_dir, file_name)
+
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        with open(output_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+        typer.secho(f"Downloaded: {output_path}", fg="green")
+    except requests.exceptions.ConnectionError:
+        typer.secho(
+            "Error: Unable to connect to the spectre-server. Is the container running?",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.secho(f"Error downloading {url}: {e}", fg="yellow")
+        raise typer.Exit(1)
+
+
+def download_files(urls: list[str], output_dir: str) -> None:
+    """Download multiple files from URLs to the specified directory.
+
+    :param urls: List of URLs of files to download.
+    :param output_dir: The directory to save the files to.
+    """
+    for url in urls:
+        download_file(url, output_dir)
