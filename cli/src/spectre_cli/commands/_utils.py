@@ -54,7 +54,7 @@ def safe_request(
     if route_url.startswith("/"):
         route_url = route_url.lstrip("/")
 
-    full_url = os.path.join(SPECTRE_SERVER, route_url)
+    full_url = f"{SPECTRE_SERVER}/{route_url}"
 
     try:
         response = requests.request(method, full_url, json=json, params=params)
@@ -114,7 +114,12 @@ def download_file(url: str, output_dir: str) -> None:
     file_name = os.path.basename(parsed_url.path)
 
     # Sanitize the filename to prevent directory traversal
-    if not file_name or file_name in (".", ".."):
+    if (
+        not file_name
+        or file_name in (".", "..")
+        or "/" in file_name
+        or "\\" in file_name
+    ):
         raise ValueError(f"Invalid filename in URL: {url}")
 
     # Build the full output path and validate it's within output_dir
