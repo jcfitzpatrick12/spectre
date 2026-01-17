@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -30,7 +30,7 @@ RUN pip install .
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.0.1-alpha" \
+      version="3.0.2-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
@@ -57,7 +57,7 @@ USER appuser
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.0.1-alpha" \
+      version="3.0.2-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
