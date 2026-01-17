@@ -104,17 +104,28 @@ def download_file(url: str, output_dir: str) -> None:
     :param url: The URL of the file to download.
     :param output_dir: The directory to save the file to.
     """
+    from urllib.parse import urlparse
+
     # Create the output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Extract the file name from the URL
-    file_name = os.path.basename(url.rstrip("/"))
+    # Extract the file name from the URL using urlparse
+    parsed_url = urlparse(url)
+    file_name = os.path.basename(parsed_url.path)
 
-    # Build the full output path
+    # Sanitize the filename to prevent directory traversal
+    file_name = os.path.basename(file_name)  # Remove any path components
+    if not file_name or file_name in (".", ".."):
+        raise ValueError(f"Invalid filename in URL: {url}")
+
+    # Build the full output path and validate it's within output_dir
     output_path = os.path.join(output_dir, file_name)
+    output_path = os.path.normpath(output_path)
+    if not output_path.startswith(os.path.normpath(output_dir)):
+        raise ValueError(f"Invalid path: {output_path}")
 
     try:
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, timeout=30)
         response.raise_for_status()
 
         with open(output_path, "wb") as f:
@@ -128,7 +139,13 @@ def download_file(url: str, output_dir: str) -> None:
             fg="yellow",
         )
         raise typer.Exit(1)
-    except Exception as e:
+    except requests.exceptions.Timeout:
+        typer.secho(f"Error: Timeout while downloading {url}", fg="yellow")
+        raise typer.Exit(1)
+    except requests.exceptions.HTTPError as e:
+        typer.secho(f"Error: HTTP error while downloading {url}: {e}", fg="yellow")
+        raise typer.Exit(1)
+    except requests.exceptions.RequestException as e:
         typer.secho(f"Error downloading {url}: {e}", fg="yellow")
         raise typer.Exit(1)
 

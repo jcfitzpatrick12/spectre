@@ -2,8 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
+
 import typer
 
+from ..config import SPECTRE_SERVER
 from ._utils import safe_request, get_config_file_name, download_file, download_files
 from ._secho_resources import (
     pprint_dict,
@@ -55,22 +58,10 @@ def log(
     ),
 ) -> None:
     if output_dir:
-        # Download mode: get the file endpoint and download it
-        jsend_dict = safe_request(f"spectre-data/logs", "GET")
-        endpoints = jsend_dict["data"]
-
-        # Find the endpoint for this specific log file
-        log_endpoint = None
-        for endpoint in endpoints:
-            if endpoint.endswith(f"/{file_name}"):
-                log_endpoint = endpoint
-                break
-
-        if log_endpoint:
-            download_file(log_endpoint, output_dir)
-        else:
-            typer.secho(f"Error: Log file {file_name} not found.", fg="yellow")
-            raise typer.Exit(1)
+        # Download mode: use the direct endpoint to download the file
+        # The backend's get_log endpoint returns the file directly
+        log_url = os.path.join(SPECTRE_SERVER, f"spectre-data/logs/{file_name}")
+        download_file(log_url, output_dir)
     else:
         # Display mode: print the log contents
         jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
@@ -193,22 +184,10 @@ def config(
     file_name = get_config_file_name(file_name, tag)
 
     if output_dir:
-        # Download mode: get the file endpoint and download it
-        jsend_dict = safe_request(f"spectre-data/configs", "GET")
-        endpoints = jsend_dict["data"]
-
-        # Find the endpoint for this specific config file
-        config_endpoint = None
-        for endpoint in endpoints:
-            if endpoint.endswith(f"/{file_name}"):
-                config_endpoint = endpoint
-                break
-
-        if config_endpoint:
-            download_file(config_endpoint, output_dir)
-        else:
-            typer.secho(f"Error: Config file {file_name} not found.", fg="yellow")
-            raise typer.Exit(1)
+        # Download mode: use the direct endpoint to download the file
+        # The backend's get_config endpoint returns the file directly
+        config_url = os.path.join(SPECTRE_SERVER, f"spectre-data/configs/{file_name}")
+        download_file(config_url, output_dir)
     else:
         # Display mode: print the config contents
         jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
