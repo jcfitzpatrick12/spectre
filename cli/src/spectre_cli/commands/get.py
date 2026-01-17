@@ -2,8 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import os
-
 import typer
 
 from ..config import SPECTRE_SERVER
@@ -60,7 +58,7 @@ def log(
     if output_dir:
         # Download mode: use the direct endpoint to download the file
         # The backend's get_log endpoint returns the file directly
-        log_url = os.path.join(SPECTRE_SERVER, f"spectre-data/logs/{file_name}")
+        log_url = f"{SPECTRE_SERVER}/spectre-data/logs/{file_name}"
         download_file(log_url, output_dir)
     else:
         # Display mode: print the log contents
@@ -186,7 +184,7 @@ def config(
     if output_dir:
         # Download mode: use the direct endpoint to download the file
         # The backend's get_config endpoint returns the file directly
-        config_url = os.path.join(SPECTRE_SERVER, f"spectre-data/configs/{file_name}")
+        config_url = f"{SPECTRE_SERVER}/spectre-data/configs/{file_name}"
         download_file(config_url, output_dir)
     else:
         # Display mode: print the config contents

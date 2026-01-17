@@ -114,7 +114,6 @@ def download_file(url: str, output_dir: str) -> None:
     file_name = os.path.basename(parsed_url.path)
 
     # Sanitize the filename to prevent directory traversal
-    file_name = os.path.basename(file_name)  # Remove any path components
     if not file_name or file_name in (".", ".."):
         raise ValueError(f"Invalid filename in URL: {url}")
 
