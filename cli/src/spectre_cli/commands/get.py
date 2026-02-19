@@ -1,8 +1,10 @@
-# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import typer
+import os
+import requests
 
 from ._utils import safe_request, get_config_file_name
 from ._secho_resources import (
@@ -10,6 +12,19 @@ from ._secho_resources import (
     secho_existing_resource,
     secho_existing_resources,
 )
+
+
+def __download_resource(endpoint: str, directory: str) -> None:
+    file_path = os.path.join(directory, os.path.basename(endpoint))
+    response = requests.get(endpoint)
+    with open(file_path, "wb") as file:
+        file.write(response.content)
+
+
+def __download_resources(endpoints: list[str], directory: str) -> None:
+    os.makedirs(directory, exist_ok=True)
+    for endpoint in endpoints:
+        __download_resource(endpoint, directory)
 
 
 get_typer = typer.Typer(help="Display one or many resources.")
@@ -29,12 +44,20 @@ def logs(
         None, "--month", "-m", help="Only list logs under this month."
     ),
     day: int = typer.Option(None, "--day", "-d", help="Only list logs under this day."),
+    export: str = typer.Option(
+        None,
+        "--export",
+        help="Bulk download logs to your local filesystem inside this directory.",
+    ),
 ) -> None:
     params = {"process_type": process_types, "year": year, "month": month, "day": day}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
-    secho_existing_resources(endpoints)
+    if export is None:
+        secho_existing_resources(endpoints)
+    else:
+        __download_resources(endpoints, export)
     raise typer.Exit()
 
 
@@ -71,6 +94,11 @@ def files(
     day: int = typer.Option(
         None, "--day", "-d", help="Only list files under this day."
     ),
+    export: str = typer.Option(
+        None,
+        "--export",
+        help="Bulk download files to your local filesystem inside this directory.",
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -86,7 +114,11 @@ def files(
     )
     endpoints = jsend_dict["data"]
 
-    secho_existing_resources(endpoints)
+    if export is None:
+        secho_existing_resources(endpoints)
+    else:
+        __download_resources(endpoints, export)
+
     raise typer.Exit()
 
 
@@ -119,11 +151,20 @@ def modes(
 
 
 @get_typer.command(help="List configs.")
-def configs() -> None:
+def configs(
+    export: str = typer.Option(
+        None,
+        "--export",
+        help="Bulk download configs to your local filesystem inside this directory.",
+    ),
+) -> None:
 
     jsend_dict = safe_request(f"spectre-data/configs", "GET")
     endpoints = jsend_dict["data"]
-    secho_existing_resources(endpoints)
+    if export is None:
+        secho_existing_resources(endpoints)
+    else:
+        __download_resources(endpoints, export)
     raise typer.Exit()
 
 
