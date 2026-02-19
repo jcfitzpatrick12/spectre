@@ -42,7 +42,7 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - Run natively on Linux, including Raspberry Pi
 - Intuitive CLI tool
 - Record spectrograms and I/Q data
-- Long-form recordings
+- Short and long-form recordings
 - Compatible with [inspectrum](https://github.com/miek/inspectrum)
 
 ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/jcfitzpatrick12/spectre-lite), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
