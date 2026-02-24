@@ -55,6 +55,53 @@ def config(
     raise typer.Exit()
 
 
+@create_typer.command(help="Copy an existing config under a new tag.")
+def copy(
+    tag: str = typer.Option(None, "--tag", "-t", help="The tag of the config to copy."),
+    file_name: str = typer.Option(
+        None, "-f", help="The file name of the config to copy.", metavar="<tag>.json"
+    ),
+    new_tag: str = typer.Option(None, "--new-tag", help="The tag for the new config."),
+    new_file_name: str = typer.Option(
+        None,
+        "--new-file",
+        help="The file name for the new config.",
+        metavar="<tag>.json",
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help="If specified, force the operation even if files exist with the new tag.",
+    ),
+    skip_validation: bool = typer.Option(
+        False,
+        "--skip-validation",
+        help="If specified, do not validate the parameters.",
+    ),
+) -> None:
+    src_file_name = get_config_file_name(file_name, tag)
+    dst_file_name = get_config_file_name(new_file_name, new_tag)
+
+    jsend_dict = safe_request(f"spectre-data/configs/{src_file_name}/raw", "GET")
+    config = jsend_dict["data"]
+
+    receiver_name = config.pop("receiver_name")
+    receiver_mode = config.pop("receiver_mode")
+    string_parameters = [f"{k}={v}" for k, v in config.items()]
+
+    json = {
+        "receiver_name": receiver_name,
+        "receiver_mode": receiver_mode,
+        "string_parameters": string_parameters,
+        "force": force,
+        "validate": not skip_validation,
+    }
+    jsend_dict = safe_request(f"spectre-data/configs/{dst_file_name}", "PUT", json=json)
+    endpoint = jsend_dict["data"]
+    secho_new_resource(endpoint)
+    raise typer.Exit()
+
+
 @create_typer.command(help="Create a plot of spectrogram data.")
 def plot(
     tags: list[str] = typer.Option(
