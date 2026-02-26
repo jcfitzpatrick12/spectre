@@ -85,9 +85,9 @@ def copy(
     jsend_dict = safe_request(f"spectre-data/configs/{src_file_name}/raw", "GET")
     config = jsend_dict["data"]
 
-    receiver_name = config.pop("receiver_name")
-    receiver_mode = config.pop("receiver_mode")
-    string_parameters = [f"{k}={v}" for k, v in config.items()]
+    receiver_name = config["receiver_name"]
+    receiver_mode = config["receiver_mode"]
+    string_parameters = [f"{k}={v}" for k, v in config["parameters"].items()]
 
     json = {
         "receiver_name": receiver_name,
