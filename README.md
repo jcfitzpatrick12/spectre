@@ -13,10 +13,6 @@
   <img src="gallery/solar_radio_narrowband.png" width="45%" hspace="7" alt="Solar Radio Observations">
 </div>
 
-
-> [!IMPORTANT]
-> We're building Polyspectre: a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
-
 ## Getting started
 
 Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki). Quick links are provided below:  
@@ -28,6 +24,9 @@ Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki
 Track our progress and upcoming features on our [GitHub Project Board](https://github.com/users/jcfitzpatrick12/projects/3).
 
 ## About Us
+
+> [!IMPORTANT]
+> We're building [Polyspectre](http://polyspectre.org/): a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
 
 _Spectre_ is a free and open source SDR-agnostic program for recording radio signals and spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
 
