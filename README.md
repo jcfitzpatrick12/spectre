@@ -13,6 +13,9 @@
   <img src="gallery/solar_radio_narrowband.png" width="45%" hspace="7" alt="Solar Radio Observations">
 </div>
 
+> [!Update]
+> We're building Polyspectre: a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
+
 ## Getting started
 
 Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki). Quick links are provided below:  
