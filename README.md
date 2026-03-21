@@ -24,10 +24,6 @@ Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki
 Track our progress and upcoming features on our [GitHub Project Board](https://github.com/users/jcfitzpatrick12/projects/3).
 
 ## About Us
-
-> [!IMPORTANT]
-> We're building [Polyspectre](http://polyspectre.org/): a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
-
 _Spectre_ is a free and open source SDR-agnostic program for recording radio signals and spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
 
 Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.org/), it provides high performance on modest hardware. Applications include:  
@@ -37,6 +33,9 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - Amateur radio experimentation
 - Lightning and atmospheric event detection
 - RFI monitoring
+
+> [!IMPORTANT]
+> 2026 update: We're building [Polyspectre](http://polyspectre.org/): a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
 
 ## **Features**
 
