@@ -35,7 +35,7 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - RFI monitoring
 
 > [!IMPORTANT]
-> We're now building [Polyspectre](http://polyspectre.org/): a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
+> We're now building [Spectregrams](http://spectregrams.org/): a global network of low-cost, narrowband FFT spectrometers for solar radio observations.
 
 ## **Features**
 
