@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "spectre-server"
 version = "3.3.2-alpha"
 authors = [
-  { name = "Jimmy Fitzpatrick", email = "jcfitzpatrick12@gmail.com" }
+  { name = "Jimmy Fitzpatrick", email = "jimmy@spectregrams.org" }
 ]
 requires-python = ">=3.10.2"
 classifiers = [

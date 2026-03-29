@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -421,7 +421,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 # --------------------------------- # 
 FROM base AS runtime
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       version="3.3.2-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
@@ -503,7 +503,7 @@ CMD ["/app/cmd.sh"]
 # --------------------------------- # 
 FROM base AS development
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       version="3.3.2-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
