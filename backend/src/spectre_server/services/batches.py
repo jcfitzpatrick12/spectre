@@ -41,7 +41,7 @@ def _get_batch_file(
     return batch.get_file(extension)
 
 
-@spectre_server.coore.logs.log_call
+@spectre_server.core.logs.log_call
 def get_batch_file(
     file_name: str,
 ) -> str:
