@@ -249,7 +249,7 @@ class PanelStack:
         self._get_fig().clear()
         plt.close(self._fig)
         # Garbage collection seems to be required to prevent the memory leak.
-        # See https://github.com/jcfitzpatrick12/spectre/issues/128
+        # See https://github.com/spectregrams/spectre/issues/128
         gc.collect()
 
     def show(self) -> None:

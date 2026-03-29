@@ -15,13 +15,13 @@
 
 ## Getting started
 
-Check out our [GitHub Wiki here](https://github.com/jcfitzpatrick12/spectre/wiki). Quick links are provided below:  
+Check out our [GitHub Wiki here](https://github.com/spectregrams/spectre/wiki). Quick links are provided below:  
 
-- [Installation](https://github.com/jcfitzpatrick12/spectre/wiki/Installation)
-- [Tutorials](https://github.com/jcfitzpatrick12/spectre/wiki/Tutorials)
-- [Contributing](https://github.com/jcfitzpatrick12/spectre/wiki/Contributing)
+- [Installation](https://github.com/spectregrams/spectre/wiki/Installation)
+- [Tutorials](https://github.com/spectregrams/spectre/wiki/Tutorials)
+- [Contributing](https://github.com/spectregrams/spectre/wiki/Contributing)
 
-Track our progress and upcoming features on our [GitHub Project Board](https://github.com/users/jcfitzpatrick12/projects/3).
+Track our progress and upcoming features on our [GitHub Project Board](https://github.com/orgs/spectregrams/projects/1).
 
 ## About Us
 _Spectre_ is a free and open source SDR-agnostic program for recording radio signals and spectrograms. It's geared for hobbyists, citizen scientists, and academics who want to achieve scientifically interesting results at low cost. 
