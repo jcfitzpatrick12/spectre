@@ -7,7 +7,6 @@ import flask
 from ..services import recordings as services
 from ._format_responses import jsendify_response
 
-
 recordings_blueprint = flask.Blueprint("recordings", __name__, url_prefix="/recordings")
 
 

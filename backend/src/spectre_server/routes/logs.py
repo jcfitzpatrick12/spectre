@@ -10,7 +10,6 @@ from ..services import logs as services
 from ._format_responses import jsendify_response, serve_from_directory
 from ._utils import validate_date, is_true
 
-
 logs_blueprint = flask.Blueprint("logs", __name__, url_prefix="/spectre-data/logs")
 
 

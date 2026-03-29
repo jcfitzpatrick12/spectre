@@ -6,11 +6,11 @@ import typing
 import datetime
 import os
 
-import spectre_core.batches
-import spectre_core.receivers
-import spectre_core.config
-import spectre_core.spectrograms
-import spectre_core.plotting
+import spectre_server.core.batches
+import spectre_server.core.receivers
+import spectre_server.core.config
+import spectre_server.core.spectrograms
+import spectre_server.core.plotting
 
 
 def _get_batch(
@@ -18,26 +18,30 @@ def _get_batch(
     year: int,
     month: int,
     day: int,
-) -> spectre_core.batches.Base:
-    start_time, tag, _ = spectre_core.batches.parse_batch_file_name(file_name)
-    batches = spectre_core.batches.Batches(
+) -> spectre_server.core.batches.Base:
+    start_time, tag, _ = spectre_server.core.batches.parse_batch_file_name(file_name)
+    batches = spectre_server.core.batches.Batches(
         tag,
-        spectre_core.receivers.get_batch_cls(tag),
-        spectre_core.config.paths.get_batches_dir_path(year, month, day),
+        spectre_server.core.receivers.get_batch_cls(tag),
+        spectre_server.core.config.paths.get_batches_dir_path(year, month, day),
     )
     return batches[start_time]
 
 
 def _get_batch_file(
     file_name: str,
-) -> spectre_core.batches.BatchFile:
-    start_time, _, extension = spectre_core.batches.parse_batch_file_name(file_name)
-    dt = datetime.datetime.strptime(start_time, spectre_core.config.TimeFormat.DATETIME)
+) -> spectre_server.core.batches.BatchFile:
+    start_time, _, extension = spectre_server.core.batches.parse_batch_file_name(
+        file_name
+    )
+    dt = datetime.datetime.strptime(
+        start_time, spectre_server.core.config.TimeFormat.DATETIME
+    )
     batch = _get_batch(file_name, dt.year, dt.month, dt.day)
     return batch.get_file(extension)
 
 
-@spectre_core.logs.log_call
+@spectre_server.coore.logs.log_call
 def get_batch_file(
     file_name: str,
 ) -> str:
@@ -51,7 +55,7 @@ def get_batch_file(
     return batch_file.file_path
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_batch_files(
     tags: list[str],
     extensions: list[str],
@@ -73,10 +77,10 @@ def get_batch_files(
 
     batch_files = []
     for tag in tags:
-        batches = spectre_core.batches.Batches(
+        batches = spectre_server.core.batches.Batches(
             tag,
-            spectre_core.receivers.get_batch_cls(tag),
-            spectre_core.config.paths.get_batches_dir_path(year, month, day),
+            spectre_server.core.receivers.get_batch_cls(tag),
+            spectre_server.core.config.paths.get_batches_dir_path(year, month, day),
         )
 
         for batch in batches:
@@ -95,7 +99,7 @@ def get_batch_files(
     return sorted(batch_files)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def delete_batch_file(
     file_name: str,
     dry_run: bool = False,
@@ -112,7 +116,7 @@ def delete_batch_file(
     return batch_file.file_path
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def delete_batch_files(
     tags: list[str],
     extensions: list[str],
@@ -135,10 +139,10 @@ def delete_batch_files(
     """
     deleted_batch_files = []
     for tag in tags:
-        batches = spectre_core.batches.Batches(
+        batches = spectre_server.core.batches.Batches(
             tag,
-            spectre_core.receivers.get_batch_cls(tag),
-            spectre_core.config.paths.get_batches_dir_path(year, month, day),
+            spectre_server.core.receivers.get_batch_cls(tag),
+            spectre_server.core.config.paths.get_batches_dir_path(year, month, day),
         )
 
         for batch in batches:
@@ -156,7 +160,7 @@ def delete_batch_files(
     return deleted_batch_files
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_analytical_test_results(
     file_name: str, absolute_tolerance: float
 ) -> dict[str, bool | dict[float, bool]]:
@@ -171,21 +175,24 @@ def get_analytical_test_results(
     """
     batch_file = _get_batch_file(file_name)
 
-    _, tag, _ = spectre_core.batches.parse_batch_file_name(file_name)
+    _, tag, _ = spectre_server.core.batches.parse_batch_file_name(file_name)
 
     spectrogram = batch_file.read()
 
-    if not isinstance(spectrogram, spectre_core.spectrograms.Spectrogram):
+    if not isinstance(spectrogram, spectre_server.core.spectrograms.Spectrogram):
         raise ValueError(
             f"The file '{batch_file.file_name}' does not contain a spectrogram."
         )
 
-    config = spectre_core.receivers.read_config(tag)
-    if not config.receiver_name == spectre_core.receivers.ReceiverName.SIGNAL_GENERATOR:
+    config = spectre_server.core.receivers.read_config(tag)
+    if (
+        not config.receiver_name
+        == spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR
+    ):
         raise ValueError(
-            f"Expected receiver name '{spectre_core.receivers.ReceiverName.SIGNAL_GENERATOR}', but got '{config.receiver_name}."
+            f"Expected receiver name '{spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR}', but got '{config.receiver_name}."
         )
-    signal_generator = spectre_core.receivers.get_receiver(
+    signal_generator = spectre_server.core.receivers.get_receiver(
         "signal_generator", config.receiver_mode
     )
     return signal_generator.validate_analytically(
@@ -195,7 +202,7 @@ def get_analytical_test_results(
     )
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_tags(
     year: typing.Optional[int] = None,
     month: typing.Optional[int] = None,
@@ -208,7 +215,9 @@ def get_tags(
     :param day: Only look for batch files under this day. Defaults to None. If year and month are specified, but not day, find tags under that month.
     :return: A list of unique tags which have existing batch files in the file system.
     """
-    batches_dir_path = spectre_core.config.paths.get_batches_dir_path(year, month, day)
+    batches_dir_path = spectre_server.core.config.paths.get_batches_dir_path(
+        year, month, day
+    )
     batch_file_names = [
         os.path.basename(f)
         for (_, _, files) in os.walk(batches_dir_path)
@@ -216,7 +225,7 @@ def get_tags(
     ]
     tags = set()
     for batch_file_name in batch_file_names:
-        _, tag, _ = spectre_core.batches.parse_batch_file_name(batch_file_name)
+        _, tag, _ = spectre_server.core.batches.parse_batch_file_name(batch_file_name)
         tags.add(tag)
     return sorted(list(tags))
 
@@ -225,40 +234,44 @@ def _make_batches(
     tag: str,
     obs_date: datetime.date,
 ):
-    return spectre_core.batches.Batches(
+    return spectre_server.core.batches.Batches(
         tag,
-        spectre_core.receivers.get_batch_cls(tag),
-        spectre_core.config.paths.get_batches_dir_path(
+        spectre_server.core.receivers.get_batch_cls(tag),
+        spectre_server.core.config.paths.get_batches_dir_path(
             obs_date.year, obs_date.month, obs_date.day
         ),
     )
 
 
 def _get_spectrogram(
-    batches: spectre_core.batches.Batches,
+    batches: spectre_server.core.batches.Batches,
     obs_date: datetime.date,
     start_time: datetime.time,
     end_time: datetime.time,
     lower_freq: typing.Optional[float],
     upper_freq: typing.Optional[float],
-) -> spectre_core.spectrograms.Spectrogram:
+) -> spectre_server.core.spectrograms.Spectrogram:
     start_datetime = datetime.datetime.combine(obs_date, start_time)
     end_datetime = datetime.datetime.combine(obs_date, end_time)
     s = batches.get_spectrogram(start_datetime, end_datetime)
 
     if lower_freq is not None and upper_freq is not None:
-        return spectre_core.spectrograms.frequency_chop(s, lower_freq, upper_freq)
+        return spectre_server.core.spectrograms.frequency_chop(
+            s, lower_freq, upper_freq
+        )
     elif lower_freq is not None and upper_freq is None:
-        return spectre_core.spectrograms.frequency_chop(
+        return spectre_server.core.spectrograms.frequency_chop(
             s, lower_freq, s.frequencies[-1]
         )
     elif lower_freq is None and upper_freq is not None:
-        return spectre_core.spectrograms.frequency_chop(s, s.frequencies[0], upper_freq)
+        return spectre_server.core.spectrograms.frequency_chop(
+            s, s.frequencies[0], upper_freq
+        )
     else:
         return s
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def create_plot(
     tags: list[str],
     figsize: tuple[int, int],
@@ -294,13 +307,13 @@ def create_plot(
     """
     # Parse the datetimes
     obs_date_as_date = datetime.datetime.strptime(
-        obs_date, spectre_core.config.TimeFormat.DATE
+        obs_date, spectre_server.core.config.TimeFormat.DATE
     ).date()
     start_time_as_time = datetime.datetime.strptime(
-        start_time, spectre_core.config.TimeFormat.TIME
+        start_time, spectre_server.core.config.TimeFormat.TIME
     ).time()
     end_time_as_time = datetime.datetime.strptime(
-        end_time, spectre_core.config.TimeFormat.TIME
+        end_time, spectre_server.core.config.TimeFormat.TIME
     ).time()
 
     # Filter the batch files for each tag.
@@ -322,14 +335,14 @@ def create_plot(
 
     # Create the plot, and save it as a batch file.
     # TODO: Permit relative time type too.
-    panel_stack = spectre_core.plotting.PanelStack(
-        time_type=spectre_core.spectrograms.TimeType.DATETIMES,
+    panel_stack = spectre_server.core.plotting.PanelStack(
+        time_type=spectre_server.core.spectrograms.TimeType.DATETIMES,
         non_interactive=True,
         figsize=figsize,
     )
     for spectrogram in spectrograms:
         panel_stack.add_panel(
-            spectre_core.plotting.SpectrogramPanel(
+            spectre_server.core.plotting.SpectrogramPanel(
                 spectrogram, log_norm=log_norm, dBb=dBb, vmin=vmin, vmax=vmax
             )
         )

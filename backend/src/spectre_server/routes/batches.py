@@ -10,7 +10,6 @@ from ..services import batches as services
 from ._utils import validate_date, is_true
 from ._format_responses import jsendify_response, serve_from_directory
 
-
 batches_blueprint = flask.Blueprint(
     "batches", __name__, url_prefix="/spectre-data/batches"
 )

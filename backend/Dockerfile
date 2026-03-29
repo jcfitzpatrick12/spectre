@@ -386,7 +386,7 @@ RUN . ./build_oot_module.sh && \
 FROM oot_module AS gr_spectre
 
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v2.0.0 && \
+    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.0.0 && \
     rm -rf /tmp/*
 
 
@@ -526,18 +526,14 @@ COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
 # Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set backend/ && \
     git checkout && \
     pip install --editable backend/[test]
 
-# Get the latest version of `spectre-core`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
-    pip install --editable .[test]
-
 # Get the latest version of `gr-spectre`, but don't build it by default.
-RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git
+RUN git clone https://github.com/spectregrams/gr-spectre
         
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]

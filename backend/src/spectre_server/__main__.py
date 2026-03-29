@@ -2,10 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import spectre_core.logs
-
-spectre_core.logs.configure_root_logger(spectre_core.logs.ProcessType.USER)
-
 import flask
 
 from .config import SPECTRE_BIND_HOST, SPECTRE_BIND_PORT
@@ -14,6 +10,10 @@ from .routes.recordings import recordings_blueprint
 from .routes.batches import batches_blueprint
 from .routes.receivers import receivers_blueprint
 from .routes.logs import logs_blueprint
+
+from .core.logs import configure_root_logger, ProcessType
+
+configure_root_logger(ProcessType.USER)
 
 
 def make_app() -> flask.Flask:

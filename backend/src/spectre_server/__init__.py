@@ -3,3 +3,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 __version__ = "3.3.1-alpha"
+
+__all__ = ["core", "routes", "services"]

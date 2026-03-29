@@ -8,7 +8,6 @@ import typing
 from ..services import receivers as services
 from ._format_responses import jsendify_response
 
-
 receivers_blueprint = flask.Blueprint("receivers", __name__, url_prefix="/receivers")
 
 

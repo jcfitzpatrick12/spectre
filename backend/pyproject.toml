@@ -15,7 +15,12 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 dependencies = [
-    "spectre-core==3.1.1",
+    'numpy==1.24.0',
+    'pyfftw==0.15.0',
+    'astropy==6.0.1',
+    'pydantic==2.12.3',
+    'matplotlib==3.5.0',
+    'watchdog==4.0.0',
     "flask==2.3.2",
     "gunicorn==21.2.0"
 ]
@@ -23,4 +28,4 @@ license = { file = "LICENSE" }
 
 
 [project.optional-dependencies]
-test = ["pytest", "mypy", "black"]
+test = ["pytest==9.0.2", "mypy==1.19.1", "black==26.3.1"]

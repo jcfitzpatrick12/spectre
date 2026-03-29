@@ -11,7 +11,6 @@ from ..services import configs as services
 from ._format_responses import jsendify_response, serve_from_directory
 from ._utils import is_true
 
-
 configs_blueprint = flask.Blueprint(
     "configs", __name__, url_prefix="/spectre-data/configs"
 )

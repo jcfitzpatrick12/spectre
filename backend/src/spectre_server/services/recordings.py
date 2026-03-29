@@ -2,11 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import spectre_core.logs
-import spectre_core.receivers
+import spectre_server.core.logs
+import spectre_server.core.receivers
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def signal(
     tags: list[str],
     duration: float,
@@ -24,13 +24,13 @@ def signal(
     :param validate: If True, validate the config parameters. Defaults to True.
     :return: A string indicating the job has completed.
     """
-    configs = [spectre_core.receivers.read_config(tag) for tag in tags]
-    return spectre_core.receivers.record_signal(
+    configs = [spectre_server.core.receivers.read_config(tag) for tag in tags]
+    return spectre_server.core.receivers.record_signal(
         configs, duration, force_restart, max_restarts, skip_validation=not validate
     )
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def spectrograms(
     tags: list[str],
     duration: float,
@@ -48,7 +48,7 @@ def spectrograms(
     :param validate: If True, validate the config parameters. Defaults to True.
     :return: A string indicating the job has completed.
     """
-    configs = [spectre_core.receivers.read_config(tag) for tag in tags]
-    return spectre_core.receivers.record_spectrograms(
+    configs = [spectre_server.core.receivers.read_config(tag) for tag in tags]
+    return spectre_server.core.receivers.record_spectrograms(
         configs, duration, force_restart, max_restarts, skip_validation=not validate
     )

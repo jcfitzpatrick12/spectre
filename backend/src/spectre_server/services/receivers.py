@@ -4,17 +4,17 @@
 
 import typing
 
-import spectre_core.logs
-import spectre_core.receivers
+import spectre_server.core.logs
+import spectre_server.core.receivers
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_receivers() -> list[str]:
     """List the names of all supported receivers."""
-    return spectre_core.receivers.get_registered_receivers()
+    return spectre_server.core.receivers.get_registered_receivers()
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_modes(
     receiver_name: str,
 ) -> list[str]:
@@ -23,11 +23,11 @@ def get_modes(
     :param receiver_name: The name of the receiver.
     :return: The operating modes for the receiver.
     """
-    receiver = spectre_core.receivers.get_receiver(receiver_name)
+    receiver = spectre_server.core.receivers.get_receiver(receiver_name)
     return receiver.modes
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_model(receiver_name: str, receiver_mode: str) -> dict[str, typing.Any]:
     """Get the model for a receiver in a particular operating mode.
 
@@ -35,5 +35,5 @@ def get_model(receiver_name: str, receiver_mode: str) -> dict[str, typing.Any]:
     :param receiver_mode: The operating mode for the receiver.
     :return: The serialisable model.
     """
-    receiver = spectre_core.receivers.get_receiver(receiver_name, receiver_mode)
+    receiver = spectre_server.core.receivers.get_receiver(receiver_name, receiver_mode)
     return receiver.model_schema

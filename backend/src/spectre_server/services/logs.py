@@ -6,23 +6,25 @@
 from typing import Optional
 from datetime import datetime
 
-import spectre_core.logs
-import spectre_core.config
+import spectre_server.core.logs
+import spectre_server.core.config
 
 
 def _get_log(
     file_name: str,
-) -> spectre_core.logs.Log:
-    start_time, pid, process_type = spectre_core.logs.parse_log_file_name(file_name)
-    dt = datetime.strptime(start_time, spectre_core.config.TimeFormat.DATETIME)
-    logs = spectre_core.logs.Logs(
+) -> spectre_server.core.logs.Log:
+    start_time, pid, process_type = spectre_server.core.logs.parse_log_file_name(
+        file_name
+    )
+    dt = datetime.strptime(start_time, spectre_server.core.config.TimeFormat.DATETIME)
+    logs = spectre_server.core.logs.Logs(
         process_type,
-        spectre_core.config.paths.get_logs_dir_path(dt.year, dt.month, dt.day),
+        spectre_server.core.config.paths.get_logs_dir_path(dt.year, dt.month, dt.day),
     )
     return logs.get_from_pid(pid)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_log(
     file_name: str,
 ) -> str:
@@ -35,7 +37,7 @@ def get_log(
     return log.file_path
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_log_raw(
     file_name: str,
 ) -> str:
@@ -48,7 +50,7 @@ def get_log_raw(
     return log.read()
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_logs(
     process_types: list[str],
     year: Optional[int] = None,
@@ -68,16 +70,16 @@ def get_logs(
 
     log_file_paths = []
     for process_type in process_types:
-        logs = spectre_core.logs.Logs(
-            spectre_core.logs.ProcessType(process_type).value,
-            spectre_core.config.paths.get_logs_dir_path(year, month, day),
+        logs = spectre_server.core.logs.Logs(
+            spectre_server.core.logs.ProcessType(process_type).value,
+            spectre_server.core.config.paths.get_logs_dir_path(year, month, day),
         )
         log_file_paths += [log.file_path for log in logs]
 
     return log_file_paths
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def delete_log(
     file_name: str,
     dry_run: bool = False,
@@ -94,7 +96,7 @@ def delete_log(
     return log.file_path
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def delete_logs(
     process_types: list[str],
     year: Optional[int] = None,
@@ -115,9 +117,10 @@ def delete_logs(
     """
     deleted_file_paths = []
     for process_type in process_types:
-        proc_type = spectre_core.logs.ProcessType(process_type).value
-        logs = spectre_core.logs.Logs(
-            proc_type, spectre_core.config.paths.get_logs_dir_path(year, month, day)
+        proc_type = spectre_server.core.logs.ProcessType(process_type).value
+        logs = spectre_server.core.logs.Logs(
+            proc_type,
+            spectre_server.core.config.paths.get_logs_dir_path(year, month, day),
         )
         for log in logs:
             if not dry_run:
