@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -29,8 +29,8 @@ RUN pip install .
 # --------------------------------- # 
 FROM base AS runtime
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.3.1-alpha" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
+      version="3.3.2-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
@@ -56,8 +56,8 @@ USER appuser
 # --------------------------------- # 
 FROM base AS development
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.3.1-alpha" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
+      version="3.3.2-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
 
@@ -68,7 +68,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Clone the `spectre` repository and install the CLI in editable mode.
-RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set cli/ && \
     git checkout && \

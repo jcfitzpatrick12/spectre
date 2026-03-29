@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,7 +10,6 @@ import flask
 from ..services import configs as services
 from ._format_responses import jsendify_response, serve_from_directory
 from ._utils import is_true
-
 
 configs_blueprint = flask.Blueprint(
     "configs", __name__, url_prefix="/spectre-data/configs"

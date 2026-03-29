@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,16 +6,15 @@ import typing
 import os
 import logging
 
-import spectre_core.receivers
-import spectre_core.logs
-import spectre_core.config
-import spectre_core.batches
-
+import spectre_server.core.receivers
+import spectre_server.core.logs
+import spectre_server.core.config
+import spectre_server.core.batches
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_config(
     file_name: str,
 ) -> str:
@@ -24,32 +23,32 @@ def get_config(
     :param file_name: Look for a config with this file name.
     :return: The file path of the config if it exists in the file system, as an absolute path within the container's file system.
     """
-    tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
-    return spectre_core.receivers.get_config_file_path(tag)
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
+    return spectre_server.core.receivers.get_config_file_path(tag)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_config_raw(file_name: str) -> dict[str, typing.Any]:
     """Read a config file.
 
     :param file_name: The file name of the config.
     :return: The contents of the config, as a serialisable dictionary.
     """
-    tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
-    config = spectre_core.receivers.read_config(tag)
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
+    config = spectre_server.core.receivers.read_config(tag)
     return config.content
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def get_configs() -> list[str]:
     """Get the absolute file paths of all configs which exist in the file system."""
-    config_dir = spectre_core.config.paths.get_configs_dir_path()
+    config_dir = spectre_server.core.config.paths.get_configs_dir_path()
     return [entry.path for entry in os.scandir(config_dir) if entry.is_file()]
 
 
 def _has_batches(tag: str) -> bool:
-    batches = spectre_core.batches.Batches(
-        tag, spectre_core.receivers.get_batch_cls(tag)
+    batches = spectre_server.core.batches.Batches(
+        tag, spectre_server.core.receivers.get_batch_cls(tag)
     )
     return len(batches) > 0
 
@@ -105,7 +104,7 @@ def _parse_string_parameters(string_parameters: list[str]) -> dict[str, str]:
     return d
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def create_config(
     file_name: str,
     receiver_name: str,
@@ -130,11 +129,13 @@ def create_config(
     if string_parameters is None:
         string_parameters = []
 
-    receiver = spectre_core.receivers.get_receiver(receiver_name, mode=receiver_mode)
+    receiver = spectre_server.core.receivers.get_receiver(
+        receiver_name, mode=receiver_mode
+    )
 
-    tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
 
-    if os.path.exists(spectre_core.receivers.get_config_file_path(tag)):
+    if os.path.exists(spectre_server.core.receivers.get_config_file_path(tag)):
         _caution_update(tag, force)
 
     receiver.write_config(
@@ -143,10 +144,10 @@ def create_config(
         skip_validation=not validate or force,
     )
 
-    return spectre_core.receivers.get_config_file_path(tag)
+    return spectre_server.core.receivers.get_config_file_path(tag)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def update_config(
     file_name: str,
     string_parameters: list[str],
@@ -166,15 +167,15 @@ def update_config(
     :return: The file path of the successfully updated config, as an absolute path in the container's file system.
     :raises FileNotFoundError: If the config does not exist.
     """
-    tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
-    if not os.path.exists(spectre_core.receivers.get_config_file_path(tag)):
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
+    if not os.path.exists(spectre_server.core.receivers.get_config_file_path(tag)):
         raise FileNotFoundError(f"The config '{file_name}' does not exist.")
 
     _caution_update(tag, force)
-    config = spectre_core.receivers.read_config(tag)
+    config = spectre_server.core.receivers.read_config(tag)
     parameters = {**config.parameters, **_parse_string_parameters(string_parameters)}
 
-    receiver = spectre_core.receivers.get_receiver(
+    receiver = spectre_server.core.receivers.get_receiver(
         config.receiver_name, mode=config.receiver_mode
     )
     receiver.write_config(
@@ -182,10 +183,10 @@ def update_config(
         parameters,
         skip_validation=not validate or force,
     )
-    return spectre_core.receivers.get_config_file_path(tag)
+    return spectre_server.core.receivers.get_config_file_path(tag)
 
 
-@spectre_core.logs.log_call
+@spectre_server.core.logs.log_call
 def delete_config(file_name: str, dry_run: bool = False) -> str:
     """Delete a config.
 
@@ -193,8 +194,8 @@ def delete_config(file_name: str, dry_run: bool = False) -> str:
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted config, as an absolute path within the container's file system.
     """
-    tag, _ = spectre_core.receivers.parse_config_file_name(file_name)
-    config_file_path = spectre_core.receivers.get_config_file_path(tag)
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
+    config_file_path = spectre_server.core.receivers.get_config_file_path(tag)
     config_exists = os.path.exists(config_file_path)
 
     if config_exists:

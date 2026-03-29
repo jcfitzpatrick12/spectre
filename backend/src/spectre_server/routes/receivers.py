@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2025 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -7,7 +7,6 @@ import typing
 
 from ..services import receivers as services
 from ._format_responses import jsendify_response
-
 
 receivers_blueprint = flask.Blueprint("receivers", __name__, url_prefix="/receivers")
 

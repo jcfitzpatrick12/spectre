@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -386,7 +386,7 @@ RUN . ./build_oot_module.sh && \
 FROM oot_module AS gr_spectre
 
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/jcfitzpatrick12/gr-spectre.git v2.0.0 && \
+    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.0.0 && \
     rm -rf /tmp/*
 
 
@@ -421,8 +421,8 @@ COPY gunicorn.conf.py /opt/spectre_server/
 # --------------------------------- # 
 FROM base AS runtime
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.3.1-alpha" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
+      version="3.3.2-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -503,8 +503,8 @@ CMD ["/app/cmd.sh"]
 # --------------------------------- # 
 FROM base AS development
 
-LABEL maintainer="Jimmy Fitzpatrick <jcfitzpatrick12@gmail.com>" \
-      version="3.3.1-alpha" \
+LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
+      version="3.3.2-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -526,18 +526,14 @@ COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
 # Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/jcfitzpatrick12/spectre.git --no-checkout && cd spectre && \
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set backend/ && \
     git checkout && \
     pip install --editable backend/[test]
 
-# Get the latest version of `spectre-core`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/jcfitzpatrick12/spectre-core.git && cd spectre-core && \
-    pip install --editable .[test]
-
 # Get the latest version of `gr-spectre`, but don't build it by default.
-RUN git clone https://github.com/jcfitzpatrick12/gr-spectre.git
+RUN git clone https://github.com/spectregrams/gr-spectre
         
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
