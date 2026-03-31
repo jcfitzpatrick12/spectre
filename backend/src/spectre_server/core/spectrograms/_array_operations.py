@@ -35,14 +35,15 @@ def moving_average(
         # Nothing to do - arithmetic mean of one sample is itself.
         return array
 
-    num_windows: float = axis_length / window_size
+    num_windows = axis_length // window_size
+    remainder = axis_length % window_size
 
     # Force the axis length to be a multiple of the window size, so if the last window is partial,
     # we just average over remaining elements.
-    if not num_windows.is_integer():
+    if remainder:
 
         # We only need to pad the end of the axis we're averaging over.
-        width = window_size - axis_length % window_size
+        width = window_size - remainder
         pad_widths = [(0, 0) for _ in range(array.ndim)]
         pad_widths[axis] = (0, width)
 
