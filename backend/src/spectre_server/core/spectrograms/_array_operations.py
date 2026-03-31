@@ -54,7 +54,7 @@ def moving_average(
         num_windows += 1
 
     new_shape = list(array.shape)
-    new_shape[axis] = int(num_windows)
+    new_shape[axis] = num_windows
     new_shape.insert(axis + 1, window_size)
     return np.nanmean(array.reshape(new_shape), axis=axis + 1)
 
