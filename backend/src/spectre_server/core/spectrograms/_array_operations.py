@@ -8,65 +8,54 @@ import numpy as np
 import numpy.typing as npt
 
 
-def average_array(
-    array: npt.NDArray[np.float32], average_over: int, axis: int = 0
+def moving_average(
+    array: npt.NDArray[np.float32], window_size: int, axis: int = 0
 ) -> npt.NDArray[np.float32]:
-    """
-    Averages elements of an array in blocks along a specified axis.
+    """Applies a moving average along a specified axis by computing the arithmetic mean
+    over non-overlapping but exactly adjacent windows.
 
     :param array: Input array to be averaged.
-    :param average_over: Number of elements in each averaging block.
+    :param window_size: Number of items in the window.
     :param axis: Axis along which to perform the averaging, defaults to 0.
-    :raises TypeError: If `average_over` is not an integer.
-    :raises ValueError: If `average_over` is not in the range [1, size of the axis].
-    :raises ValueError: If `axis` is out of bounds for the array.
-    :return: Array of averaged values along the specified axis.
+    :return: A new array, averaged along the specified axis.
     """
-
-    # Get the size of the specified axis which we will average over
-    axis_size = array.shape[axis]
-    # Check if average_over is within the valid range
-    if not 1 <= average_over <= axis_size:
+    if window_size < 1:
         raise ValueError(
-            f"average_over must be between 1 and the length of the axis ({axis_size})"
+            f"Cannot average over windows of size {window_size}, must be more than one"
         )
 
-    max_axis_index = len(np.shape(array)) - 1
-    if axis > max_axis_index:  # zero indexing on specifying axis, so minus one
+    axis_length = array.shape[axis]
+    if window_size > axis_length:
         raise ValueError(
-            f"Requested axis is out of range of array dimensions. Axis: {axis}, max axis index: {max_axis_index}"
+            f"The window size ({window_size}) cannot be greater than the length of the axis ({axis})"
+            f"Got axis length {axis_length}"
         )
 
-    # find the number of elements in the requested axis
-    num_elements = array.shape[axis]
+    if window_size == 1:
+        # Nothing to do - arithmetic mean of one sample is itself.
+        return array
 
-    # find the number of "full blocks" to average over
-    num_full_blocks = num_elements // average_over
-    # if num_elements is not exactly divisible by average_over, we will have some elements left over
-    # these remaining elements will be padded with nans to become another full block
-    remainder = num_elements % average_over
+    num_windows: float = axis_length / window_size
 
-    # if there exists a remainder, pad the last block
-    if remainder != 0:
-        # initialise an array to hold the padding shape
-        padding_shape = [(0, 0)] * array.ndim
-        # pad after the last column in the requested axis
-        padding_shape[axis] = (0, average_over - remainder)
-        # pad with nan values (so to not contribute towards the mean computation)
-        array = np.pad(array, padding_shape, mode="constant", constant_values=np.nan)
+    # Force the axis length to be a multiple of the window size, so if the last window is partial,
+    # we just average over remaining elements.
+    if not num_windows.is_integer():
 
-    # initalise a list to hold the new shape
+        # We only need to pad the end of the axis we're averaging over.
+        width = window_size - axis_length % window_size
+        pad_widths = [(0, 0) for _ in range(array.ndim)]
+        pad_widths[axis] = (0, width)
+
+        # Turn the partial window at the end into a full window.
+        array = np.pad(
+            array, pad_width=pad_widths, mode="constant", constant_values=(np.nan,)
+        )
+        num_windows += 1
+
     new_shape = list(array.shape)
-    # update the shape on the requested access (to the number of blocks we will average over)
-    new_shape[axis] = num_full_blocks + (1 if remainder else 0)
-    # insert a new dimension, with the size of each block
-    new_shape.insert(axis + 1, average_over)
-    # and reshape the array to sort the array into the relevant blocks.
-    reshaped_array = array.reshape(new_shape)
-    # average over the newly created axis, essentially averaging over the blocks.
-    averaged_array = np.nanmean(reshaped_array, axis=axis + 1)
-    # return the averaged array
-    return averaged_array
+    new_shape[axis] = int(num_windows)
+    new_shape.insert(axis + 1, window_size)
+    return np.nanmean(array.reshape(new_shape), axis=axis + 1)
 
 
 T = typing.TypeVar("T", np.float32, np.datetime64)
