@@ -121,10 +121,11 @@ class FixedCenterFrequency(
         )
 
         spectrogram = spectre_server.core.spectrograms.time_average(
-            spectrogram, resolution=self.__model.time_resolution
+            spectrogram, max(self.__model.time_resolution, spectrogram.time_resolution)
         )
         spectrogram = spectre_server.core.spectrograms.frequency_average(
-            spectrogram, resolution=self.__model.frequency_resolution
+            spectrogram,
+            max(self.__model.frequency_resolution, spectrogram.frequency_resolution),
         )
 
         _LOGGER.info("Spectrogram created successfully")

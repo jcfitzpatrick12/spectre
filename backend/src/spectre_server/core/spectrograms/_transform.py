@@ -2,12 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import numpy as np
 import datetime
-import typing
 import math
 
-from ._array_operations import find_closest_index, average_array, time_elapsed
+import numpy as np
+
+from ._array_operations import find_closest_index, moving_average, time_elapsed
 from ._spectrogram import Spectrogram
 
 
@@ -132,103 +132,76 @@ def time_chop(
     )
 
 
-def _validate_and_compute_average_over(
-    original_resolution: float, resolution: typing.Optional[float], average_over: int
-) -> int:
-    """
-    Validates the input parameters and computes `average_over` if `resolution` is specified.
-
-    :param resolution: The desired resolution for averaging. Mutually exclusive with `average_over`.
-    :param average_over: The number of consecutive spectrums to average over. Mutually exclusive with `resolution`.
-    :param original_resolution: The original resolution (e.g., time or frequency).
-    :raises ValueError: If neither or both `resolution` and `average_over` are specified.
-    :return: The computed or validated `average_over` value.
-    """
-    if (resolution is None) and (average_over == 1):
-        return average_over
-
-    if not (resolution is not None) ^ (average_over != 1):
-        raise ValueError(
-            "Exactly one of 'resolution' or 'average_over' must be specified."
-        )
-
-    if resolution is not None:
-        return max(1, math.floor(resolution / original_resolution))
-
-    else:
-        return average_over
-
-
-def time_average(
-    spectrogram: Spectrogram,
-    resolution: typing.Optional[float] = None,
-    average_over: int = 1,
-) -> Spectrogram:
-    """
-    Performs time averaging on the spectrogram data.
+def time_average(spectrogram: Spectrogram, resolution: float) -> Spectrogram:
+    """Average a spectrogram in time to a desired resolution by applying a moving average.
 
     :param spectrogram: The input spectrogram to process.
-    :param resolution: The desired time resolution for averaging (seconds). Mutually exclusive with `average_over`.
-    :param average_over: The number of consecutive time points to average. Mutually exclusive with `resolution`.
-    :raises NotImplementedError: If the spectrogram lacks a defined start datetime.
-    :raises ValueError: If neither or both `resolution` and `average_over` are specified.
-    :return: A new spectrogram with time-averaged data.
+    :param resolution: The desired time resolution.
     """
-    if not spectrogram.start_datetime_is_set:
-        raise NotImplementedError(
-            "Time averaging is not supported for spectrograms without an assigned start datetime."
+
+    if resolution < spectrogram.time_resolution:
+        raise ValueError(
+            f"Desired time resolution {resolution} is less than the current {spectrogram.time_resolution}"
         )
 
-    average_over = _validate_and_compute_average_over(
-        spectrogram.time_resolution, resolution, average_over
+    if resolution >= spectrogram.time_range:
+        raise ValueError(
+            f"Desired time resolution {resolution} must be less than the time range {spectrogram.time_range}"
+        )
+
+    window_size = math.floor(resolution / spectrogram.time_resolution)
+    transformed_dynamic_spectra = moving_average(
+        spectrogram.dynamic_spectra, window_size, axis=1
     )
 
-    transformed_dynamic_spectra = average_array(
-        spectrogram.dynamic_spectra, average_over, axis=1
-    )
-
-    # Take the start time of each block (this preserves the original start time.)
-    transformed_times = spectrogram.times[0::average_over]
+    # Assign the start time of each window to as the time of each spectrum in the new spectrogram.
+    # This preserves the time of the first spectrum before and after the transformation.
+    transformed_times = spectrogram.times[0::window_size]
 
     return Spectrogram(
         transformed_dynamic_spectra,
         transformed_times,
         spectrogram.frequencies,
         spectrogram.spectrum_unit,
-        spectrogram.start_datetime,
+        start_datetime=(
+            spectrogram.start_datetime if spectrogram.start_datetime_is_set else None
+        ),
     )
 
 
-def frequency_average(
-    spectrogram: Spectrogram,
-    resolution: typing.Optional[float] = None,
-    average_over: int = 1,
-) -> Spectrogram:
-    """
-    Performs frequency averaging on the spectrogram data.
+def frequency_average(spectrogram: Spectrogram, resolution: float) -> Spectrogram:
+    """Average a spectrogram in frequency to a desired resolution by applying a moving average.
 
     :param spectrogram: The input spectrogram to process.
-    :param resolution: The desired frequency resolution for averaging (Hz). Mutually exclusive with `average_over`.
-    :param average_over: The number of consecutive frequency bins to average. Mutually exclusive with `resolution`.
-    :raises ValueError: If neither or both `resolution` and `average_over` are specified.
-    :return: A new spectrogram with frequency-averaged data.
+    :param resolution: The desired frequency resolution.
     """
-    average_over = _validate_and_compute_average_over(
-        spectrogram.frequency_resolution, resolution, average_over
+
+    if resolution < spectrogram.frequency_resolution:
+        raise ValueError(
+            f"Desired frequency resolution {resolution} is less than the current {spectrogram.frequency_resolution}"
+        )
+
+    if resolution >= spectrogram.frequency_range:
+        raise ValueError(
+            f"Desired frequency resolution {resolution} must be less than the frequency range {spectrogram.time_range}"
+        )
+
+    window_size = math.floor(resolution / spectrogram.frequency_resolution)
+    transformed_dynamic_spectra = moving_average(
+        spectrogram.dynamic_spectra, window_size, axis=0
     )
 
-    # Perform averaging
-    transformed_dynamic_spectra = average_array(
-        spectrogram.dynamic_spectra, average_over, axis=0
-    )
-    transformed_frequencies = average_array(spectrogram.frequencies, average_over)
+    # Contrary to the time average, average over the frequencies corresponding to each spectral component per window.
+    transformed_frequencies = moving_average(spectrogram.frequencies, window_size)
 
     return Spectrogram(
         transformed_dynamic_spectra,
         spectrogram.times,
         transformed_frequencies,
         spectrogram.spectrum_unit,
-        spectrogram.start_datetime,
+        start_datetime=(
+            spectrogram.start_datetime if spectrogram.start_datetime_is_set else None
+        ),
     )
 
 
