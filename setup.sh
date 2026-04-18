@@ -40,6 +40,8 @@ echo "Writing udev rules to $UDEV_FILE"
     echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"1d50\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
     echo '# RTL-SDR'
     echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"0bda\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
+    echo '# SDDC'
+    echo "SUBSYSTEM==\"usb\", ENV{ID_VENDOR_ID}==\"04b4\", MODE=\"0660\", GROUP=\"$SPECTRE_GROUP\""
 } > "$UDEV_FILE"
 
 # Apply the new udev rules.
