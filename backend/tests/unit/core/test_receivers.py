@@ -141,6 +141,7 @@ class TestReceivers:
             spectre_server.core.receivers.ReceiverName.HACKRF,
             spectre_server.core.receivers.ReceiverName.HACKRFONE,
             spectre_server.core.receivers.ReceiverName.RTLSDR,
+            spectre_server.core.receivers.ReceiverName.RX888MK2,
         ],
     )
     def test_construction(self, receiver_name: str) -> None:
@@ -159,6 +160,7 @@ class TestReceivers:
             spectre_server.core.receivers.ReceiverName.HACKRF,
             spectre_server.core.receivers.ReceiverName.HACKRFONE,
             spectre_server.core.receivers.ReceiverName.RTLSDR,
+            spectre_server.core.receivers.ReceiverName.RX888MK2,
         ],
     )
     def test_write_default_config(

@@ -20,6 +20,7 @@ class ReceiverName:
     :ivar HACKRF: Any general HackRF receiver.
     :ivar HACKRFONE: Hack RF One.
     :ivar RTLSDR: RTL-SDR.
+    :ivar RX888MK2: RX-888 MK II.
     """
 
     CUSTOM = "custom"
@@ -33,3 +34,4 @@ class ReceiverName:
     HACKRF = "hackrf"
     HACKRFONE = "hackrfone"
     RTLSDR = "rtlsdr"
+    RX888MK2 = "rx888mk2"
