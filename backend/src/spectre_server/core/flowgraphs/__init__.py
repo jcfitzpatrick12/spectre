@@ -41,6 +41,11 @@ from ._usrp import (
 )
 from ._hackrf import HackRFFixedCenterFrequency, HackRFFixedCenterFrequencyModel
 from ._rtlsdr import RTLSDRFixedCenterFrequency, RTLSDRFixedCenterFrequencyModel
+from ._rx888mk2 import (
+    RX888MK2FixedCenterFrequency,
+    RX888MK2FixedCenterFrequencyModel,
+    RX888MK2Port,
+)
 
 __all__ = [
     "Base",
@@ -73,4 +78,7 @@ __all__ = [
     "HackRFFixedCenterFrequencyModel",
     "RTLSDRFixedCenterFrequency",
     "RTLSDRFixedCenterFrequencyModel",
+    "RX888MK2FixedCenterFrequency",
+    "RX888MK2FixedCenterFrequencyModel",
+    "RX888MK2Port",
 ]

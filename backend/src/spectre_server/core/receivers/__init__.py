@@ -26,6 +26,7 @@ from ._b200mini import B200mini
 from ._hackrf import HackRF
 from ._hackrfone import HackRFOne
 from ._rtlsdr import RTLSDR
+from ._rx888mk2 import RX888MK2
 from ._record import record_signal, record_spectrograms
 
 __all__ = [

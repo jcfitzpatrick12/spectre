@@ -343,6 +343,27 @@ RUN git clone --depth 1 -b soapy-rtl-sdr-0.3.3 https://github.com/pothosware/Soa
     rm -rf /tmp/*
 
 # --------------------------------------------- #
+# Install the Soapy SDDC plugin.
+# --------------------------------------------- #
+FROM build AS soapy_sddc
+
+WORKDIR /tmp
+
+# TODO: At the time of writing, there's nothing to pin since the [latest tag](https://github.com/ik1xpv/ExtIO_sddc/releases/tag/v1.2.0) 
+# does not provide the Soapy plugin. A stable fork is used instead, for consistent builds. Revisit this when we can pin the version from the 
+# official repository.
+RUN git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
+    cd ExtIO_sddc && \
+    mkdir build && \
+    cd build && \
+    cmake -Wno-dev \
+          -DCMAKE_INSTALL_PREFIX=/opt/soapy_sddc \
+          .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    rm -rf /tmp/*
+
+# --------------------------------------------- #
 # Shared build dependencies for OOT modules.
 # --------------------------------------------- #
 FROM build AS oot_module
@@ -422,7 +443,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.3.3-alpha" \
+      version="3.4.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -446,6 +467,9 @@ COPY --from=soapy_hackrf /opt/soapy_hackrf/lib /usr/local/lib
 COPY --from=rtlsdr /opt/rtlsdr/bin /usr/bin
 COPY --from=rtlsdr /opt/rtlsdr/lib /usr/lib
 COPY --from=soapy_rtlsdr /opt/soapy_rtlsdr/lib /usr/local/lib
+
+# Copy in the sddc runtime dependencies.
+COPY --from=soapy_sddc /opt/soapy_sddc/lib /usr/local/lib
 
 # Copy in the UHD runtime dependencies.
 COPY --from=uhd /opt/uhd/lib /usr/lib
@@ -504,7 +528,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.3.3-alpha" \
+      version="3.4.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
