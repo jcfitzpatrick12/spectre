@@ -2,6 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-__version__ = "3.4.0-alpha"
+__version__ = "3.4.1-alpha"
 
 __all__ = ["core", "routes", "services"]
