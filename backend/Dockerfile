@@ -349,10 +349,15 @@ FROM build AS soapy_sddc
 
 WORKDIR /tmp
 
+ARG TARGETARCH
+
 # TODO: At the time of writing, there's nothing to pin since the [latest tag](https://github.com/ik1xpv/ExtIO_sddc/releases/tag/v1.2.0) 
 # does not provide the Soapy plugin. A stable fork is used instead, for consistent builds. Revisit this when we can pin the version from the 
 # official repository.
-RUN git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
+# NOTE: ExtIO_sddc does not yet compile with the platform linux/arm64. In that case, create an empty directory so we have something to copy
+# into the runtime target.
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+    git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
     mkdir build && \
     cd build && \
@@ -361,7 +366,10 @@ RUN git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
           .. && \
     make -j"$(nproc)" && \
     make install && \
-    rm -rf /tmp/*
+    rm -rf /tmp/*; \
+    else \
+    mkdir -p /opt/soapy_sddc/lib; \
+    fi
 
 # --------------------------------------------- #
 # Shared build dependencies for OOT modules.
