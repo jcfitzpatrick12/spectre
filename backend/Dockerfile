@@ -349,10 +349,15 @@ FROM build AS soapy_sddc
 
 WORKDIR /tmp
 
+ARG TARGETARCH
+
 # TODO: At the time of writing, there's nothing to pin since the [latest tag](https://github.com/ik1xpv/ExtIO_sddc/releases/tag/v1.2.0) 
 # does not provide the Soapy plugin. A stable fork is used instead, for consistent builds. Revisit this when we can pin the version from the 
 # official repository.
-RUN git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
+# NOTE: ExtIO_sddc does not yet compile on linux/arm64, so we can't support devices that use it on that platform.
+# An empty directory is created as a placeholder, so the COPY instruction to the runtime target doesn't fail.
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+    git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
     mkdir build && \
     cd build && \
@@ -361,7 +366,10 @@ RUN git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
           .. && \
     make -j"$(nproc)" && \
     make install && \
-    rm -rf /tmp/*
+    rm -rf /tmp/*; \
+    else \
+    mkdir -p /opt/soapy_sddc/lib; \
+    fi
 
 # --------------------------------------------- #
 # Shared build dependencies for OOT modules.
@@ -443,7 +451,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.0-alpha" \
+      version="3.4.1-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -528,7 +536,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.0-alpha" \
+      version="3.4.1-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
