@@ -20,4 +20,5 @@ def test_get_receivers() -> None:
         "hackrfone",
         "rtlsdr",
         "rsp1b",
+        "rx888mk2",
     ]
