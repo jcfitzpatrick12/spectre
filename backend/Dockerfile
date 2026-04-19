@@ -354,8 +354,8 @@ ARG TARGETARCH
 # TODO: At the time of writing, there's nothing to pin since the [latest tag](https://github.com/ik1xpv/ExtIO_sddc/releases/tag/v1.2.0) 
 # does not provide the Soapy plugin. A stable fork is used instead, for consistent builds. Revisit this when we can pin the version from the 
 # official repository.
-# NOTE: ExtIO_sddc does not yet compile with the platform linux/arm64. In that case, create an empty directory so we have something to copy
-# into the runtime target.
+# NOTE: ExtIO_sddc does not yet compile on linux/arm64, so we can't support devices that use it on that platform.
+# An empty directory is created as a placeholder, so the COPY instruction to the runtime target doesn't fail.
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
     git clone --depth 1 https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
