@@ -22,6 +22,7 @@ RF_GAIN_LOWER_BOUND = -31.5
 RF_GAIN_UPPER_BOUND = 0
 IF_GAIN_LOWER_BOUND = -24.583
 IF_GAIN_UPPER_BOUND = 33.1409
+EXPECTED_OUTPUT_TYPES: list[str] = ["fc32"]
 
 
 class RX888MK2FixedCenterFrequency(
@@ -59,4 +60,5 @@ class RX888MK2FixedCenterFrequency(
             name="if_gain",
         )
         validate_one_of(self.sample_rate, HF_ALLOWED_SAMPLE_RATES, "sample_rate")
+        validate_one_of(self.output_type, EXPECTED_OUTPUT_TYPES, "output_type")
         return self
