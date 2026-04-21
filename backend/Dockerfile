@@ -415,7 +415,7 @@ RUN . ./build_oot_module.sh && \
 FROM oot_module AS gr_spectre
 
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.0.0 && \
+    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.1.0 && \
     rm -rf /tmp/*
 
 
