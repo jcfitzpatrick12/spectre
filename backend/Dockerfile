@@ -415,7 +415,7 @@ RUN . ./build_oot_module.sh && \
 FROM oot_module AS gr_spectre
 
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.0.0 && \
+    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.1.0 && \
     rm -rf /tmp/*
 
 
@@ -451,7 +451,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.1-alpha" \
+      version="3.4.2-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -536,7 +536,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.1-alpha" \
+      version="3.4.2-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
