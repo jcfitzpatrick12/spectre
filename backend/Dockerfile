@@ -451,7 +451,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.1-alpha" \
+      version="3.4.2-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -536,7 +536,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.4.1-alpha" \
+      version="3.4.2-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
