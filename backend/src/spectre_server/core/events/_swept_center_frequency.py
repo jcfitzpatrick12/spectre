@@ -176,7 +176,7 @@ def _compute_times(
         end_step = (sweep_index + 1) * num_steps_per_sweep
 
         # Update cumulative samples
-        cumulative_samples += np.sum(num_samples[start_step:end_step])
+        cumulative_samples += int(np.sum(num_samples[start_step:end_step]))
 
 
 def _swept_stfft(
