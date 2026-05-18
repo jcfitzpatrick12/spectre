@@ -43,7 +43,7 @@ def _average_over_steps(
 
 
 def _compute_num_max_frames_in_step(
-    num_samples: npt.NDArray[np.int32], window_size: int, window_hop: int
+    num_samples: npt.NDArray[np.int64], window_size: int, window_hop: int
 ) -> int:
     """Compute the maximum number of frames for all steps, and all sweeps, in the batch."""
     return get_num_spectrums(int(np.max(num_samples)), window_size, window_hop)
@@ -101,7 +101,7 @@ def _compute_stepped_dynamic_spectra(
     window_hop: int,
     num_full_sweeps: int,
     num_steps_per_sweep: int,
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.int64],
 ) -> None:
     """For each full sweep, compute execute a short-time discrete Fourier transform on the IQ samples for each step."""
     # Store the step index over all sweeps (doesn't reset each sweep).
@@ -159,7 +159,7 @@ def _compute_frequencies(
 
 def _compute_times(
     times: npt.NDArray[np.float32],
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.int64],
     sample_rate: float,
     num_full_sweeps: int,
     num_steps_per_sweep: int,
@@ -188,7 +188,7 @@ def _swept_stfft(
     sample_rate: float,
     frequency_hop: float,
     center_frequencies: npt.NDArray[np.float32],
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.int64],
 ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.float32], npt.NDArray[np.float32]]:
     _validate_center_frequencies_ordering(center_frequencies, frequency_hop)
 
@@ -239,10 +239,10 @@ def _swept_stfft(
 
 
 def _prepend_num_samples(
-    carryover_num_samples: npt.NDArray[np.int32],
-    num_samples: npt.NDArray[np.int32],
+    carryover_num_samples: npt.NDArray[np.int64],
+    num_samples: npt.NDArray[np.int64],
     final_step_spans_two_batches: bool,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.int64]:
     """Prepend the number of samples from the final sweep of the previous batch, to the first
     sweep of the current batch."""
     if final_step_spans_two_batches:
@@ -278,7 +278,7 @@ def _prepend_iq_data(
 def _get_final_sweep(
     previous_iq_data: npt.NDArray[np.complex64],
     previous_iq_metadata: spectre_server.core.batches.IQMetadata,
-) -> tuple[npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int32]]:
+) -> tuple[npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int64]]:
     """Get IQ samples and metadata from the final sweep of the previous batch."""
 
     if (
@@ -322,7 +322,7 @@ def _reconstruct_initial_sweep(
     iq_data: npt.NDArray[np.complex64],
     iq_metadata: spectre_server.core.batches.IQMetadata,
 ) -> tuple[
-    npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int32], int
+    npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int64], int
 ]:
     """Reconstruct the initial sweep of the current batch, using data from the previous batch.
 
