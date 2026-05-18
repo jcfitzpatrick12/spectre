@@ -102,9 +102,9 @@ class _HdrFile(BatchFile[IQMetadata]):
         n_entries = raw.size // entry_bytes
         raw = raw[:n_entries * entry_bytes]
 
-        values = np.frombuffer(raw.tobytes(), dtype=np.float32, count=n_entries, offset=0)
-        nsamples = np.frombuffer(raw.tobytes(), dtype=np.uint64, count=n_entries, offset=4)
-        return IQMetadata(values, nsamples.astype(np.int64))
+        dt = np.dtype([('value', '<f4'), ('nsamples', '<u8')])
+        structured = np.frombuffer(raw.tobytes(), dtype=dt)
+        return IQMetadata(structured['value'], structured['nsamples'].astype(np.int64))
 
 
 class _FitsFile(BatchFile[spectre_server.core.spectrograms.Spectrogram]):
