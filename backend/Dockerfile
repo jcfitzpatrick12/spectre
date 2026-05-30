@@ -552,7 +552,7 @@ COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
 # Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/robrui/spectre.git -b fix/hdr-uint64-counts --no-checkout && cd spectre && \
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set backend/ && \
     git checkout && \
