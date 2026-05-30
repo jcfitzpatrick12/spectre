@@ -86,7 +86,7 @@ class IQMetadata:
     """
 
     center_frequencies: npt.NDArray[np.float32]
-    num_samples: npt.NDArray[np.int64]
+    num_samples: npt.NDArray[np.uint64]
 
 
 class _HdrFile(BatchFile[IQMetadata]):
@@ -96,15 +96,9 @@ class _HdrFile(BatchFile[IQMetadata]):
 
         :return: A container for the metadata
         """
-        # The binary layout is [value_float32, nsamples_uint64] repeated (12 bytes per entry).
-        raw = np.fromfile(self.file_path, dtype=np.uint8)
-        entry_bytes = 12
-        n_entries = raw.size // entry_bytes
-        raw = raw[: n_entries * entry_bytes]
-
-        dt = np.dtype([("value", "<f4"), ("nsamples", "<u8")])
-        structured = np.frombuffer(raw.tobytes(), dtype=dt)
-        return IQMetadata(structured["value"], structured["nsamples"].astype(np.int64))
+        dt = np.dtype([("value", np.float32), ("num_samples", np.uint64)])
+        metadata = np.fromfile(self.file_path, dtype=dt)
+        return IQMetadata(metadata["value"], metadata["num_samples"])
 
 
 class _FitsFile(BatchFile[spectre_server.core.spectrograms.Spectrogram]):
