@@ -43,7 +43,7 @@ def _average_over_steps(
 
 
 def _compute_num_max_frames_in_step(
-    num_samples: npt.NDArray[np.int32], window_size: int, window_hop: int
+    num_samples: npt.NDArray[np.uint64], window_size: int, window_hop: int
 ) -> int:
     """Compute the maximum number of frames for all steps, and all sweeps, in the batch."""
     return get_num_spectrums(int(np.max(num_samples)), window_size, window_hop)
@@ -101,7 +101,7 @@ def _compute_stepped_dynamic_spectra(
     window_hop: int,
     num_full_sweeps: int,
     num_steps_per_sweep: int,
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.uint64],
 ) -> None:
     """For each full sweep, compute execute a short-time discrete Fourier transform on the IQ samples for each step."""
     # Store the step index over all sweeps (doesn't reset each sweep).
@@ -113,12 +113,11 @@ def _compute_stepped_dynamic_spectra(
         for step_index in range(num_steps_per_sweep):
 
             # Extract how many samples are in the current step from the metadata.
-            end_sample_index = start_sample_index + num_samples[global_step_index]
+            samples_in_step = int(num_samples[global_step_index])
+            end_sample_index = start_sample_index + samples_in_step
 
             # Compute the number of frames we can squeeze into the current step.
-            num_frames = get_num_spectrums(
-                num_samples[global_step_index], window.size, window_hop
-            )
+            num_frames = get_num_spectrums(samples_in_step, window.size, window_hop)
 
             # Execute a short time discrete fourier transform on the step, then shift the
             # zero-frequency component to the middle of the spectrum.
@@ -159,7 +158,7 @@ def _compute_frequencies(
 
 def _compute_times(
     times: npt.NDArray[np.float32],
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.uint64],
     sample_rate: float,
     num_full_sweeps: int,
     num_steps_per_sweep: int,
@@ -176,7 +175,7 @@ def _compute_times(
         end_step = (sweep_index + 1) * num_steps_per_sweep
 
         # Update cumulative samples
-        cumulative_samples += np.sum(num_samples[start_step:end_step])
+        cumulative_samples += int(np.sum(num_samples[start_step:end_step]))
 
 
 def _swept_stfft(
@@ -188,7 +187,7 @@ def _swept_stfft(
     sample_rate: float,
     frequency_hop: float,
     center_frequencies: npt.NDArray[np.float32],
-    num_samples: npt.NDArray[np.int32],
+    num_samples: npt.NDArray[np.uint64],
 ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.float32], npt.NDArray[np.float32]]:
     _validate_center_frequencies_ordering(center_frequencies, frequency_hop)
 
@@ -239,10 +238,10 @@ def _swept_stfft(
 
 
 def _prepend_num_samples(
-    carryover_num_samples: npt.NDArray[np.int32],
-    num_samples: npt.NDArray[np.int32],
+    carryover_num_samples: npt.NDArray[np.uint64],
+    num_samples: npt.NDArray[np.uint64],
     final_step_spans_two_batches: bool,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.uint64]:
     """Prepend the number of samples from the final sweep of the previous batch, to the first
     sweep of the current batch."""
     if final_step_spans_two_batches:
@@ -278,7 +277,7 @@ def _prepend_iq_data(
 def _get_final_sweep(
     previous_iq_data: npt.NDArray[np.complex64],
     previous_iq_metadata: spectre_server.core.batches.IQMetadata,
-) -> tuple[npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int32]]:
+) -> tuple[npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.uint64]]:
     """Get IQ samples and metadata from the final sweep of the previous batch."""
 
     if (
@@ -301,14 +300,15 @@ def _get_final_sweep(
         final_sweep_start_step_index:
     ]
     final_num_samples = previous_iq_metadata.num_samples[final_sweep_start_step_index:]
-    final_iq_data = previous_iq_data[-np.sum(final_num_samples) :]
+    final_iq_data = previous_iq_data[-int(np.sum(final_num_samples, dtype=np.uint64)) :]
 
     # Do a sanity check on the number of samples in the final sweep
-    if len(final_iq_data) != np.sum(final_num_samples):
+    expected_num_samples = int(np.sum(final_num_samples))
+    if len(final_iq_data) != expected_num_samples:
         raise ValueError(
             (
                 f"Unexpected error! Mismatch in sample count for the final sweep data."
-                f"Expected {np.sum(final_num_samples)} based on sweep metadata, but found "
+                f"Expected {expected_num_samples} based on sweep metadata, but found "
                 f" {len(final_iq_data)} IQ samples in the final sweep"
             )
         )
@@ -322,7 +322,7 @@ def _reconstruct_initial_sweep(
     iq_data: npt.NDArray[np.complex64],
     iq_metadata: spectre_server.core.batches.IQMetadata,
 ) -> tuple[
-    npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.int32], int
+    npt.NDArray[np.complex64], npt.NDArray[np.float32], npt.NDArray[np.uint64], int
 ]:
     """Reconstruct the initial sweep of the current batch, using data from the previous batch.
 
