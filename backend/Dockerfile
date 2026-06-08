@@ -354,7 +354,7 @@ ARG TARGETARCH
 # Use a custom fork with a patch providing support for the RX-888 MK II on the platform `linux/arm64`.
 # See PR: (https://github.com/ik1xpv/ExtIO_sddc/pull/246).
 # TODO: Buld ExtIO_sddc from an official branch.
-RUN git clone --depth 1 -b v0.0.2 https://github.com/spectregrams/ExtIO_sddc && \
+RUN git clone --depth 1 -b v0.0.3 https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
     mkdir build && \
     cd build && \
