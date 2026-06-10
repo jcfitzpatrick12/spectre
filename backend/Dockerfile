@@ -354,7 +354,7 @@ ARG TARGETARCH
 # Use a custom fork with a patch providing support for the RX-888 MK II on the platform `linux/arm64`.
 # See PR: (https://github.com/ik1xpv/ExtIO_sddc/pull/246).
 # TODO: Buld ExtIO_sddc from an official branch.
-RUN git clone --depth 1 -b v0.0.3 https://github.com/spectregrams/ExtIO_sddc && \
+RUN git clone --depth 1 -b v0.0.5 https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
     mkdir build && \
     cd build && \
@@ -445,7 +445,7 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.5.3-alpha" \
+      version="3.5.4-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -530,7 +530,7 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="3.5.3-alpha" \
+      version="3.5.4-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
