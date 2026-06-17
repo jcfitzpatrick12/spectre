@@ -27,9 +27,13 @@ class SpectrumUnit(enum.Enum):
     """A defined unit for dynamic spectra values.
 
     :ivar AMPLITUDE: DFT amplitude (see https://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html)
+    :ivar CALLISTO_DIGITS: 8-bit "digit" values per the e-Callisto FITS convention
+    (https://www.e-callisto.org/), used by `Spectrogram.save()` to dispatch to the
+    CALLISTO-shaped writer.
     """
 
     AMPLITUDE = "amplitude"
+    CALLISTO_DIGITS = "digits"
 
 
 @dataclasses.dataclass
@@ -509,9 +513,54 @@ class Spectrogram:
         obs_alt: float,
         obs_lat: float,
         obs_lon: float,
+        obs_lac: str,
+        obs_loc: str,
         batches_dir_path: typing.Optional[str] = None,
     ) -> None:
         """Write the spectrogram and its associated metadata to a batch file in the FITS format."""
+        # TODO: A per-unit writer registry would let callers pass the model directly and remove the duplication.
+        if self._spectrum_unit == SpectrumUnit.CALLISTO_DIGITS:
+            return self._save_callisto(
+                tag,
+                origin,
+                instrument,
+                telescope,
+                object,
+                obs_alt,
+                obs_lat,
+                obs_lon,
+                obs_lac,
+                obs_loc,
+                batches_dir_path,
+            )
+        return self._save_default(
+            tag,
+            origin,
+            instrument,
+            telescope,
+            object,
+            obs_alt,
+            obs_lat,
+            obs_lon,
+            obs_lac,
+            obs_loc,
+            batches_dir_path,
+        )
+
+    def _save_default(
+        self,
+        tag: str,
+        origin: str,
+        instrument: str,
+        telescope: str,
+        object: str,
+        obs_alt: float,
+        obs_lat: float,
+        obs_lon: float,
+        obs_lac: str,
+        obs_loc: str,
+        batches_dir_path: typing.Optional[str] = None,
+    ) -> None:
         # Create the primary HDU.
         primary_hdu = astropy.io.fits.PrimaryHDU(self.dynamic_spectra)
 
@@ -570,9 +619,9 @@ class Spectrogram:
         primary_hdu.header.set("CDELT2", self.frequency_resolution)
 
         primary_hdu.header.set("OBS_LAT", f"{obs_lat}")
-        primary_hdu.header.set("OBS_LAC", "N")
+        primary_hdu.header.set("OBS_LAC", obs_lac)
         primary_hdu.header.set("OBS_LON", f"{obs_lon}")
-        primary_hdu.header.set("OBS_LOC", "W")
+        primary_hdu.header.set("OBS_LOC", obs_loc)
         primary_hdu.header.set("OBS_ALT", f"{obs_alt}")
 
         # Create the Binary table HDU, wrapping the arrays to mimic the e-CALLISTO FITS files.
@@ -597,7 +646,120 @@ class Spectrogram:
 
         # Combine the HDUs, and write them to the filesystem as a file in the FITS format.
         hdul = astropy.io.fits.HDUList([primary_hdu, bin_table_hdu])
+        self._write_hdul(hdul, tag, batches_dir_path)
 
+    def _save_callisto(
+        self,
+        tag: str,
+        origin: str,
+        instrument: str,
+        telescope: str,
+        object: str,
+        obs_alt: float,
+        obs_lat: float,
+        obs_lon: float,
+        obs_lac: str,
+        obs_loc: str,
+        batches_dir_path: typing.Optional[str] = None,
+    ) -> None:
+        # Flip along frequency: e-CALLISTO viewers expect a descending frequency axis.
+        digits = np.round(np.clip(self.dynamic_spectra[::-1, :], 0, 255)).astype(
+            np.uint8
+        )
+
+        primary_hdu = astropy.io.fits.PrimaryHDU(digits)
+
+        start_datetime = typing.cast(
+            datetime.datetime, self.datetimes[0].astype(datetime.datetime)
+        )
+        end_datetime = typing.cast(
+            datetime.datetime, self.datetimes[-1].astype(datetime.datetime)
+        )
+        date_dashes = start_datetime.strftime("%Y-%m-%d")
+        date_slashes = start_datetime.strftime("%Y/%m/%d")
+        time_obs = start_datetime.strftime("%H:%M:%S.%f")[:-3]
+        date_end = end_datetime.strftime("%Y/%m/%d")
+        time_end = end_datetime.strftime("%H:%M:%S")
+
+        frequencies_descending_MHz = (self.frequencies * 1e-6)[::-1]
+
+        primary_hdu.header.set("SIMPLE", True)
+        primary_hdu.header.set("BITPIX", 8)
+        primary_hdu.header.set("NAXIS", 2)
+        primary_hdu.header.set("NAXIS1", self.num_times)
+        primary_hdu.header.set("NAXIS2", self.num_frequencies)
+        primary_hdu.header.set("EXTEND", True)
+
+        primary_hdu.header.set("DATE", date_dashes)
+        primary_hdu.header.set(
+            "CONTENT",
+            f"{date_slashes}  Radio flux density, e-CALLISTO ({instrument})",
+        )
+        primary_hdu.header.set("ORIGIN", origin)
+        primary_hdu.header.set("TELESCOP", telescope)
+        primary_hdu.header.set("INSTRUME", instrument)
+        primary_hdu.header.set("OBJECT", object)
+
+        primary_hdu.header.set("DATE-OBS", date_slashes)
+        primary_hdu.header.set("TIME-OBS", time_obs)
+        primary_hdu.header.set("DATE-END", date_end)
+        primary_hdu.header.set("TIME-END", time_end)
+
+        primary_hdu.header.set("BZERO", 0.0)
+        primary_hdu.header.set("BSCALE", 1.0)
+        primary_hdu.header.set("BUNIT", self.spectrum_unit.value)
+
+        primary_hdu.header.set("DATAMIN", int(digits.min()))
+        primary_hdu.header.set("DATAMAX", int(digits.max()))
+
+        primary_hdu.header.set("CRVAL1", float(_seconds_of_day(start_datetime)))
+        primary_hdu.header.set("CRPIX1", 0)
+        primary_hdu.header.set("CTYPE1", "Time [UT]")
+        primary_hdu.header.set("CDELT1", self.time_resolution)
+
+        primary_hdu.header.set("CRVAL2", float(frequencies_descending_MHz[0]))
+        primary_hdu.header.set("CRPIX2", 0)
+        primary_hdu.header.set("CTYPE2", "Frequency [MHz]")
+        primary_hdu.header.set("CDELT2", -self.frequency_resolution * 1e-6)
+
+        primary_hdu.header.set("OBS_LAT", float(obs_lat))
+        primary_hdu.header.set("OBS_LAC", obs_lac)
+        primary_hdu.header.set("OBS_LON", float(obs_lon))
+        primary_hdu.header.set("OBS_LOC", obs_loc)
+        primary_hdu.header.set("OBS_ALT", float(obs_alt))
+
+        # Neutral values for the standard CALLISTO hardware headers (manual §11); RX-888 lacks both.
+        primary_hdu.header.set("FRQFILE", "")
+        primary_hdu.header.set("PWM_VAL", 0)
+
+        col1 = astropy.io.fits.Column(
+            name="TIME",
+            format=f"{self.num_times}D8.3",
+            array=np.array([self.times]),
+        )
+        col2 = astropy.io.fits.Column(
+            name="FREQUENCY",
+            format=f"{self.num_frequencies}D8.3",
+            array=np.array([frequencies_descending_MHz]),
+        )
+        bin_table_hdu = astropy.io.fits.BinTableHDU.from_columns(
+            astropy.io.fits.ColDefs([col1, col2])
+        )
+        bin_table_hdu.header.set("PCOUNT", 0)
+        bin_table_hdu.header.set("GCOUNT", 1)
+        bin_table_hdu.header.set("TFIELDS", 2)
+        bin_table_hdu.header.set("TTYPE1", "TIME")
+        bin_table_hdu.header.set("TTYPE2", "FREQUENCY")
+
+        hdul = astropy.io.fits.HDUList([primary_hdu, bin_table_hdu])
+        self._write_hdul(hdul, tag, batches_dir_path)
+
+    def _write_hdul(
+        self,
+        hdul: astropy.io.fits.HDUList,
+        tag: str,
+        batches_dir_path: typing.Optional[str],
+    ) -> None:
         dt = typing.cast(
             datetime.datetime, self.start_datetime.astype(datetime.datetime)
         )

@@ -172,6 +172,34 @@ class ConstantStaircaseSolver(
 class _Mode:
     COSINE_WAVE = "cosine_wave"
     CONSTANT_STAIRCASE = "constant_staircase"
+    ECALLISTO = "ecallisto"
+
+
+class ECallistoSolver(Solver[spectre_server.core.models.SignalGeneratorECallisto]):
+    """Wraps `CosineWaveSolver` and rescales its amplitude spectrum into CALLISTO digits,
+    matching the amplitude -> dB -> 8-bit digit chain in `ECallisto.process`."""
+
+    def __init__(self) -> None:
+        self._cosine_solver = CosineWaveSolver()
+
+    def solve(
+        self,
+        num_spectrums: int,
+        model: spectre_server.core.models.SignalGeneratorECallisto,
+    ) -> spectre_server.core.spectrograms.Spectrogram:
+        cosine_spectrogram = self._cosine_solver.solve(num_spectrums, model)
+
+        dB = 10.0 * np.log10(np.maximum(cosine_spectrogram.dynamic_spectra, np.finfo(np.float32).tiny))
+        digits = np.clip(
+            dB * spectre_server.core.events.CALLISTO_DIGIT_PER_DB, 0, 255
+        ).astype(np.float32)
+
+        return spectre_server.core.spectrograms.Spectrogram(
+            digits,
+            cosine_spectrogram.times,
+            cosine_spectrogram.frequencies,
+            spectre_server.core.spectrograms.SpectrumUnit.CALLISTO_DIGITS,
+        )
 
 
 @register_receiver(ReceiverName.SIGNAL_GENERATOR)
@@ -201,6 +229,15 @@ class SignalGenerator(Base):
             spectre_server.core.batches.IQStreamBatch,
         )
         self.add_solver(_Mode.CONSTANT_STAIRCASE, ConstantStaircaseSolver())
+
+        self.add_mode(
+            _Mode.ECALLISTO,
+            spectre_server.core.models.SignalGeneratorECallisto,
+            spectre_server.core.flowgraphs.SignalGeneratorCosineWave,
+            spectre_server.core.events.ECallisto,
+            spectre_server.core.batches.ECallistoBatch,
+        )
+        self.add_solver(_Mode.ECALLISTO, ECallistoSolver())
 
     @property
     def solver(

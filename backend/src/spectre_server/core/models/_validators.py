@@ -145,3 +145,11 @@ def validate_num_samples_per_step(
                 f"Please increase the dwell time."
             )
         )
+
+
+def validate_focus_code(value: str) -> None:
+    """Check the e-CALLISTO focus code is exactly two decimal digits."""
+    if not (isinstance(value, str) and len(value) == 2 and value.isdigit()):
+        raise ValueError(
+            f"focus_code must be exactly two decimal digits (e.g. '02'). Got {value!r}."
+        )

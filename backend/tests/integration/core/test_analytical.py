@@ -43,6 +43,23 @@ CONSTANT_STAIRCASE_PARAMETERS = {
     "step_increment": 200,
 }
 
+ECALLISTO_MODE = "ecallisto"
+ECALLISTO_PARAMETERS = {
+    "batch_size": 1,
+    "amplitude": 3.0,
+    "frequency": 16000.0,
+    "window_hop": 256,
+    "window_size": 256,
+    "window_type": "boxcar",
+    "sample_rate": 128000,
+    "time_resolution": 0,
+    "frequency_resolution": 0,
+    "instrument": "TEST",
+    "object": "Sun",
+    "origin": "TEST",
+    "telescope": "TEST",
+}
+
 
 @pytest.mark.parametrize(
     ("modes", "parameters"),
@@ -51,6 +68,7 @@ CONSTANT_STAIRCASE_PARAMETERS = {
         ([COSINE_WAVE_MODE], [COSINE_WAVE_PARAMETERS]),
         ([CONSTANT_STAIRCASE_MODE], [USE_DEFAULT_PARAMETERS]),
         ([CONSTANT_STAIRCASE_MODE], [CONSTANT_STAIRCASE_PARAMETERS]),
+        ([ECALLISTO_MODE], [ECALLISTO_PARAMETERS]),
         (
             [COSINE_WAVE_MODE, CONSTANT_STAIRCASE_MODE],
             [USE_DEFAULT_PARAMETERS, USE_DEFAULT_PARAMETERS],

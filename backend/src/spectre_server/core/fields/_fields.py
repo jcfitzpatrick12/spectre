@@ -173,6 +173,36 @@ class Field:
             description="Corresponds to the FITS keyword OBS_LON.",
         ),
     ]
+    obs_lac = typing.Annotated[
+        str,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            description="The hemisphere for OBS_LAT, one of 'N' or 'S'. Corresponds to the FITS keyword OBS_LAC.",
+        ),
+    ]
+    obs_loc = typing.Annotated[
+        str,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            description="The hemisphere for OBS_LON, one of 'E' or 'W'. Corresponds to the FITS keyword OBS_LOC.",
+        ),
+    ]
+    scaling_factor = typing.Annotated[
+        float,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            gt=0,
+            description=(
+                "Empirical linear factor applied to FFT amplitude before dB conversion. The "
+                "reference port (AlexandroRP99/e-Callisto_Py_RX-888_MK_II, mode 0) uses ~89958.6; "
+                "the default 1.0 leaves data unscaled - tune per receiver/antenna if spectrograms "
+                "render consistently dark or saturated."
+            ),
+        ),
+    ]
     keep_signal = typing.Annotated[
         bool,
         pydantic.Field(

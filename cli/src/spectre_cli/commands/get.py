@@ -2,9 +2,13 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import typer
+import datetime
 import os
+import re
+import typer
 import requests
+
+import astropy.io.fits
 
 from ._utils import safe_request, get_config_file_name
 from ._secho_resources import (
@@ -118,6 +122,83 @@ def files(
         secho_existing_resources(endpoints)
     else:
         __download_resources(endpoints, export)
+
+    raise typer.Exit()
+
+
+_FOCUS_CODE_RE = re.compile(r"^\d{2}$")
+
+
+def __rename_to_ecallisto(file_path: str, focus_code: str) -> str:
+    """Rewrite ``file_path`` to ``{INSTRUME}_{YYYYMMDD}_{HHMMSS}_{focus_code}.fit`` in place."""
+    with astropy.io.fits.open(file_path) as hdul:
+        header = hdul[0].header
+        instrume = header.get("INSTRUME")
+        date_obs = header.get("DATE-OBS")
+        time_obs = header.get("TIME-OBS")
+
+    if not (instrume and date_obs and time_obs):
+        raise ValueError(
+            f"missing one of INSTRUME / DATE-OBS / TIME-OBS in {os.path.basename(file_path)}"
+        )
+
+    dt = datetime.datetime.strptime(
+        f"{date_obs} {time_obs}", "%Y/%m/%d %H:%M:%S.%f"
+    )
+    canonical_name = (
+        f"{instrume}_{dt.strftime('%Y%m%d')}_{dt.strftime('%H%M%S')}_{focus_code}.fit"
+    )
+    canonical_path = os.path.join(os.path.dirname(file_path), canonical_name)
+    os.rename(file_path, canonical_path)
+    return canonical_path
+
+
+@get_typer.command(
+    help=(
+        "Download e-CALLISTO-shaped FITS batches and rename each to the canonical "
+        "{INSTRUME}_{YYYYMMDD}_{HHMMSS}_{focus_code}.fit filename."
+    )
+)
+def ecallisto(
+    tag: str = typer.Option(..., "--tag", "-t", help="The tag identifying the batches."),
+    export: str = typer.Option(
+        ...,
+        "--export",
+        help="Directory to download the renamed e-CALLISTO files into.",
+    ),
+    focus_code: str = typer.Option(
+        ...,
+        "--focus-code",
+        help="Two-digit focus code (e.g. '02'), used only in the filename suffix.",
+    ),
+    year: int = typer.Option(None, "--year", "-y", help="Only fetch batches under this year."),
+    month: int = typer.Option(None, "--month", "-m", help="Only fetch batches under this month."),
+    day: int = typer.Option(None, "--day", "-d", help="Only fetch batches under this day."),
+) -> None:
+    if not _FOCUS_CODE_RE.match(focus_code):
+        typer.secho(
+            f"--focus-code must be exactly two decimal digits. Got {focus_code!r}.",
+            err=True,
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+    params = {"extension": ["fits"], "tag": [tag], "year": year, "month": month, "day": day}
+    jsend_dict = safe_request("spectre-data/batches", "GET", params=params)
+    endpoints = jsend_dict["data"]
+
+    os.makedirs(export, exist_ok=True)
+    for endpoint in endpoints:
+        download_path = os.path.join(export, os.path.basename(endpoint))
+        response = requests.get(endpoint)
+        with open(download_path, "wb") as f:
+            f.write(response.content)
+        try:
+            canonical_path = __rename_to_ecallisto(download_path, focus_code)
+        except (ValueError, OSError) as err:
+            typer.secho(f"Skipping {os.path.basename(download_path)}: {err}", fg=typer.colors.YELLOW)
+            continue
+        secho_existing_resource(canonical_path)
 
     raise typer.Exit()
 

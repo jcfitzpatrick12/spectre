@@ -20,6 +20,8 @@ OBJECT = "NOTSET"
 OBS_ALT = 0.0
 OBS_LON = 0.0
 OBS_LAT = 0.0
+OBS_LAC = "N"
+OBS_LOC = "W"
 TEST_START = datetime.datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0)
 
 
@@ -75,6 +77,8 @@ def batches(
             OBS_ALT,
             OBS_LAT,
             OBS_LON,
+            OBS_LAC,
+            OBS_LOC,
             batches_dir_path=spectre_config_paths.get_batches_dir_path(),
         )
 

@@ -28,6 +28,8 @@ class BaseModel(pydantic.BaseModel):
     obs_alt: spectre_server.core.fields.Field.obs_alt = 0.0
     obs_lat: spectre_server.core.fields.Field.obs_lat = 0.0
     obs_lon: spectre_server.core.fields.Field.obs_lon = 0.0
+    obs_lac: spectre_server.core.fields.Field.obs_lac = "N"
+    obs_loc: spectre_server.core.fields.Field.obs_loc = "W"
 
 
 B = typing.TypeVar("B", bound=spectre_server.core.batches.Base)
@@ -159,6 +161,8 @@ class Base(abc.ABC, typing.Generic[M, B], watchdog.events.FileSystemEventHandler
                 self.__model.obs_alt,
                 self.__model.obs_lat,
                 self.__model.obs_lon,
+                self.__model.obs_lac,
+                self.__model.obs_loc,
             )
             _LOGGER.info("Flush successful, resetting spectrogram cache")
             self.__cached_spectrogram = None  # reset the cache

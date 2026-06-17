@@ -8,6 +8,7 @@
 from ._signal_generator import (
     SignalGeneratorCosineWaveModel,
     SignalGeneratorConstantStaircaseModel,
+    SignalGeneratorECallisto,
 )
 from ._rsp1a import RSP1AFixedCenterFrequency, RSP1ASweptCenterFrequency
 from ._rsp1b import RSP1BFixedCenterFrequency
@@ -18,7 +19,7 @@ from ._b200mini import B200miniFixedCenterFrequency, B200miniSweptCenterFrequenc
 from ._hackrf import HackRFFixedCenterFrequency
 from ._hackrfone import HackRFOneFixedCenterFrequency
 from ._rtlsdr import RTLSDRFixedCenterFrequency
-from ._rx888mk2 import RX888MK2FixedCenterFrequency
+from ._rx888mk2 import RX888MK2FixedCenterFrequency, RX888MK2ECallisto
 
 __all__ = [
     "SignalGeneratorCosineWaveModel",
@@ -38,4 +39,6 @@ __all__ = [
     "HackRFOneFixedCenterFrequency",
     "RTLSDRFixedCenterFrequency",
     "RX888MK2FixedCenterFrequency",
+    "RX888MK2ECallisto",
+    "SignalGeneratorECallisto",
 ]

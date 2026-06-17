@@ -7,6 +7,7 @@
 from ._base import Base
 from ._fixed_center_frequency import FixedCenterFrequency, FixedCenterFrequencyModel
 from ._swept_center_frequency import SweptCenterFrequency, SweptCenterFrequencyModel
+from ._ecallisto import ECallisto, ECallistoModel, CALLISTO_DIGIT_PER_DB
 
 from ._stfft import (
     stfft,
@@ -25,6 +26,9 @@ __all__ = [
     "FixedCenterFrequencyModel",
     "SweptCenterFrequency",
     "SweptCenterFrequencyModel",
+    "ECallisto",
+    "ECallistoModel",
+    "CALLISTO_DIGIT_PER_DB",
     "stfft",
     "get_buffer",
     "get_window",
