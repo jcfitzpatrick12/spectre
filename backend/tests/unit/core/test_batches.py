@@ -477,6 +477,8 @@ class TestIQStreamBatch:
             assert primary_hdu.header.get("BZERO") == 0.0
             # Not required - in general the DFT of samples from SDRs don't directly correspond to a physical quantity.
             assert "BUNIT" not in primary_hdu.header.keys()
+            assert primary_hdu.header.get("DATAMIN") == 0.0
+            assert primary_hdu.header.get("DATAMAX") == 23
 
             # Keywords describing the mapping between image coordinates and world (physical) coordinates.
             assert primary_hdu.header.get("WCSAXES") == 2
