@@ -1,7 +1,7 @@
 services:
   spectre-server:
     container_name: spectre-server
-    image: spectregrams/spectre-server:3.5.4-alpha
+    image: spectregrams/spectre-server:4.0.0-alpha
     environment:
       - SPECTRE_GID=${SPECTRE_GID}
       - SPECTRE_BIND_HOST=${SPECTRE_BIND_HOST}
@@ -11,7 +11,7 @@ services:
     networks:
       - spectre-network
     volumes:
-      - spectre-data-v3:/app/.spectre-data
+      - spectre-data-v4:/app/.spectre-data
     devices:
       - "/dev/bus/usb"
     ports:
@@ -20,7 +20,7 @@ services:
 
   spectre-cli:
     container_name: spectre-cli
-    image: spectregrams/spectre-cli:3.5.4-alpha
+    image: spectregrams/spectre-cli:4.0.0-alpha
     environment:
       - SPECTRE_SERVER_HOST=${SPECTRE_SERVER_HOST}
       - SPECTRE_SERVER_PORT=${SPECTRE_SERVER_PORT}
@@ -37,5 +37,5 @@ networks:
     driver: bridge
 
 volumes:
-  spectre-data-v3:
-    name: spectre-data-v3
+  spectre-data-v4:
+    name: spectre-data-v4
