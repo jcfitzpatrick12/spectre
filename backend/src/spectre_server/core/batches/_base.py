@@ -114,6 +114,32 @@ class Base(abc.ABC):
     ) -> BatchFile[spectre_server.core.spectrograms.Spectrogram]:
         """Indicate the file in the batch storing spectrogram data."""
 
+    @abc.abstractmethod
+    def write_spectrogram(
+        self,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+        origin: str,
+        instrume: str,
+        observer: str,
+        object_: str,
+        telescop: str,
+        obsgeo_b: float,
+        obsgeo_l: float,
+        obsgeo_h: float,
+    ) -> None:
+        """Write a spectrogram to the batch on disk.
+
+        :param spectrogram: The spectrogram to write to disk (must have the same start time).
+        :param origin: Corresponds to the FITS keyword ORIGIN.
+        :param instrume: Corresponds to the FITS keyword INSTRUME.
+        :param observer: Corresponds to the FITS keyword OBSERVER.
+        :param object_: Corresponds to the FITS keyword OBJECT,
+        :param telescop: Corresponds to the FITS keyword TELESCOP.
+        :param obsgeo_b: Corresponds to the FITS keyword OBSGEO_B.
+        :param obsgeo_l: Corresponds to the FITS kewyord OBSGEO_L.
+        :param obsgeo_h: Corresponds to the FITS keyword OBSGEO_H.
+        """
+
     @property
     def start_time(self) -> str:
         """The start time of the batch, up to seconds precision."""
@@ -198,3 +224,39 @@ class Base(abc.ABC):
         :return: The spectrogram stored by the batch `spectrogram_file`.
         """
         return self.spectrogram_file.read()
+
+
+B = typing.TypeVar("B", bound=Base)
+
+
+def from_spectrogram(
+    batch_cls: typing.Type[B],
+    tag: str,
+    spectrogram: spectre_server.core.spectrograms.Spectrogram,
+    batches_dir_path: typing.Optional[str] = None,
+) -> B:
+    """Make a batch from a spectrogram.
+
+    :param batch_cls: Make a batch using this class.
+    :param tag: Make a batch with this tag.
+    :param spectrogram: Make a batch for this spectrogram.
+    :param batches_dir_path: Optionally override the parent directory for the batch.
+    :raises ValueError: If the spectrogrma has no start datetime set.
+    :return: A batch with the same start time as the spectrogram.
+    """
+    if not spectrogram.start_datetime_is_set:
+        raise ValueError(
+            f"The start time of the spectrogram must be set to make a batch from it"
+        )
+
+    start_datetime = spectrogram.start_datetime.astype(datetime.datetime)
+    batches_dir_path = (
+        batches_dir_path
+        or spectre_server.core.config.paths.get_batches_dir_path(
+            start_datetime.year, start_datetime.month, start_datetime.day
+        )
+    )
+    start_time = datetime.datetime.strftime(
+        start_datetime, spectre_server.core.config.TimeFormat.DATETIME
+    )
+    return batch_cls(batches_dir_path, start_time, tag)

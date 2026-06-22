@@ -5,10 +5,12 @@
 import datetime
 import dataclasses
 import typing
+import os
 
 import numpy as np
 import numpy.typing as npt
 import astropy.io
+import astropy.wcs
 
 import spectre_server.core.config
 import spectre_server.core.spectrograms
@@ -102,33 +104,39 @@ class _HdrFile(BatchFile[IQMetadata]):
 
 
 class _FitsFile(BatchFile[spectre_server.core.spectrograms.Spectrogram]):
+
     def read(self) -> spectre_server.core.spectrograms.Spectrogram:
         """Read the FITS file and create a spectrogram."""
         with astropy.io.fits.open(self.file_path, mode="readonly") as hdulist:
-            primary_hdu = hdulist["PRIMARY"]
+            primary_hdu = hdulist[0]
             dynamic_spectra = primary_hdu.data
-            bunit = primary_hdu.header["BUNIT"]
 
-            date_obs = primary_hdu.header["DATE-OBS"]
-            time_obs = primary_hdu.header["TIME-OBS"]
-            spectrogram_start_datetime = datetime.datetime.strptime(
-                f"{date_obs}T{time_obs}Z",
-                spectre_server.core.config.TimeFormat.DATETIME,
+            wcs = astropy.wcs.WCS(primary_hdu.header, fix=False, relax=False)
+
+            pixel_coordinates = (
+                np.indices(
+                    (
+                        primary_hdu.header.get("NAXIS1"),
+                        primary_hdu.header.get("NAXIS2"),
+                    ),
+                    dtype=np.float32,
+                )
+                + 1
+            )  # Pixel coordinates are 1-indexed in the FITS standard.
+
+            # The time coordinates are identical for any spectral bin, so just pick the first.
+            times = wcs.wcs_pix2world(pixel_coordinates[:, :, 0].T, 1)[:, 0]
+
+            # The frequency coordinates for every spectrum are identical, so just pick the first.
+            frequencies = wcs.wcs_pix2world(pixel_coordinates[:, 0, :].T, 1)[:, 1]
+
+            return spectre_server.core.spectrograms.Spectrogram(
+                dynamic_spectra,
+                times,
+                frequencies,
+                spectre_server.core.spectrograms.SpectrumUnit.AMPLITUDE,
+                self.start_datetime,
             )
-
-            bintable_hdu = hdulist[1]
-            times = bintable_hdu.data["TIME"][0]
-            frequencies = bintable_hdu.data["FREQUENCY"][0] * 1e6  # Convert to Hz
-
-        # bunit is interpreted as a SpectrumUnit.
-        spectrum_unit = spectre_server.core.spectrograms.SpectrumUnit(bunit)
-        return spectre_server.core.spectrograms.Spectrogram(
-            dynamic_spectra,
-            times,
-            frequencies,
-            spectrum_unit,
-            spectrogram_start_datetime,
-        )
 
 
 class IQStreamBatch(Base):
@@ -144,6 +152,7 @@ class IQStreamBatch(Base):
         - `.sc16`
         - `.hdr`
 
+        :param batches_dir_path: The shared parent directory for each batch file.
         :param start_time: The start time of the batch.
         :param tag: The batch name tag.
         """
@@ -228,3 +237,95 @@ class IQStreamBatch(Base):
             self.sc16_file.delete()
         else:
             raise ValueError(f"Unsupported output type: {extension}")
+
+    def write_spectrogram(
+        self,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+        origin: str,
+        instrume: str,
+        observer: str,
+        object_: str,
+        telescop: str,
+        obsgeo_b: float,
+        obsgeo_l: float,
+        obsgeo_h: float,
+    ) -> None:
+
+        # Create the primary HDU (the basic keywords are set by Astropy).
+        primary_hdu = astropy.io.fits.PrimaryHDU(spectrogram.dynamic_spectra)
+
+        # All data in the batch should have the same start time.
+        if self.start_datetime != spectrogram.start_datetime.astype(datetime.datetime):
+            raise ValueError(
+                "Start time of the spectrogram must coincide with the start time of the batch. "
+                f"Expected: {self.start_datetime}. Got: {spectrogram.start_datetime}."
+            )
+        start_datetime = datetime.datetime.strftime(
+            self.start_datetime, spectre_server.core.config.TimeFormat.FITS
+        )
+
+        # Set keywords representing time.
+        primary_hdu.header.set("DATE", start_datetime)
+        primary_hdu.header.set("DATE-OBS", start_datetime)
+        primary_hdu.header.set("TIMESYS", "UTC")
+        primary_hdu.header.set("TREFPOS", "TOPOCENTER")
+        primary_hdu.header.set("OBSGEO-B", obsgeo_b)
+        primary_hdu.header.set("OBSGEO-L", obsgeo_l)
+        primary_hdu.header.set("OBSGEO-H", obsgeo_h)
+        primary_hdu.header.set("DATEREF", start_datetime)
+
+        date_beg = datetime.datetime.strftime(
+            spectrogram.datetimes[0].astype(datetime.datetime),
+            spectre_server.core.config.TimeFormat.FITS,
+        )
+        date_end = datetime.datetime.strftime(
+            spectrogram.datetimes[-1].astype(datetime.datetime),
+            spectre_server.core.config.TimeFormat.FITS,
+        )
+        primary_hdu.header.set("DATE-BEG", date_beg)
+        primary_hdu.header.set("DATE-END", date_end)
+
+        # Set general descriptive keywords.
+        primary_hdu.header.set("ORIGIN", origin)
+        # TODO: Set to True when we include a binary table extension.
+        primary_hdu.header.set("EXTEND", False)
+
+        # Set keywords describing observations.
+        primary_hdu.header.set("TELESCOP", telescop)
+        primary_hdu.header.set("INSTRUME", instrume)
+        primary_hdu.header.set("OBSERVER", observer)
+        primary_hdu.header.set("OBJECT", object_)
+
+        # Set keywords describing the primary data array.
+        # No linear scaling.
+        primary_hdu.header.set("BSCALE", 1.0)
+        primary_hdu.header.set("BZERO", 0.0)
+
+        # Set keywords describing the mapping between image coordinates and world coordinates.
+        primary_hdu.header["WCSAXES"] = 2
+        primary_hdu.header["CTYPE1"] = "UTC"
+        primary_hdu.header["CUNIT1"] = "s"
+        # As per the standard, the first pixel in the image has pixel coordinates (1.0, 1.0)
+        primary_hdu.header["CRPIX1"] = 1.0
+        primary_hdu.header["CRVAL1"] = spectrogram.times[0]
+        primary_hdu.header["CDELT1"] = spectrogram.time_resolution
+        primary_hdu.header["CTYPE2"] = "FREQ"
+        primary_hdu.header["CUNIT2"] = "Hz"
+        # As per the standard, the first pixel in the image has pixel coordinates (1.0, 1.0)
+        primary_hdu.header["CRPIX2"] = 1.0
+        primary_hdu.header["CRVAL2"] = spectrogram.frequencies[0]
+        primary_hdu.header["CDELT2"] = spectrogram.frequency_resolution
+        # Identity linear transformation matrix.
+        primary_hdu.header["PC1_1"] = 1.0
+        primary_hdu.header["PC2_2"] = 1.0
+        primary_hdu.header["PC1_2"] = 0.0
+        primary_hdu.header["PC2_1"] = 0.0
+
+        # Add a checksum.
+        primary_hdu.add_checksum()
+
+        os.makedirs(self.fits_file.parent_dir_path, exist_ok=True)
+        astropy.io.fits.HDUList([primary_hdu]).writeto(
+            self.fits_file.file_path,
+            overwrite=True,
+        )
