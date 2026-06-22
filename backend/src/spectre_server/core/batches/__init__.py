@@ -21,7 +21,6 @@ __all__ = [
     "parse_batch_file_path",
     "from_spectrogram",
     "Batches",
-    "CallistoBatch",
     "IQMetadata",
     "IQStreamBatch",
     "IQStreamBatchExtension",
