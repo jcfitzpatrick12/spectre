@@ -34,7 +34,7 @@ class Field:
             ...,
             validate_default=True,
             gt=0,
-            description="Samples are recorded in batches of this size, specified in seconds.",
+            description="Signals are recorded in batches of this size, in seconds.",
         ),
     ]
     frequency = typing.Annotated[
@@ -86,7 +86,7 @@ class Field:
             ...,
             validate_default=True,
             gt=0.0,
-            description="The center frequency, in Hz. This value determines the midpoint of the frequency range being processed.",
+            description="The center frequency, in Hz, determines the middle of the spectrogram frequency range.",
         ),
     ]
     frequency_resolution = typing.Annotated[
@@ -95,7 +95,7 @@ class Field:
             ...,
             validate_default=True,
             ge=0,
-            description="Spectrograms are averaged up to the frequency resolution, in Hz. 0 for no averaging.",
+            description="The minimum target frequency resolution of the spectrogram, in Hz. 0 for minimum possible.",
         ),
     ]
     time_resolution = typing.Annotated[
@@ -104,7 +104,7 @@ class Field:
             ...,
             validate_default=True,
             ge=0,
-            description="Spectrograms are averaged up to the time resolution, in seconds. 0 for no averaging.",
+            description="The minimum target time resolution of the spectrogram, in seconds. 0 for minimum possible.",
         ),
     ]
     time_range = typing.Annotated[
@@ -113,7 +113,7 @@ class Field:
             ...,
             validate_default=True,
             ge=0,
-            description="Spectrograms are stitched together until the time range has elapsed. 0 for no stitching.",
+            description="The minimum target time range of the spectrogram, in seconds. 0 for minimum possible.",
         ),
     ]
     origin = typing.Annotated[
@@ -124,7 +124,7 @@ class Field:
             description="Corresponds to the FITS keyword ORIGIN.",
         ),
     ]
-    telescope = typing.Annotated[
+    telescop = typing.Annotated[
         str,
         pydantic.Field(
             ...,
@@ -132,16 +132,23 @@ class Field:
             description="Corresponds to the FITS keyword TELESCOP.",
         ),
     ]
-    instrument = typing.Annotated[
+    instrume = typing.Annotated[
         str,
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword INSTRUMEN.",
+            description="Corresponds to the FITS keyword INSTRUME.",
         ),
     ]
-    # Add an underscore to not conflict with the globally-scoped `object`.
-    object_ = typing.Annotated[
+    observer = typing.Annotated[
+        str,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            description="Corresponds to the FITS keyword OBSERVER.",
+        ),
+    ]
+    object = typing.Annotated[
         str,
         pydantic.Field(
             ...,
@@ -149,28 +156,28 @@ class Field:
             description="Corresponds to the FITS keyword OBJECT.",
         ),
     ]
-    obs_lat = typing.Annotated[
+    obsgeo_l = typing.Annotated[
         float,
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBS_LAT.",
+            description="Corresponds to the FITS keyword OBSGEO-L",
         ),
     ]
-    obs_alt = typing.Annotated[
+    obsgeo_h = typing.Annotated[
         float,
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBS_ALT.",
+            description="Corresponds to the FITS keyword OBSGEO-H.",
         ),
     ]
-    obs_lon = typing.Annotated[
+    obsgeo_b = typing.Annotated[
         float,
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBS_LON.",
+            description="Corresponds to the FITS keyword OBSGEO-B.",
         ),
     ]
     keep_signal = typing.Annotated[

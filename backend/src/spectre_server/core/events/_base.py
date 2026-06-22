@@ -22,12 +22,13 @@ class BaseModel(pydantic.BaseModel):
     )
     time_range: spectre_server.core.fields.Field.time_range = 0
     origin: spectre_server.core.fields.Field.origin = "NOTSET"
-    telescope: spectre_server.core.fields.Field.telescope = "NOTSET"
-    instrument: spectre_server.core.fields.Field.instrument = "NOTSET"
-    object: spectre_server.core.fields.Field.object_ = "NOTSET"
-    obs_alt: spectre_server.core.fields.Field.obs_alt = 0.0
-    obs_lat: spectre_server.core.fields.Field.obs_lat = 0.0
-    obs_lon: spectre_server.core.fields.Field.obs_lon = 0.0
+    telescop: spectre_server.core.fields.Field.telescop = "NOTSET"
+    instrume: spectre_server.core.fields.Field.instrume = "NOTSET"
+    observer: spectre_server.core.fields.Field.observer = "NOTSET"
+    object: spectre_server.core.fields.Field.object = "NOTSET"
+    obsgeo_b: spectre_server.core.fields.Field.obsgeo_b = 0.0
+    obsgeo_l: spectre_server.core.fields.Field.obsgeo_l = 0.0
+    obsgeo_h: spectre_server.core.fields.Field.obsgeo_h = 0.0
 
 
 B = typing.TypeVar("B", bound=spectre_server.core.batches.Base)
@@ -147,18 +148,26 @@ class Base(abc.ABC, typing.Generic[M, B], watchdog.events.FileSystemEventHandler
     def __flush_cache(self) -> None:
         if self.__cached_spectrogram:
             _LOGGER.info(
-                f"Flushing spectrogram to file with start time "
+                f"Writing spectrogram to disk with start time "
                 f"'{self.__cached_spectrogram.format_start_time()}'"
             )
-            self.__cached_spectrogram.save(
-                self._tag,
-                self.__model.origin,
-                self.__model.instrument,
-                self.__model.telescope,
-                self.__model.object,
-                self.__model.obs_alt,
-                self.__model.obs_lat,
-                self.__model.obs_lon,
+
+            # Use the start time of the spectrogram to make a new batch to write to.
+            batch = spectre_server.core.batches.from_spectrogram(
+                self.__batch_cls, self._tag, self.__cached_spectrogram
             )
-            _LOGGER.info("Flush successful, resetting spectrogram cache")
-            self.__cached_spectrogram = None  # reset the cache
+
+            batch.write_spectrogram(
+                self.__cached_spectrogram,
+                self.__model.origin,
+                self.__model.instrume,
+                self.__model.observer,
+                self.__model.object,
+                self.__model.telescop,
+                self.__model.obsgeo_b,
+                self.__model.obsgeo_l,
+                self.__model.obsgeo_h,
+            )
+
+            # Reset the cache.
+            self.__cached_spectrogram = None
