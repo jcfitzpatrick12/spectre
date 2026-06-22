@@ -40,11 +40,12 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 ## **Features**
 
 - Simple installation with Docker
-- Wide receiver support (SDRplay, HackRF, RTL-SDR, USRP)
+- Wide receiver support (SDRplay, HackRF, RTL-SDR, USRP, RX-888 MK II)
 - Run natively on Linux, including Raspberry Pi
 - Intuitive CLI tool
 - Record spectrograms and I/Q data
 - Short and long-form recordings
-- Compatible with [inspectrum](https://github.com/miek/inspectrum)
+- Compatible with [inspectrum](https://github.com/miek/inspectrum), [NumPy](https://numpy.org/) and [Astropy](https://www.astropy.org/)
+- [FITS standard](https://ui.adsabs.harvard.edu/abs/2010A&A...524A..42P) compliant.
 
 ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/spectregrams/spectrel), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
