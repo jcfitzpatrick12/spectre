@@ -133,11 +133,11 @@ class Base(abc.ABC):
         :param origin: Corresponds to the FITS keyword ORIGIN.
         :param instrume: Corresponds to the FITS keyword INSTRUME.
         :param observer: Corresponds to the FITS keyword OBSERVER.
-        :param object_: Corresponds to the FITS keyword OBJECT,
+        :param object_: Corresponds to the FITS keyword OBJECT.
         :param telescop: Corresponds to the FITS keyword TELESCOP.
-        :param obsgeo_b: Corresponds to the FITS keyword OBSGEO_B.
-        :param obsgeo_l: Corresponds to the FITS kewyord OBSGEO_L.
-        :param obsgeo_h: Corresponds to the FITS keyword OBSGEO_H.
+        :param obsgeo_b: Corresponds to the FITS keyword OBSGEO-B.
+        :param obsgeo_l: Corresponds to the FITS keyword OBSGEO-L.
+        :param obsgeo_h: Corresponds to the FITS keyword OBSGEO-H.
         """
 
     @property

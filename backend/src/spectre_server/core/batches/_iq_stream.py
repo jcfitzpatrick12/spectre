@@ -9,7 +9,7 @@ import os
 
 import numpy as np
 import numpy.typing as npt
-import astropy.io
+import astropy.io.fits
 import astropy.wcs
 
 import spectre_server.core.config
@@ -300,8 +300,8 @@ class IQStreamBatch(Base):
         # No linear scaling.
         primary_hdu.header.set("BSCALE", 1.0)
         primary_hdu.header.set("BZERO", 0.0)
-        primary_hdu.header.set("DATAMAX", np.max(spectrogram.dynamic_spectra))
-        primary_hdu.header.set("DATAMIN", np.min(spectrogram.dynamic_spectra))
+        primary_hdu.header.set("DATAMAX", np.nanmax(spectrogram.dynamic_spectra))
+        primary_hdu.header.set("DATAMIN", np.nanmin(spectrogram.dynamic_spectra))
 
         # Set keywords describing the mapping between image coordinates and world coordinates.
         primary_hdu.header["WCSAXES"] = 2

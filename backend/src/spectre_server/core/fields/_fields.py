@@ -148,7 +148,6 @@ class Field:
             description="Corresponds to the FITS keyword OBSERVER.",
         ),
     ]
-    # Add an underscore to not conflict with the globally-scoped `object`.
     object = typing.Annotated[
         str,
         pydantic.Field(
@@ -162,7 +161,7 @@ class Field:
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBSGEO_L",
+            description="Corresponds to the FITS keyword OBSGEO-L",
         ),
     ]
     obsgeo_h = typing.Annotated[
@@ -170,7 +169,7 @@ class Field:
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBSGEO_H.",
+            description="Corresponds to the FITS keyword OBSGEO-H.",
         ),
     ]
     obsgeo_b = typing.Annotated[
@@ -178,7 +177,7 @@ class Field:
         pydantic.Field(
             ...,
             validate_default=True,
-            description="Corresponds to the FITS keyword OBSGEO_B.",
+            description="Corresponds to the FITS keyword OBSGEO-B.",
         ),
     ]
     keep_signal = typing.Annotated[
