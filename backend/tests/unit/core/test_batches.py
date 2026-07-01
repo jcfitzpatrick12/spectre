@@ -23,7 +23,7 @@ OBSERVER = "jimmy@spectregrams.org"
 OBSGEO_B = -4.3342366
 OBSGEO_L = 55.7726726
 OBSGEO_H = 138
-TEST_START = datetime.datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0)
+TEST_START = datetime.datetime(year=2000, month=1, day=25, hour=1, minute=0, second=0)
 
 
 @pytest.fixture
@@ -115,8 +115,8 @@ def spectrogram() -> spectre_server.core.spectrograms.Spectrogram:
         ],
         dtype=np.float32,
     )
-    times = np.array([0.00, 0.20, 0.40, 0.60, 0.80, 1.0])
-    frequencies = np.array([1e6, 2e6, 3e6, 4e6])
+    times = np.array([0.00, 0.20, 0.40, 0.60, 0.80, 1.0], dtype=np.float32)
+    frequencies = np.array([1e6, 2e6, 3e6, 4e6], dtype=np.float32)
     return spectre_server.core.spectrograms.Spectrogram(
         dynamic_spectra,
         times,
@@ -175,12 +175,30 @@ def iqstream_batch(
     )
 
 
+@pytest.fixture
+def callisto_batch(
+    spectre_config_paths: spectre_server.core.config.Paths,
+) -> spectre_server.core.batches.CallistoBatch:
+    batches_dir_path = spectre_config_paths.get_batches_dir_path(
+        TEST_START.year,
+        TEST_START.month,
+        TEST_START.day,
+    )
+    return spectre_server.core.batches.CallistoBatch(
+        batches_dir_path,
+        datetime.datetime.strftime(
+            TEST_START, spectre_server.core.config.TimeFormat.DATETIME
+        ),
+        TAG,
+    )
+
+
 @pytest.mark.parametrize(
     "file_name, parsed_file_name",
     [
         (
-            "2025-06-01T00:00:00.000000Z_tag.ext",
-            ("2025-06-01T00:00:00.000000Z", "tag", "ext"),
+            "2025-06-01T01:00:00.000000Z_tag.ext",
+            ("2025-06-01T01:00:00.000000Z", "tag", "ext"),
         ),  # Happy path.
     ],
 )
@@ -195,8 +213,8 @@ def test_parse_batch_file_name(
 @pytest.mark.parametrize(
     "file_name",
     [
-        "2025-06-01T00:00:00.000000Z.ext",  # No tag
-        "2025-06-01T00:00:00.000000Z_bad_tag.ext",  # Multiple underscores.
+        "2025-06-01T01:00:00.000000Z.ext",  # No tag
+        "2025-06-01T01:00:00.000000Z_bad_tag.ext",  # Multiple underscores.
     ],
 )
 def test_parse_batch_file_name_invalid_underscores(file_name: str) -> None:
@@ -214,45 +232,45 @@ class TestBatches:
                 -1,
                 4,
                 [
-                    "2000-01-01T00:00:00.000000Z_tag",
-                    "2000-01-01T00:00:01.000000Z_tag",
-                    "2000-01-01T00:00:02.000000Z_tag",
+                    "2000-01-25T01:00:00.000000Z_tag",
+                    "2000-01-25T01:00:01.000000Z_tag",
+                    "2000-01-25T01:00:02.000000Z_tag",
                 ],
             ),
             (
                 0,
                 3,
                 [
-                    "2000-01-01T00:00:00.000000Z_tag",
-                    "2000-01-01T00:00:01.000000Z_tag",
-                    "2000-01-01T00:00:02.000000Z_tag",
+                    "2000-01-25T01:00:00.000000Z_tag",
+                    "2000-01-25T01:00:01.000000Z_tag",
+                    "2000-01-25T01:00:02.000000Z_tag",
                 ],
             ),
             # Range includes only the first batch.
-            (0, 0.0001, ["2000-01-01T00:00:00.000000Z_tag"]),
-            (0, 0.9999, ["2000-01-01T00:00:00.000000Z_tag"]),
+            (0, 0.0001, ["2000-01-25T01:00:00.000000Z_tag"]),
+            (0, 0.9999, ["2000-01-25T01:00:00.000000Z_tag"]),
             # Range includes only the middle batch.
-            (1, 1.0001, ["2000-01-01T00:00:01.000000Z_tag"]),
-            (1, 1.9999, ["2000-01-01T00:00:01.000000Z_tag"]),
+            (1, 1.0001, ["2000-01-25T01:00:01.000000Z_tag"]),
+            (1, 1.9999, ["2000-01-25T01:00:01.000000Z_tag"]),
             # Range includes only the last batch.
-            (2, 2.0001, ["2000-01-01T00:00:02.000000Z_tag"]),
-            (2, 2.9999, ["2000-01-01T00:00:02.000000Z_tag"]),
+            (2, 2.0001, ["2000-01-25T01:00:02.000000Z_tag"]),
+            (2, 2.9999, ["2000-01-25T01:00:02.000000Z_tag"]),
             # Range includes first two batches.
             (
                 0,
                 1.5,
-                ["2000-01-01T00:00:00.000000Z_tag", "2000-01-01T00:00:01.000000Z_tag"],
+                ["2000-01-25T01:00:00.000000Z_tag", "2000-01-25T01:00:01.000000Z_tag"],
             ),
             # Range includes last two batches.
             (
                 1,
                 3,
-                ["2000-01-01T00:00:01.000000Z_tag", "2000-01-01T00:00:02.000000Z_tag"],
+                ["2000-01-25T01:00:01.000000Z_tag", "2000-01-25T01:00:02.000000Z_tag"],
             ),
             # Range before all batches
             (-10, -1, []),
             # Range after all batches (final batch has an indeterminate end)
-            (10, 20, ["2000-01-01T00:00:02.000000Z_tag"]),
+            (10, 20, ["2000-01-25T01:00:02.000000Z_tag"]),
         ],
     )
     def test_get_batches_in_range(
@@ -428,7 +446,7 @@ class TestIQStreamBatch:
             obsgeo_h=OBSGEO_H,
         )
 
-        # Check the spectrogram we wrote to disk, is consistent with what we read back.
+        # Check the spectrogram we wrote to disk is consistent with what we read back.
         s = iqstream_batch.read_spectrogram()
         assert np.array_equal(s.dynamic_spectra, spectrogram.dynamic_spectra)
 
@@ -451,16 +469,16 @@ class TestIQStreamBatch:
             # assert "END" in primary_hdu.header.keys()
 
             # Keywords representing time.
-            assert primary_hdu.header.get("DATE") == "2000-01-01T00:00:00.000000"
-            assert primary_hdu.header.get("DATE-OBS") == "2000-01-01T00:00:00.000000"
+            assert primary_hdu.header.get("DATE") == "2000-01-25T01:00:00.000000"
+            assert primary_hdu.header.get("DATE-OBS") == "2000-01-25T01:00:00.000000"
             assert primary_hdu.header.get("TIMESYS") == "UTC"
             assert primary_hdu.header.get("TREFPOS") == "TOPOCENTER"
             assert primary_hdu.header.get("OBSGEO-B") == OBSGEO_B
             assert primary_hdu.header.get("OBSGEO-L") == OBSGEO_L
             assert primary_hdu.header.get("OBSGEO-H") == OBSGEO_H
-            assert primary_hdu.header.get("DATEREF") == "2000-01-01T00:00:00.000000"
-            assert primary_hdu.header.get("DATE-BEG") == "2000-01-01T00:00:00.000000"
-            assert primary_hdu.header.get("DATE-END") == "2000-01-01T00:00:01.000000"
+            assert primary_hdu.header.get("DATEREF") == "2000-01-25T01:00:00.000000"
+            assert primary_hdu.header.get("DATE-BEG") == "2000-01-25T01:00:00.000000"
+            assert primary_hdu.header.get("DATE-END") == "2000-01-25T01:00:01.000000"
 
             # General descriptive keywords.
             assert primary_hdu.header.get("ORIGIN") == ORIGIN
@@ -486,13 +504,13 @@ class TestIQStreamBatch:
             assert primary_hdu.header.get("CUNIT1") == "s"
             assert primary_hdu.header.get("CRPIX1") == 1.0
             assert primary_hdu.header.get("CRVAL1") == 0.0
-            assert primary_hdu.header.get("CDELT1") == 0.2
+            assert np.isclose(primary_hdu.header.get("CDELT1"), 0.2)
 
             assert primary_hdu.header.get("CTYPE2") == "FREQ"
             assert primary_hdu.header.get("CUNIT2") == "Hz"
             assert primary_hdu.header.get("CRPIX2") == 1.0
             assert primary_hdu.header.get("CRVAL2") == 1e6
-            assert primary_hdu.header.get("CDELT2") == 1e6
+            assert np.isclose(primary_hdu.header.get("CDELT2"), 1e6)
 
             assert primary_hdu.header.get("PC1_1") == 1.0
             assert primary_hdu.header.get("PC2_2") == 1.0
@@ -507,7 +525,246 @@ class TestIQStreamBatch:
             wcs = astropy.wcs.WCS(primary_hdu.header, fix=False)
 
             # Check the four world coordinates at extremal indices (1-indexed, by convention in the standard)
-            assert np.array_equal(wcs.wcs_pix2world([[1, 1]], 1), [[0.0, 1e6]])
-            assert np.array_equal(wcs.wcs_pix2world([[1, 4]], 1), [[0.0, 4e6]])
-            assert np.array_equal(wcs.wcs_pix2world([[6, 1]], 1), [[1.0, 1e6]])
-            assert np.array_equal(wcs.wcs_pix2world([[6, 4]], 1), [[1.0, 4e6]])
+            assert np.allclose(wcs.wcs_pix2world([[1, 1]], 1), [[0.0, 1e6]])
+            assert np.allclose(wcs.wcs_pix2world([[1, 4]], 1), [[0.0, 4e6]])
+            assert np.allclose(wcs.wcs_pix2world([[6, 1]], 1), [[1.0, 1e6]])
+            assert np.allclose(wcs.wcs_pix2world([[6, 4]], 1), [[1.0, 4e6]])
+
+
+class TestCallistoBatch:
+    def test_callisto_digits_from_linear_no_underflow(
+        self,
+    ) -> None:
+        """Check that small values don't underflow when they're transformed to CALLISTO digits."""
+        dynamic_spectra = np.array([-1, 0, 0.5, 1, 2, 3], dtype=np.float32)
+        expected = np.array([0, 0, 0, 0, 8, 12], dtype=np.uint8)
+        assert np.array_equal(
+            spectre_server.core.batches.callisto_digits_from_linear(dynamic_spectra),
+            expected,
+        )
+
+    def test_callisto_digits_from_linear_no_overflow(
+        self,
+    ) -> None:
+        """Check that large values don't overflow when they're transformed to CALLISTO digits."""
+        # The big value and delta were found empircally.
+        big_value, delta = 6958566400, 5e8
+        just_under, just_over = big_value - delta, big_value + delta
+        very_over = big_value * 2
+        dynamic_spectra = np.array(
+            [just_under, big_value, just_over, very_over],
+            dtype=np.float32,
+        )
+        expected = np.array([254, 255, 255, 255], dtype=np.uint8)
+        assert np.array_equal(
+            spectre_server.core.batches.callisto_digits_from_linear(dynamic_spectra),
+            expected,
+        )
+
+    def test_callisto_digits_from_linear_typical(self) -> None:
+        """Check a typical value correctly transforms to a CALLISTO digit."""
+        # The expected value is computed by hand.
+        dynamic_spectra = np.array([3.470352815], dtype=np.float32)
+        expected = np.array([14], dtype=np.uint8)
+        assert np.array_equal(
+            spectre_server.core.batches.callisto_digits_from_linear(dynamic_spectra),
+            expected,
+        )
+
+    def test_callisto_digits_to_linear_min(
+        self,
+    ) -> None:
+        """Check that the minimum possible CALLISTO digit is correctly transformed to unity when linearised."""
+        digits = np.array([0], dtype=np.uint8)
+        expected = np.float32(1)
+        assert (
+            spectre_server.core.batches.callisto_digits_to_linear(digits)[0] == expected
+        )
+
+    def test_callisto_digits_to_linear_max(
+        self,
+    ) -> None:
+        """Check that the maximum possible CALLISTO digit is correctly transformed to the maximum value when linearised."""
+        digits = np.array([255], dtype=np.uint8)
+        expected = np.float32(6958566400)
+        assert np.isclose(
+            spectre_server.core.batches.callisto_digits_to_linear(digits)[0],
+            expected,
+        )
+
+    def test_callisto_digits_to_linear_typical(
+        self,
+    ) -> None:
+        """Check that a typical digit is correctly transformed when linearised."""
+        # The expected value is computed by hand.
+        digits = np.array([14], dtype=np.uint8)
+        expected = np.float32(3.470352815)
+        assert np.isclose(
+            spectre_server.core.batches.callisto_digits_to_linear(digits)[0], expected
+        )
+
+    def test_round_trip_from_callisto_digits(
+        self,
+    ) -> None:
+        """Check that CALLISTO digits are preserved transforming to and from the linear scale."""
+        digits = np.arange(255, dtype=np.uint8)
+        assert np.array_equal(
+            digits,
+            spectre_server.core.batches.callisto_digits_from_linear(
+                spectre_server.core.batches.callisto_digits_to_linear(digits)
+            ),
+        )
+
+    def test_round_trip_from_linear(
+        self,
+    ) -> None:
+        """Explicitly recognise a round trip is _not_ possible starting from linear values,
+        due to floating point precision loss and quantisation errors."""
+        # The range of values was chosen arbitrarily, we just have to stick to positive values.
+        linear = np.arange(100, dtype=np.float32)
+        assert not np.allclose(
+            linear,
+            spectre_server.core.batches.callisto_digits_to_linear(
+                spectre_server.core.batches.callisto_digits_from_linear(linear)
+            ),
+        )
+
+    def test_write_and_read_spectrogram(
+        self,
+        callisto_batch: spectre_server.core.batches.CallistoBatch,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+    ) -> None:
+        """Spectrograms written to disk must conform to e-Callisto FITS conventions,
+        and be consistent with the spectrogram read back.
+        """
+
+        # Write the spectrogram to disk.
+        callisto_batch.write_spectrogram(
+            spectrogram,
+            origin=ORIGIN,
+            instrume=INSTRUME,
+            observer=OBSERVER,
+            object_=OBJECT,
+            telescop=TELESCOP,
+            obsgeo_b=OBSGEO_B,
+            obsgeo_l=OBSGEO_L,
+            obsgeo_h=OBSGEO_H,
+        )
+
+        # Check the spectrogram we wrote to disk is consistent with what we read back.
+        # A full round trip is _not_ possible starting from linear values due to floating point precision loss
+        # and quantisation errors during the transformation. So, check a few of the values are close, up to a tolerance.
+        s = callisto_batch.read_spectrogram()
+        assert np.allclose(s.dynamic_spectra, spectrogram.dynamic_spectra, atol=1)
+
+        # Should be bitwise equal, since this is read from the binary table extension.
+        assert np.array_equal(s.times, spectrogram.times)
+        assert np.array_equal(s.frequencies, spectrogram.frequencies)
+
+        # Check the FITS file conforms to e-Callisto conventions.
+        with astropy.io.fits.open(callisto_batch.fit_file.file_path) as hdulist:
+
+            # First, check the keywords in the primary HDU.
+            primary_hdu: astropy.io.fits.PrimaryHDU = hdulist[0]
+
+            # ----------------------------------------------- #
+            # Conformal keywords that assume conformal values.
+            # ----------------------------------------------- #
+            assert primary_hdu.header.get("SIMPLE") == True
+            assert primary_hdu.header.get("BITPIX") == 8
+            assert primary_hdu.header.get("NAXIS") == 2
+            assert primary_hdu.header.get("NAXIS1") == 6
+            assert primary_hdu.header.get("NAXIS2") == 4
+            assert primary_hdu.header.get("EXTEND") == True
+            assert primary_hdu.header.get("DATE") == "2000-01-25"
+            assert primary_hdu.header.get("ORIGIN") == ORIGIN
+            assert primary_hdu.header.get("TELESCOP") == TELESCOP
+            assert primary_hdu.header.get("INSTRUME") == INSTRUME
+            assert primary_hdu.header.get("OBJECT") == OBJECT
+            assert primary_hdu.header.get("BZERO") == 0
+            assert primary_hdu.header.get("BSCALE") == 1
+            assert primary_hdu.header.get("DATAMIN") == 0
+            assert primary_hdu.header.get("DATAMAX") == 35
+            # Not reccommended (the value should conform with the recommendations in the IAU Style Manual), but this is conformal.
+            assert primary_hdu.header.get("BUNIT") == "digits"
+
+            # ----------------------------------------------------------------------- #
+            # Conformal keywords that do not assume conformal values.
+            #
+            # Keyword records are retained for consistency with e-Callisto FITS files.
+            # ----------------------------------------------------------------------- #
+            # Non-conformal due to invalid date format.
+            assert primary_hdu.header.get("DATE-OBS") == "2000/01/25"
+            assert primary_hdu.header.get("DATE-END") == "2000/01/25"
+
+            # ----------------------------------------------------------------------- #
+            # Non-conformal keywords.
+            #
+            # Keyword records are retained for consistency with e-Callisto FITS files.
+            # ----------------------------------------------------------------------- #
+            # Values are retained for consistency with e-Callisto FITS files.
+            assert (
+                primary_hdu.header.get("CONTENT")
+                == f"{primary_hdu.header.get('DATE-OBS')}  Radio flux density, e-CALLISTO ({primary_hdu.header.get('INSTRUME')})"
+            )
+            # Exactly three digits to the fractional component is intentional.
+            assert primary_hdu.header.get("TIME-OBS") == "01:00:00.000"
+            # No fractional component is intentional.
+            assert primary_hdu.header.get("TIME-END") == "01:00:01"
+            assert primary_hdu.header.get("OBS_LAT") == OBSGEO_B
+            assert primary_hdu.header.get("OBS_LAC") == "N"
+            assert primary_hdu.header.get("OBS_LON") == OBSGEO_L
+            assert primary_hdu.header.get("OBS_LOC") == "E"
+            assert primary_hdu.header.get("OBS_ALT") == OBSGEO_H
+            # Empty values are intentional - these keyword records don't carry over in any meaningful way.
+            assert primary_hdu.header.get("FRQFILE") == ""
+            assert primary_hdu.header.get("PWM_VAL") == ""
+
+            # ----------------------------------------------------------------------- #
+            # In the e-Callisto FITS files, the values assumed by the world coordinate
+            # system keywords don't appear to be consistent with the data in the binary
+            # table extension or the spectrogram. We prioritise making them consistent
+            # with e-Callisto, rather than the FITS standard. Values may be hardcoded and
+            # inconsistent with the data.
+            # ----------------------------------------------------------------------- #
+            # This appears to be the elapsed time from midnight on DATE-OBS.
+            assert primary_hdu.header.get("CRVAL1") == 3600
+            assert primary_hdu.header.get("CRPIX1") == 0
+            assert primary_hdu.header.get("CTYPE1") == "Time [UT]"
+            # All e-Calliso files inspected appear to hold here the time resolution (as opposed to CDELT2, which does not
+            # hold the frequency resolution).
+            assert np.isclose(primary_hdu.header.get("CDELT1"), 0.2)
+
+            # All e-Calliso files inspected held a fixed value of 200.
+            assert primary_hdu.header.get("CRVAL2") == 200
+            assert primary_hdu.header.get("CRPIX2") == 0
+            assert primary_hdu.header.get("CRTYPE2") == "Frequency [MHz]"
+            assert primary_hdu.header.get("CDELT2") == -1
+
+            # Secondly, check the keywords in the binary table extension.
+            bintable_hdu: astropy.io.fits.BinTableHDU = hdulist[1]
+
+            # ----------------------------------------------- #
+            # Conformal keywords that assume conformal values.
+            # ----------------------------------------------- #
+            assert bintable_hdu.header.get("XTENSION") == "BINTABLE"
+            assert bintable_hdu.header.get("BITPIX") == 8
+            assert bintable_hdu.header.get("NAXIS") == 2
+            assert bintable_hdu.header.get("PCOUNT") == 0
+            assert bintable_hdu.header.get("GCOUNT") == 1
+            assert bintable_hdu.header.get("TFIELDS") == 2
+            assert bintable_hdu.header.get("TTYPE1") == "TIME"
+            assert bintable_hdu.header.get("TTYPE2") == "FREQUENCY"
+            assert bintable_hdu.header.get("TSCAL1") == 1
+            assert bintable_hdu.header.get("TSCAL2") == 1
+            assert bintable_hdu.header.get("TZERO1") == 0
+            assert bintable_hdu.header.get("TZERO2") == 0
+            assert bintable_hdu.header.get("NAXIS1") == 4 * 8 + 6 * 8
+            assert bintable_hdu.header.get("NAXIS2") == 1
+
+            # ----------------------------------------------------------------------- #
+            # Conformal keywords that do not assume conformal values.
+            # ----------------------------------------------------------------------- #
+            # The .3 are e-Callisto conventions.
+            assert bintable_hdu.header.get("TFORM1") == "6D8.3"
+            assert bintable_hdu.header.get("TFORM2") == "4D8.3"

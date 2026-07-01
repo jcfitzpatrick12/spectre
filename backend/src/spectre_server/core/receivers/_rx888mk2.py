@@ -17,6 +17,7 @@ from ._names import ReceiverName
 @dataclasses.dataclass(frozen=True)
 class _Mode:
     FIXED_CENTER_FREQUENCY = "fixed_center_frequency"
+    CALLISTO = "callisto"
 
 
 @register_receiver(ReceiverName.RX888MK2)
@@ -30,4 +31,13 @@ class RX888MK2(Base):
             spectre_server.core.flowgraphs.RX888MK2FixedCenterFrequency,
             spectre_server.core.events.FixedCenterFrequency,
             spectre_server.core.batches.IQStreamBatch,
+        )
+
+        self.add_mode(
+            _Mode.CALLISTO,
+            spectre_server.core.models.RX888MK2Callisto,
+            # Reuse the flowgraph from the `fixed_center_frequency` mode.
+            spectre_server.core.flowgraphs.RX888MK2FixedCenterFrequency,
+            spectre_server.core.events.Callisto,
+            spectre_server.core.batches.CallistoBatch,
         )

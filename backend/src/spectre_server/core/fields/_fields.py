@@ -349,3 +349,11 @@ class Field:
             description="The variable-gain amplifier gain, in dB.",
         ),
     ]
+    callisto_scale_factor = typing.Annotated[
+        float,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            description="A scale factor that transforms DFT amplitudes to linearised CALLISTO digits.",
+        ),
+    ]

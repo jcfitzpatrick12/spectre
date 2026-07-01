@@ -10,6 +10,7 @@ import spectre_server.core.flowgraphs
 from ._validators import (
     skip_validator,
     validate_window_size,
+    validate_window_type,
     validate_in_range,
     validate_one_of,
 )
@@ -34,6 +35,47 @@ class RX888MK2FixedCenterFrequency(
         if skip_validator(info):
             return self
         validate_window_size(self.window_size)
+        validate_output_type(self.output_type)
+
+        if not self.antenna_port == spectre_server.core.flowgraphs.RX888MK2Port.HF:
+            raise ValueError(
+                f"Only the HF port is currently supported. Got {self.antenna_port}"
+            )
+
+        validate_in_range(
+            self.center_frequency,
+            lower_bound=HF_FREQ_LOWER_BOUND,
+            upper_bound=HF_FREQ_UPPER_BOUND,
+            name="center_frequency",
+        )
+        validate_in_range(
+            self.rf_gain,
+            lower_bound=RF_GAIN_LOWER_BOUND,
+            upper_bound=RF_GAIN_UPPER_BOUND,
+            name="rf_gain",
+        )
+        validate_in_range(
+            self.if_gain,
+            lower_bound=IF_GAIN_LOWER_BOUND,
+            upper_bound=IF_GAIN_UPPER_BOUND,
+            name="if_gain",
+        )
+        validate_one_of(self.sample_rate, HF_ALLOWED_SAMPLE_RATES, "sample_rate")
+        validate_one_of(self.output_type, EXPECTED_OUTPUT_TYPES, "output_type")
+        return self
+
+
+class RX888MK2Callisto(
+    # Reuse the flowgraph from the `fixed_center_frequency` mode.
+    spectre_server.core.flowgraphs.RX888MK2FixedCenterFrequencyModel,
+    spectre_server.core.events.CallistoModel,
+):
+    @pydantic.model_validator(mode="after")
+    def validator(self, info: pydantic.ValidationInfo):
+        if skip_validator(info):
+            return self
+        validate_window_size(self.window_size)
+        validate_window_type(self.window_type)
         validate_output_type(self.output_type)
 
         if not self.antenna_port == spectre_server.core.flowgraphs.RX888MK2Port.HF:
