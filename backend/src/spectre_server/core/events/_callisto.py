@@ -40,10 +40,13 @@ class CallistoModel(BaseModel):
     output_type: spectre_server.core.fields.Field.output_type = (
         spectre_server.core.fields.OutputType.FC32
     )
-    callisto_scale_factor: spectre_server.core.fields.Field.callisto_scale_factor = 1
+    # Default value is provided by Alexandro Rabadán Parra, see https://github.com/AlexandroRP99/e-Callisto_Py_RX-888_MK_II
+    callisto_scale_factor: spectre_server.core.fields.Field.callisto_scale_factor = (
+        89958.629068
+    )
 
 
-def __linear_calibration(
+def linear_calibration(
     dynamic_spectra: npt.NDArray[np.float32], gradient: float, const: float = 0
 ) -> npt.NDArray[np.float32]:
     """Apply a calibration relating DFT amplitudes to linearised CALLISTO digits.
@@ -119,7 +122,7 @@ class Callisto(Base[CallistoModel, spectre_server.core.batches.CallistoBatch]):
         # Shift the zero-frequency component to the middle of the spectrum.
         dynamic_spectra = np.fft.fftshift(dynamic_spectra, axes=0)
 
-        linearised_digits = __linear_calibration(
+        linearised_digits = linear_calibration(
             dynamic_spectra, self.__model.callisto_scale_factor
         )
 
