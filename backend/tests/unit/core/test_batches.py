@@ -761,10 +761,6 @@ class TestCallistoBatch:
             assert bintable_hdu.header.get("TZERO2") == 0
             assert bintable_hdu.header.get("NAXIS1") == 4 * 8 + 6 * 8
             assert bintable_hdu.header.get("NAXIS2") == 1
-
-            # ----------------------------------------------------------------------- #
-            # Conformal keywords that do not assume conformal values.
-            # ----------------------------------------------------------------------- #
             # The .3 are e-Callisto conventions.
             assert bintable_hdu.header.get("TFORM1") == "6D8.3"
             assert bintable_hdu.header.get("TFORM2") == "4D8.3"
