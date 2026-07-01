@@ -13,6 +13,12 @@ from ._base import (
 )
 from ._batches import Batches
 from ._iq_stream import IQMetadata, IQStreamBatch, IQStreamBatchExtension
+from ._callisto import (
+    CallistoBatch,
+    CallistoBatchExtension,
+    callisto_digits_to_linear,
+    callisto_digits_from_linear,
+)
 
 __all__ = [
     "Base",
@@ -24,4 +30,8 @@ __all__ = [
     "IQMetadata",
     "IQStreamBatch",
     "IQStreamBatchExtension",
+    "CallistoBatch",
+    "CallistoBatchExtension",
+    "callisto_digits_to_linear",
+    "callisto_digits_from_linear",
 ]

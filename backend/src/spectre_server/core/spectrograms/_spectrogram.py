@@ -26,9 +26,11 @@ class SpectrumUnit(enum.Enum):
     """A defined unit for dynamic spectra values.
 
     :ivar AMPLITUDE: DFT amplitude (see https://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html)
+    :ivar CALLISTO: Linearised callisto digits.
     """
 
     AMPLITUDE = "amplitude"
+    CALLISTO = "callisto"
 
 
 @dataclasses.dataclass
@@ -272,7 +274,7 @@ class Spectrogram:
         background_spectra = background_spectrum[:, np.newaxis]
         # Suppress divide by zero and invalid value warnings for this block of code
         with np.errstate(divide="ignore", invalid="ignore"):
-            if self._spectrum_unit == SpectrumUnit.AMPLITUDE:
+            if self._spectrum_unit in [SpectrumUnit.AMPLITUDE, SpectrumUnit.CALLISTO]:
                 dynamic_spectra_dBb = 10 * np.log10(
                     self._dynamic_spectra / background_spectra
                 )
