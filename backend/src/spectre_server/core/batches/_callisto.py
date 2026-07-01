@@ -154,6 +154,8 @@ class CallistoBatch(Base):
         """Delete I/Q samples from the batch."""
         if extension == CallistoBatchExtension.FC32:
             self.fc32_file.delete()
+        else:
+            raise ValueError(f"Unsupported output type: {extension}")
 
     def write_spectrogram(
         self,
