@@ -36,8 +36,7 @@ def callisto_digits_from_linear(
     # detector and ADC.
     digits = ((db * DETECTOR_CONVERSION_RATE) / ADC_VOLTAGE_RANGE) * ADC_DIGIT_RANGE
 
-    # Round to nearest ADC code before casting to avoid float32 truncation artifacts
-    # (e.g. 0.9999999 becoming 0).
+    # Avoid float32 truncation artifacts (e.g. 0.9999999 becoming 0).
     digits = np.rint(digits)
 
     # Cast to unsigned 8-bit integers, clipping to avoid overflows.
