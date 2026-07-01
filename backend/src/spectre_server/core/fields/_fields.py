@@ -354,6 +354,6 @@ class Field:
         pydantic.Field(
             ...,
             validate_default=True,
-            description="A scale factor that transforms DFT amplitudes to linearised CALLISTO digits.",
+            description="Transform DFT amplitudes to linearised CALLISTO receiver digits through a linear calibration.",
         ),
     ]
