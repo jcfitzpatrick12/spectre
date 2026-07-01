@@ -547,7 +547,7 @@ class TestCallistoBatch:
         self,
     ) -> None:
         """Check that large values don't overflow when they're transformed to CALLISTO digits."""
-        # The big value and delta were found empircally.
+        # The big value and delta were found empirically.
         big_value, delta = 6958566400, 5e8
         just_under, just_over = big_value - delta, big_value + delta
         very_over = big_value * 2
@@ -607,7 +607,7 @@ class TestCallistoBatch:
         self,
     ) -> None:
         """Check that CALLISTO digits are preserved transforming to and from the linear scale."""
-        digits = np.arange(255, dtype=np.uint8)
+        digits = np.arange(256, dtype=np.uint8)
         assert np.array_equal(
             digits,
             spectre_server.core.batches.callisto_digits_from_linear(
@@ -685,7 +685,7 @@ class TestCallistoBatch:
             assert primary_hdu.header.get("BSCALE") == 1
             assert primary_hdu.header.get("DATAMIN") == 0
             assert primary_hdu.header.get("DATAMAX") == 35
-            # Not reccommended (the value should conform with the recommendations in the IAU Style Manual), but this is conformal.
+            # Not recommended (the value should conform with the recommendations in the IAU Style Manual), but this is conformal.
             assert primary_hdu.header.get("BUNIT") == "digits"
 
             # ----------------------------------------------------------------------- #
@@ -731,11 +731,11 @@ class TestCallistoBatch:
             assert primary_hdu.header.get("CRVAL1") == 3600
             assert primary_hdu.header.get("CRPIX1") == 0
             assert primary_hdu.header.get("CTYPE1") == "Time [UT]"
-            # All e-Calliso files inspected appear to hold here the time resolution (as opposed to CDELT2, which does not
+            # All e-Callisto files inspected appear to hold here the time resolution (as opposed to CDELT2, which does not
             # hold the frequency resolution).
             assert np.isclose(primary_hdu.header.get("CDELT1"), 0.2)
 
-            # All e-Calliso files inspected held a fixed value of 200.
+            # All e-Callisto files inspected held a fixed value of 200.
             assert primary_hdu.header.get("CRVAL2") == 200
             assert primary_hdu.header.get("CRPIX2") == 0
             assert primary_hdu.header.get("CRTYPE2") == "Frequency [MHz]"

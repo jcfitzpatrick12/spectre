@@ -85,7 +85,7 @@ class Callisto(Base[CallistoModel, spectre_server.core.batches.CallistoBatch]):
     def process(
         self, batch: spectre_server.core.batches.CallistoBatch
     ) -> spectre_server.core.spectrograms.Spectrogram:
-        """TBD."""
+        """Create a CALLISTO-compatible spectrogram from a batch of IQ samples."""
         _LOGGER.info(f"Reading the I/Q samples")
         iq_data = batch.read_iq(self.__model.output_type)
 
