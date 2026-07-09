@@ -5,6 +5,9 @@
 import typer
 import os
 import requests
+import datetime
+import enum
+import gzip
 
 from ._utils import safe_request, get_config_file_name
 from ._secho_resources import (
@@ -12,6 +15,56 @@ from ._secho_resources import (
     secho_existing_resource,
     secho_existing_resources,
 )
+
+_CALLISTO_FOCUS_CODE = "04"
+
+
+class RenamePolicy(str, enum.Enum):
+    default = "default"
+    callisto = "callisto"
+
+
+def __parse_spectre_file_name(file_name: str) -> tuple[datetime.datetime, str, str]:
+    """Parse a Spectre file name of the form `<datetime>_<tag>.<extension>`."""
+    base_name, _, extension = file_name.rpartition(".")
+    datetime_string, _, tag = base_name.partition("_")
+    try:
+        datetime_value = datetime.datetime.fromisoformat(
+            datetime_string.replace("Z", "+00:00")
+        )
+    except ValueError:
+        typer.secho(
+            f"Error: Could not parse the file name '{file_name}'. Expected the form "
+            "'<datetime>_<tag>.<extension>', with an ISO 8601 formatted datetime.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    return datetime_value, tag, extension
+
+
+def __get_callisto_instrume(tag: str) -> str:
+    """Extract the `instrume` parameter from the config with the given tag."""
+    file_name = get_config_file_name(file_name=None, tag=tag)
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
+    config = jsend_dict["data"]
+
+    receiver_mode = config["receiver_mode"]
+    if receiver_mode != RenamePolicy.callisto.value:
+        typer.secho(
+            f"Error: The '{RenamePolicy.callisto.value}' rename policy requires the receiver mode "
+            f"'{RenamePolicy.callisto.value}', but the config with tag '{tag}' has mode '{receiver_mode}'.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+
+    instrume = config["parameters"].get("instrume")
+    if instrume is None:
+        typer.secho(
+            f"Error: The config with tag '{tag}' is missing the required parameter 'instrume'.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    return instrume
 
 
 def __download_resource(endpoint: str, directory: str) -> None:
@@ -21,10 +74,32 @@ def __download_resource(endpoint: str, directory: str) -> None:
         file.write(response.content)
 
 
+def __download_callisto_resource(endpoint: str, directory: str, instrume: str) -> None:
+    datetime_value, _, extension = __parse_spectre_file_name(os.path.basename(endpoint))
+    file_name = (
+        f"{instrume}_{datetime_value.strftime('%Y%m%d_%H%M%S')}_"
+        f"{_CALLISTO_FOCUS_CODE}.{extension}.gz"
+    )
+    file_path = os.path.join(directory, file_name)
+    response = requests.get(endpoint)
+    with gzip.open(file_path, "wb") as file:
+        file.write(response.content)
+
+
 def __download_resources(endpoints: list[str], directory: str) -> None:
     os.makedirs(directory, exist_ok=True)
     for endpoint in endpoints:
         __download_resource(endpoint, directory)
+
+
+def __download_callisto_resources(endpoints: list[str], directory: str) -> None:
+    os.makedirs(directory, exist_ok=True)
+    instrume_by_tag: dict[str, str] = {}
+    for endpoint in endpoints:
+        _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
+        if tag not in instrume_by_tag:
+            instrume_by_tag[tag] = __get_callisto_instrume(tag)
+        __download_callisto_resource(endpoint, directory, instrume_by_tag[tag])
 
 
 get_typer = typer.Typer(help="Display one or many resources.")
@@ -99,6 +174,11 @@ def files(
         "--export",
         help="Bulk download files to your local filesystem inside this directory.",
     ),
+    rename: RenamePolicy = typer.Option(
+        RenamePolicy.default,
+        "--rename",
+        help="Rename files on export according to this policy. Ignored if '--export' is not provided.",
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -116,6 +196,8 @@ def files(
 
     if export is None:
         secho_existing_resources(endpoints)
+    elif rename == RenamePolicy.callisto:
+        __download_callisto_resources(endpoints, export)
     else:
         __download_resources(endpoints, export)
 
