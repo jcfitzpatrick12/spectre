@@ -8,7 +8,6 @@ from typing import List
 from ._utils import safe_request, get_config_file_name
 from ._secho_resources import secho_new_resource
 
-
 update_typer = typer.Typer(help="Update resources.")
 
 

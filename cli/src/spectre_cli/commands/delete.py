@@ -12,7 +12,6 @@ from ._secho_resources import (
     secho_existing_resources,
 )
 
-
 delete_typer = typer.Typer(help="Delete resources.")
 
 
