@@ -67,39 +67,48 @@ def __get_callisto_instrume(tag: str) -> str:
     return instrume
 
 
-def __download_resource(endpoint: str, directory: str) -> None:
-    file_path = os.path.join(directory, os.path.basename(endpoint))
-    response = requests.get(endpoint)
-    with open(file_path, "wb") as file:
-        file.write(response.content)
-
-
-def __download_callisto_resource(endpoint: str, directory: str, instrume: str) -> None:
+def __get_callisto_file_name(endpoint: str, instrume: str) -> str:
     datetime_value, _, extension = __parse_spectre_file_name(os.path.basename(endpoint))
-    file_name = (
+    return (
         f"{instrume}_{datetime_value.strftime('%Y%m%d_%H%M%S')}_"
-        f"{_CALLISTO_FOCUS_CODE}.{extension}.gz"
+        f"{_CALLISTO_FOCUS_CODE}.{extension}"
     )
+
+
+def __download_resource(
+    endpoint: str, directory: str, file_name: str, compress: bool = False
+) -> None:
+    if compress:
+        file_name += ".gz"
     file_path = os.path.join(directory, file_name)
     response = requests.get(endpoint)
-    with gzip.open(file_path, "wb") as file:
-        file.write(response.content)
+    if compress:
+        with gzip.open(file_path, "wb") as file:
+            file.write(response.content)
+    else:
+        with open(file_path, "wb") as file:
+            file.write(response.content)
 
 
-def __download_resources(endpoints: list[str], directory: str) -> None:
+def __download_resources(
+    endpoints: list[str], directory: str, compress: bool = False
+) -> None:
     os.makedirs(directory, exist_ok=True)
     for endpoint in endpoints:
-        __download_resource(endpoint, directory)
+        __download_resource(endpoint, directory, os.path.basename(endpoint), compress)
 
 
-def __download_callisto_resources(endpoints: list[str], directory: str) -> None:
+def __download_callisto_resources(
+    endpoints: list[str], directory: str, compress: bool = False
+) -> None:
     os.makedirs(directory, exist_ok=True)
     instrume_by_tag: dict[str, str] = {}
     for endpoint in endpoints:
         _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
         if tag not in instrume_by_tag:
             instrume_by_tag[tag] = __get_callisto_instrume(tag)
-        __download_callisto_resource(endpoint, directory, instrume_by_tag[tag])
+        file_name = __get_callisto_file_name(endpoint, instrume_by_tag[tag])
+        __download_resource(endpoint, directory, file_name, compress)
 
 
 get_typer = typer.Typer(help="Display one or many resources.")
@@ -179,6 +188,11 @@ def files(
         "--rename",
         help="Rename files on export according to this policy. Ignored if '--export' is not provided.",
     ),
+    compress: bool = typer.Option(
+        False,
+        "--compress",
+        help="Compress files on export using gzip, appending the '.gz' extension. Ignored if '--export' is not provided.",
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -197,9 +211,9 @@ def files(
     if export is None:
         secho_existing_resources(endpoints)
     elif rename == RenamePolicy.callisto:
-        __download_callisto_resources(endpoints, export)
+        __download_callisto_resources(endpoints, export, compress)
     else:
-        __download_resources(endpoints, export)
+        __download_resources(endpoints, export, compress)
 
     raise typer.Exit()
 
