@@ -11,7 +11,6 @@ from spectre_cli.commands.update import update_typer
 from spectre_cli.commands.test import test_typer
 from spectre_cli.commands.record import record_typer
 
-
 app = typer.Typer(
     help="Spectre: Process, Explore and Capture Transient Radio Emissions"
 )

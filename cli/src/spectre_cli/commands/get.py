@@ -5,6 +5,9 @@
 import typer
 import os
 import requests
+import datetime
+import enum
+import gzip
 
 from ._utils import safe_request, get_config_file_name
 from ._secho_resources import (
@@ -13,18 +16,95 @@ from ._secho_resources import (
     secho_existing_resources,
 )
 
+_CALLISTO_FOCUS_CODE = "04"
 
-def __download_resource(endpoint: str, directory: str) -> None:
-    file_path = os.path.join(directory, os.path.basename(endpoint))
+
+class _RenamePolicy(str, enum.Enum):
+    spectre = "spectre"
+    callisto = "callisto"
+
+
+def __parse_spectre_file_name(file_name: str) -> tuple[datetime.datetime, str, str]:
+    """Parse a Spectre file name of the form `<datetime>_<tag>.<extension>`."""
+    base_name, _, extension = file_name.rpartition(".")
+    datetime_string, _, tag = base_name.partition("_")
+    try:
+        datetime_value = datetime.datetime.fromisoformat(
+            datetime_string.replace("Z", "+00:00")
+        )
+    except ValueError:
+        typer.secho(
+            f"Error: Could not parse the file name '{file_name}'. The datetime is not "
+            "ISO 8601 compliant.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    return datetime_value, tag, extension
+
+
+def __get_callisto_instrume(tag: str) -> str:
+    """Extract the `instrume` parameter from the config with the given tag."""
+    file_name = get_config_file_name(file_name=None, tag=tag)
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
+    config = jsend_dict["data"]
+
+    instrume = config["parameters"].get("instrume")
+    if instrume is None:
+        typer.secho(
+            f"Error: The config with tag '{tag}' is missing the required parameter 'instrume'.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    return instrume
+
+
+def __get_callisto_file_name(endpoint: str, instrume: str) -> str:
+    datetime_value, _, extension = __parse_spectre_file_name(os.path.basename(endpoint))
+    return (
+        f"{instrume}_{datetime_value.strftime('%Y%m%d_%H%M%S')}_"
+        f"{_CALLISTO_FOCUS_CODE}.{extension}"
+    )
+
+
+def __download_resource(
+    endpoint: str, directory: str, file_name: str, compress: bool = False
+) -> None:
+    if compress:
+        file_name += ".gz"
+    file_path = os.path.join(directory, file_name)
     response = requests.get(endpoint)
-    with open(file_path, "wb") as file:
-        file.write(response.content)
+    if compress:
+        with gzip.open(file_path, "wb") as file:
+            file.write(response.content)
+    else:
+        with open(file_path, "wb") as file:
+            file.write(response.content)
 
 
-def __download_resources(endpoints: list[str], directory: str) -> None:
+def __download_resources(
+    endpoints: list[str], directory: str, compress: bool = False
+) -> None:
     os.makedirs(directory, exist_ok=True)
     for endpoint in endpoints:
-        __download_resource(endpoint, directory)
+        __download_resource(endpoint, directory, os.path.basename(endpoint), compress)
+
+
+def __download_callisto_resources(
+    endpoints: list[str], directory: str, compress: bool = False
+) -> None:
+    # First, check that data files for all tags are _able_ to be renamed under this policy.
+    # Notably, they require the parameter `instrume` in the corresponding config.
+    instrume_by_tag: dict[str, str] = {}
+    for endpoint in endpoints:
+        _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
+        if tag not in instrume_by_tag:
+            instrume_by_tag[tag] = __get_callisto_instrume(tag)
+
+    os.makedirs(directory, exist_ok=True)
+    for endpoint in endpoints:
+        _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
+        file_name = __get_callisto_file_name(endpoint, instrume_by_tag[tag])
+        __download_resource(endpoint, directory, file_name, compress)
 
 
 get_typer = typer.Typer(help="Display one or many resources.")
@@ -99,6 +179,16 @@ def files(
         "--export",
         help="Bulk download files to your local filesystem inside this directory.",
     ),
+    rename: _RenamePolicy = typer.Option(
+        _RenamePolicy.spectre,
+        "--rename",
+        help="Rename files on export according to this policy. Ignored if '--export' is not provided.",
+    ),
+    compress: bool = typer.Option(
+        False,
+        "--compress",
+        help="Compress files on export using gzip. Ignored if '--export' is not provided.",
+    ),
 ) -> None:
     params = {
         "extension": extensions,
@@ -116,8 +206,10 @@ def files(
 
     if export is None:
         secho_existing_resources(endpoints)
+    elif rename == _RenamePolicy.callisto:
+        __download_callisto_resources(endpoints, export, compress)
     else:
-        __download_resources(endpoints, export)
+        __download_resources(endpoints, export, compress)
 
     raise typer.Exit()
 

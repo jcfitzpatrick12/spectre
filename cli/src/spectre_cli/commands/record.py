@@ -6,7 +6,6 @@ import typer
 
 from ._utils import safe_request, spinner
 
-
 record_typer = typer.Typer(help="Start recording data.")
 
 _DEFAULT_MAX_RESTARTS = 5
