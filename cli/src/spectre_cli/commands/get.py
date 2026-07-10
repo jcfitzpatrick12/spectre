@@ -20,7 +20,7 @@ _CALLISTO_FOCUS_CODE = "04"
 
 
 class RenamePolicy(str, enum.Enum):
-    default = "default"
+    spectre = "spectre"
     callisto = "callisto"
 
 
@@ -184,7 +184,7 @@ def files(
         help="Bulk download files to your local filesystem inside this directory.",
     ),
     rename: RenamePolicy = typer.Option(
-        RenamePolicy.default,
+        RenamePolicy.spectre,
         "--rename",
         help="Rename files on export according to this policy. Ignored if '--export' is not provided.",
     ),
