@@ -19,7 +19,7 @@ from ._secho_resources import (
 _CALLISTO_FOCUS_CODE = "04"
 
 
-class RenamePolicy(str, enum.Enum):
+class _RenamePolicy(str, enum.Enum):
     spectre = "spectre"
     callisto = "callisto"
 
@@ -34,8 +34,8 @@ def __parse_spectre_file_name(file_name: str) -> tuple[datetime.datetime, str, s
         )
     except ValueError:
         typer.secho(
-            f"Error: Could not parse the file name '{file_name}'. Expected the form "
-            "'<datetime>_<tag>.<extension>', with an ISO 8601 formatted datetime.",
+            f"Error: Could not parse the file name '{file_name}'. The datetime is not "
+            "ISO 8601 compliant.",
             fg="yellow",
         )
         raise typer.Exit(1)
@@ -179,15 +179,15 @@ def files(
         "--export",
         help="Bulk download files to your local filesystem inside this directory.",
     ),
-    rename: RenamePolicy = typer.Option(
-        RenamePolicy.spectre,
+    rename: _RenamePolicy = typer.Option(
+        _RenamePolicy.spectre,
         "--rename",
         help="Rename files on export according to this policy. Ignored if '--export' is not provided.",
     ),
     compress: bool = typer.Option(
         False,
         "--compress",
-        help="Compress files on export using gzip, appending the '.gz' extension. Ignored if '--export' is not provided.",
+        help="Compress files on export using gzip. Ignored if '--export' is not provided.",
     ),
 ) -> None:
     params = {
@@ -206,7 +206,7 @@ def files(
 
     if export is None:
         secho_existing_resources(endpoints)
-    elif rename == RenamePolicy.callisto:
+    elif rename == _RenamePolicy.callisto:
         __download_callisto_resources(endpoints, export, compress)
     else:
         __download_resources(endpoints, export, compress)
