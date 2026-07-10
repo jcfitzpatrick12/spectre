@@ -48,15 +48,6 @@ def __get_callisto_instrume(tag: str) -> str:
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
     config = jsend_dict["data"]
 
-    receiver_mode = config["receiver_mode"]
-    if receiver_mode != RenamePolicy.callisto.value:
-        typer.secho(
-            f"Error: The '{RenamePolicy.callisto.value}' rename policy requires the receiver mode "
-            f"'{RenamePolicy.callisto.value}', but the config with tag '{tag}' has mode '{receiver_mode}'.",
-            fg="yellow",
-        )
-        raise typer.Exit(1)
-
     instrume = config["parameters"].get("instrume")
     if instrume is None:
         typer.secho(
@@ -101,12 +92,17 @@ def __download_resources(
 def __download_callisto_resources(
     endpoints: list[str], directory: str, compress: bool = False
 ) -> None:
-    os.makedirs(directory, exist_ok=True)
+    # First, check that data files for all tags are _able_ to be renamed under this policy.
+    # Notably, they require the parameter `instrume` in the corresponding config.
     instrume_by_tag: dict[str, str] = {}
     for endpoint in endpoints:
         _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
         if tag not in instrume_by_tag:
             instrume_by_tag[tag] = __get_callisto_instrume(tag)
+
+    os.makedirs(directory, exist_ok=True)
+    for endpoint in endpoints:
+        _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
         file_name = __get_callisto_file_name(endpoint, instrume_by_tag[tag])
         __download_resource(endpoint, directory, file_name, compress)
 
