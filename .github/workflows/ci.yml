@@ -19,9 +19,17 @@ permissions:
 
 jobs:
   backend:
-    name: backend
-    runs-on: ubuntu-latest
+    name: backend (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,9 +53,17 @@ jobs:
         run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/integration -q
 
   cli:
-    name: cli
-    runs-on: ubuntu-latest
+    name: cli (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
