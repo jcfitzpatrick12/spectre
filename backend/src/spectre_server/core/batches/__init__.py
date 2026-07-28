@@ -2,7 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""IO operations on batched data files."""
+"""IO operations on batched data files.""" 
 
 from ._base import (
     Base,
