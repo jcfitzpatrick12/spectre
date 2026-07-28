@@ -5,9 +5,9 @@
 import os
 import multiprocessing
 
-SPECTRE_BIND_HOST  = os.environ.get("SPECTRE_BIND_HOST", "0.0.0.0")
-SPECTRE_BIND_PORT  = int( os.environ.get("SPECTRE_BIND_PORT", "5000") )
+SPECTRE_BIND_HOST = os.environ.get("SPECTRE_BIND_HOST", "0.0.0.0")
+SPECTRE_BIND_PORT = int(os.environ.get("SPECTRE_BIND_PORT", "5000"))
 
 bind = f"{SPECTRE_BIND_HOST}:{SPECTRE_BIND_PORT}"
 workers = multiprocessing.cpu_count() // 2
-timeout=0
+timeout = 0
