@@ -537,9 +537,6 @@ CMD ["/app/cmd.sh"]
 # --------------------------------- # 
 FROM base AS development
 
-ARG GR_SPECTRE_REF
-ARG EXTIO_SDDC_REF
-
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       version="4.2.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
@@ -562,17 +559,9 @@ COPY --from=uhd /opt/uhd/include /usr/include
 COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
-# Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
-    git sparse-checkout init --no-cone && \
-    git sparse-checkout set backend/ && \
-    git checkout && \
-    pip install --editable backend/[test]
-
-# Clone the OOT module sources at the same refs baked into the runtime image,
-# so CTest can be re-run against them without a build-time rebuild.
-RUN git clone --depth 1 -b "${GR_SPECTRE_REF}" https://github.com/spectregrams/gr-spectre.git && \
-    git clone --depth 1 -b "${EXTIO_SDDC_REF}" https://github.com/spectregrams/ExtIO_sddc.git
+# Bake the current backend source and install it editable with test extras.
+COPY . /app/backend
+RUN pip install --editable /app/backend[test]
 
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
