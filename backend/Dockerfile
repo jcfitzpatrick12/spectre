@@ -455,8 +455,6 @@ FROM base AS runtime
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
-# x-release-please-version
-LABEL version="4.2.0"
 
 WORKDIR /app
 
@@ -541,8 +539,6 @@ FROM base AS development
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
-# x-release-please-version
-LABEL version="4.2.0"
 
 WORKDIR /app
 

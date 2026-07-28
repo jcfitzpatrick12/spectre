@@ -6,10 +6,8 @@
       "extra-files": [
         "backend/pyproject.toml",
         "backend/src/spectre_server/__init__.py",
-        "backend/Dockerfile",
         "cli/pyproject.toml",
         "cli/src/spectre_cli/__init__.py",
-        "cli/Dockerfile",
         "docker-compose.yml"
       ]
     }
