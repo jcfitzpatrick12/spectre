@@ -19,63 +19,59 @@ permissions:
 
 jobs:
   backend:
-    name: backend (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
+        arch: [amd64, arm64]
         include:
           - arch: amd64
             runner: ubuntu-latest
           - arch: arm64
             runner: ubuntu-24.04-arm
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Build development image
         run: docker build --target development -t spectre-dev-server:ci backend/
-
       - name: Build runtime image
         run: docker build --target runtime -t spectre-server:ci backend/
-
       - name: Black
         run: docker run --rm -w /app/backend spectre-dev-server:ci black --check .
-
       - name: Mypy
         run: docker run --rm -w /app/backend spectre-dev-server:ci mypy src tests
-
       - name: Pytest unit
         run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/unit -q
-
       - name: Pytest integration
         run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/integration -q
 
   cli:
-    name: cli (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
+        arch: [amd64, arm64]
         include:
           - arch: amd64
             runner: ubuntu-latest
           - arch: arm64
             runner: ubuntu-24.04-arm
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Build development image
         run: docker build --target development -t spectre-dev-cli:ci cli/
-
       - name: Build runtime image
         run: docker build --target runtime -t spectre-cli:ci cli/
-
       - name: Black
         run: docker run --rm -w /app/cli spectre-dev-cli:ci black --check .
-
       - name: Mypy
         run: docker run --rm -w /app/cli spectre-dev-cli:ci mypy src
+
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v6
+        with:
+          firstParent: false
