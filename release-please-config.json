@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "extra-files": [
+        "backend/pyproject.toml",
+        "backend/src/spectre_server/__init__.py",
+        "backend/Dockerfile",
+        "cli/pyproject.toml",
+        "cli/src/spectre_cli/__init__.py",
+        "cli/Dockerfile",
+        "docker-compose.yml"
+      ]
+    }
+  }
+}

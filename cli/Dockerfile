@@ -30,9 +30,10 @@ RUN pip install .
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="4.2.0-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
+# x-release-please-version
+LABEL version="4.2.0"
 
 
 WORKDIR /app
@@ -57,9 +58,10 @@ USER appuser
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="4.2.0-alpha" \
       description="Docker image for running the `spectre-cli`." \
       license="GPL-3.0-or-later"
+# x-release-please-version
+LABEL version="4.2.0"
 
 # Install development tools.
 RUN apt-get update && apt-get install -y --no-install-recommends \
