@@ -226,6 +226,17 @@ def receivers() -> None:
     raise typer.Exit()
 
 
+@get_typer.command(help="Discover a receiver.")
+def receiver(
+    receiver_name: str = typer.Option(
+        ..., "--receiver", "-r", help="The name of the receiver."
+    )
+) -> None:
+    jsend_dict = safe_request(f"receivers/{receiver_name}", "GET")
+    pprint_dict(jsend_dict["data"])
+    raise typer.Exit()
+
+
 @get_typer.command(help=("List the supported operating modes for a receiver."))
 def modes(
     receiver_name: str = typer.Option(

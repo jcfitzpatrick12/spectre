@@ -21,6 +21,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.RSP1B)
 class RSP1B(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["sdrplay_find_devices"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 

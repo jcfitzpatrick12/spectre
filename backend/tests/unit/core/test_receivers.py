@@ -131,6 +131,54 @@ class TestReceiver:
 
 class TestReceivers:
     @pytest.mark.parametrize(
+        ("receiver_name", "expected_command"),
+        [
+            (spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR, ["true"]),
+            (spectre_server.core.receivers.ReceiverName.CUSTOM, ["true"]),
+            (
+                spectre_server.core.receivers.ReceiverName.RSP1A,
+                ["sdrplay_find_devices"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.RSP1B,
+                ["sdrplay_find_devices"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.RSPDUO,
+                ["sdrplay_find_devices"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.RSPDX,
+                ["sdrplay_find_devices"],
+            ),
+            (spectre_server.core.receivers.ReceiverName.USRP, ["uhd_find_devices"]),
+            (spectre_server.core.receivers.ReceiverName.B200MINI, ["uhd_find_devices"]),
+            (
+                spectre_server.core.receivers.ReceiverName.HACKRF,
+                ["SoapySDRUtil", "--probe=driver=hackrf"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.HACKRFONE,
+                ["SoapySDRUtil", "--probe=driver=hackrf"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.RTLSDR,
+                ["SoapySDRUtil", "--probe=driver=rtlsdr"],
+            ),
+            (
+                spectre_server.core.receivers.ReceiverName.RX888MK2,
+                ["SoapySDRUtil", "--probe=driver=SDDC"],
+            ),
+        ],
+    )
+    def test_discovery_command(
+        self, receiver_name: str, expected_command: list[str]
+    ) -> None:
+        receiver = spectre_server.core.receivers.get_receiver(receiver_name)
+
+        assert receiver.discovery_command == expected_command
+
+    @pytest.mark.parametrize(
         ("receiver_name"),
         [
             spectre_server.core.receivers.ReceiverName.RSP1A,

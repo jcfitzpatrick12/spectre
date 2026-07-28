@@ -21,6 +21,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.RTLSDR)
 class RTLSDR(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["SoapySDRUtil", "--probe=driver=rtlsdr"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 

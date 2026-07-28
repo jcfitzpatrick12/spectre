@@ -4,6 +4,8 @@
 
 import flask.testing
 
+import spectre_server.services.receivers as services
+
 
 def test_get_receivers(client: flask.testing.FlaskClient) -> None:
     response = client.get("/receivers")
@@ -11,3 +13,17 @@ def test_get_receivers(client: flask.testing.FlaskClient) -> None:
     assert jsend["status"] == "success"
     assert isinstance(jsend["data"], list)
     assert "signal_generator" in jsend["data"]
+
+
+def test_discover_receiver(client: flask.testing.FlaskClient, monkeypatch) -> None:
+    expected = {
+        "name": "rtlsdr",
+        "modes": ["fixed_center_frequency"],
+        "found": True,
+    }
+    monkeypatch.setattr(services, "discover_receiver", lambda receiver_name: expected)
+
+    response = client.get("/receivers/rtlsdr")
+
+    assert response.status_code == 200
+    assert response.get_json() == {"status": "success", "data": expected}

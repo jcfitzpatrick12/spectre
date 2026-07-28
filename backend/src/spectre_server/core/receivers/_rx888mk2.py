@@ -22,6 +22,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.RX888MK2)
 class RX888MK2(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["SoapySDRUtil", "--probe=driver=SDDC"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 

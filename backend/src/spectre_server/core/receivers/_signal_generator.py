@@ -176,6 +176,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.SIGNAL_GENERATOR)
 class SignalGenerator(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["true"]
+
     def __init__(
         self, *args, solvers: typing.Optional[Solvers] = None, **kwargs
     ) -> None:

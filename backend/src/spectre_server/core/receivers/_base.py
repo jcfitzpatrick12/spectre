@@ -2,6 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import abc
 import typing
 import logging
 import pydantic
@@ -71,7 +72,7 @@ class Batches(ReceiverComponents[typing.Type[spectre_server.core.batches.Base]])
     """Store the batch class per operating mode."""
 
 
-class Base:
+class Base(abc.ABC):
     def __init__(
         self,
         name: str,
@@ -96,6 +97,11 @@ class Base:
         self.__flowgraphs = flowgraphs or Flowgraphs()
         self.__event_handlers = event_handlers or EventHandlers()
         self.__batches = batches or Batches()
+
+    @property
+    @abc.abstractmethod
+    def discovery_command(self) -> list[str]:
+        """The command used to discover this receiver."""
 
     @property
     def name(self) -> str:
