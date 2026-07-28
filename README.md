@@ -1,5 +1,5 @@
 <h1 align="center">
-  Spectre: Process, Explore and Capture Transient Radio Emissions
+  Spectre
 </h1>
 
 <div align="center">
@@ -47,5 +47,4 @@ Powered by [GNU Radio](https://www.gnuradio.org/) and [FFTW](https://www.fftw.or
 - Short and long-form recordings
 - Compatible with [inspectrum](https://github.com/miek/inspectrum), [NumPy](https://numpy.org/) and [Astropy](https://www.astropy.org/)
 - [FITS standard](https://ui.adsabs.harvard.edu/abs/2010A&A...524A..42P) compliant.
-
-ℹ️ Looking for a lightweight alternative? Check out [_Spectrel_](https://github.com/spectregrams/spectrel), a stripped-back derivative of _Spectre_, written in pure C. No Docker required.
+- Integration with the [e-Callisto](https://www.e-callisto.org/) network
