@@ -67,10 +67,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     vim && \  
     rm -rf /var/lib/apt/lists/*
 
-# Clone the `spectre` repository and install the CLI in editable mode.
+# Clone the `spectre` repository and install the CLI in editable mode with
+# test extras so Black, Mypy, pytest and the required type stubs are baked
+# into the image (CI must never `pip install` at runtime).
 RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
     git sparse-checkout init --no-cone && \
     git sparse-checkout set cli/ && \
     git checkout && \
-    pip install -e cli/
+    pip install -e cli/[test]
 

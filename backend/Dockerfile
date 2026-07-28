@@ -2,6 +2,11 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Pinned refs for external repositories built inside this image. Declared at
+# global scope so every stage that clones them shares a single source of truth.
+ARG GR_SPECTRE_REF=v2.1.2
+ARG EXTIO_SDDC_REF=v0.0.5
+
 # --------------------------------- # 
 # Create the base stage.
 # --------------------------------- # 
@@ -350,11 +355,12 @@ FROM build AS soapy_sddc
 WORKDIR /tmp
 
 ARG TARGETARCH
+ARG EXTIO_SDDC_REF
 
 # Use a custom fork with a patch providing support for the RX-888 MK II on the platform `linux/arm64`.
 # See PR: (https://github.com/ik1xpv/ExtIO_sddc/pull/246).
 # TODO: Buld ExtIO_sddc from an official branch.
-RUN git clone --depth 1 -b v0.0.5 https://github.com/spectregrams/ExtIO_sddc && \
+RUN git clone --depth 1 -b "${EXTIO_SDDC_REF}" https://github.com/spectregrams/ExtIO_sddc && \
     cd ExtIO_sddc && \
     mkdir build && \
     cd build && \
@@ -408,8 +414,10 @@ RUN . ./build_oot_module.sh && \
 # --------------------------------------------- #
 FROM oot_module AS gr_spectre
 
+ARG GR_SPECTRE_REF
+
 RUN . ./build_oot_module.sh && \
-    build_from_repo https://github.com/spectregrams/gr-spectre.git v2.1.2 && \
+    build_from_repo https://github.com/spectregrams/gr-spectre.git "${GR_SPECTRE_REF}" && \
     rm -rf /tmp/*
 
 
@@ -529,6 +537,9 @@ CMD ["/app/cmd.sh"]
 # --------------------------------- # 
 FROM base AS development
 
+ARG GR_SPECTRE_REF
+ARG EXTIO_SDDC_REF
+
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
       version="4.2.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
@@ -558,9 +569,11 @@ RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd sp
     git checkout && \
     pip install --editable backend/[test]
 
-# Get the latest version of `gr-spectre`, but don't build it by default.
-RUN git clone https://github.com/spectregrams/gr-spectre
-        
+# Clone the OOT module sources at the same refs baked into the runtime image,
+# so CTest can be re-run against them without a build-time rebuild.
+RUN git clone --depth 1 -b "${GR_SPECTRE_REF}" https://github.com/spectregrams/gr-spectre.git && \
+    git clone --depth 1 -b "${EXTIO_SDDC_REF}" https://github.com/spectregrams/ExtIO_sddc.git
+
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
 CMD [ "/bin/bash" ]

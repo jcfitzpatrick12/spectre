@@ -21,8 +21,6 @@ jobs:
   backend-checks:
     name: backend-checks
     runs-on: ubuntu-latest
-    # Cold build of backend/Dockerfile (no cache) may take ~60-90 min due to
-    # UHD + GNU Radio + OOT modules. Warm build should finish in <15 min.
     timeout-minutes: 120
     steps:
       - name: Checkout repository
@@ -43,9 +41,6 @@ jobs:
           cache-to: type=gha,mode=max,scope=backend-dev
 
       - name: Black (backend)
-        # PYTHONPATH points the image's baked editable install at the mounted
-        # PR checkout, so `import spectre_server` resolves to the code being
-        # tested rather than the git-cloned copy inside the image.
         run: |
           docker run --rm \
             -e PYTHONPATH=/workspace/backend/src \
@@ -71,3 +66,96 @@ jobs:
             -w /workspace/backend \
             spectre-dev-server:ci \
             pytest tests/unit -q
+
+      - name: Pytest integration (backend)
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/backend/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/backend \
+            spectre-dev-server:ci \
+            pytest tests/integration -q
+
+  cli-checks:
+    name: cli-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build CLI development image
+        uses: docker/build-push-action@v6
+        with:
+          context: cli
+          file: cli/Dockerfile
+          target: development
+          load: true
+          tags: spectre-dev-cli:ci
+          cache-from: type=gha,scope=cli-dev
+          cache-to: type=gha,mode=max,scope=cli-dev
+
+      - name: Black (cli)
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/cli/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/cli \
+            spectre-dev-cli:ci \
+            black --check .
+
+      - name: Mypy (cli)
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/cli/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/cli \
+            spectre-dev-cli:ci \
+            mypy src
+
+  external-ctest:
+    name: external-ctest (${{ matrix.repo }})
+    runs-on: ubuntu-latest
+    needs: backend-checks
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repo: gr-spectre
+            dir: gr-spectre
+            ctest_args: ""
+          - repo: ExtIO_sddc
+            dir: ExtIO_sddc
+            # TODO: replace with `-L unit` once ExtIO_sddc labels its
+            # hardware-requiring tests via set_tests_properties(... LABELS ...).
+            ctest_args: '-R "^unit$"'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load backend development image from cache
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          target: development
+          load: true
+          tags: spectre-dev-server:ci
+          cache-from: type=gha,scope=backend-dev
+
+      - name: CTest ${{ matrix.repo }}
+        run: |
+          docker run --rm spectre-dev-server:ci bash -eu -c '
+            cd /app/${{ matrix.dir }}
+            mkdir build && cd build
+            cmake -Wno-dev -DENABLE_TESTING=ON ..
+            make -j"$(nproc)"
+            ctest --output-on-failure ${{ matrix.ctest_args }}
+          '
