@@ -25,6 +25,9 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest", "mypy", "black", "types-PyYAML", "types-requests"]
 
+[tool.mypy]
+ignore_missing_imports = true
+
 
 [project.scripts]
 spectre = "spectre_cli.__main__:app"

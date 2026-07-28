@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend-checks:
+    name: backend-checks
+    runs-on: ubuntu-latest
+    # Cold build of backend/Dockerfile (no cache) may take ~60-90 min due to
+    # UHD + GNU Radio + OOT modules. Warm build should finish in <15 min.
+    timeout-minutes: 120
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend development image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          target: development
+          load: true
+          tags: spectre-dev-server:ci
+          cache-from: type=gha,scope=backend-dev
+          cache-to: type=gha,mode=max,scope=backend-dev
+
+      - name: Black (backend)
+        # PYTHONPATH points the image's baked editable install at the mounted
+        # PR checkout, so `import spectre_server` resolves to the code being
+        # tested rather than the git-cloned copy inside the image.
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/backend/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/backend \
+            spectre-dev-server:ci \
+            black --check .
+
+      - name: Mypy (backend)
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/backend/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/backend \
+            spectre-dev-server:ci \
+            mypy src tests
+
+      - name: Pytest unit (backend)
+        run: |
+          docker run --rm \
+            -e PYTHONPATH=/workspace/backend/src \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace/backend \
+            spectre-dev-server:ci \
+            pytest tests/unit -q
