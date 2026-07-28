@@ -33,13 +33,13 @@ jobs:
         run: docker build --target development -t spectre-dev-server:ci backend/
       - name: Build runtime image
         run: docker build --target runtime -t spectre-server:ci backend/
-      - name: Black
+      - name: Check formatting
         run: docker run --rm -w /app/backend spectre-dev-server:ci black --check .
-      - name: Mypy
+      - name: Check types
         run: docker run --rm -w /app/backend spectre-dev-server:ci mypy src tests
-      - name: Pytest unit
+      - name: Run unit tests
         run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/unit -q
-      - name: Pytest integration
+      - name: Run integration tests
         run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/integration -q
 
   cli:
@@ -59,9 +59,9 @@ jobs:
         run: docker build --target development -t spectre-dev-cli:ci cli/
       - name: Build runtime image
         run: docker build --target runtime -t spectre-cli:ci cli/
-      - name: Black
+      - name: Check formatting
         run: docker run --rm -w /app/cli spectre-dev-cli:ci black --check .
-      - name: Mypy
+      - name: Check types
         run: docker run --rm -w /app/cli spectre-dev-cli:ci mypy src
 
   commitlint:
