@@ -24,6 +24,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.USRP)
 class USRP(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["uhd_find_devices"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 

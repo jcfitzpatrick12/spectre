@@ -13,3 +13,7 @@ class Custom(Base):
 
     Use `add_mode` to add new operating modes.
     """
+
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["true"]

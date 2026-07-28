@@ -21,6 +21,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.HACKRF)
 class HackRF(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["SoapySDRUtil", "--probe=driver=hackrf"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 

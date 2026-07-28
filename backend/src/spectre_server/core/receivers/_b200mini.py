@@ -22,6 +22,10 @@ class _Mode:
 
 @register_receiver(ReceiverName.B200MINI)
 class B200mini(Base):
+    @property
+    def discovery_command(self) -> list[str]:
+        return ["uhd_find_devices"]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
