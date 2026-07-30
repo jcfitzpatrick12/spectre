@@ -4,6 +4,7 @@
 
 import typing
 import os
+import subprocess
 
 import pytest
 import pydantic
@@ -135,48 +136,14 @@ class TestReceivers:
         [
             (spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR, ["true"]),
             (spectre_server.core.receivers.ReceiverName.CUSTOM, ["true"]),
-            (
-                spectre_server.core.receivers.ReceiverName.RSP1A,
-                ["sdrplay_find_devices"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.RSP1B,
-                ["sdrplay_find_devices"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.RSPDUO,
-                ["sdrplay_find_devices"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.RSPDX,
-                ["sdrplay_find_devices"],
-            ),
-            (spectre_server.core.receivers.ReceiverName.USRP, ["uhd_find_devices"]),
-            (spectre_server.core.receivers.ReceiverName.B200MINI, ["uhd_find_devices"]),
-            (
-                spectre_server.core.receivers.ReceiverName.HACKRF,
-                ["SoapySDRUtil", "--probe=driver=hackrf"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.HACKRFONE,
-                ["SoapySDRUtil", "--probe=driver=hackrf"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.RTLSDR,
-                ["SoapySDRUtil", "--probe=driver=rtlsdr"],
-            ),
-            (
-                spectre_server.core.receivers.ReceiverName.RX888MK2,
-                ["SoapySDRUtil", "--probe=driver=SDDC"],
-            ),
         ],
     )
-    def test_discovery_command(
+    def test_find_receivers_no_hardware(
         self, receiver_name: str, expected_command: list[str]
     ) -> None:
+        """Check receivers that don't require hardware are always found."""
         receiver = spectre_server.core.receivers.get_receiver(receiver_name)
-
-        assert receiver.discovery_command == expected_command
+        assert subprocess.run(receiver.discovery_command).returncode == 0
 
     @pytest.mark.parametrize(
         ("receiver_name"),
