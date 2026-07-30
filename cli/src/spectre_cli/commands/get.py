@@ -226,7 +226,7 @@ def receivers() -> None:
     raise typer.Exit()
 
 
-@get_typer.command(help="Get a receiver's connection status.")
+@get_typer.command(help="Get receiver metadata.")
 def receiver(
     receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
