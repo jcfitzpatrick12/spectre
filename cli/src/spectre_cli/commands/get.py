@@ -226,19 +226,19 @@ def receivers() -> None:
     raise typer.Exit()
 
 
-@get_typer.command(help="Discover a receiver.")
+@get_typer.command(help="Get a receiver's connection status.")
 def receiver(
     receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
     )
 ) -> None:
-    jsend_dict = safe_request(f"receivers/{receiver_name}/found", "GET")
-    found = jsend_dict["data"]
+    jsend_dict = safe_request(f"receivers/{receiver_name}/connected", "GET")
+    connected = jsend_dict["data"]
 
     jsend_dict = safe_request(f"receivers/{receiver_name}/modes", "GET")
     modes = jsend_dict["data"]
 
-    pprint_dict({"found": found, "modes": modes})
+    pprint_dict({"connected": connected, "modes": modes})
     raise typer.Exit()
 
 
