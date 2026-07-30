@@ -4,9 +4,12 @@
 
 import subprocess
 import typing
+import logging
 
 import spectre_server.core.logs
 import spectre_server.core.receivers
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @spectre_server.core.logs.log_call
@@ -16,17 +19,15 @@ def get_receivers() -> list[str]:
 
 
 @spectre_server.core.logs.log_call
-def discover_receiver(receiver_name: str) -> dict[str, typing.Any]:
-    """Return receiver metadata and whether the receiver can be discovered."""
+def find_receiver(receiver_name: str) -> bool:
+    """Check if the receiver is is ready to record data."""
     receiver = spectre_server.core.receivers.get_receiver(receiver_name)
-    try:
-        result = subprocess.run(
-            receiver.discovery_command, capture_output=True, check=False
-        )
-        found = result.returncode == 0
-    except FileNotFoundError:
-        found = False
-    return {"name": receiver.name, "modes": receiver.modes, "found": found}
+    _LOGGER.info(f"Running {receiver.discovery_command}")
+    result = subprocess.run(receiver.discovery_command, capture_output=True)
+    _LOGGER.info(result.stdout)
+    if result.stderr:
+        _LOGGER.error(result.stderr)
+    return result.returncode == 0
 
 
 @spectre_server.core.logs.log_call
