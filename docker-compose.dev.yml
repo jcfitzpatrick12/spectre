@@ -10,7 +10,9 @@ services:
     volumes:
       - spectre-dev-data-v4:/app/.spectre-data
     devices:
-      - "/dev/bus/usb"
+      - /dev/bus/usb:/dev/bus/usb
+    device_cgroup_rules:
+      - "c 189:* rw"
     ports:
       - 127.0.0.1:5001:5001
     tty: true
