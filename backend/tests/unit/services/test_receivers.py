@@ -28,5 +28,5 @@ def test_get_receivers() -> None:
     ]
 
 
-def test_find_receiver() -> None:
-    assert services.find_receiver("signal_generator") == True
+def test_get_connected() -> None:
+    assert services.get_connected("signal_generator") == True

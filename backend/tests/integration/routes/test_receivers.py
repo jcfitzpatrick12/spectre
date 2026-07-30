@@ -15,8 +15,8 @@ def test_get_receivers(client: flask.testing.FlaskClient) -> None:
     assert "signal_generator" in jsend["data"]
 
 
-def test_find_receiver(client: flask.testing.FlaskClient) -> None:
-    response = client.get("/receivers/signal_generator/found")
+def test_get_connected(client: flask.testing.FlaskClient) -> None:
+    response = client.get("/receivers/signal_generator/connected")
     assert response.get_json() == {"status": "success", "data": True}
 
 
