@@ -65,7 +65,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     vim && \  
     rm -rf /var/lib/apt/lists/*
 
-# Bake the current CLI source and install it editable with test extras.
-COPY . /app/cli
-RUN pip install --editable /app/cli[test]
+# Install the latest CLI in editable mode.
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
+    git sparse-checkout init --no-cone && \
+    git sparse-checkout set cli/ && \
+    git checkout && \
+    pip install -e cli/
+    
+
+FROM development AS ci
+
+# Copy the local workspace source into the CI image so checks run against the current checkout.
+COPY . /app/ci/cli
+RUN pip install --editable /app/ci/cli[test]
 

@@ -29,18 +29,18 @@ jobs:
             runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
-      - name: Build development image
-        run: docker build --target development -t spectre-dev-server:ci backend/
+      - name: Build ci image
+        run: docker build --target ci -t spectre-dev-server:ci backend/
       - name: Build runtime image
         run: docker build --target runtime -t spectre-server:ci backend/
       - name: Check formatting
-        run: docker run --rm -w /app/backend spectre-dev-server:ci black --check .
+        run: docker run --rm -w /app/ci/backend spectre-dev-server:ci black --check .
       - name: Check types
-        run: docker run --rm -w /app/backend spectre-dev-server:ci mypy src tests
+        run: docker run --rm -w /app/ci/backend spectre-dev-server:ci mypy src tests
       - name: Run unit tests
-        run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/unit -q
+        run: docker run --rm -w /app/ci/backend spectre-dev-server:ci pytest tests/unit -q
       - name: Run integration tests
-        run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/integration -q
+        run: docker run --rm -w /app/ci/backend spectre-dev-server:ci pytest tests/integration -q
 
   cli:
     runs-on: ${{ matrix.runner }}
@@ -55,14 +55,14 @@ jobs:
             runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
-      - name: Build development image
-        run: docker build --target development -t spectre-dev-cli:ci cli/
+      - name: Build ci image
+        run: docker build --target ci -t spectre-dev-cli:ci cli/
       - name: Build runtime image
         run: docker build --target runtime -t spectre-cli:ci cli/
       - name: Check formatting
-        run: docker run --rm -w /app/cli spectre-dev-cli:ci black --check .
+        run: docker run --rm -w /app/ci/cli spectre-dev-cli:ci black --check .
       - name: Check types
-        run: docker run --rm -w /app/cli spectre-dev-cli:ci mypy src
+        run: docker run --rm -w /app/ci/cli spectre-dev-cli:ci mypy src
 
   commitlint:
     runs-on: ubuntu-latest
