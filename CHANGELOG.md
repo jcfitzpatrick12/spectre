@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.3.0](https://github.com/spectregrams/spectre/compare/v4.2.2...v4.3.0) (2026-07-30)
+
+
+### Features
+
+* discover receivers through the CLI ([122eead](https://github.com/spectregrams/spectre/commit/122eeadd8490ec3437e70daa3b5824e870e0bf2e))
+
+
+### Bug Fixes
+
+* issue-268 Enable first-time receiver discovery ([be3ba32](https://github.com/spectregrams/spectre/commit/be3ba32734e659f8d46bc616fcf6a30ec5f52e02))
+* issue-268 Ensure text output is captured in receiver connection check ([e162925](https://github.com/spectregrams/spectre/commit/e1629250b56fc0aa7e747f6433013c9af757c420))
+* issue-268 Report failure if no SDRplay devices are found ([82b37af](https://github.com/spectregrams/spectre/commit/82b37af608faf0bad0bcf9c963d3a11f2ccd5264))
+
 ## [4.2.2](https://github.com/spectregrams/spectre/compare/v4.2.1...v4.2.2) (2026-07-28)
 
 
