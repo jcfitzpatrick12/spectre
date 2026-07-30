@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build development image
+        run: docker build --target development -t spectre-dev-server:ci backend/
+      - name: Build runtime image
+        run: docker build --target runtime -t spectre-server:ci backend/
+      - name: Check formatting
+        run: docker run --rm -w /app/backend spectre-dev-server:ci black --check .
+      - name: Check types
+        run: docker run --rm -w /app/backend spectre-dev-server:ci mypy src tests
+      - name: Run unit tests
+        run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/unit -q
+      - name: Run integration tests
+        run: docker run --rm -w /app/backend spectre-dev-server:ci pytest tests/integration -q
+
+  cli:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build development image
+        run: docker build --target development -t spectre-dev-cli:ci cli/
+      - name: Build runtime image
+        run: docker build --target runtime -t spectre-cli:ci cli/
+      - name: Check formatting
+        run: docker run --rm -w /app/cli spectre-dev-cli:ci black --check .
+      - name: Check types
+        run: docker run --rm -w /app/cli spectre-dev-cli:ci mypy src
+
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v6
+        with:
+          firstParent: false

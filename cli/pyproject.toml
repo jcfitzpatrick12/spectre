@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectre-cli"
-version = "4.2.0-alpha"
+version = "4.2.2" # x-release-please-version
 maintainers = [
   { name="Jimmy Fitzpatrick", email="jimmy@spectregrams.org" },
 ]
@@ -24,6 +24,9 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "mypy", "black", "types-PyYAML", "types-requests"]
+
+[tool.mypy]
+ignore_missing_imports = true
 
 
 [project.scripts]

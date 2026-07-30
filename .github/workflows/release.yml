@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: © 2024-2026 Jimmy Fitzpatrick <jimmy@spectregrams.org>
+# This file is part of SPECTRE
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.release.outputs.release_created }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - { name: server, context: backend }
+          - { name: cli,    context: cli     }
+        variant:
+          - { target: runtime,     suffix: ''     }
+          - { target: development, suffix: '-dev' }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.release-please.outputs.version }}
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        run: |
+          image="spectregrams/spectre-${{ matrix.component.name }}"
+          version="${{ needs.release-please.outputs.version }}"
+          suffix="${{ matrix.variant.suffix }}"
+          docker buildx build --push \
+            --target ${{ matrix.variant.target }} \
+            --platform linux/amd64,linux/arm64 \
+            --tag "$image:${version}${suffix}" \
+            --tag "$image:latest${suffix}" \
+            ${{ matrix.component.context }}/

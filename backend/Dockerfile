@@ -445,7 +445,6 @@ COPY gunicorn.conf.py /opt/spectre_server/
 FROM base AS runtime
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="4.2.0-alpha" \
       description="Docker image for running the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -530,7 +529,6 @@ CMD ["/app/cmd.sh"]
 FROM base AS development
 
 LABEL maintainer="Jimmy Fitzpatrick <jimmy@spectregrams.org>" \
-      version="4.2.0-alpha" \
       description="Docker image for  developing the `spectre-server`." \
       license="GPL-3.0-or-later"
 
@@ -551,16 +549,10 @@ COPY --from=uhd /opt/uhd/include /usr/include
 COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
-# Get the latest version of `spectre-server`, overriding that from the `runtime` stage.
-RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
-    git sparse-checkout init --no-cone && \
-    git sparse-checkout set backend/ && \
-    git checkout && \
-    pip install --editable backend/[test]
+# Bake the current backend source and install it editable with test extras.
+COPY . /app/backend
+RUN pip install --editable /app/backend[test]
 
-# Get the latest version of `gr-spectre`, but don't build it by default.
-RUN git clone https://github.com/spectregrams/gr-spectre
-        
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
 CMD [ "/bin/bash" ]
