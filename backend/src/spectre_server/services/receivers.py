@@ -23,7 +23,7 @@ def get_connected(receiver_name: str) -> bool:
     """Check if the receiver is connected and ready to record data."""
     receiver = spectre_server.core.receivers.get_receiver(receiver_name)
     _LOGGER.info(f"Running {receiver.discovery_command}")
-    result = subprocess.run(receiver.discovery_command, capture_output=True)
+    result = subprocess.run(receiver.discovery_command, capture_output=True, text=True)
     _LOGGER.info(result.stdout)
     if result.stderr:
         _LOGGER.error(result.stderr)
