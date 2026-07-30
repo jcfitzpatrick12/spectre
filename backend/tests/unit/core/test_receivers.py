@@ -132,15 +132,13 @@ class TestReceiver:
 
 class TestReceivers:
     @pytest.mark.parametrize(
-        ("receiver_name", "expected_command"),
+        ("receiver_name"),
         [
-            (spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR, ["true"]),
-            (spectre_server.core.receivers.ReceiverName.CUSTOM, ["true"]),
+            (spectre_server.core.receivers.ReceiverName.SIGNAL_GENERATOR),
+            (spectre_server.core.receivers.ReceiverName.CUSTOM),
         ],
     )
-    def test_find_receivers_no_hardware(
-        self, receiver_name: str, expected_command: list[str]
-    ) -> None:
+    def test_find_receivers_no_hardware(self, receiver_name: str) -> None:
         """Check receivers that don't require hardware are always found."""
         receiver = spectre_server.core.receivers.get_receiver(receiver_name)
         assert subprocess.run(receiver.discovery_command).returncode == 0
