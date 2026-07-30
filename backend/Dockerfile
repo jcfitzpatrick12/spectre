@@ -549,10 +549,22 @@ COPY --from=uhd /opt/uhd/include /usr/include
 COPY --from=volk /opt/volk/include /usr/include
 COPY --from=gnuradio /opt/gnuradio/include /usr/include
 
-# Bake the current backend source and install it editable with test extras.
-COPY . /app/backend
-RUN pip install --editable /app/backend[test]
+# Install the latest backend in editable mode.
+RUN git clone https://github.com/spectregrams/spectre.git --no-checkout && cd spectre && \
+    git sparse-checkout init --no-cone && \
+    git sparse-checkout set backend/ && \
+    git checkout && \
+    pip install --editable backend/[test]
+
+# Get the latest version of `gr-spectre`, but don't build it by default.
+RUN git clone https://github.com/spectregrams/gr-spectre
 
 # Disable the existing entrypoint and start up commands, and run as root.
 ENTRYPOINT [ ]
 CMD [ "/bin/bash" ]
+
+FROM development AS ci
+
+# Copy the local workspace source into the CI image so checks run against the current checkout.
+COPY . /app/ci/backend
+RUN pip install --editable /app/ci/backend[test]
