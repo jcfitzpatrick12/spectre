@@ -4,8 +4,6 @@
 
 import flask.testing
 
-import spectre_server.services.receivers as services
-
 
 def test_get_receivers(client: flask.testing.FlaskClient) -> None:
     response = client.get("/receivers")
