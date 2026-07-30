@@ -23,5 +23,5 @@ int main() {
     sdrplay_api_UnlockDeviceApi();
     sdrplay_api_Close();
     
-    return 0;
+    return (numDevices > 0) ? 0 : 1;
 }
