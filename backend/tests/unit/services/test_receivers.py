@@ -2,9 +2,6 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import subprocess
-
-import pytest
 
 import spectre_server.services.receivers as services
 
