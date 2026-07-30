@@ -232,8 +232,13 @@ def receiver(
         ..., "--receiver", "-r", help="The name of the receiver."
     )
 ) -> None:
-    jsend_dict = safe_request(f"receivers/{receiver_name}", "GET")
-    pprint_dict(jsend_dict["data"])
+    jsend_dict = safe_request(f"receivers/{receiver_name}/found", "GET")
+    found = jsend_dict["data"]
+
+    jsend_dict = safe_request(f"receivers/{receiver_name}/modes", "GET")
+    modes = jsend_dict["data"]
+
+    pprint_dict({"found": found, "modes": modes})
     raise typer.Exit()
 
 

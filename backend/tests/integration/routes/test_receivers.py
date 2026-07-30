@@ -15,15 +15,14 @@ def test_get_receivers(client: flask.testing.FlaskClient) -> None:
     assert "signal_generator" in jsend["data"]
 
 
-def test_discover_receiver(client: flask.testing.FlaskClient, monkeypatch) -> None:
-    expected = {
-        "name": "rtlsdr",
-        "modes": ["fixed_center_frequency"],
-        "found": True,
+def test_find_receiver(client: flask.testing.FlaskClient) -> None:
+    response = client.get("/receivers/signal_generator/found")
+    assert response.get_json() == {"status": "success", "data": True}
+
+
+def test_get_modes(client: flask.testing.FlaskClient) -> None:
+    response = client.get("/receivers/signal_generator/modes")
+    assert response.get_json() == {
+        "status": "success",
+        "data": ["cosine_wave", "constant_staircase"],
     }
-    monkeypatch.setattr(services, "discover_receiver", lambda receiver_name: expected)
-
-    response = client.get("/receivers/rtlsdr")
-
-    assert response.status_code == 200
-    assert response.get_json() == {"status": "success", "data": expected}

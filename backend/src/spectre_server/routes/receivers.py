@@ -17,10 +17,10 @@ def get_receivers() -> list[str]:
     return services.get_receivers()
 
 
-@receivers_blueprint.route("/<string:receiver_name>", methods=["GET"])
+@receivers_blueprint.route("/<string:receiver_name>/found", methods=["GET"])
 @jsendify_response
-def discover_receiver(receiver_name: str) -> dict[str, typing.Any]:
-    return services.discover_receiver(receiver_name)
+def find_receiver(receiver_name: str) -> bool:
+    return services.find_receiver(receiver_name)
 
 
 @receivers_blueprint.route("/<string:receiver_name>/modes", methods=["GET"])
