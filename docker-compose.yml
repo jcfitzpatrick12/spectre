@@ -12,7 +12,6 @@ services:
       - spectre-network
     volumes:
       - spectre-data-v4:/app/.spectre-data
-    devices:
       - /dev/bus/usb:/dev/bus/usb
     device_cgroup_rules:
       - "c 189:* rw"
