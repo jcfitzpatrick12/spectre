@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/spectregrams/spectre/compare/v4.3.1...v4.4.0) (2026-08-02)
+
+
+### Features
+
+* issue-255 Parametrise the number of receive buffers ([cea8c64](https://github.com/spectregrams/spectre/commit/cea8c640fd461e1c9144b336601197d0ca2761b3))
+
 ## [4.3.1](https://github.com/spectregrams/spectre/compare/v4.3.0...v4.3.1) (2026-07-31)
 
 
