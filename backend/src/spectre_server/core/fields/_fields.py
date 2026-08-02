@@ -298,7 +298,7 @@ class Field:
             ...,
             validate_default=True,
             gt=0,
-            description="The number of receive buffers to allocate in the Soapy device.",
+            description="Depth of the receive ring buffer.",
         ),
     ]
     wire_format = typing.Annotated[
