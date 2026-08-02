@@ -292,6 +292,15 @@ class Field:
             gt=0,
         ),
     ]
+    buffers = typing.Annotated[
+        int,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            gt=0,
+            description="The number of receive buffers to allocate in the Soapy device.",
+        ),
+    ]
     wire_format = typing.Annotated[
         str,
         pydantic.Field(

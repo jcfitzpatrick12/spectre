@@ -28,6 +28,7 @@ class RX888MK2FixedCenterFrequencyModel(BaseModel):
     if_gain: spectre_server.core.fields.Field.if_gain = -24.583
     rf_gain: spectre_server.core.fields.Field.rf_gain = -31.5
     batch_size: spectre_server.core.fields.Field.batch_size = 3
+    buffers: spectre_server.core.fields.Field.buffers = 1024
     output_type: spectre_server.core.fields.Field.output_type = (
         spectre_server.core.fields.OutputType.FC32
     )
@@ -39,7 +40,7 @@ class RX888MK2FixedCenterFrequency(Base[RX888MK2FixedCenterFrequencyModel]):
         type = model.output_type
         nchan = 1
         dev_args = ""
-        stream_args = ""
+        stream_args = f"buffers={model.buffers}"
         tune_args = [""]
         settings = [""]
         self.soapy_rx888mk2_source = soapy.source(
