@@ -155,3 +155,21 @@ def config(
     else:
         secho_existing_resource(endpoint)
     raise typer.Exit()
+
+
+@delete_typer.command(help="Delete a terminal recording.")
+def recording(
+    id: str = typer.Option(..., "--id", "-i", help="The recording id."),
+    non_interactive: bool = typer.Option(
+        False, "--non-interactive", help="Suppress any interactive prompts."
+    ),
+) -> None:
+    jsend_dict = safe_request(
+        f"recordings/{id}",
+        "DELETE",
+        require_confirmation=True,
+        non_interactive=non_interactive,
+    )
+    endpoint = jsend_dict["data"]
+    secho_stale_resource(endpoint)
+    raise typer.Exit()

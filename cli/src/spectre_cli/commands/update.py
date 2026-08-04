@@ -43,3 +43,20 @@ def config(
     endpoint = jsend_dict["data"]
     secho_new_resource(endpoint)
     raise typer.Exit()
+
+
+@update_typer.command(help="Request a recording state transition.")
+def recording(
+    id: str = typer.Option(..., "--id", "-i", help="The recording id."),
+    state: str = typer.Option(
+        ...,
+        "--state",
+        help="The requested state. Only 'stopped' is currently accepted.",
+    ),
+) -> None:
+    jsend_dict = safe_request(
+        f"recordings/{id}", "PATCH", json={"state": state}
+    )
+    endpoint = jsend_dict["data"]
+    secho_new_resource(endpoint)
+    raise typer.Exit()

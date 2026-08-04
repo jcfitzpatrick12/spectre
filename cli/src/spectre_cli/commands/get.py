@@ -345,3 +345,46 @@ def model(
     model = jsend_dict["data"]
     pprint_dict(model)
     typer.Exit()
+
+
+@get_typer.command(help="List recordings.")
+def recordings(
+    state: str = typer.Option(
+        None,
+        "--state",
+        help="Only list recordings in this state (pending, running, completed, stopped, failed).",
+    ),
+    tag: str = typer.Option(
+        None, "--tag", "-t", help="Only list recordings with this tag."
+    ),
+    kind: str = typer.Option(
+        None, "--kind", "-k", help="Only list recordings of this kind (signal, spectrogram)."
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Print each recording's full properties instead of just its URL.",
+    ),
+) -> None:
+    params = {"state": state, "tag": tag, "kind": kind}
+    jsend_dict = safe_request("recordings", "GET", params=params)
+    endpoints = jsend_dict["data"]
+    if not verbose:
+        secho_existing_resources(endpoints)
+        raise typer.Exit()
+    for endpoint in endpoints:
+        id = endpoint.rsplit("/", 1)[-1]
+        details = safe_request(f"recordings/{id}", "GET")["data"]
+        secho_existing_resource(endpoint)
+        pprint_dict(details)
+    raise typer.Exit()
+
+
+@get_typer.command(help="Print a recording's properties.")
+def recording(
+    id: str = typer.Option(..., "--id", "-i", help="The recording id."),
+) -> None:
+    jsend_dict = safe_request(f"recordings/{id}", "GET")
+    pprint_dict(jsend_dict["data"])
+    raise typer.Exit()
