@@ -6,6 +6,7 @@ import typing
 import pytest
 
 import spectre_server.core.receivers
+import spectre_server.core.jobs
 import spectre_server.core.config
 import spectre_server.core.batches
 
@@ -85,11 +86,24 @@ def test_analytical(
             )
         )
 
-    # Record some spectrograms.
-    spectre_server.core.receivers.record_spectrograms(
-        configs,
-        DURATION,
-        spectre_data_dir_path=spectre_config_paths.get_spectre_data_dir_path(),
+    # Record some spectrograms. Drives the same worker plumbing that the
+    # supervisor uses in production, but skips the DB / subprocess layer so
+    # this test stays focused on end-to-end spectrogram validation.
+    data_dir = spectre_config_paths.get_spectre_data_dir_path()
+    flowgraph_workers = [
+        spectre_server.core.receivers.make_flowgraph_worker(
+            config, skip_validation=False, spectre_data_dir_path=data_dir
+        )
+        for config in configs
+    ]
+    post_processing_workers = [
+        spectre_server.core.receivers.make_post_processing_worker(
+            config, skip_validation=False, spectre_data_dir_path=data_dir
+        )
+        for config in configs
+    ]
+    spectre_server.core.jobs.start_job(
+        post_processing_workers + flowgraph_workers, DURATION
     )
 
     for config in configs:

@@ -97,7 +97,7 @@ def jsendify_response(
             return _make_jsend_response(
                 _JsendStatus.SUCCESS, data=data, code=http.HTTPStatus.OK
             )
-        except:  # simplistic treatment, any exceptions are interpreted as JSend errors.
+        except Exception:  # any application exception becomes a JSend error.
             return _make_jsend_response(
                 _JsendStatus.ERROR,
                 message=(

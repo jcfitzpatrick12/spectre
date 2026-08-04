@@ -16,5 +16,6 @@ __all__ = [
     "models",
     "plotting",
     "receivers",
+    "recordings",
     "spectrograms",
 ]

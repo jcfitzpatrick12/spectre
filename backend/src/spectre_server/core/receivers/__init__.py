@@ -27,7 +27,10 @@ from ._hackrf import HackRF
 from ._hackrfone import HackRFOne
 from ._rtlsdr import RTLSDR
 from ._rx888mk2 import RX888MK2
-from ._record import record_signal, record_spectrograms
+from ._record import (
+    make_flowgraph_worker,
+    make_post_processing_worker,
+)
 
 __all__ = [
     "register_receiver",
@@ -53,6 +56,6 @@ __all__ = [
     "HackRFOne",
     "RTLSDR",
     "ReceiverName",
-    "record_signal",
-    "record_spectrograms",
+    "make_flowgraph_worker",
+    "make_post_processing_worker",
 ]

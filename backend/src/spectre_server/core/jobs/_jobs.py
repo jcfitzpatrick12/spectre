@@ -19,6 +19,16 @@ class Job:
         :param workers: A list of `Worker` instances to manage as part of the job.
         """
         self._workers = workers
+        self._stop_requested = False
+
+    def request_stop(self) -> None:
+        """Signal the monitor loop to exit at its next tick.
+
+        Idempotent. The monitor will kill all workers and return normally
+        (no exception raised); callers should treat this as a graceful stop
+        rather than a failure.
+        """
+        self._stop_requested = True
 
     @property
     def workers_are_alive(self) -> bool:
@@ -74,8 +84,9 @@ class Job:
 
         restarts_remaining = max_restarts
         try:
-            # Check that the elapsed time since the job started is within the total runtime configured by the user.
-            while time.time() - start_time < duration:
+            # Check that the elapsed time since the job started is within the total runtime configured by the user,
+            # and that no external caller has requested a graceful stop.
+            while (time.time() - start_time < duration) and not self._stop_requested:
                 for worker in self._workers:
                     if not worker.is_alive:
                         error_message = (
