@@ -4,7 +4,7 @@
 
 import typer
 
-from ._secho_resources import secho_new_resource
+from ._secho_resources import secho_new_resource, secho_new_resources
 from ._utils import safe_request, get_config_file_name, spinner
 
 create_typer = typer.Typer(help="Create resources.")
@@ -182,4 +182,48 @@ def plot(
         jsend_dict = safe_request(f"spectre-data/batches/plots", "PUT", json=json)
     endpoint = jsend_dict["data"]
     secho_new_resource(endpoint)
+    raise typer.Exit()
+
+
+_KINDS = ["signal", "spectrogram"]
+
+
+@create_typer.command(help="Start a recording.")
+def recording(
+    kind: str = typer.Option(
+        ..., "--kind", "-k", help=f"The recording kind: one of {_KINDS}."
+    ),
+    tags: list[str] = typer.Option(
+        ..., "--tag", "-t", help="The config tag. Specify one per recording."
+    ),
+    duration: float = typer.Option(
+        ..., "--duration", "-d", help="How long to record for, in seconds."
+    ),
+    force_restart: bool = typer.Option(
+        False,
+        "--force-restart",
+        help="If specified, restart if an error occurs at runtime.",
+    ),
+    max_restarts: int = typer.Option(
+        5,
+        "--max-restarts",
+        help="Maximum number of times to restart before giving up.",
+    ),
+    skip_validation: bool = typer.Option(
+        False,
+        "--skip-validation",
+        help="If specified, do not validate config parameters.",
+    ),
+) -> None:
+    json = {
+        "kind": kind,
+        "tags": tags,
+        "duration": duration,
+        "force_restart": force_restart,
+        "max_restarts": max_restarts,
+        "validate": not skip_validation,
+    }
+    jsend_dict = safe_request("recordings", "POST", json=json)
+    endpoints = jsend_dict["data"]
+    secho_new_resources(endpoints)
     raise typer.Exit()
