@@ -32,6 +32,20 @@ services:
     tty: true
     stop_signal: SIGKILL
 
+  spectre-frontend:
+    container_name: spectre-frontend
+    build:
+      context: ./frontend
+    environment:
+      - SPECTRE_BACKEND_URL=http://spectre-server:${SPECTRE_BIND_PORT}
+    networks:
+      - spectre-network
+    depends_on:
+      - spectre-server
+    ports:
+      - 127.0.0.1:5173:5173
+    stop_signal: SIGKILL
+
 networks:
   spectre-network:
     name: spectre-network

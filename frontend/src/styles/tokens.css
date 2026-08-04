@@ -1,0 +1,17 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #e8e6d8;
+  --dim: #4a4a4a;
+  --accent: #c93b3b;
+  --border: 1px solid var(--fg);
+  --border-dim: 1px solid var(--dim);
+
+  --font-mono: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  --font-display: 'VT323', 'IBM Plex Mono', Menlo, Consolas, monospace;
+
+  --gap: 12px;
+  --pad: 12px;
+  --panel-min-h: 160px;
+
+  --track: #1a1a1a;
+}

@@ -1,0 +1,10 @@
+.json-view {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fg);
+  white-space: pre;
+  overflow: auto;
+  max-height: 60vh;
+}

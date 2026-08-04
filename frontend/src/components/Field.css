@@ -1,0 +1,49 @@
+.field {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.field__label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.field__control {
+  background: transparent;
+  color: var(--fg);
+  border: none;
+  border-bottom: var(--border);
+  padding: 2px 4px;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.field__control:focus-visible {
+  outline: none;
+  background: var(--track);
+}
+
+.field__control--select {
+  appearance: none;
+  padding-right: 18px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg) 50%),
+                    linear-gradient(-45deg, transparent 50%, var(--fg) 50%);
+  background-position: right 6px top 8px, right 2px top 8px;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+
+.field__control--select option {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.field__control::placeholder {
+  color: var(--dim);
+}

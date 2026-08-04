@@ -1,0 +1,41 @@
+.log-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  min-height: 0;
+}
+
+.log-stream__file {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-stream__pre {
+  margin: 0;
+  padding: 4px;
+  background: var(--track);
+  border: var(--border-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.log-stream__cursor {
+  display: inline-block;
+  animation: log-cursor 1s steps(2, end) infinite;
+  color: var(--fg);
+}
+
+@keyframes log-cursor {
+  50% { opacity: 0; }
+}

@@ -1,0 +1,68 @@
+.rec-indicator {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 200;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.rec-indicator__chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--fg);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  pointer-events: auto;
+  min-width: 200px;
+  justify-content: space-between;
+}
+
+.rec-indicator__chip--live {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rec-indicator__chip--ok {
+  border-color: var(--fg);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.rec-indicator__chip--err {
+  border-color: var(--accent);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.rec-indicator__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: rec-blink 1s steps(2, end) infinite;
+}
+
+@keyframes rec-blink {
+  50% { opacity: 0; }
+}
+
+.rec-indicator__label {
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rec-indicator__time {
+  font-family: var(--font-display);
+  font-size: 14px;
+  white-space: nowrap;
+}

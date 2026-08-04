@@ -1,0 +1,100 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--dim);
+}
+
+/* App shell */
+.app {
+  min-height: 100%;
+  padding: var(--gap);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(var(--panel-min-h), auto);
+  gap: var(--gap);
+  position: relative;
+}
+
+.watermark {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  width: 48px;
+  height: auto;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+  filter: grayscale(1) contrast(1.2);
+}
+
+.grid-span-2 { grid-column: span 2; }
+.grid-span-3 { grid-column: span 3; }
+.grid-span-4 { grid-column: span 4; }
+.grid-span-6 { grid-column: span 6; }
+.grid-span-8 { grid-column: span 8; }
+.grid-span-12 { grid-column: span 12; }
+
+@media (max-width: 1200px) {
+  .app { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .grid-span-2, .grid-span-3, .grid-span-4 { grid-column: span 3; }
+  .grid-span-6, .grid-span-8, .grid-span-12 { grid-column: span 6; }
+}
