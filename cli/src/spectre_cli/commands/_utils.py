@@ -66,6 +66,12 @@ def safe_request(
             fg="yellow",
         )
         raise typer.Exit(1)
+    except requests.exceptions.HTTPError as exc:
+        typer.secho(
+            f"Error: HTTP {exc.response.status_code} from server.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
 
     status = jsend_dict.get("status")
 
@@ -73,7 +79,14 @@ def safe_request(
         return jsend_dict
 
     elif status == "error":
-        typer.secho(jsend_dict.get("message", "An error occurred."), fg="yellow")
+        message = jsend_dict.get("message", "An error occurred.")
+        _BOILERPLATE = "use `spectre get log`"
+        meaningful = [
+            line for line in message.splitlines()
+            if line.strip() and _BOILERPLATE not in line.lower()
+        ]
+        last_line = meaningful[-1] if meaningful else message.splitlines()[-1]
+        typer.secho(last_line, fg="yellow")
         raise typer.Exit(1)
 
     elif status == "fail":

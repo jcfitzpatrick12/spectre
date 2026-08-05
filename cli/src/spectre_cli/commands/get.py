@@ -10,6 +10,7 @@ import enum
 import gzip
 
 from ._utils import safe_request, get_config_file_name
+from ..config import SPECTRE_SERVER
 from ._secho_resources import (
     pprint_dict,
     secho_existing_resource,
@@ -376,6 +377,11 @@ def recordings(
     for endpoint in endpoints:
         id = endpoint.rsplit("/", 1)[-1]
         details = safe_request(f"recordings/{id}", "GET")["data"]
+        worker_urls = safe_request(f"recordings/{id}/workers", "GET")["data"]
+        details["workers"] = [
+            safe_request(u[len(SPECTRE_SERVER):], "GET")["data"]
+            for u in worker_urls
+        ]
         secho_existing_resource(endpoint)
         pprint_dict(details)
     raise typer.Exit()
@@ -385,6 +391,45 @@ def recordings(
 def recording(
     id: str = typer.Option(..., "--id", "-i", help="The recording id."),
 ) -> None:
-    jsend_dict = safe_request(f"recordings/{id}", "GET")
-    pprint_dict(jsend_dict["data"])
+    details = safe_request(f"recordings/{id}", "GET")["data"]
+    worker_urls = safe_request(f"recordings/{id}/workers", "GET")["data"]
+    details["workers"] = [
+        safe_request(u[len(SPECTRE_SERVER):], "GET")["data"]
+        for u in worker_urls
+    ]
+    pprint_dict(details)
+    raise typer.Exit()
+
+
+@get_typer.command(help="List workers registered against a recording.")
+def workers(
+    recording_id: str = typer.Option(
+        ..., "--recording", "-r", help="The recording id."
+    ),
+) -> None:
+    jsend_dict = safe_request(f"recordings/{recording_id}/workers", "GET")
+    secho_existing_resources(jsend_dict["data"])
+    raise typer.Exit()
+
+
+@get_typer.command(help="Print a worker's metadata, or its log with --log.")
+def worker(
+    recording_id: str = typer.Option(
+        ..., "--recording", "-r", help="The recording id."
+    ),
+    worker_id: int = typer.Option(..., "--id", "-i", help="The worker id."),
+    log: bool = typer.Option(
+        False, "--log", "-l", help="Print the worker's log instead of its metadata."
+    ),
+) -> None:
+    if log:
+        jsend_dict = safe_request(
+            f"recordings/{recording_id}/workers/{worker_id}/logs", "GET"
+        )
+        print(jsend_dict["data"])
+    else:
+        jsend_dict = safe_request(
+            f"recordings/{recording_id}/workers/{worker_id}", "GET"
+        )
+        pprint_dict(jsend_dict["data"])
     raise typer.Exit()
