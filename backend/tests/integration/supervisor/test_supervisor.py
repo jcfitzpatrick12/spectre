@@ -118,7 +118,7 @@ def test_supervisor_short_circuits_on_pre_requested_stop(spectre_env) -> None:
     assert fetched.state is spectre_server.core.recordings.RecordingState.STOPPED
     # We short-circuited: no workers were ever built, no started_at.
     assert fetched.started_at is None
-    assert fetched.terminal_at is not None
+    assert fetched.finished_at is not None
 
 
 def test_supervisor_completes_signal_recording(spectre_env) -> None:
@@ -141,7 +141,7 @@ def test_supervisor_completes_signal_recording(spectre_env) -> None:
     assert fetched is not None
     assert fetched.state is spectre_server.core.recordings.RecordingState.COMPLETED
     assert fetched.started_at is not None
-    assert fetched.terminal_at is not None
+    assert fetched.finished_at is not None
     assert fetched.supervisor_pid == proc.pid
 
 
@@ -182,4 +182,4 @@ def test_supervisor_stops_mid_recording_on_sigterm(spectre_env) -> None:
     assert fetched.state is spectre_server.core.recordings.RecordingState.STOPPED
     assert fetched.started_at is not None
     assert fetched.stop_requested_at is not None
-    assert fetched.terminal_at is not None
+    assert fetched.finished_at is not None
