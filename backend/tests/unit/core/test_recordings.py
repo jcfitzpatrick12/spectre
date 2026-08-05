@@ -48,7 +48,7 @@ def test_insert_returns_pending_recording(db_path: str) -> None:
     assert len(rec.id) == 16
     assert rec.supervisor_pid is None
     assert rec.started_at is None
-    assert rec.terminal_at is None
+    assert rec.finished_at is None
     assert rec.stop_requested_at is None
 
 
@@ -102,7 +102,7 @@ def test_tag_conflict_allowed_after_terminal_state(db_path: str) -> None:
     recordings.set_state(
         rec.id,
         recordings.RecordingState.COMPLETED,
-        terminal_at="2024-01-01T00:00:05+00:00",
+        finished_at="2024-01-01T00:00:05+00:00",
         db_path=db_path,
     )
     # No conflict because prior recording is terminal.
@@ -160,7 +160,7 @@ def test_set_state_rejects_transition_from_terminal(db_path: str) -> None:
     recordings.set_state(
         rec.id,
         recordings.RecordingState.FAILED,
-        terminal_at="2024-01-01T00:00:00+00:00",
+        finished_at="2024-01-01T00:00:00+00:00",
         db_path=db_path,
     )
     with pytest.raises(RuntimeError):
@@ -241,7 +241,7 @@ def test_mark_stale_as_failed(db_path: str) -> None:
     recordings.set_state(
         c.id,
         recordings.RecordingState.COMPLETED,
-        terminal_at="2024-01-01T00:00:05+00:00",
+        finished_at="2024-01-01T00:00:05+00:00",
         db_path=db_path,
     )
 
@@ -254,5 +254,5 @@ def test_mark_stale_as_failed(db_path: str) -> None:
     assert fetched_a is not None and fetched_a.state is recordings.RecordingState.FAILED
     assert fetched_b is not None and fetched_b.state is recordings.RecordingState.FAILED
     assert fetched_c is not None and fetched_c.state is recordings.RecordingState.COMPLETED
-    assert fetched_a.terminal_at is not None
-    assert fetched_b.terminal_at is not None
+    assert fetched_a.finished_at is not None
+    assert fetched_b.finished_at is not None

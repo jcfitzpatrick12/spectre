@@ -31,6 +31,7 @@ import typing
 import spectre_server.core.logs
 import spectre_server.core.receivers
 import spectre_server.core.recordings
+import spectre_server.core.workers
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ _WIRE_FIELDS: tuple[str, ...] = (
     "duration_seconds",
     "created_at",
     "started_at",
-    "terminal_at",
+    "finished_at",
     "stop_requested_at",
 )
 
@@ -265,6 +266,73 @@ def delete_recording(id: str) -> str:
         )
     spectre_server.core.recordings.delete(id)
     return id
+
+
+def _require_recording(id: str) -> spectre_server.core.recordings.Recording:
+    """Return the recording or raise ``RecordingNotFound``."""
+    recording = spectre_server.core.recordings.get(id)
+    if recording is None:
+        raise spectre_server.core.recordings.RecordingNotFound(id)
+    return recording
+
+
+@spectre_server.core.logs.log_call
+def list_workers(recording_id: str) -> list[int]:
+    """Return the worker ids registered against a recording, in insertion order.
+
+    :raises RecordingNotFound: if the recording does not exist.
+    """
+    _require_recording(recording_id)
+    return [
+        w.id
+        for w in spectre_server.core.workers.list_by_recording(recording_id)
+    ]
+
+
+@spectre_server.core.logs.log_call
+def get_worker(
+    recording_id: str, worker_id: int
+) -> dict[str, typing.Any]:
+    """Return the metadata for a single worker under a recording.
+
+    :raises RecordingNotFound: if the recording does not exist.
+    :raises WorkerNotFound: if no worker with that id exists under the recording.
+    """
+    _require_recording(recording_id)
+    worker = spectre_server.core.workers.get(recording_id, worker_id)
+    if worker is None:
+        raise spectre_server.core.workers.WorkerNotFound(
+            recording_id, worker_id
+        )
+    return {
+        "id": worker.id,
+        "recording_id": worker.recording_id,
+        "pid": worker.pid,
+    }
+
+
+@spectre_server.core.logs.log_call
+def get_worker_log(recording_id: str, worker_id: int) -> str:
+    """Return the raw text of the log file the worker wrote.
+
+    Locates the log file on disk by scanning every worker-typed log for the
+    persisted PID.
+
+    :raises RecordingNotFound: if the recording does not exist.
+    :raises WorkerNotFound: if no worker with that id exists under the recording.
+    :raises FileNotFoundError: if no log file matches the worker's PID (e.g.
+        it was deleted, or the worker never wrote one).
+    """
+    _require_recording(recording_id)
+    worker = spectre_server.core.workers.get(recording_id, worker_id)
+    if worker is None:
+        raise spectre_server.core.workers.WorkerNotFound(
+            recording_id, worker_id
+        )
+    logs = spectre_server.core.logs.Logs(
+        process_type=spectre_server.core.logs.ProcessType.WORKER.value,
+    )
+    return logs.get_from_pid(str(worker.pid)).read()
 
 
 def _wait_for_terminal_state(

@@ -108,6 +108,42 @@ def delete_recording(id: str) -> str:
     return _recording_url(id)
 
 
+def _worker_url(recording_id: str, worker_id: int) -> str:
+    return flask.url_for(
+        "recordings.get_worker",
+        id=recording_id,
+        worker_id=worker_id,
+        _external=True,
+    )
+
+
+@recordings_blueprint.route("/<string:id>/workers", methods=["GET"])
+@jsendify_response
+def list_workers(id: str) -> list[str]:
+    """List worker URLs for a recording, in the order they were registered."""
+    return [
+        _worker_url(id, wid) for wid in services.list_workers(id)
+    ]
+
+
+@recordings_blueprint.route(
+    "/<string:id>/workers/<int:worker_id>", methods=["GET"]
+)
+@jsendify_response
+def get_worker(id: str, worker_id: int) -> dict[str, typing.Any]:
+    """Return worker metadata under a recording."""
+    return services.get_worker(id, worker_id)
+
+
+@recordings_blueprint.route(
+    "/<string:id>/workers/<int:worker_id>/logs", methods=["GET"]
+)
+@jsendify_response
+def get_worker_log(id: str, worker_id: int) -> str:
+    """Return the raw text of the log the worker wrote."""
+    return services.get_worker_log(id, worker_id)
+
+
 # ---------------------------------------------------------------------------
 # Backwards-compatible endpoints.
 #

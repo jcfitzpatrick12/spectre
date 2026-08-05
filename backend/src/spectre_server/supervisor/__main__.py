@@ -30,6 +30,7 @@ import spectre_server.core.jobs
 import spectre_server.core.logs
 import spectre_server.core.receivers
 import spectre_server.core.recordings
+import spectre_server.core.workers
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,17 +47,25 @@ def _build_workers(
     - ``spectrogram`` recordings additionally run one post-processing worker,
       listed first so it is up and consuming batches before the flowgraph
       starts producing them.
+
+    Each worker registers its PID against the recording on every start
+    (including restarts) so the log file it wrote can be located later.
     """
+    recording_id = recording.id
+
+    def _register(pid: int) -> None:
+        spectre_server.core.workers.insert(recording_id, pid)
+
     config = spectre_server.core.receivers.read_config(recording.tag)
     flowgraph_worker = spectre_server.core.receivers.make_flowgraph_worker(
-        config, skip_validation
+        config, skip_validation, on_start=_register
     )
     if recording.kind == "signal":
         return [flowgraph_worker]
     if recording.kind == "spectrogram":
         post_processing_worker = (
             spectre_server.core.receivers.make_post_processing_worker(
-                config, skip_validation
+                config, skip_validation, on_start=_register
             )
         )
         return [post_processing_worker, flowgraph_worker]
@@ -131,7 +140,7 @@ def _run(
         spectre_server.core.recordings.set_state(
             recording_id,
             spectre_server.core.recordings.RecordingState.STOPPED,
-            terminal_at=_now(),
+            finished_at=_now(),
         )
         return 0
 
@@ -169,7 +178,7 @@ def _run(
         spectre_server.core.recordings.set_state(
             recording_id,
             terminal_state,
-            terminal_at=_now(),
+            finished_at=_now(),
         )
     except RuntimeError:
         _LOGGER.exception(
@@ -179,7 +188,7 @@ def _run(
         spectre_server.core.recordings.set_state(
             recording_id,
             spectre_server.core.recordings.RecordingState.FAILED,
-            terminal_at=_now(),
+            finished_at=_now(),
         )
     _LOGGER.info(
         "Supervisor for recording %s exiting with state=%s.",

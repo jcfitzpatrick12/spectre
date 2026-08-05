@@ -112,7 +112,7 @@ def test_create_recording_returns_urls(
     assert completed["tag"] == "create-and-wait"
     assert completed["kind"] == "signal"
     assert completed["started_at"] is not None
-    assert completed["terminal_at"] is not None
+    assert completed["finished_at"] is not None
     # `supervisor_pid` is a server-side detail and must not leak on the wire.
     assert "supervisor_pid" not in completed
 
@@ -250,7 +250,7 @@ def test_patch_stops_running_recording(
 
     stopped = _wait_for_state(client, id, "stopped", timeout=15.0)
     assert stopped["stop_requested_at"] is not None
-    assert stopped["terminal_at"] is not None
+    assert stopped["finished_at"] is not None
 
 
 def test_patch_rejects_missing_state(
@@ -356,3 +356,107 @@ def test_bc_spectrogram_endpoint_still_works(
     payload = response.get_json()
     assert payload["status"] == "success"
     assert payload["data"] == 0
+
+
+def _worker_id_from_url(url: str) -> int:
+    return int(urllib.parse.urlparse(url).path.rstrip("/").rsplit("/", 1)[-1])
+
+
+def test_workers_endpoints_expose_per_worker_logs(
+    client: flask.testing.FlaskClient,
+) -> None:
+    _write_cosine_wave_config("workers-signal")
+    urls = client.post(
+        "/recordings",
+        json={"kind": "signal", "tags": ["workers-signal"], "duration": 1.5},
+    ).get_json()["data"]
+    id = _id_from_url(urls[0])
+    _wait_for_state(client, id, "completed", timeout=30.0)
+
+    worker_list = client.get(f"/recordings/{id}/workers").get_json()
+    assert worker_list["status"] == "success"
+    worker_urls = worker_list["data"]
+    assert isinstance(worker_urls, list) and len(worker_urls) == 1
+
+    worker_id = _worker_id_from_url(worker_urls[0])
+    metadata = client.get(f"/recordings/{id}/workers/{worker_id}").get_json()
+    assert metadata["status"] == "success"
+    assert metadata["data"]["recording_id"] == id
+    assert metadata["data"]["id"] == worker_id
+    assert isinstance(metadata["data"]["pid"], int)
+
+    log_response = client.get(
+        f"/recordings/{id}/workers/{worker_id}/logs"
+    ).get_json()
+    assert log_response["status"] == "success"
+    assert isinstance(log_response["data"], str)
+    assert log_response["data"]  # non-empty
+
+
+def test_workers_endpoints_spectrogram_has_two_workers(
+    client: flask.testing.FlaskClient,
+) -> None:
+    _write_cosine_wave_config("workers-spec")
+    urls = client.post(
+        "/recordings",
+        json={"kind": "spectrogram", "tags": ["workers-spec"], "duration": 1.5},
+    ).get_json()["data"]
+    id = _id_from_url(urls[0])
+    _wait_for_state(client, id, "completed", timeout=30.0)
+
+    worker_urls = client.get(f"/recordings/{id}/workers").get_json()["data"]
+    assert len(worker_urls) == 2
+    pids = set()
+    for wurl in worker_urls:
+        wid = _worker_id_from_url(wurl)
+        payload = client.get(f"/recordings/{id}/workers/{wid}").get_json()
+        assert payload["status"] == "success"
+        pids.add(payload["data"]["pid"])
+    assert len(pids) == 2
+
+
+def test_workers_endpoint_unknown_recording_errors(
+    client: flask.testing.FlaskClient,
+) -> None:
+    payload = client.get("/recordings/deadbeef/workers").get_json()
+    assert payload["status"] == "error"
+    assert "RecordingNotFound" in payload["message"]
+
+
+def test_get_worker_unknown_worker_errors(
+    client: flask.testing.FlaskClient,
+) -> None:
+    _write_cosine_wave_config("workers-404")
+    urls = client.post(
+        "/recordings",
+        json={"kind": "signal", "tags": ["workers-404"], "duration": 1.5},
+    ).get_json()["data"]
+    id = _id_from_url(urls[0])
+    _wait_for_state(client, id, "completed", timeout=30.0)
+    payload = client.get(f"/recordings/{id}/workers/99999").get_json()
+    assert payload["status"] == "error"
+    assert "WorkerNotFound" in payload["message"]
+
+
+def test_worker_log_after_recording_delete_gone(
+    client: flask.testing.FlaskClient,
+) -> None:
+    _write_cosine_wave_config("workers-cascade")
+    urls = client.post(
+        "/recordings",
+        json={"kind": "signal", "tags": ["workers-cascade"], "duration": 1.5},
+    ).get_json()["data"]
+    id = _id_from_url(urls[0])
+    _wait_for_state(client, id, "completed", timeout=30.0)
+
+    worker_urls = client.get(f"/recordings/{id}/workers").get_json()["data"]
+    worker_id = _worker_id_from_url(worker_urls[0])
+
+    del_response = client.delete(f"/recordings/{id}")
+    assert del_response.get_json()["status"] == "success"
+
+    payload = client.get(
+        f"/recordings/{id}/workers/{worker_id}"
+    ).get_json()
+    assert payload["status"] == "error"
+    assert "RecordingNotFound" in payload["message"]
