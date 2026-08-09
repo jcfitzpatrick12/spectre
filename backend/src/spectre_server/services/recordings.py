@@ -240,9 +240,9 @@ def stop_recording(
 ) -> str:
     """Request a recording to stop.
 
-    :param id: The recording identifier.
+    :param recording_id: The recording identifier.
     :param db_path: Optionally override the db used at runtime.
-    :returns: The identifier of the (deleted) recording.
+    :returns: The recording identifier.
     """
     recording_manager = _open_recording_manager(db_path)
     recording_manager.request_stop(recording_id)

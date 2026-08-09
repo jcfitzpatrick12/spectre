@@ -57,17 +57,6 @@ class Worker:
         """Return whether the managed process is alive."""
         return self._process.is_alive()
 
-    @property
-    def pid(self) -> int:
-        """Get the OS process id of the worker process.
-
-        :raises RuntimeError: if the worker has not been started yet
-            (multiprocessing only assigns a pid at `start()` time).
-        """
-        if self._process.pid is None:
-            raise RuntimeError("Worker has not been started.")
-        return self._process.pid
-
     def start(self) -> None:
         """Start the worker process.
 
