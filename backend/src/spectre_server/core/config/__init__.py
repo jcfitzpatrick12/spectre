@@ -6,6 +6,6 @@
 """Program-wide config."""
 
 from ._paths import paths, Paths
-from ._time_formats import TimeFormat
+from ._time_formats import TimeFormat, utc_now
 
-__all__ = ["paths", "Paths", "TimeFormat"]
+__all__ = ["paths", "Paths", "TimeFormat", "utc_now"]

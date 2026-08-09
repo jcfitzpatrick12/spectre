@@ -103,7 +103,6 @@ def jsendify_response(
                 message=(
                     f"An internal server error has occured. "
                     f"Received the following error: \n{traceback.format_exc()}"
-                    f"Use `spectre get log` for more information."
                 ),
                 code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
             )

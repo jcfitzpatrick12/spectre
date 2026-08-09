@@ -6,7 +6,7 @@ import typer
 from typing import List
 
 from ._utils import safe_request, get_config_file_name
-from ._secho_resources import secho_new_resource
+from ._secho_resources import secho_new_resource, secho_existing_resource
 
 update_typer = typer.Typer(help="Update resources.")
 
@@ -42,4 +42,23 @@ def config(
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}", "PATCH", json=json)
     endpoint = jsend_dict["data"]
     secho_new_resource(endpoint)
+    raise typer.Exit()
+
+
+@update_typer.command(help="Update a recording.")
+def recording(
+    recording_id: str = typer.Option(
+        ..., "--recording-id", help="The unique identifier of the recording."
+    ),
+    request_stop: bool = typer.Option(
+        False,
+        "--request-stop",
+        help="If specified, signal the recording to stop.",
+    ),
+) -> None:
+
+    json = {"stop_requested": request_stop}
+    jsend_dict = safe_request(f"recordings/{recording_id}", "PATCH", json=json)
+    endpoint = jsend_dict["data"]
+    secho_existing_resource(endpoint)
     raise typer.Exit()

@@ -5,6 +5,8 @@
 import datetime
 import typing
 
+import spectre_server.core.config
+
 
 def validate_date(
     year: typing.Optional[int] = None,
@@ -20,7 +22,7 @@ def validate_date(
     - Year and month
     - Full date (year, month, day)
     """
-    today = datetime.datetime.now(datetime.timezone.utc).date()
+    today = spectre_server.core.config.utc_now().date()
 
     if day is not None and month is None:
         raise ValueError("Day cannot be specified without month.")

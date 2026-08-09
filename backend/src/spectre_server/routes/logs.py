@@ -6,9 +6,11 @@
 import flask
 import os
 
+import spectre_server.core.logs
+
 from ..services import logs as services
 from ._format_responses import jsendify_response, serve_from_directory
-from ._utils import validate_date, is_true
+from ._utils import is_true
 
 logs_blueprint = flask.Blueprint("logs", __name__, url_prefix="/spectre-data/logs")
 
@@ -29,6 +31,19 @@ def _get_log_file_endpoints(log_file_paths: list[str]) -> list[str]:
     return [_get_log_file_endpoint(log_file) for log_file in log_file_paths]
 
 
+def _resolve_process_types(
+    values: list[str],
+) -> list[spectre_server.core.logs.ProcessType]:
+    """Convert query-string values to `ProcessType` enums.
+
+    An empty selection defaults to every scope, so the caller sees all logs
+    unless they explicitly narrow the request.
+    """
+    if not values:
+        return list(spectre_server.core.logs.ProcessType)
+    return [spectre_server.core.logs.ProcessType(v) for v in values]
+
+
 @logs_blueprint.route("/<string:file_name>", methods=["GET"])
 def get_log(file_name: str) -> flask.Response:
     return serve_from_directory(services.get_log(file_name))
@@ -43,12 +58,8 @@ def get_log_raw(file_name: str) -> str:
 @logs_blueprint.route("/", methods=["GET"])
 @jsendify_response
 def get_logs() -> list[str]:
-    process_types = flask.request.args.getlist("process_type")
-    year = flask.request.args.get("year", type=int)
-    month = flask.request.args.get("month", type=int)
-    day = flask.request.args.get("day", type=int)
-    validate_date(year, month, day)
-    log_files = services.get_logs(process_types, year=year, month=month, day=day)
+    process_types = _resolve_process_types(flask.request.args.getlist("process_type"))
+    log_files = services.get_logs(process_types)
     return _get_log_file_endpoints(log_files)
 
 
@@ -63,15 +74,7 @@ def delete_log(file_name: str) -> str:
 @logs_blueprint.route("/", methods=["DELETE"])
 @jsendify_response
 def delete_logs() -> list[str]:
-    year = flask.request.args.get("year", type=int)
-    month = flask.request.args.get("month", type=int)
-    day = flask.request.args.get("day", type=int)
     dry_run = flask.request.args.get("dry_run", type=is_true, default=False)
-    validate_date(year, month, day)
-    process_types = flask.request.args.getlist("process_type")
-
-    log_files = services.delete_logs(
-        process_types, year=year, month=month, day=day, dry_run=dry_run
-    )
-
+    process_types = _resolve_process_types(flask.request.args.getlist("process_type"))
+    log_files = services.delete_logs(process_types, dry_run=dry_run)
     return _get_log_file_endpoints(log_files)

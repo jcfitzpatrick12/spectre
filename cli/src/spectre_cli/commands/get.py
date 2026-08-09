@@ -9,7 +9,7 @@ import datetime
 import enum
 import gzip
 
-from ._utils import safe_request, get_config_file_name
+from ._utils import safe_request, get_config_file_name, RecordingState, ProcessType
 from ._secho_resources import (
     pprint_dict,
     secho_existing_resource,
@@ -107,30 +107,23 @@ def __download_callisto_resources(
         __download_resource(endpoint, directory, file_name, compress)
 
 
-get_typer = typer.Typer(help="Display one or many resources.")
+get_typer = typer.Typer(help="Display resources.")
 
 
 @get_typer.command(help="List logs.")
 def logs(
-    process_types: list[str] = typer.Option(
+    process_types: list[ProcessType] = typer.Option(
         [],
         "--process-type",
-        help="List all logs with this process type, specifying one of 'worker' or 'user'. If not provided, list logs with any process type.",
+        help="List all logs with this process type. If not provided, list logs with any process type.",
     ),
-    year: int = typer.Option(
-        None, "--year", "-y", help="Only list logs under this year."
-    ),
-    month: int = typer.Option(
-        None, "--month", "-m", help="Only list logs under this month."
-    ),
-    day: int = typer.Option(None, "--day", "-d", help="Only list logs under this day."),
     export: str = typer.Option(
         None,
         "--export",
         help="Bulk download logs to your local filesystem inside this directory.",
     ),
 ) -> None:
-    params = {"process_type": process_types, "year": year, "month": month, "day": day}
+    params = {"process_type": process_types}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
@@ -143,11 +136,38 @@ def logs(
 
 @get_typer.command(help="Print the contents of a log.")
 def log(
-    file_name: str = typer.Option(..., "-f", help="The file name."),
+    file_name: str = typer.Option(None, "-f", help="The file name."),
+    recording_id: str = typer.Option(
+        None,
+        "--recording-id",
+        help="The unique identifier of the parent recording.",
+    ),
+    worker_name: str = typer.Option(
+        None, "--worker-name", help="The name of the worker."
+    ),
 ) -> None:
-    jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
-    log_contents = jsend_dict["data"]
-    print(log_contents)
+    by_file = file_name is not None
+    by_worker = recording_id is not None and worker_name is not None
+    if by_file and (recording_id is not None or worker_name is not None):
+        typer.secho(
+            "Error: Specify either -f or both --recording-id and --worker-name, not both.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
+    if by_file:
+        jsend_dict = safe_request(f"spectre-data/logs/{file_name}/raw", "GET")
+        print(jsend_dict["data"])
+    elif by_worker:
+        jsend_dict = safe_request(
+            f"recordings/{recording_id}/workers/{worker_name}/log", "GET"
+        )
+        print(jsend_dict["data"])
+    else:
+        typer.secho(
+            "Error: Specify either -f or both --recording-id and --worker-name.",
+            fg="yellow",
+        )
+        raise typer.Exit(1)
     raise typer.Exit()
 
 
@@ -214,7 +234,7 @@ def files(
     raise typer.Exit()
 
 
-@get_typer.command(help="List supported receivers.")
+@get_typer.command(help="List receivers.")
 def receivers() -> None:
 
     jsend_dict = safe_request("receivers", "GET")
@@ -226,7 +246,7 @@ def receivers() -> None:
     raise typer.Exit()
 
 
-@get_typer.command(help="Get receiver metadata.")
+@get_typer.command(help="Print receiver metadata.")
 def receiver(
     receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
@@ -242,7 +262,7 @@ def receiver(
     raise typer.Exit()
 
 
-@get_typer.command(help=("List the supported operating modes for a receiver."))
+@get_typer.command(help="List operating modes for a receiver.")
 def modes(
     receiver_name: str = typer.Option(
         ..., "--receiver", "-r", help="The name of the receiver."
@@ -314,12 +334,7 @@ def tags(
     ),
 ) -> None:
     params = {"year": year, "month": month, "day": day}
-    url = (
-        f"spectre-data/batches/tags"
-        if year is not None
-        else "spectre-data/batches/tags"
-    )
-    jsend_dict = safe_request(url, "GET", params=params)
+    jsend_dict = safe_request("spectre-data/batches/tags", "GET", params=params)
     tags = jsend_dict["data"]
 
     for tag in tags:
@@ -345,3 +360,43 @@ def model(
     model = jsend_dict["data"]
     pprint_dict(model)
     typer.Exit()
+
+
+@get_typer.command(help="List recordings.")
+def recordings(
+    states: list[RecordingState] = typer.Option(
+        [],
+        "--state",
+        help="List all recordings with this state. If not provided, list recordings with any state.",
+    ),
+) -> None:
+    endpoints: list[str] = []
+    if states:
+        for state in states:
+            jsend_dict = safe_request("recordings", "GET", params={"state": state})
+            endpoints.extend(jsend_dict["data"])
+    else:
+        jsend_dict = safe_request("recordings", "GET")
+        endpoints = jsend_dict["data"]
+    secho_existing_resources(endpoints)
+    raise typer.Exit()
+
+
+@get_typer.command(help="Print recording metadata.")
+def recording(
+    recording_id: str = typer.Option(
+        ..., "--recording-id", help="The unique identifier of the recording."
+    ),
+) -> None:
+    jsend_dict = safe_request(f"recordings/{recording_id}", "GET")
+    pprint_dict(jsend_dict["data"])
+
+    # Get worker metadata, too.
+    jsend_dict = safe_request(f"recordings/{recording_id}/workers", "GET")
+    worker_endpoints = jsend_dict["data"]
+    typer.secho("Workers:")
+    if worker_endpoints:
+        secho_existing_resources(jsend_dict["data"])
+    else:
+        typer.secho("None")
+    raise typer.Exit()

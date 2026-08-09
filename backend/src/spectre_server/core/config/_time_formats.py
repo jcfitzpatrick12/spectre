@@ -2,6 +2,7 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import datetime
 from dataclasses import dataclass
 
 
@@ -22,3 +23,8 @@ class TimeFormat:
     DATETIME = f"{DATE}T{FRACTIONAL_TIME}Z"
     # Time zone designators (like `Z`) are not allowed. See http://dx.doi.org/10.1051/0004-6361/201424653 section 3.1.
     FITS = f"%Y-%m-%dT%H:%M:%S.%f"
+
+
+def utc_now() -> datetime.datetime:
+    """Return the current UTC time with an explicit timezone."""
+    return datetime.datetime.now(datetime.timezone.utc)

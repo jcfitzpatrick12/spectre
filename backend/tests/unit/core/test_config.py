@@ -5,6 +5,7 @@
 import tempfile
 import os
 import datetime
+import typing
 
 import pytest
 
@@ -60,27 +61,19 @@ def test_get_batches_dir_path(
 
 
 @pytest.mark.parametrize(
-    ["year", "month", "day", "expected_dir_path"],
+    ["scope", "expected_dir_path"],
     [
-        (None, None, None, os.path.join("/tmp", ".spectre-data", "logs")),
-        (2025, None, None, os.path.join("/tmp", ".spectre-data", "logs", "2025")),
-        (2025, 2, None, os.path.join("/tmp", ".spectre-data", "logs", "2025", "02")),
-        (
-            2025,
-            2,
-            13,
-            os.path.join("/tmp", ".spectre-data", "logs", "2025", "02", "13"),
-        ),
+        (None, os.path.join("/tmp", ".spectre-data", "logs")),
+        ("server", os.path.join("/tmp", ".spectre-data", "logs", "server")),
+        ("worker", os.path.join("/tmp", ".spectre-data", "logs", "worker")),
     ],
 )
 def test_get_logs_dir_path(
-    year: int,
-    month: int,
-    day: int,
+    scope: typing.Optional[str],
     expected_dir_path: str,
 ) -> None:
     """Check that the logs directory paths are created as expected."""
-    result = spectre_server.core.config.paths.get_logs_dir_path(year, month, day)
+    result = spectre_server.core.config.paths.get_logs_dir_path(scope)
     assert result == expected_dir_path
 
 

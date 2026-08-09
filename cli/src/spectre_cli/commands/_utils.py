@@ -10,6 +10,7 @@ import typing
 import requests
 import os
 import contextlib
+import enum
 
 import typer
 import yaspin
@@ -30,6 +31,17 @@ def confirm_with_user() -> None:
         raise typer.Exit(1)
 
 
+class RecordingState(str, enum.Enum):
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class ProcessType(str, enum.Enum):
+    SERVER = "server"
+    WORKER = "worker"
+
+
 def safe_request(
     route_url: str,
     method: str,
@@ -45,7 +57,7 @@ def safe_request(
     :param json: typer.Optional JSON payload for the request body.
     :param params: typer.Optional query parameters for the request.
     :param require_confirmation: If True, prompt the user if they'd like to continue.
-    :param suppress_confirmation: If True, ignore the `require_confirmation` flag, and continue with the request.
+    :param non_interactive: If True, ignore the `require_confirmation` flag, and continue with the request.
     :return: Parsed JSON response as a dictionary.
     """
     if require_confirmation and not non_interactive:

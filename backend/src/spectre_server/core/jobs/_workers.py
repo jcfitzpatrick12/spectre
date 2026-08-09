@@ -28,7 +28,11 @@ def _make_daemon_process(
 
 
 class Worker:
-    def __init__(self, name: str, target: typing.Callable[[], None]) -> None:
+    def __init__(
+        self,
+        name: str,
+        target: typing.Callable[[], None],
+    ) -> None:
         """A lightweight wrapper for a `multiprocessing.Process` daemon.
 
         Provides a very simple API to start, kill, and restart a multiprocessing process.
@@ -52,6 +56,17 @@ class Worker:
     def is_alive(self) -> bool:
         """Return whether the managed process is alive."""
         return self._process.is_alive()
+
+    @property
+    def pid(self) -> int:
+        """Get the OS process id of the worker process.
+
+        :raises RuntimeError: if the worker has not been started yet
+            (multiprocessing only assigns a pid at `start()` time).
+        """
+        if self._process.pid is None:
+            raise RuntimeError("Worker has not been started.")
+        return self._process.pid
 
     def start(self) -> None:
         """Start the worker process.
@@ -94,7 +109,7 @@ def make_worker(
     name: str,
     target: typing.Callable[..., None],
     args: tuple = (),
-    configure_logging: bool = True,
+    log_file_path: typing.Optional[str] = None,
     spectre_data_dir_path: typing.Optional[str] = None,
 ) -> Worker:
     """Create a `Worker` instance to manage a target function in a multiprocessing background daemon process.
@@ -106,7 +121,8 @@ def make_worker(
     :param name: Human-readable name for the worker process.
     :param target: The function to be executed by the worker process.
     :param args: Arguments to pass to the target function.
-    :param configure_logging: If True, configure the root logger to write log events to file. Defaults to True.
+    :param log_file_path: If specified, configure the root logger in the worker process to
+    write log events to this file. If None, root logger configuration is skipped.
     :param spectre_data_dir_path: If specified, override the `SPECTRE_DATA_DIR_PATH` environment variable to this value in the process
     managed by the worker.
     :return: A `Worker` instance managing the background process (not started).
@@ -118,10 +134,8 @@ def make_worker(
                 spectre_data_dir_path
             )
 
-        if configure_logging:
-            spectre_server.core.logs.configure_root_logger(
-                spectre_server.core.logs.ProcessType.WORKER,
-            )
+        if log_file_path is not None:
+            spectre_server.core.logs.configure_root_logger(log_file_path)
 
         target(*args)
 

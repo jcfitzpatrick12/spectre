@@ -16,7 +16,7 @@ def config(
         ..., "--receiver", "-r", help="The name of the receiver."
     ),
     receiver_mode: str = typer.Option(
-        ..., "--mode", "-m", help="The operating mode for the receiver."
+        ..., "--mode", "-m", help="The operating mode of the receiver."
     ),
     tag: str = typer.Option(None, "--tag", "-t", help="The unique identifier."),
     file_name: str = typer.Option(

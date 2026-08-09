@@ -6,6 +6,26 @@
 
 from ._jobs import Job, start_job
 from ._workers import Worker, make_worker
+from ._recordings import (
+    RecordingManager,
+    RecordingRecord,
+    RecordingState,
+    RecordingKind,
+    WorkerRecord,
+    WorkerName,
+)
 from ._duration import Duration
 
-__all__ = ["Job", "Worker", "make_worker", "start_job", "Duration"]
+__all__ = [
+    "Job",
+    "Worker",
+    "make_worker",
+    "start_job",
+    "Duration",
+    "RecordingManager",
+    "RecordingRecord",
+    "RecordingState",
+    "RecordingKind",
+    "WorkerRecord",
+    "WorkerName",
+]

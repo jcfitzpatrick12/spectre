@@ -63,23 +63,24 @@ class Paths:
 
     def get_logs_dir_path(
         self,
-        year: Optional[int] = None,
-        month: Optional[int] = None,
-        day: Optional[int] = None,
+        scope: Optional[str] = None,
     ) -> str:
-        """Get the directory for log files, optionally with a date-based subdirectory."""
-        return str(
-            self.__get_date_based_dir_path(
-                pathlib.Path(self.get_spectre_data_dir_path()) / "logs",
-                year,
-                month,
-                day,
-            )
-        )
+        """Get the directory for log files, optionally scoped to a subdirectory.
+
+        :param scope: If specified, append as a subdirectory.
+        """
+        base = pathlib.Path(self.get_spectre_data_dir_path()) / "logs"
+        if scope is not None:
+            base = base / scope
+        return str(base)
 
     def get_configs_dir_path(self) -> str:
         """Get the directory for configuration files."""
         return str(pathlib.Path(self.get_spectre_data_dir_path()) / "configs")
+
+    def get_db_path(self) -> str:
+        """Get the path to the recordings database on-disk."""
+        return str(pathlib.Path(self.get_spectre_data_dir_path()) / "recordings.db")
 
     def __get_date_based_dir_path(
         self,

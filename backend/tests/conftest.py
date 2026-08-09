@@ -34,5 +34,11 @@ def app() -> typing.Iterator[flask.Flask]:
 
 
 @pytest.fixture()
-def client(app: flask.Flask) -> flask.testing.FlaskClient:
+def client(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+    app: flask.Flask,
+) -> flask.testing.FlaskClient:
+    monkeypatch.setenv("SPECTRE_DATA_DIR_PATH", str(tmp_path))
+    spectre_server.core.config.paths.set_spectre_data_dir_path(str(tmp_path))
     return app.test_client()
