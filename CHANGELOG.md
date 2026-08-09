@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/spectregrams/spectre/compare/v4.4.0...v5.0.0) (2026-08-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* issue-195 Start, track and stop recordings
+
+### Features
+
+* issue-195 Start, track and stop recordings ([b75f46c](https://github.com/spectregrams/spectre/commit/b75f46c3945269f05568a42a28a43a058cc1d9d8))
+
 ## [4.4.0](https://github.com/spectregrams/spectre/compare/v4.3.1...v4.4.0) (2026-08-02)
 
 
