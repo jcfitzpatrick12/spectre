@@ -228,7 +228,7 @@ class RecordingManager:
                     tag,
                     duration,
                     RecordingState.RUNNING.value,
-                    False,  # Stop cannot be requeste at registration.
+                    False,  # Stop cannot be requested at registration.
                     self.__serialize_datetime(started_at),
                 ),
             )
@@ -291,11 +291,12 @@ class RecordingManager:
         self.__set_finished(id, RecordingState.FAILED, finished_at)
 
     def delete(self, id: str) -> None:
-        """Remove a recording. No-op for unknown ids.
+        """Remove a recording.
 
         Cascades to any associated worker rows via the FK constraint.
 
         :param id: The recording identifier.
+        :raises ValueError: If the recording does not exist.
         """
         self.__require(id)
 
