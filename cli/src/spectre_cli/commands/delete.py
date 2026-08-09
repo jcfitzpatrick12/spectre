@@ -41,7 +41,7 @@ def logs(
         non_interactive = True
 
     params = {
-        "process_type": process_types,
+        "process_type": [t.value for t in process_types],
         "dry_run": dry_run,
     }
 
@@ -188,7 +188,7 @@ def recordings(
 ) -> None:
     endpoints: list[str] = []
     for state in states:
-        jsend_dict = safe_request("recordings", "GET", params={"state": state})
+        jsend_dict = safe_request("recordings", "GET", params={"state": state.value})
         endpoints.extend(jsend_dict["data"])
 
     if not non_interactive:

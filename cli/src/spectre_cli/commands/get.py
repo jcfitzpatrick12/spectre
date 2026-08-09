@@ -123,7 +123,7 @@ def logs(
         help="Bulk download logs to your local filesystem inside this directory.",
     ),
 ) -> None:
-    params = {"process_type": process_types}
+    params = {"process_type": [t.value for t in process_types]}
     jsend_dict = safe_request(f"spectre-data/logs", "GET", params=params)
     endpoints = jsend_dict["data"]
 
@@ -373,7 +373,7 @@ def recordings(
     endpoints: list[str] = []
     if states:
         for state in states:
-            jsend_dict = safe_request("recordings", "GET", params={"state": state})
+            jsend_dict = safe_request("recordings", "GET", params={"state": state.value})
             endpoints.extend(jsend_dict["data"])
     else:
         jsend_dict = safe_request("recordings", "GET")
