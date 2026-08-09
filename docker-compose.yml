@@ -11,7 +11,7 @@ services:
     networks:
       - spectre-network
     volumes:
-      - spectre-data-v4:/app/.spectre-data
+      - spectre-data-v5:/app/.spectre-data
       - /dev/bus/usb:/dev/bus/usb
     device_cgroup_rules:
       - "c 189:* rw"
@@ -38,5 +38,5 @@ networks:
     driver: bridge
 
 volumes:
-  spectre-data-v4:
-    name: spectre-data-v4
+  spectre-data-v5:
+    name: spectre-data-v5
