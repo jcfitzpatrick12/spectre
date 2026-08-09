@@ -373,7 +373,9 @@ def recordings(
     endpoints: list[str] = []
     if states:
         for state in states:
-            jsend_dict = safe_request("recordings", "GET", params={"state": state.value})
+            jsend_dict = safe_request(
+                "recordings", "GET", params={"state": state.value}
+            )
             endpoints.extend(jsend_dict["data"])
     else:
         jsend_dict = safe_request("recordings", "GET")
