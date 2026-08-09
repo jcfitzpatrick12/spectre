@@ -4,7 +4,13 @@
 
 import typer
 
-from ._utils import safe_request, get_config_file_name
+from ._utils import (
+    safe_request,
+    get_config_file_name,
+    confirm_with_user,
+    RecordingState,
+    ProcessType,
+)
 from ._secho_resources import (
     secho_stale_resource,
     secho_stale_resources,
@@ -17,19 +23,10 @@ delete_typer = typer.Typer(help="Delete resources.")
 
 @delete_typer.command(help="Delete logs.")
 def logs(
-    process_types: list[str] = typer.Option(
+    process_types: list[ProcessType] = typer.Option(
         [],
         "--process-type",
-        help="Delete all logs with this process type, specifying one of 'worker' or 'user'. If not provided, nothing will be deleted.",
-    ),
-    year: int = typer.Option(
-        None, "--year", "-y", help="Only delete logs under this year."
-    ),
-    month: int = typer.Option(
-        None, "--month", "-m", help="Only delete logs under this month."
-    ),
-    day: int = typer.Option(
-        None, "--day", "-d", help="Only delete logs under this day."
+        help="Delete all logs with this process type. If not provided, nothing will be deleted.",
     ),
     non_interactive: bool = typer.Option(
         False, "--non-interactive", help="Suppress any interactive prompts."
@@ -46,9 +43,6 @@ def logs(
     params = {
         "process_type": process_types,
         "dry_run": dry_run,
-        "year": year,
-        "month": month,
-        "day": day,
     }
 
     jsend_dict = safe_request(
@@ -154,4 +148,55 @@ def config(
         secho_stale_resource(endpoint)
     else:
         secho_existing_resource(endpoint)
+    raise typer.Exit()
+
+
+@delete_typer.command(help="Delete a recording.")
+def recording(
+    recording_id: str = typer.Option(
+        ..., "--recording-id", help="The unique identifier of the recording."
+    ),
+    non_interactive: bool = typer.Option(
+        False,
+        "--non-interactive",
+        help="Suppress any interactive prompts.",
+    ),
+) -> None:
+    jsend_dict = safe_request(
+        f"recordings/{recording_id}",
+        "DELETE",
+        require_confirmation=True,
+        non_interactive=non_interactive,
+    )
+    endpoint = jsend_dict["data"]
+    secho_stale_resource(endpoint)
+    raise typer.Exit()
+
+
+@delete_typer.command(help="Delete recordings.")
+def recordings(
+    states: list[RecordingState] = typer.Option(
+        [],
+        "--state",
+        help="Delete all recordings with this state. If not provided, nothing will be deleted.",
+    ),
+    non_interactive: bool = typer.Option(
+        False,
+        "--non-interactive",
+        help="Suppress any interactive prompts.",
+    ),
+) -> None:
+    endpoints: list[str] = []
+    for state in states:
+        jsend_dict = safe_request("recordings", "GET", params={"state": state})
+        endpoints.extend(jsend_dict["data"])
+
+    if not non_interactive:
+        confirm_with_user()
+
+    for endpoint in endpoints:
+        recording_id = endpoint.split("/")[-1]
+        result = safe_request(f"recordings/{recording_id}", "DELETE")
+        secho_stale_resource(result["data"])
+
     raise typer.Exit()

@@ -11,96 +11,51 @@ from ._factory import get_receiver
 from ._config import Config
 
 
-def _make_flowgraph_worker(
+def make_signal_worker(
     config: Config,
+    recording_id: str,
     skip_validation: bool,
-    spectre_data_dir_path: typing.Optional[str],
+    logs_dir_path: typing.Optional[str] = None,
+    spectre_data_dir_path: typing.Optional[str] = None,
 ) -> spectre_server.core.jobs.Worker:
+    """Build a `Worker` that runs a receiver's flowgraph for a given config.
+
+    Not started; the caller must invoke `start()` on the returned worker (or
+    hand it to a `Job`).
+    """
     receiver = get_receiver(config.receiver_name, config.receiver_mode)
+    worker_name = spectre_server.core.jobs.WorkerName.SIGNAL.value
     return spectre_server.core.jobs.make_worker(
-        "flowgraph",
+        worker_name,
         receiver.activate_flowgraph,
         (config.tag, config.parameters, skip_validation),
+        log_file_path=spectre_server.core.logs.get_worker_log_file_path(
+            recording_id, worker_name, logs_dir_path=logs_dir_path
+        ),
         spectre_data_dir_path=spectre_data_dir_path,
     )
 
 
-def _make_post_processing_worker(
+def make_spectrograms_worker(
     config: Config,
+    recording_id: str,
     skip_validation: bool,
-    spectre_data_dir_path: typing.Optional[str],
+    logs_dir_path: typing.Optional[str] = None,
+    spectre_data_dir_path: typing.Optional[str] = None,
 ) -> spectre_server.core.jobs.Worker:
+    """Build a `Worker` that runs a receiver's post-processing for a config.
+
+    Not started; the caller must invoke `start()` on the returned worker (or
+    hand it to a `Job`).
+    """
     receiver = get_receiver(config.receiver_name, config.receiver_mode)
+    worker_name = spectre_server.core.jobs.WorkerName.SPECTROGRAM.value
     return spectre_server.core.jobs.make_worker(
-        "post_processing",
+        worker_name,
         receiver.activate_post_processing,
         (config.tag, config.parameters, skip_validation),
+        log_file_path=spectre_server.core.logs.get_worker_log_file_path(
+            recording_id, worker_name, logs_dir_path=logs_dir_path
+        ),
         spectre_data_dir_path=spectre_data_dir_path,
     )
-
-
-@spectre_server.core.logs.log_call
-def record_signal(
-    configs: list[Config],
-    duration: float = 60,
-    force_restart: bool = False,
-    max_restarts: int = 5,
-    skip_validation: bool = False,
-    spectre_data_dir_path: typing.Optional[str] = None,
-) -> int:
-    """Capture data from SDRs in real time.
-
-    :param config: A list of configs.
-    :param duration: How long to record for, in seconds.
-    :param force_restart: If specified, restart the recording if it fails at runtime.
-    :param max_restarts: Maximum number of times the recording can be restarted before giving up.
-    Only applies when force_restart is True. Defaults to 5.
-    :param skip_validation: If True, skip validating the config parameters against the model.
-    :return: 0 exit code on success.
-    """
-    flowgraph_workers = [
-        _make_flowgraph_worker(config, skip_validation, spectre_data_dir_path)
-        for config in configs
-    ]
-    spectre_server.core.jobs.start_job(
-        flowgraph_workers, duration, force_restart, max_restarts
-    )
-
-    return 0
-
-
-@spectre_server.core.logs.log_call
-def record_spectrograms(
-    configs: list[Config],
-    duration: float = 60,
-    force_restart: bool = False,
-    max_restarts: int = 5,
-    skip_validation: bool = False,
-    spectre_data_dir_path: typing.Optional[str] = None,
-) -> int:
-    """Capture data from SDRs and post-process it into spectrograms in real time.
-
-    :param configs: A list of configs.
-    :param duration: How long to record for, in seconds.
-    :param force_restart: If specified, restart the recording if it fails at runtime.
-    :param max_restarts: Maximum number of times the recording can be restarted before giving up.
-    Only applies when force_restart is True. Defaults to 5.
-    :param skip_validation: If True, skip validating the config parameters against the model.
-    :return: 0 exit code on success.
-    """
-    flowgraph_workers = [
-        _make_flowgraph_worker(config, skip_validation, spectre_data_dir_path)
-        for config in configs
-    ]
-    post_processing_workers = [
-        _make_post_processing_worker(config, skip_validation, spectre_data_dir_path)
-        for config in configs
-    ]
-    spectre_server.core.jobs.start_job(
-        post_processing_workers + flowgraph_workers,
-        duration=duration,
-        force_restart=force_restart,
-        max_restarts=max_restarts,
-    )
-
-    return 0

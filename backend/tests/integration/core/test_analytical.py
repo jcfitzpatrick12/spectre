@@ -2,12 +2,15 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import time
 import typing
 import pytest
+import secrets
 
 import spectre_server.core.receivers
 import spectre_server.core.config
 import spectre_server.core.batches
+import spectre_server.services.recordings
 
 
 @pytest.fixture
@@ -44,6 +47,51 @@ CONSTANT_STAIRCASE_PARAMETERS = {
 }
 
 
+def _await_recording_finished(
+    recording_id: str,
+    paths: spectre_server.core.config.Paths,
+    timeout_s: float = 30.0,
+) -> dict[str, typing.Any]:
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        recording = spectre_server.services.recordings.get_recording(
+            recording_id, db_path=paths.get_db_path()
+        )
+        if recording["state"] in {"completed", "failed"}:
+            return recording
+        time.sleep(0.1)
+    raise TimeoutError(f"Timed out waiting for recording '{recording_id}' to finish")
+
+
+def _validate_batches(
+    config: spectre_server.core.receivers.Config,
+    signal_generator: spectre_server.core.receivers.SignalGenerator,
+    spectre_config_paths: spectre_server.core.config.Paths,
+) -> None:
+    signal_generator.mode = config.receiver_mode
+    found_spectrograms = False
+    for batch in spectre_server.core.batches.Batches(
+        config.tag,
+        signal_generator.batch_cls,
+        spectre_config_paths.get_batches_dir_path(),
+    ):
+        if not batch.spectrogram_file.exists:
+            continue
+
+        spectrogram = batch.read_spectrogram()
+        found_spectrograms = True
+        result = signal_generator.validate_analytically(
+            spectrogram,
+            signal_generator.model_validate(config.parameters),
+            ATOL,
+        )
+        assert result["frequencies_validated"]
+        assert result["times_validated"]
+        assert 0 <= result["num_invalid_spectrums"] <= 1
+
+    assert found_spectrograms
+
+
 @pytest.mark.parametrize(
     ("modes", "parameters"),
     [
@@ -67,58 +115,34 @@ def test_analytical(
     the results to analytically derived solutions."""
     configs: list[spectre_server.core.receivers.Config] = []
     for mode, p in zip(modes, parameters):
-        # Set the mode of the receiver.
         signal_generator.mode = mode
-
-        # Make a new config, with the tag dynamically created based on the receiver mode.
-        tag = mode.replace("_", "-")
+        rand_suffix = secrets.token_hex(2)
+        tag = mode.replace("_", "-") + f"-{rand_suffix}"
         signal_generator.write_config(
             tag,
             p,
             configs_dir_path=spectre_config_paths.get_configs_dir_path(),
         )
-
-        # Read the config back from the filesystem.
         configs.append(
             signal_generator.read_config(
                 tag, configs_dir_path=spectre_config_paths.get_configs_dir_path()
             )
         )
 
-    # Record some spectrograms.
-    spectre_server.core.receivers.record_spectrograms(
-        configs,
-        DURATION,
-        spectre_data_dir_path=spectre_config_paths.get_spectre_data_dir_path(),
-    )
+    recording_ids = [
+        spectre_server.services.recordings.create_recording(
+            tag=config.tag,
+            kind="spectrogram",
+            duration=DURATION,
+            validate=True,
+            paths=spectre_config_paths,
+        )
+        for config in configs
+    ]
+
+    for recording_id in recording_ids:
+        recording = _await_recording_finished(recording_id, spectre_config_paths)
+        assert recording["state"] == "completed"
 
     for config in configs:
-        # Check that we've found some spectrograms.
-        found_spectrograms = False
-
-        signal_generator.mode = config.receiver_mode
-
-        # Compare each spectrogram to the corresponding analytically derived solutions.
-        for batch in spectre_server.core.batches.Batches(
-            config.tag,
-            signal_generator.batch_cls,
-            spectre_config_paths.get_batches_dir_path(),
-        ):
-            if batch.spectrogram_file.exists:
-
-                spectrogram = batch.read_spectrogram()
-                found_spectrograms = True
-
-                result = signal_generator.validate_analytically(
-                    spectrogram,
-                    signal_generator.model_validate(config.parameters),
-                    ATOL,
-                )
-
-                assert result["frequencies_validated"]
-                assert result["times_validated"]
-
-                # Permit at most one invalid spectrum (usually the first, due to window effects)
-                assert 0 <= result["num_invalid_spectrums"] <= 1
-
-            assert found_spectrograms
+        _validate_batches(config, signal_generator, spectre_config_paths)

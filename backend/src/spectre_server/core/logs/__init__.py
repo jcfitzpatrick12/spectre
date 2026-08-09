@@ -7,8 +7,13 @@
 
 from ._process_types import ProcessType
 from ._decorators import log_call
-from ._configure import configure_root_logger, get_root_logger_state
-from ._logs import Log, Logs, parse_log_file_name
+from ._configure import (
+    configure_root_logger,
+    get_root_logger_state,
+    get_server_log_file_path,
+    get_worker_log_file_path,
+)
+from ._logs import Log, Logs
 
 __all__ = [
     "log_call",
@@ -17,5 +22,6 @@ __all__ = [
     "Logs",
     "ProcessType",
     "get_root_logger_state",
-    "parse_log_file_name",
+    "get_server_log_file_path",
+    "get_worker_log_file_path",
 ]

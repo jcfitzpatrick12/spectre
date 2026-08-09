@@ -3,25 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from typing import Optional
-from datetime import datetime
-
 import spectre_server.core.logs
 import spectre_server.core.config
 
 
-def _get_log(
-    file_name: str,
-) -> spectre_server.core.logs.Log:
-    start_time, pid, process_type = spectre_server.core.logs.parse_log_file_name(
-        file_name
-    )
-    dt = datetime.strptime(start_time, spectre_server.core.config.TimeFormat.DATETIME)
+def _get_log(file_name: str) -> spectre_server.core.logs.Log:
     logs = spectre_server.core.logs.Logs(
-        process_type,
-        spectre_server.core.config.paths.get_logs_dir_path(dt.year, dt.month, dt.day),
+        spectre_server.core.config.paths.get_logs_dir_path(),
     )
-    return logs.get_from_pid(pid)
+    return logs.get_from_file_name(file_name)
 
 
 @spectre_server.core.logs.log_call
@@ -44,39 +34,11 @@ def get_log_raw(
     """Read a log file.
 
     :param file_name: The file name of the log.
+    :param scope: The process type under which to look for the log.
     :return: The contents of the log, if it exists in the file system.
     """
     log = _get_log(file_name)
     return log.read()
-
-
-@spectre_server.core.logs.log_call
-def get_logs(
-    process_types: list[str],
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
-) -> list[str]:
-    """Get the file paths of logs which exist in the file system.
-
-    :param process_types: Look for logs with these process types. If none are specified, look for logs with any process type.
-    :param year: Only look for logs under this year, defaults to None. If year, month and day are unspecified, look for logs under any year.
-    :param month: Only look for logs under this month, defaults to None. If year is specified, but not month and day, look for logs under that year.
-    :param day: Only look for logs under this day, defaults to None. If year and month are specified, but not day, look for logs under that month and year.
-    :return: The file paths of all logs under the input tag which exist in the file system, as absolute paths within the container's file system.
-    """
-    if not process_types:
-        process_types = ["user", "worker"]
-
-    log_file_paths = []
-    for process_type in process_types:
-        logs = spectre_server.core.logs.Logs(
-            spectre_server.core.logs.ProcessType(process_type).value,
-            spectre_server.core.config.paths.get_logs_dir_path(year, month, day),
-        )
-        log_file_paths += [log.file_path for log in logs]
-
-    return log_file_paths
 
 
 @spectre_server.core.logs.log_call
@@ -87,6 +49,7 @@ def delete_log(
     """Remove a log from the file system.
 
     :param file_name: Delete the log with this file name.
+    :param scope: The process type under which to look for the log.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file path of the deleted log, as an absolute file path in the container's file system.
     """
@@ -97,34 +60,43 @@ def delete_log(
 
 
 @spectre_server.core.logs.log_call
+def get_logs(
+    process_types: list[spectre_server.core.logs.ProcessType],
+) -> list[str]:
+    """Get the file paths of logs which exist in the file system.
+
+    :param process_types: Look for logs under these process types.
+    :return: The file paths of all logs under the input tag which exist in the file system, as absolute paths within the container's file system.
+    """
+    log_paths = []
+    for process_type in process_types:
+        logs = spectre_server.core.logs.Logs(
+            spectre_server.core.config.paths.get_logs_dir_path(process_type.value),
+        )
+        log_paths += [log.file_path for log in logs]
+    return log_paths
+
+
+@spectre_server.core.logs.log_call
 def delete_logs(
-    process_types: list[str],
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
+    process_types: list[spectre_server.core.logs.ProcessType],
     dry_run: bool = False,
 ) -> list[str]:
     """Bulk remove logs from the file system.
 
     Use with caution, the current implementation contains little safeguarding.
 
-    :param process_types: Delete logs with these process types. If none are provided, no logs are deleted.
-    :param year: Only delete logs under this year. Defaults to None. If no year, month, or day is specified, files from any year will be deleted.
-    :param month: Only delete logs under this month. Defaults to None. If a year is specified, but not a month, all files from that year will be deleted.
-    :param day: Only delete logs under this day. Defaults to None. If both year and month are specified, but not the day, all files from that year and month will be deleted.
+    :param process_types: Delete logs under these process types. If none are provided, no logs are deleted.
     :param dry_run: If True, display which files would be deleted without actually deleting them. Defaults to False
     :return: The file paths of logs which have been successfully deleted, as absolute paths within the container's file system.
     """
     deleted_file_paths = []
     for process_type in process_types:
-        proc_type = spectre_server.core.logs.ProcessType(process_type).value
         logs = spectre_server.core.logs.Logs(
-            proc_type,
-            spectre_server.core.config.paths.get_logs_dir_path(year, month, day),
+            spectre_server.core.config.paths.get_logs_dir_path(process_type.value),
         )
         for log in logs:
             if not dry_run:
                 log.delete()
             deleted_file_paths.append(log.file_path)
-
     return deleted_file_paths

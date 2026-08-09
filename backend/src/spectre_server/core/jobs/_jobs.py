@@ -4,6 +4,7 @@
 
 import logging
 import time
+import typing
 
 from ._workers import Worker
 from ._duration import Duration
@@ -53,7 +54,11 @@ class Job:
             worker.restart()
 
     def monitor(
-        self, duration: float, force_restart: bool = False, max_restarts: int = 5
+        self,
+        duration: float,
+        force_restart: bool = False,
+        max_restarts: int = 5,
+        should_stop: typing.Callable[[], bool] = lambda: False,
     ) -> None:
         """
         Monitor the workers during execution and handle unexpected exits.
@@ -67,6 +72,8 @@ class Job:
         :param force_restart: Whether to restart all workers if one dies unexpectedly.
         :param max_restarts: Maximum number of times workers can be restarted before giving up and killing all workers.
         Only applies when force_restart is True. Defaults to 5.
+        :param should_stop: A callable returning True when the monitor should stop early.
+        Defaults to a no-op that always returns False.
         :raises RuntimeError: If a worker exits and `force_restart` is False.
         """
         _LOGGER.info("Monitoring workers...")
@@ -74,8 +81,7 @@ class Job:
 
         restarts_remaining = max_restarts
         try:
-            # Check that the elapsed time since the job started is within the total runtime configured by the user.
-            while time.time() - start_time < duration:
+            while (time.time() - start_time < duration) and not should_stop():
                 for worker in self._workers:
                     if not worker.is_alive:
                         error_message = (

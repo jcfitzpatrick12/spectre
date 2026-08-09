@@ -6,11 +6,5 @@ from enum import Enum
 
 
 class ProcessType(Enum):
-    """The origin of a Spectre process.
-
-    USER: The main user session.
-    WORKER: A background task created and managed internally by Spectre.
-    """
-
-    USER = "user"
+    SERVER = "server"
     WORKER = "worker"

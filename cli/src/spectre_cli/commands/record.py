@@ -2,9 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import time
+
 import typer
 
 from ._utils import safe_request, spinner
+from ._secho_resources import secho_new_resource
 
 record_typer = typer.Typer(help="Start recording data.")
 
@@ -13,9 +16,65 @@ _DEFAULT_FORCE_RESTART = False
 _DEFAULT_SKIP_VALIDATION = False
 
 
+def _id_from_endpoint(endpoint: str) -> str:
+    return endpoint.split("/")[-1]
+
+
+def _record(
+    tag: str,
+    kind: str,
+    duration: float,
+    force_restart: bool,
+    max_restarts: int,
+    skip_validation: bool,
+    detach: bool,
+) -> None:
+    jsend_dict = safe_request(
+        "recordings",
+        "POST",
+        json={
+            "tag": tag,
+            "kind": kind,
+            "duration": duration,
+            "force_restart": force_restart,
+            "max_restarts": max_restarts,
+            "validate": not skip_validation,
+        },
+    )
+    endpoint = jsend_dict["data"]
+    recording_id = _id_from_endpoint(endpoint)
+    secho_new_resource(endpoint)
+
+    if detach:
+        raise typer.Exit()
+
+    try:
+        with spinner():
+            while True:
+                jsend_dict = safe_request(f"recordings/{recording_id}", "GET")
+                state = jsend_dict["data"]["state"]
+                if state != "running":
+                    break
+                time.sleep(1)
+    except KeyboardInterrupt:
+        safe_request(
+            f"recordings/{recording_id}", "PATCH", json={"stop_requested": True}
+        )
+        typer.secho("stopped", fg="yellow")
+        raise typer.Exit()
+
+    if state == "failed":
+        typer.secho("failed", fg="yellow")
+        raise typer.Exit(1)
+
+    raise typer.Exit()
+
+
 @record_typer.command(help="Capture data from an SDR in real time.")
 def signal(
-    tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
+    tag: str = typer.Option(
+        ..., "--tag", "-t", help="The unique identifier of the config."
+    ),
     duration: float = typer.Option(
         ...,
         "--duration",
@@ -35,26 +94,27 @@ def signal(
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate config parameters.",
+        help="If specified, do not validate the parameters.",
+    ),
+    detach: bool = typer.Option(
+        False,
+        "--detach",
+        "-D",
+        help="If specified, return immediately and leave the recording running in the background.",
     ),
 ) -> None:
-    json = {
-        "tags": tags,
-        "duration": duration,
-        "force_restart": force_restart,
-        "max_restarts": max_restarts,
-        "validate": not skip_validation,
-    }
-    with spinner():
-        _ = safe_request("recordings/signal", "POST", json=json)
-    raise typer.Exit()
+    _record(
+        tag, "signal", duration, force_restart, max_restarts, skip_validation, detach
+    )
 
 
 @record_typer.command(
     help="Capture data from an SDR and post-process it into spectrograms in real time."
 )
 def spectrograms(
-    tags: list[str] = typer.Option(..., "--tag", "-t", help="The config tag."),
+    tag: str = typer.Option(
+        ..., "--tag", "-t", help="The unique identifier of the config."
+    ),
     duration: float = typer.Option(
         ...,
         "--duration",
@@ -74,16 +134,21 @@ def spectrograms(
     skip_validation: bool = typer.Option(
         _DEFAULT_SKIP_VALIDATION,
         "--skip-validation",
-        help="If specified, do not validate config parameters.",
+        help="If specified, do not validate the parameters.",
+    ),
+    detach: bool = typer.Option(
+        False,
+        "--detach",
+        "-D",
+        help="If specified, return immediately and leave the recording running in the background.",
     ),
 ) -> None:
-    json = {
-        "tags": tags,
-        "duration": duration,
-        "force_restart": force_restart,
-        "max_restarts": max_restarts,
-        "validate": not skip_validation,
-    }
-    with spinner():
-        _ = safe_request("recordings/spectrogram", "POST", json=json)
-    raise typer.Exit()
+    _record(
+        tag,
+        "spectrogram",
+        duration,
+        force_restart,
+        max_restarts,
+        skip_validation,
+        detach,
+    )

@@ -4,60 +4,39 @@
 
 import os
 import logging
-import datetime
 import typing
 
 import spectre_server.core.config
+
 from ._process_types import ProcessType
 
 
 def configure_root_logger(
-    process_type: ProcessType,
+    file_path: str,
     level: int = logging.INFO,
-    logs_dir_path: typing.Optional[str] = None,
 ) -> str:
-    """Configure the root logger to write log events to a file.
+    """Configure the root logger to write log events to the given file.
 
-    The log file will be created at the following path:
+    The parent directory of `file_path` is created if it does not exist.
 
-        `<logs_dir_path>/<start_time>_<pid>_<process_type>.log`
-
-    :param process_type: The type of the process (e.g., USER, WORKER).
+    :param file_path: Absolute path of the log file to write to.
     :param level: The logging level, defaults to logging.INFO.
-    :param logs_dir_path: Optionally override the directory in which logs will be written, defaults to None.
-    :return: The file path of the log file on the filesystem.
+    :return: The absolute file path of the log file.
     """
-    # Get the root logger, set its level and remove any existing handlers.
     logger = logging.getLogger()
     logger.setLevel(level)
-    for handler in logger.handlers:
+    for handler in list(logger.handlers):
         logger.removeHandler(handler)
 
-    # Get the current system time and current process ID.
-    system_datetime = datetime.datetime.now()
-    start_time = system_datetime.strftime(
-        spectre_server.core.config.TimeFormat.DATETIME
-    )
-    pid = str(os.getpid())
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-    # Make the file path.
-    if logs_dir_path is None:
-        logs_dir_path = spectre_server.core.config.paths.get_logs_dir_path(
-            system_datetime.year, system_datetime.month, system_datetime.day
-        )
-    if not os.path.exists(logs_dir_path):
-        os.makedirs(logs_dir_path)
-    file_path = os.path.join(
-        logs_dir_path, f"{start_time}_{pid}_{process_type.value}.log"
-    )
-
-    # Add the file handler to the root logger.
     file_handler = logging.FileHandler(file_path)
     file_handler.setLevel(level)
-    formatter = logging.Formatter(
-        "[%(asctime)s] [%(levelname)8s] --- %(message)s (%(name)s:%(lineno)s)"
+    file_handler.setFormatter(
+        logging.Formatter(
+            "[%(asctime)s] [%(levelname)8s] --- %(message)s (%(name)s:%(lineno)s)"
+        )
     )
-    file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     return os.path.abspath(file_path)
@@ -74,3 +53,39 @@ def get_root_logger_state() -> tuple[bool, int]:
     if root_logger.handlers:
         return True, root_logger.level
     return False, logging.NOTSET
+
+
+def get_server_log_file_path(
+    start_time: str,
+    pid: int,
+    logs_dir_path: typing.Optional[str] = None,
+) -> str:
+    """Get the absolute path of a server log file.
+
+    :param start_time: When the process started.
+    :param pid: The OS process id.
+    :param logs_dir_path: If specified, place the log directly under this directory. Otherwise defaults to the server-scoped log subdirectory.
+    :return: The absolute path of the log file.
+    """
+    directory = logs_dir_path or spectre_server.core.config.paths.get_logs_dir_path(
+        ProcessType.SERVER.value
+    )
+    return os.path.join(directory, f"{start_time}_{pid}.log")
+
+
+def get_worker_log_file_path(
+    recording_id: str,
+    worker_name: str,
+    logs_dir_path: typing.Optional[str] = None,
+) -> str:
+    """Get the absolute path of a worker log file.
+
+    :param recording_id: Parent recording identifier.
+    :param worker_name: The worker's name.
+    :param logs_dir_path: If specified, place the log directly under this directory. Otherwise defaults to the worker-scoped log subdirectory.
+    :return: The absolute path of the log file.
+    """
+    directory = logs_dir_path or spectre_server.core.config.paths.get_logs_dir_path(
+        ProcessType.WORKER.value
+    )
+    return os.path.join(directory, f"{recording_id}_{worker_name}.log")
