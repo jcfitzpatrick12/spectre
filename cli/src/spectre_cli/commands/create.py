@@ -2,7 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import datetime
+import io
+
 import typer
+import requests
+from PIL import Image
 
 from ._secho_resources import secho_new_resource
 from ._utils import safe_request, get_config_file_name, spinner
@@ -111,31 +116,30 @@ def plot(
         help="The file tag. Specifying multiple tags yields a stacked plot over the same time frame.",
     ),
     obs_date: str = typer.Option(
-        ...,
+        None,
         "--obs-date",
-        help="The start date of the observation, in the format `%Y-%m-%d`.",
+        "--date",
+        help="The start date of the observation, in the format `%%Y-%%m-%%d`. Defaults to today.",
     ),
     start_time: str = typer.Option(
-        ...,
+        "00:00:00",
         "--start-time",
-        help="The start time of the observation (UTC), in the format `%H:%M:%S`.",
+        help="The start time of the observation (UTC), in the format `%%H:%%M:%%S`.",
     ),
     end_time: str = typer.Option(
-        ...,
+        "23:59:00",
         "--end-time",
-        help="The end time of the observation (UTC), in the format `%H:%M:%S`.",
+        help="The end time of the observation (UTC), in the format `%%H:%%M:%%S`.",
     ),
     lower_freq: float = typer.Option(
         None,
         "--lower-freq",
-        help="The lower bound of the frequency range in Hz. If unspecified, the minimum frequency "
-        "available in each spectrogram is used.",
+        help="The lower bound of the frequency range in Hz.",
     ),
     upper_freq: float = typer.Option(
         None,
         "--upper-freq",
-        help="The upper bound of the frequency range in Hz. If unspecified, the maximum frequency "
-        "available in each spectrogram is used.",
+        help="The upper bound of the frequency range in Hz.",
     ),
     log_norm: bool = typer.Option(
         False,
@@ -144,6 +148,7 @@ def plot(
     ),
     dBb: bool = typer.Option(
         False,
+        "--db",
         "--dBb",
         help="If specified, use units of decibels above the background.",
     ),
@@ -163,7 +168,26 @@ def plot(
     figsize_y: int = typer.Option(
         None, "--figsize-y", help="The vertical size of the plot."
     ),
+    mhz: bool = typer.Option(
+        False,
+        "--mhz",
+        "--MHz",
+        help="If specified, display frequencies in MHz instead of Hz.",
+    ),
+    elapsed_time: bool = typer.Option(
+        False,
+        "--elapsed-time",
+        help="If specified, display elapsed seconds on the x-axis instead of UTC datetimes.",
+    ),
+    show: bool = typer.Option(
+        False,
+        "--show",
+        help="If specified, download and open the plot after creation.",
+    ),
 ) -> None:
+    if obs_date is None:
+        obs_date = datetime.date.today().strftime("%Y-%m-%d")
+
     json = {
         "tags": tags,
         "obs_date": obs_date,
@@ -177,9 +201,17 @@ def plot(
         "vmax": vmax,
         "figsize_x": figsize_x,
         "figsize_y": figsize_y,
+        "mhz": mhz,
+        "elapsed_time": elapsed_time,
     }
     with spinner():
-        jsend_dict = safe_request(f"spectre-data/batches/plots", "PUT", json=json)
+        jsend_dict = safe_request("spectre-data/batches/plots", "PUT", json=json)
     endpoint = jsend_dict["data"]
     secho_new_resource(endpoint)
+
+    if show:
+        response = requests.get(endpoint)
+        response.raise_for_status()
+        Image.open(io.BytesIO(response.content)).show()
+
     raise typer.Exit()

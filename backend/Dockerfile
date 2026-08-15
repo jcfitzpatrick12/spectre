@@ -230,11 +230,14 @@ ARG SDRPLAY_API_PATCH=2
 ARG SDRPLAY_VERSION=${SDRPLAY_API_MAJ_MIN}.${SDRPLAY_API_PATCH}
 ARG SDRPLAY_API_LIB=libsdrplay_api
 
+# It looks like SDRplay removed the standalone API installer from their website. We need to
+# sort this out, but as a band-aid for now use an archived version.
 RUN mkdir -p /opt/sdrplay_api/include \
              /opt/sdrplay_api/lib \
              /opt/sdrplay_api/bin \
              /opt/sdrplay_api/share/doc/ && \
-    wget https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run && \
+    wget -O SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run \
+         "https://web.archive.org/web/20251108002618if_/https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run" && \
     sh SDRplay_RSP_API-Linux-${SDRPLAY_VERSION}.run --tar xf && \
     ARCH=$(uname -m | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/') && \
     cp ${ARCH}/${SDRPLAY_API_LIB}.so.${SDRPLAY_API_MAJ_MIN} /opt/sdrplay_api/lib/ && \
