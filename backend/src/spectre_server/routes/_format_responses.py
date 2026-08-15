@@ -10,6 +10,7 @@ import enum
 import http
 
 import flask
+import werkzeug.exceptions
 
 """This module implements the JSend specification. For more information, please refer
 to https://github.com/omniti-labs/jsend"""
@@ -54,7 +55,10 @@ def _make_jsend_response(
                 f"JSend status codes."
             )
         jsend_dict["data"] = data
-        return flask.jsonify(jsend_dict)
+        response = flask.jsonify(jsend_dict)
+        if code is not None:
+            response.status_code = code
+        return response
 
     # Handle error status
     elif status == _JsendStatus.ERROR:
@@ -70,7 +74,10 @@ def _make_jsend_response(
         if code is not None:
             jsend_dict["code"] = str(code)
 
-        return flask.jsonify(jsend_dict)
+        response = flask.jsonify(jsend_dict)
+        if code is not None:
+            response.status_code = code
+        return response
 
 
 P = typing.ParamSpec("P")
@@ -97,7 +104,13 @@ def jsendify_response(
             return _make_jsend_response(
                 _JsendStatus.SUCCESS, data=data, code=http.HTTPStatus.OK
             )
-        except:  # simplistic treatment, any exceptions are interpreted as JSend errors.
+        except werkzeug.exceptions.HTTPException as exc:
+            return _make_jsend_response(
+                _JsendStatus.ERROR,
+                message=exc.description,
+                code=exc.code,
+            )
+        except Exception:  # Unexpected exceptions are interpreted as JSend errors.
             return _make_jsend_response(
                 _JsendStatus.ERROR,
                 message=(

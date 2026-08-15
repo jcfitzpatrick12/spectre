@@ -53,6 +53,17 @@ def _has_batches(tag: str) -> bool:
     return len(batches) > 0
 
 
+@spectre_server.core.logs.log_call
+def is_config_locked(file_name: str) -> bool:
+    """Return whether a config has recorded batch files and must not be updated.
+
+    A config is locked once it has been used to record data. Updating it after
+    that point would make the config no longer represent the existing batches.
+    """
+    tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
+    return _has_batches(tag)
+
+
 def _caution_update(tag: str, force: bool) -> None:
     """Caution users if batch files exist with the input tag.
 
@@ -124,7 +135,7 @@ def create_config(
     :param force: If True, force the update even if batches exist with the input tag. Defaults to False
     :param validate: If True, validate config parameters. Defaults to True.
     :return: The file path of the newly created config, as an absolute path in the container's file system.
-    :raises FileExistsError: If the config already exists, files exist under the config tag and force is False.
+    :raises FileExistsError: If the config already exists and is locked because batches exist under its tag, unless force is True. A locked config represents existing recorded data and should normally be left unchanged.
     """
     if string_parameters is None:
         string_parameters = []
@@ -166,6 +177,7 @@ def update_config(
     :param validate: If True, apply the capture template and validate config parameters. Defaults to True.
     :return: The file path of the successfully updated config, as an absolute path in the container's file system.
     :raises FileNotFoundError: If the config does not exist.
+    :raises FileExistsError: If the config is locked because batches exist under its tag and force is False. A locked config represents existing recorded data and should normally be left unchanged.
     """
     tag, _ = spectre_server.core.receivers.parse_config_file_name(file_name)
     if not os.path.exists(spectre_server.core.receivers.get_config_file_path(tag)):

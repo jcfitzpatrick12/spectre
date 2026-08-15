@@ -6,6 +6,7 @@ import os
 import typing
 
 import flask
+import werkzeug.exceptions
 
 from ..services import configs as services
 from ._format_responses import jsendify_response, serve_from_directory
@@ -47,6 +48,13 @@ def get_config_raw(
 @configs_blueprint.route("/<string:file_name>", methods=["GET"])
 def get_config(file_name: str) -> flask.Response:
     return serve_from_directory(services.get_config(file_name))
+
+
+@configs_blueprint.route("/<string:file_name>/locked", methods=["GET"])
+@jsendify_response
+def get_config_locked(file_name: str) -> bool:
+    """Return whether existing batch files prevent safe updates to a config."""
+    return services.is_config_locked(file_name)
 
 
 @configs_blueprint.route("/", methods=["GET"])
@@ -93,6 +101,15 @@ def update_config(file_name: str) -> str:
     string_parameters = json.get("params")
     force = json.get("force")
     validate = json.get("validate")
+
+    if services.is_config_locked(file_name) and not force:
+        raise werkzeug.exceptions.Conflict(
+            description=(
+                f"The config '{file_name}' is locked because recorded batch files exist. "
+                "Create a new config for changes, or set force to true only if you understand "
+                "the existing recorded data may no longer be represented by this config."
+            )
+        )
 
     config_file_path = services.update_config(
         file_name, string_parameters, force=force, validate=validate
