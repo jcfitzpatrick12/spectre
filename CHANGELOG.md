@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://github.com/spectregrams/spectre/compare/v5.0.0...v5.1.0) (2026-08-15)
+
+
+### Features
+
+* improve plotting UX (configurable formatting and convenient defaults) ([64c49dc](https://github.com/spectregrams/spectre/commit/64c49dc5d14674ddd0b4cc123f43f0e5b67efcde))
+
 ## [5.0.0](https://github.com/spectregrams/spectre/compare/v4.4.0...v5.0.0) (2026-08-09)
 
 
