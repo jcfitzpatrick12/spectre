@@ -4,6 +4,7 @@
 
 import datetime
 import io
+import typing
 
 import typer
 import requests
@@ -115,21 +116,21 @@ def plot(
         "-t",
         help="The file tag. Specifying multiple tags yields a stacked plot over the same time frame.",
     ),
-    obs_date: str = typer.Option(
+    obs_date: typing.Optional[str] = typer.Option(
         None,
         "--obs-date",
         "--date",
-        help="The start date of the observation, in the format `%%Y-%%m-%%d`. Defaults to today.",
+        help="The start date of the observation, in the format `%Y-%m-%d`. Defaults to today.",
     ),
     start_time: str = typer.Option(
         "00:00:00",
         "--start-time",
-        help="The start time of the observation (UTC), in the format `%%H:%%M:%%S`.",
+        help="The start time of the observation (UTC), in the format `%H:%M:%S`.",
     ),
     end_time: str = typer.Option(
         "23:59:00",
         "--end-time",
-        help="The end time of the observation (UTC), in the format `%%H:%%M:%%S`.",
+        help="The end time of the observation (UTC), in the format `%H:%M:%S`.",
     ),
     lower_freq: float = typer.Option(
         None,
