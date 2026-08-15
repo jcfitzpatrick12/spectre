@@ -103,7 +103,6 @@ def get_tags() -> list[str]:
 @jsendify_response
 def create_plot() -> str:
     json = flask.request.get_json()
-    # Data from multiple batch files can be compared, by passing extra `tags` through the request body.
     tags = json.get("tags")
     figsize_x = json.get("figsize_x")
     figsize_y = json.get("figsize_y")
@@ -116,6 +115,8 @@ def create_plot() -> str:
     dBb = json.get("dBb")
     vmin = json.get("vmin")
     vmax = json.get("vmax")
+    elapsed_time = json.get("elapsed_time", False)
+    mhz = json.get("mhz", False)
 
     # Handle the edge cases for figsize being specified.
     figsize_x_specified = figsize_x is not None
@@ -127,7 +128,6 @@ def create_plot() -> str:
     elif figsize_x_specified and figsize_y_specified:
         figsize = (figsize_x, figsize_y)
     else:
-        # If nothing is specified, set an arbitrary default value.
         figsize = (15, 8)
 
     # Create the plot and return the name of the batch file containing the plot.
@@ -143,5 +143,7 @@ def create_plot() -> str:
         dBb=dBb,
         vmin=vmin,
         vmax=vmax,
+        elapsed_time=elapsed_time,
+        mhz=mhz,
     )
     return get_batch_file_endpoint(batch_file)

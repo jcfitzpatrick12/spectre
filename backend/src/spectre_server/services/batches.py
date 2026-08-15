@@ -284,6 +284,8 @@ def create_plot(
     dBb: bool = False,
     vmin: typing.Optional[float] = None,
     vmax: typing.Optional[float] = None,
+    elapsed_time: bool = False,
+    mhz: bool = False,
 ) -> str:
     """
     Create a stacked plot of spectrogram data over a specified time interval, then save it to the
@@ -295,15 +297,15 @@ def create_plot(
     :param obs_date: The observation start date, in the format `%Y-%m-%d`.
     :param start_time: The observation start time (UTC), in the format `%H:%M:%S`.
     :param end_time: The observation end time (UTC), in the format `%H:%M:%S`.
-    :param lower_freq: The lower bound of the frequency range in Hz. If not specified, the minimum available
-    frequency is used for each spectrogram. Defaults to None.
-    :param upper_freq: The upper bound of the frequency range in Hz. If not specified, the maximum available
-    frequency is used for each spectrogram. Defaults to None.
+    :param lower_freq: The lower bound of the frequency range in Hz. Defaults to None.
+    :param upper_freq: The upper bound of the frequency range in Hz. Defaults to None.
     :param log_norm: If True, normalises the spectrograms to the 0-1 range on a logarithmic scale. Defaults to False.
     :param dBb: If True, use units of decibels above the background. Defaults to False.
     :param vmin: The minimum value for the colourmap. Applies only if `dBb` is True.
     :param vmax: The maximum value for the colourmap. Applies only if `dBb` is True.
-    :return: The file path of the newly created batch file containing the plot, as an absolute path in the container's file system.
+    :param elapsed_time: If True, show elapsed seconds on the x-axis instead of UTC datetimes. Defaults to False.
+    :param mhz: If True, show frequencies in MHz instead of Hz. Defaults to False.
+    :return: The file path of the newly created batch file containing the plot.
     """
     # Parse the datetimes
     obs_date_as_date = datetime.datetime.strptime(
@@ -334,9 +336,9 @@ def create_plot(
         )
 
     # Create the plot, and save it as a batch file.
-    # TODO: Permit relative time type too.
     panel_stack = spectre_server.core.plotting.PanelStack(
-        time_type=spectre_server.core.spectrograms.TimeType.DATETIMES,
+        elapsed_time=elapsed_time,
+        mhz=mhz,
         non_interactive=True,
         figsize=figsize,
     )
