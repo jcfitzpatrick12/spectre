@@ -6,7 +6,6 @@ import flask.testing
 
 import spectre_server.services.configs as services
 
-
 TAG = "cw"
 FILE_NAME = f"{TAG}.json"
 
@@ -14,7 +13,9 @@ FILE_NAME = f"{TAG}.json"
 def test_get_config_locked_returns_batch_state(
     client: flask.testing.FlaskClient, monkeypatch
 ) -> None:
-    monkeypatch.setattr(services, "is_config_locked", lambda file_name: file_name == FILE_NAME)
+    monkeypatch.setattr(
+        services, "is_config_locked", lambda file_name: file_name == FILE_NAME
+    )
 
     response = client.get(f"/spectre-data/configs/{FILE_NAME}/locked")
 
