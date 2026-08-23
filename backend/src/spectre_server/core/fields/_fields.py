@@ -366,3 +366,12 @@ class Field:
             description="Transform DFT amplitudes to linearised CALLISTO receiver digits through a linear calibration.",
         ),
     ]
+    floor_start_times = typing.Annotated[
+        bool,
+        pydantic.Field(
+            ...,
+            validate_default=True,
+            description="Floor spectrogram timestamps to the nearest multiple of `time_range` from midnight UTC. "
+            "Ignored if `time_range` is not set.",
+        ),
+    ]

@@ -36,7 +36,7 @@ def test_plot_lifecycle(client: flask.testing.FlaskClient) -> None:
         json={
             "tag": TAG,
             "kind": "spectrogram",
-            "duration": 3.0,
+            "duration": 5,
             "validate": False,
         },
     )
@@ -45,7 +45,7 @@ def test_plot_lifecycle(client: flask.testing.FlaskClient) -> None:
     recording_url = jsend["data"]
 
     # Wait for the recording to finish.
-    time.sleep(5)
+    time.sleep(10)
 
     response = client.get(recording_url)
     jsend = response.get_json()

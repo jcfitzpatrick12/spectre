@@ -11,16 +11,19 @@ import requests
 import os
 import contextlib
 import enum
+import urllib.parse
 
 import typer
 import yaspin
 
 from ..config import SPECTRE_SERVER
 
+_DEFAULT_SPINNER_TEXT = "In progress... "
+
 
 @contextlib.contextmanager
-def spinner():
-    with yaspin.yaspin(text="In progress... "):
+def spinner(text: typing.Optional[str] = None):
+    with yaspin.yaspin(text=text or _DEFAULT_SPINNER_TEXT):
         yield
 
 
@@ -96,6 +99,36 @@ def safe_request(
         raise ValueError(
             f"Unexpected response status. Got {status}, expected one of 'success', 'error' or 'fail'."
         )
+
+
+def safe_request_from_endpoint(
+    endpoint_url: str,
+    method: str,
+    json: typing.Optional[dict] = None,
+    params: typing.Optional[dict] = None,
+    require_confirmation: bool = False,
+    non_interactive: bool = False,
+) -> dict:
+    """Send a request using an API endpoint URL returned by the server.
+
+    :param endpoint_url: Endpoint URL returned by the API, or a route path.
+    :param method: HTTP method to use for the request (e.g., 'GET', 'PATCH').
+    :param json: Optional JSON payload for the request body.
+    :param params: Optional query parameters for the request.
+    :param require_confirmation: If True, prompt the user if they'd like to continue.
+    :param non_interactive: If True, ignore the `require_confirmation` flag.
+    :return: Parsed JSON response as a dictionary.
+    """
+    parsed = urllib.parse.urlparse(endpoint_url)
+    route_url = parsed.path if parsed.scheme and parsed.netloc else endpoint_url
+    return safe_request(
+        route_url,
+        method,
+        json=json,
+        params=params,
+        require_confirmation=require_confirmation,
+        non_interactive=non_interactive,
+    )
 
 
 def get_config_file_name(

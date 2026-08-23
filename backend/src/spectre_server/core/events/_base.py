@@ -2,10 +2,12 @@
 # This file is part of SPECTRE
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import datetime
 import logging
 import typing
 import abc
 
+import numpy as np
 import pydantic
 import watchdog.events
 
@@ -29,6 +31,20 @@ class BaseModel(pydantic.BaseModel):
     obsgeo_b: spectre_server.core.fields.Field.obsgeo_b = 0.0
     obsgeo_l: spectre_server.core.fields.Field.obsgeo_l = 0.0
     obsgeo_h: spectre_server.core.fields.Field.obsgeo_h = 0.0
+    floor_start_times: spectre_server.core.fields.Field.floor_start_times = False
+
+
+def floor_datetime(dt: datetime.datetime, interval_seconds: float) -> datetime.datetime:
+    """Floor a datetime to the nearest multiple of ``interval_seconds`` from midnight UTC.
+
+    :param dt: The datetime to floor.
+    :param interval_seconds: The interval size in seconds.
+    :return: The floored datetime.
+    """
+    midnight = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    elapsed = (dt - midnight).total_seconds()
+    floored = int(elapsed // interval_seconds) * interval_seconds
+    return midnight + datetime.timedelta(seconds=floored)
 
 
 B = typing.TypeVar("B", bound=spectre_server.core.batches.Base)
@@ -147,6 +163,13 @@ class Base(abc.ABC, typing.Generic[M, B], watchdog.events.FileSystemEventHandler
 
     def __flush_cache(self) -> None:
         if self.__cached_spectrogram:
+            # Time range must be set.
+            if self.__model.floor_start_times and self.__model.time_range > 0:
+                floored = floor_datetime(
+                    self.__cached_spectrogram.start_datetime.astype(datetime.datetime),
+                    self.__model.time_range,
+                )
+                self.__cached_spectrogram.start_datetime = np.datetime64(floored)
             _LOGGER.info(
                 f"Writing spectrogram to disk with start time "
                 f"'{self.__cached_spectrogram.format_start_time()}'"

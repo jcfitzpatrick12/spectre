@@ -10,6 +10,7 @@ from spectre_cli.commands.delete import delete_typer
 from spectre_cli.commands.update import update_typer
 from spectre_cli.commands.test import test_typer
 from spectre_cli.commands.record import record_typer
+from spectre_cli.commands.join import join_typer
 
 app = typer.Typer()
 
@@ -19,3 +20,4 @@ app.add_typer(delete_typer, name="delete")
 app.add_typer(update_typer, name="update")
 app.add_typer(test_typer, name="test")
 app.add_typer(record_typer, name="record")
+app.add_typer(join_typer, name="join")

@@ -4,6 +4,7 @@
 
 import pytest
 import numpy as np
+import datetime
 
 import spectre_server.core.spectrograms
 
@@ -194,3 +195,15 @@ class TestFrequencyAverage:
             np.array(expected_frequencies, dtype=np.float32),
         )
         assert np.allclose(averaged_s.times, spectrogram.times)
+
+
+class TestSpectrogram:
+    def test_start_datetime_setter(
+        self, spectrogram: spectre_server.core.spectrograms.Spectrogram
+    ) -> None:
+        """Check that we can set the start datetime of a spectrogram."""
+        dt = datetime.datetime(year=2000, month=1, day=1)
+        assert not spectrogram.start_datetime_is_set
+        spectrogram.start_datetime = np.datetime64(dt)
+        assert spectrogram.start_datetime_is_set
+        assert spectrogram.start_datetime == dt

@@ -212,6 +212,10 @@ class Spectrogram:
             raise ValueError(f"A start time has not been set.")
         return self._start_datetime
 
+    @start_datetime.setter
+    def start_datetime(self, value: datetime.datetime | np.datetime64) -> None:
+        self._start_datetime = np.datetime64(value)
+
     @property
     def datetimes(self) -> npt.NDArray[np.datetime64]:
         """The datetimes associated with each spectrum in `dynamic_spectra`.
