@@ -4,7 +4,7 @@
 
 """Real-time, extensible post-processing of SDR data into spectrograms."""
 
-from ._base import Base
+from ._base import Base, floor_datetime
 from ._fixed_center_frequency import FixedCenterFrequency, FixedCenterFrequencyModel
 from ._swept_center_frequency import SweptCenterFrequency, SweptCenterFrequencyModel
 from ._callisto import Callisto, CallistoModel
@@ -22,6 +22,7 @@ from ._stfft import (
 
 __all__ = [
     "Base",
+    "floor_datetime",
     "FixedCenterFrequency",
     "FixedCenterFrequencyModel",
     "SweptCenterFrequency",

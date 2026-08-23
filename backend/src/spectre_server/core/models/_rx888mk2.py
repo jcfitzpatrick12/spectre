@@ -13,6 +13,7 @@ from ._validators import (
     validate_window_type,
     validate_in_range,
     validate_one_of,
+    validate_floor_start_times,
 )
 from ._soapy_validators import validate_output_type
 
@@ -103,4 +104,7 @@ class RX888MK2Callisto(
         )
         validate_one_of(self.sample_rate, HF_ALLOWED_SAMPLE_RATES, "sample_rate")
         validate_one_of(self.output_type, EXPECTED_OUTPUT_TYPES, "output_type")
+        validate_floor_start_times(
+            self.floor_start_times, self.batch_size, self.time_range
+        )
         return self

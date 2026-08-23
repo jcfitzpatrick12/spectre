@@ -68,7 +68,7 @@ def __get_callisto_file_name(endpoint: str, instrume: str) -> str:
 
 def __download_resource(
     endpoint: str, directory: str, file_name: str, compress: bool = False
-) -> None:
+) -> str:
     if compress:
         file_name += ".gz"
     file_path = os.path.join(directory, file_name)
@@ -80,18 +80,26 @@ def __download_resource(
         with open(file_path, "wb") as file:
             file.write(response.content)
 
+    return file_path
+
 
 def __download_resources(
     endpoints: list[str], directory: str, compress: bool = False
-) -> None:
+) -> list[str]:
+    file_paths: list[str] = []
     os.makedirs(directory, exist_ok=True)
     for endpoint in endpoints:
-        __download_resource(endpoint, directory, os.path.basename(endpoint), compress)
+        file_paths.append(
+            __download_resource(
+                endpoint, directory, os.path.basename(endpoint), compress
+            )
+        )
+    return file_paths
 
 
-def __download_callisto_resources(
+def download_callisto_resources(
     endpoints: list[str], directory: str, compress: bool = False
-) -> None:
+) -> list[str]:
     # First, check that data files for all tags are _able_ to be renamed under this policy.
     # Notably, they require the parameter `instrume` in the corresponding config.
     instrume_by_tag: dict[str, str] = {}
@@ -101,10 +109,13 @@ def __download_callisto_resources(
             instrume_by_tag[tag] = __get_callisto_instrume(tag)
 
     os.makedirs(directory, exist_ok=True)
+
+    file_paths: list[str] = []
     for endpoint in endpoints:
         _, tag, _ = __parse_spectre_file_name(os.path.basename(endpoint))
         file_name = __get_callisto_file_name(endpoint, instrume_by_tag[tag])
-        __download_resource(endpoint, directory, file_name, compress)
+        file_paths.append(__download_resource(endpoint, directory, file_name, compress))
+    return file_paths
 
 
 get_typer = typer.Typer(help="Display resources.")
@@ -227,9 +238,9 @@ def files(
     if export is None:
         secho_existing_resources(endpoints)
     elif rename == _RenamePolicy.callisto:
-        __download_callisto_resources(endpoints, export, compress)
+        _ = download_callisto_resources(endpoints, export, compress)
     else:
-        __download_resources(endpoints, export, compress)
+        _ = __download_resources(endpoints, export, compress)
 
     raise typer.Exit()
 
@@ -292,7 +303,7 @@ def configs(
     if export is None:
         secho_existing_resources(endpoints)
     else:
-        __download_resources(endpoints, export)
+        _ = __download_resources(endpoints, export)
     raise typer.Exit()
 
 

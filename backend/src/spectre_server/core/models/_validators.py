@@ -145,3 +145,19 @@ def validate_num_samples_per_step(
                 f"Please increase the dwell time."
             )
         )
+
+
+def validate_floor_start_times(
+    floor_start_times: bool, batch_size: float, time_range: float
+) -> None:
+    """Make sure we can floor start times without clobbering."""
+    if not floor_start_times:
+        return
+
+    if time_range == 0:
+        raise ValueError(f"To floor start times, the time range must be set.")
+
+    if time_range < batch_size:
+        raise ValueError(
+            f"To floor start times, the time range must be greater than the batch size."
+        )

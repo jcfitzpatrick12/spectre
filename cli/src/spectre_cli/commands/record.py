@@ -6,7 +6,7 @@ import time
 
 import typer
 
-from ._utils import safe_request, spinner
+from ._utils import safe_request, safe_request_from_endpoint, spinner
 from ._secho_resources import secho_new_resource
 
 record_typer = typer.Typer(help="Start recording data.")
@@ -14,10 +14,6 @@ record_typer = typer.Typer(help="Start recording data.")
 _DEFAULT_MAX_RESTARTS = 5
 _DEFAULT_FORCE_RESTART = False
 _DEFAULT_SKIP_VALIDATION = False
-
-
-def _id_from_endpoint(endpoint: str) -> str:
-    return endpoint.split("/")[-1]
 
 
 def _record(
@@ -42,7 +38,6 @@ def _record(
         },
     )
     endpoint = jsend_dict["data"]
-    recording_id = _id_from_endpoint(endpoint)
     secho_new_resource(endpoint)
 
     if detach:
@@ -51,15 +46,13 @@ def _record(
     try:
         with spinner():
             while True:
-                jsend_dict = safe_request(f"recordings/{recording_id}", "GET")
+                jsend_dict = safe_request_from_endpoint(endpoint, "GET")
                 state = jsend_dict["data"]["state"]
                 if state != "running":
                     break
                 time.sleep(1)
     except KeyboardInterrupt:
-        safe_request(
-            f"recordings/{recording_id}", "PATCH", json={"stop_requested": True}
-        )
+        safe_request_from_endpoint(endpoint, "PATCH", json={"stop_requested": True})
         typer.secho("stopped", fg="yellow")
         raise typer.Exit()
 
