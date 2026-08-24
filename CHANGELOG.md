@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/spectregrams/spectre/compare/v5.1.0...v5.2.0) (2026-08-24)
+
+
+### Features
+
+* issue-265 `join` the e-Callisto network ([2724345](https://github.com/spectregrams/spectre/commit/2724345fde21200556602d8a1efadfc9069f7227))
+
 ## [5.1.0](https://github.com/spectregrams/spectre/compare/v5.0.0...v5.1.0) (2026-08-15)
 
 
