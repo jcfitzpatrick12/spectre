@@ -319,6 +319,10 @@ def config(
 
     jsend_dict = safe_request(f"spectre-data/configs/{file_name}/raw", "GET")
     config = jsend_dict["data"]
+
+    jsend_dict = safe_request(f"spectre-data/configs/{file_name}/locked", "GET")
+    config["locked"] = jsend_dict["data"]
+
     pprint_dict(config)
     raise typer.Exit()
 
