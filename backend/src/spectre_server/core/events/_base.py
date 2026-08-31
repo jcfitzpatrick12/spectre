@@ -34,19 +34,6 @@ class BaseModel(pydantic.BaseModel):
     floor_start_times: spectre_server.core.fields.Field.floor_start_times = False
 
 
-def floor_datetime(dt: datetime.datetime, interval_seconds: float) -> datetime.datetime:
-    """Floor a datetime to the nearest multiple of ``interval_seconds`` from midnight UTC.
-
-    :param dt: The datetime to floor.
-    :param interval_seconds: The interval size in seconds.
-    :return: The floored datetime.
-    """
-    midnight = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    elapsed = (dt - midnight).total_seconds()
-    floored = int(elapsed // interval_seconds) * interval_seconds
-    return midnight + datetime.timedelta(seconds=floored)
-
-
 B = typing.TypeVar("B", bound=spectre_server.core.batches.Base)
 M = typing.TypeVar("M", bound=BaseModel)
 
@@ -163,21 +150,22 @@ class Base(abc.ABC, typing.Generic[M, B], watchdog.events.FileSystemEventHandler
 
     def __flush_cache(self) -> None:
         if self.__cached_spectrogram:
-            # Time range must be set.
-            if self.__model.floor_start_times and self.__model.time_range > 0:
-                floored = floor_datetime(
-                    self.__cached_spectrogram.start_datetime.astype(datetime.datetime),
-                    self.__model.time_range,
-                )
-                self.__cached_spectrogram.start_datetime = np.datetime64(floored)
             _LOGGER.info(
                 f"Writing spectrogram to disk with start time "
                 f"'{self.__cached_spectrogram.format_start_time()}'"
             )
 
+            # We can only floor start times when the time range is set.
+            floor_to_time_range: typing.Optional[float] = None
+            if self.__model.floor_start_times and self.__model.time_range > 0:
+                floor_to_time_range = self.__model.time_range
+
             # Use the start time of the spectrogram to make a new batch to write to.
             batch = spectre_server.core.batches.from_spectrogram(
-                self.__batch_cls, self._tag, self.__cached_spectrogram
+                self.__batch_cls,
+                self._tag,
+                self.__cached_spectrogram,
+                floor_to_time_range=floor_to_time_range,
             )
 
             batch.write_spectrogram(

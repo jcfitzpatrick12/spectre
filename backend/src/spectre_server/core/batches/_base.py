@@ -14,6 +14,19 @@ import spectre_server.core.config
 import spectre_server.core.spectrograms
 
 
+def floor_datetime(dt: datetime.datetime, interval_seconds: float) -> datetime.datetime:
+    """Floor a datetime to the nearest multiple of ``interval_seconds`` from midnight UTC.
+
+    :param dt: The datetime to floor.
+    :param interval_seconds: The interval size in seconds.
+    :return: The floored datetime.
+    """
+    midnight = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    elapsed = (dt - midnight).total_seconds()
+    floored = int(elapsed // interval_seconds) * interval_seconds
+    return midnight + datetime.timedelta(seconds=floored)
+
+
 def parse_batch_file_path(absolute_file_path: str) -> tuple[str, str, str, str]:
     """Parse a file path into the directory name, the start time, tag and extension."""
     return (
@@ -234,6 +247,7 @@ def from_spectrogram(
     tag: str,
     spectrogram: spectre_server.core.spectrograms.Spectrogram,
     batches_dir_path: typing.Optional[str] = None,
+    floor_to_time_range: typing.Optional[float] = None,
 ) -> B:
     """Make a batch from a spectrogram.
 
@@ -241,7 +255,10 @@ def from_spectrogram(
     :param tag: Make a batch with this tag.
     :param spectrogram: Make a batch for this spectrogram.
     :param batches_dir_path: Optionally override the parent directory for the batch.
-    :raises ValueError: If the spectrogrma has no start datetime set.
+     :param floor_to_time_range: If provided, floor the batch start time to the nearest multiple
+     of ``floor_to_time_range`` seconds from midnight UTC.
+     :raises ValueError: If the spectrogram has no start datetime set.
+    :raises ValueError: If time range is provided, but isn't meaningful (zero or negative).
     :return: A batch with the same start time as the spectrogram.
     """
     if not spectrogram.start_datetime_is_set:
@@ -250,6 +267,11 @@ def from_spectrogram(
         )
 
     start_datetime = spectrogram.start_datetime.astype(datetime.datetime)
+    if floor_to_time_range is not None:
+        if floor_to_time_range <= 0:
+            raise ValueError(f"Time range must be strictly positive")
+        start_datetime = floor_datetime(start_datetime, floor_to_time_range)
+
     batches_dir_path = (
         batches_dir_path
         or spectre_server.core.config.paths.get_batches_dir_path(

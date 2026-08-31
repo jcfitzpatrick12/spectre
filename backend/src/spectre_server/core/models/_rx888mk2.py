@@ -66,6 +66,10 @@ class RX888MK2FixedCenterFrequency(
         return self
 
 
+_REQUIRED_IF_GAIN = 20  # [dB]
+_REQUIRED_RF_GAIN = 0  # [dB]
+
+
 class RX888MK2Callisto(
     # Reuse the flowgraph from the `fixed_center_frequency` mode.
     spectre_server.core.flowgraphs.RX888MK2FixedCenterFrequencyModel,
@@ -90,12 +94,13 @@ class RX888MK2Callisto(
             upper_bound=HF_FREQ_UPPER_BOUND,
             name="center_frequency",
         )
-        validate_in_range(
-            self.rf_gain,
-            lower_bound=RF_GAIN_LOWER_BOUND,
-            upper_bound=RF_GAIN_UPPER_BOUND,
-            name="rf_gain",
-        )
+        if self.rf_gain != _REQUIRED_RF_GAIN or self.if_gain != _REQUIRED_IF_GAIN:
+            raise ValueError(
+                f"The linear calibration uses a scale factor {self.callisto_scale_factor} "
+                f"which is only valid for RF gain {_REQUIRED_RF_GAIN} [dB] "
+                f"and IF gain {_REQUIRED_IF_GAIN} [dB]"
+            )
+
         validate_in_range(
             self.if_gain,
             lower_bound=IF_GAIN_LOWER_BOUND,
