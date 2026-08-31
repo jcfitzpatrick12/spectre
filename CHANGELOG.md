@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.1](https://github.com/spectregrams/spectre/compare/v5.2.0...v5.2.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* issue-302 Preserve original spectrogram start datetimes ([3b9623b](https://github.com/spectregrams/spectre/commit/3b9623b5ec17e388ae79e760321c17686054d549))
+
 ## [5.2.0](https://github.com/spectregrams/spectre/compare/v5.1.0...v5.2.0) (2026-08-24)
 
 
