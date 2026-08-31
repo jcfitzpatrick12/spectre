@@ -109,8 +109,7 @@ class RecordingManager:
     def __create_tables(self) -> None:
         with self.__connect() as conn:
             conn.execute("PRAGMA journal_mode=WAL")
-            conn.executescript(
-                f"""
+            conn.executescript(f"""
             CREATE TABLE IF NOT EXISTS {_RECORDING_TABLE} (
                 id TEXT PRIMARY KEY,
                 kind TEXT NOT NULL,
@@ -127,8 +126,7 @@ class RecordingManager:
                 recording_id TEXT NOT NULL REFERENCES {_RECORDING_TABLE}(id) ON DELETE CASCADE,
                 PRIMARY KEY (name, recording_id)
             );
-            """
-            )
+            """)
 
     @staticmethod
     def __serialize_datetime(dt_value: datetime.datetime) -> str:

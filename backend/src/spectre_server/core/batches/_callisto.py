@@ -12,6 +12,7 @@ import numpy.typing as npt
 import astropy.io.fits
 
 import spectre_server.core.spectrograms
+import spectre_server.core.config
 
 from ._base import Base, BatchFile
 
@@ -85,6 +86,14 @@ class _FitFile(BatchFile[spectre_server.core.spectrograms.Spectrogram]):
         """Read the FIT file and create a spectrogram."""
         with astropy.io.fits.open(self.file_path, mode="readonly") as hdulist:
             primary_hdu = hdulist[0]
+
+            # Get the start time of the spectrogram from keyword records.
+            date = primary_hdu.header.get("DATE")
+            time_obs = primary_hdu.header.get("TIME-OBS")
+            start_time = datetime.datetime.strptime(
+                f"{date}T{time_obs}", spectre_server.core.config.TimeFormat.FITS
+            )
+
             bintable_hdu = hdulist[1]
 
             # e-Callisto stores the times and frequencies as double precision floating points,
@@ -106,7 +115,7 @@ class _FitFile(BatchFile[spectre_server.core.spectrograms.Spectrogram]):
                 times,
                 frequencies,
                 spectre_server.core.spectrograms.SpectrumUnit.CALLISTO,
-                self.start_datetime,
+                start_time,
             )
 
 
@@ -176,13 +185,25 @@ class CallistoBatch(Base):
         # Reverse each spectrum in the spectrogram (as with the frequencies, e-Callisto stores them backwards).
         primary_hdu = astropy.io.fits.PrimaryHDU(data=digits[::-1, :])
 
-        # All data in the batch should have the same start time.
-        if self.start_datetime != spectrogram.start_datetime.astype(datetime.datetime):
+        # The start time of the batch may be floored with respect to the true start time of the spectrogram.
+        # Since they might differ, constrain the possible values.
+        diff = (
+            spectrogram.start_datetime.astype(datetime.datetime) - self.start_datetime
+        )
+        too_early = diff < datetime.timedelta(hours=0)
+        if too_early:
             raise ValueError(
-                "Start time of the spectrogram must coincide with the start time of the batch. "
-                f"Expected: {self.start_datetime}. Got: {spectrogram.start_datetime}."
+                f"The start of the spectrogram must be later than the start of the batch. "
+                f"Got {spectrogram.start_datetime} and {self.start_datetime} respectively"
+            )
+        one_hour = datetime.timedelta(hours=1)
+        if diff >= one_hour:
+            raise ValueError(
+                f"The start of the spectrogram must be within {one_hour.seconds} second(s) of the start of the batch. "
+                f"Got {spectrogram.start_datetime} and {self.start_datetime} respectively"
             )
 
+        # Use the start time of the spectrogram for the datetime-related keyword values.
         start_datetime = spectrogram.datetimes[0].astype(datetime.datetime)
         end_datetime = spectrogram.datetimes[-1].astype(datetime.datetime)
 

@@ -25,9 +25,9 @@ class RX888MK2FixedCenterFrequencyModel(BaseModel):
     sample_rate: spectre_server.core.fields.Field.sample_rate = 8e6
     center_frequency: spectre_server.core.fields.Field.center_frequency = 32e6
     antenna_port: spectre_server.core.fields.Field.antenna_port = RX888MK2Port.HF
-    if_gain: spectre_server.core.fields.Field.if_gain = -24.583
-    rf_gain: spectre_server.core.fields.Field.rf_gain = -31.5
-    batch_size: spectre_server.core.fields.Field.batch_size = 3
+    if_gain: spectre_server.core.fields.Field.if_gain = 20
+    rf_gain: spectre_server.core.fields.Field.rf_gain = 0
+    batch_size: spectre_server.core.fields.Field.batch_size = 1
     buffers: spectre_server.core.fields.Field.buffers = 1024
     output_type: spectre_server.core.fields.Field.output_type = (
         spectre_server.core.fields.OutputType.FC32

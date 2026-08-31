@@ -395,6 +395,60 @@ class TestBatches:
         )
 
 
+class TestFloorDatetime:
+    @pytest.mark.parametrize(
+        ("dt", "interval_seconds", "expected"),
+        [
+            # Spectrogram slightly past a 15-minute boundary floors to that boundary.
+            (
+                datetime.datetime(2000, 1, 1, 10, 0, 1, 347000),
+                900,
+                datetime.datetime(2000, 1, 1, 10, 0, 0),
+            ),
+            # Exactly on a boundary is unchanged.
+            (
+                datetime.datetime(2000, 1, 1, 10, 0, 0),
+                900,
+                datetime.datetime(2000, 1, 1, 10, 0, 0),
+            ),
+            # Last microsecond before the next boundary still floors down.
+            (
+                datetime.datetime(2000, 1, 1, 10, 14, 59, 999999),
+                900,
+                datetime.datetime(2000, 1, 1, 10, 0, 0),
+            ),
+            # Exactly on the next boundary.
+            (
+                datetime.datetime(2000, 1, 1, 10, 15, 0),
+                900,
+                datetime.datetime(2000, 1, 1, 10, 15, 0),
+            ),
+            # Midnight itself.
+            (
+                datetime.datetime(2000, 1, 1, 0, 0, 0),
+                900,
+                datetime.datetime(2000, 1, 1, 0, 0, 0),
+            ),
+            # Last window of the day.
+            (
+                datetime.datetime(2000, 1, 1, 23, 59, 59),
+                900,
+                datetime.datetime(2000, 1, 1, 23, 45, 0),
+            ),
+        ],
+    )
+    def test_floor_datetime(
+        self,
+        dt: datetime.datetime,
+        interval_seconds: float,
+        expected: datetime.datetime,
+    ) -> None:
+        """Check that datetimes are floored to the correct time_range boundary."""
+        assert (
+            spectre_server.core.batches.floor_datetime(dt, interval_seconds) == expected
+        )
+
+
 class TestBase:
     @pytest.mark.parametrize(("batch_cls"), [spectre_server.core.batches.IQStreamBatch])
     def test_from_spectrogram(
@@ -420,6 +474,57 @@ class TestBase:
         with pytest.raises(ValueError):
             spectre_server.core.batches.from_spectrogram(
                 batch_cls, TAG, spectrogram_no_start_datetime
+            )
+
+    @pytest.mark.parametrize(
+        ("batch_cls"),
+        [
+            spectre_server.core.batches.IQStreamBatch,
+            spectre_server.core.batches.CallistoBatch,
+        ],
+    )
+    def test_from_spectrogram_floor_to_time_range(
+        self,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+        batch_cls: typing.Type[spectre_server.core.batches.Base],
+    ) -> None:
+        """Check that we can properly floor batch start times to some time range."""
+        # Set the start datetime of the spectrogram to some delta past what we floor to.
+        time_range = 60
+        delta = 2
+        spectrogram.start_datetime = (
+            spectrogram.start_datetime.astype(datetime.datetime)
+            + datetime.timedelta(seconds=time_range)
+            + datetime.timedelta(seconds=delta)
+        )
+
+        # Check the batch assumes the correct floored start datetime.
+        batch = spectre_server.core.batches.from_spectrogram(
+            batch_cls, TAG, spectrogram, floor_to_time_range=time_range
+        )
+        assert batch.start_datetime == spectrogram.start_datetime.astype(
+            datetime.datetime
+        ) - datetime.timedelta(seconds=delta)
+
+    @pytest.mark.parametrize(
+        ("floor_to_time_range",),
+        [(-100,), (0,)],
+    )
+    def test_from_spectrogram_floor_to_invalid_time_range(
+        self,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+        floor_to_time_range: float,
+    ) -> None:
+        """Check that we can can't floor to meaningless time ranges."""
+        with pytest.raises(ValueError, match="Time range must be strictly positive"):
+            batch_cls = (
+                spectre_server.core.batches.IQStreamBatch
+            )  # Any subclass is fine.
+            spectre_server.core.batches.from_spectrogram(
+                batch_cls,
+                TAG,
+                spectrogram,
+                floor_to_time_range=floor_to_time_range,
             )
 
 
@@ -764,3 +869,91 @@ class TestCallistoBatch:
             # The .3 are e-Callisto conventions.
             assert bintable_hdu.header.get("TFORM1") == "6D8.3"
             assert bintable_hdu.header.get("TFORM2") == "4D8.3"
+
+    def test_floored_times_are_preserved(
+        self,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+    ) -> None:
+        """Batch start times may be floored, and so differ from the true start time of the spectrogram.
+
+        So, check that when we do this the original start time of the spectrogram is preserved.
+        """
+
+        # Set the start datetime of the spectrogram to some delta past what we floor to.
+        time_range = 60
+        delta = 2
+        spectrogram.start_datetime = (
+            spectrogram.start_datetime.astype(datetime.datetime)
+            + datetime.timedelta(seconds=time_range)
+            + datetime.timedelta(seconds=delta)
+        )
+
+        # Create the batch, flooring the start time.
+        callisto_batch_cls = spectre_server.core.batches.CallistoBatch
+        callisto_batch = spectre_server.core.batches.from_spectrogram(
+            callisto_batch_cls, TAG, spectrogram, floor_to_time_range=time_range
+        )
+
+        # Check the batch assumes the correct floored start datetime.
+        assert callisto_batch.start_datetime == spectrogram.start_datetime.astype(
+            datetime.datetime
+        ) - datetime.timedelta(seconds=delta)
+
+        # Write the spectrogram to disk.
+        callisto_batch.write_spectrogram(
+            spectrogram,
+            origin=ORIGIN,
+            instrume=INSTRUME,
+            observer=OBSERVER,
+            object_=OBJECT,
+            telescop=TELESCOP,
+            obsgeo_b=OBSGEO_B,
+            obsgeo_l=OBSGEO_L,
+            obsgeo_h=OBSGEO_H,
+        )
+
+        # Check the original start time of the spectrogram is preserved reading it back...
+        s = callisto_batch.read_spectrogram()
+        assert s.start_datetime == spectrogram.start_datetime
+        # ... and in the keyword values in the FITS file.
+        with astropy.io.fits.open(callisto_batch.fit_file.file_path) as hdulist:
+            primary_hdu: astropy.io.fits.PrimaryHDU = hdulist[0]
+            assert primary_hdu.header.get("DATE-OBS") == "2000/01/25"
+            assert primary_hdu.header.get("DATE-END") == "2000/01/25"
+            assert primary_hdu.header.get("TIME-OBS") == f"01:01:02.000"
+            assert primary_hdu.header.get("TIME-END") == "01:01:03"
+
+    @pytest.mark.parametrize(
+        ("delta"),
+        [
+            (100000),  # Far into the future.
+            (3601),  # Just past our current cut off (1hr)
+            (-10),  # In the past.
+        ],
+    )
+    def test_cant_write_spectrograms_with_invalid_times(
+        self,
+        callisto_batch: spectre_server.core.batches.CallistoBatch,
+        spectrogram: spectre_server.core.spectrograms.Spectrogram,
+        delta: int,
+    ) -> None:
+        """Check that errors are raised when we try and write a spectrogram
+        to a batch but their start times differ too much."""
+
+        # Displace the start time so it becomes invalid.
+        spectrogram.start_datetime = spectrogram.start_datetime.astype(
+            datetime.datetime
+        ) + datetime.timedelta(seconds=delta)
+
+        with pytest.raises(ValueError):
+            callisto_batch.write_spectrogram(
+                spectrogram,
+                origin=ORIGIN,
+                instrume=INSTRUME,
+                observer=OBSERVER,
+                object_=OBJECT,
+                telescop=TELESCOP,
+                obsgeo_b=OBSGEO_B,
+                obsgeo_l=OBSGEO_L,
+                obsgeo_h=OBSGEO_H,
+            )

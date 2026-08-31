@@ -10,6 +10,7 @@ from ._base import (
     parse_batch_file_name,
     parse_batch_file_path,
     from_spectrogram,
+    floor_datetime,
 )
 from ._batches import Batches
 from ._iq_stream import IQMetadata, IQStreamBatch, IQStreamBatchExtension
@@ -26,6 +27,7 @@ __all__ = [
     "parse_batch_file_name",
     "parse_batch_file_path",
     "from_spectrogram",
+    "floor_datetime",
     "Batches",
     "IQMetadata",
     "IQStreamBatch",
